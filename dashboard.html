@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trạm Hỷ - Kênh Quản Lý Nhà Cung Cấp</title>
+    
+    <!-- Tailwind CSS & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blush: '#FDF8F7',
+                            cardBg: '#FFFFFF',
+                            text: '#2A2421',
+                            goldLight: '#F5E6C4',
+                            gold: '#D4AF37',
+                            goldDark: '#AA7C11',
+                            verified: '#1E88E5'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FDF8F7;
+            color: #2A2421;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+        }
+        .blush-glow {
+            box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex">
+
+    <!-- Global Demo Controller Bar -->
+    <div class="fixed bottom-4 right-4 z-[9999] glass rounded-2xl p-4 shadow-xl flex flex-col gap-2 text-xs font-semibold border border-brand-gold/30 max-w-[260px] blush-glow">
+        <div class="flex items-center justify-between border-b border-gray-200/50 pb-1.5">
+            <span class="text-brand-goldDark flex items-center gap-1 serif-title italic text-xs">
+                <span class="material-symbols-outlined text-sm">construction</span> Demo Controller
+            </span>
+            <button onclick="toggleDemoController()" class="text-gray-400 hover:text-brand-text focus:outline-none"><span class="material-symbols-outlined text-sm" id="demo-toggle-icon">keyboard_arrow_down</span></button>
+        </div>
+        <div class="flex flex-col gap-1.5" id="demo-buttons">
+            <a href="index.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1. Trang chủ B2C</a>
+            <a href="marketplace.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">2. Chợ dịch vụ</a>
+            <a href="detail.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">3. Chi tiết & Đặt cọc</a>
+            <a href="dashboard.html" class="px-3 py-2 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 4. Kênh B2B Vendor</a>
+            <a href="invitation.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">5. Tạo thiệp & QR</a>
+            <a href="admin.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">6. Quản trị Admin</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleDemoController() {
+            const btnContainer = document.getElementById('demo-buttons');
+            const icon = document.getElementById('demo-toggle-icon');
+            if (btnContainer.classList.contains('hidden')) {
+                btnContainer.classList.remove('hidden');
+                icon.innerText = 'keyboard_arrow_down';
+            } else {
+                btnContainer.classList.add('hidden');
+                icon.innerText = 'keyboard_arrow_up';
+            }
+        }
+    </script>
+
+    <!-- Sidebar (Left Desk Panel) -->
+    <aside class="w-64 bg-white border-r border-gray-150 h-screen sticky top-0 flex flex-col justify-between p-6">
+        <div>
+            <!-- Sidebar Header -->
+            <div class="flex items-center gap-2.5 mb-8 border-b border-gray-50 pb-4">
+                <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-9 h-9 rounded-full object-cover border border-brand-gold/30">
+                <span class="serif-title text-base font-extrabold italic text-brand-text tracking-wide">Trạm Hỷ B2B</span>
+            </div>
+            
+            <!-- Menu Navigation -->
+            <nav class="space-y-1.5">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-500 rounded-xl hover:bg-brand-blush hover:text-brand-text transition-all">
+                    <span class="material-symbols-outlined text-lg">dashboard</span>
+                    Tổng quan
+                </a>
+                <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 text-xs font-bold text-brand-text bg-brand-blush rounded-xl transition-all border-l-4 border-brand-gold">
+                    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+                    Quản lý Booking
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-500 rounded-xl hover:bg-brand-blush hover:text-brand-text transition-all">
+                    <span class="material-symbols-outlined text-lg">payments</span>
+                    Quản lý Tài chính
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-500 rounded-xl hover:bg-brand-blush hover:text-brand-text transition-all">
+                    <span class="material-symbols-outlined text-lg">storefront</span>
+                    Quản lý Cửa hàng
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-xs font-bold text-gray-500 rounded-xl hover:bg-brand-blush hover:text-brand-text transition-all">
+                    <span class="material-symbols-outlined text-lg">settings</span>
+                    Cài đặt hệ thống
+                </a>
+            </nav>
+        </div>
+
+        <div class="bg-brand-blush p-4 rounded-2xl border border-brand-gold/10">
+            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Đối tác cấp</p>
+            <div class="flex items-center gap-1.5 mt-1">
+                <span class="text-[10px] font-extrabold text-brand-goldDark">Gold Partner</span>
+                <span class="material-symbols-outlined text-xs text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>
+            </div>
+            <p class="text-[8px] text-gray-400 mt-2">Duy trì tích xanh bảo chứng chất lượng thi công.</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-8 overflow-y-auto h-screen">
+        
+        <!-- Top Navigation Bar -->
+        <header class="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+            <div>
+                <h1 class="serif-title text-2xl font-bold text-brand-text">Kênh Nhà Cung Cấp</h1>
+                <p class="text-xs text-gray-400 mt-0.5">Chào mừng đối tác chính thức <strong class="text-brand-text">TuArt Wedding</strong></p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Notifications button -->
+                <button class="relative w-10 h-10 rounded-full border border-gray-150 flex items-center justify-center bg-white hover:bg-brand-blush transition-colors">
+                    <span class="material-symbols-outlined text-xl">notifications</span>
+                    <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+                
+                <!-- Avatar & Storefront Details -->
+                <div class="flex items-center gap-2 border-l border-gray-200 pl-4">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" alt="TuArt Avatar" class="w-10 h-10 rounded-full object-cover shadow-inner">
+                    <div>
+                        <p class="text-xs font-bold text-brand-text">TuArt Hà Nội</p>
+                        <p class="text-[9px] text-green-500 font-bold flex items-center gap-0.5">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Trực tuyến
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats row (4 cards) -->
+        <section class="grid grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-5 rounded-2xl border border-gray-150 shadow-sm flex flex-col justify-between">
+                <div>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Doanh thu khả dụng</p>
+                    <h3 class="text-xl font-bold text-brand-text mt-1" id="stat-revenue">110.000.000đ</h3>
+                </div>
+                <p class="text-[9px] text-green-500 font-semibold mt-4 flex items-center gap-0.5">
+                    <span class="material-symbols-outlined text-xs">trending_up</span> +12% So với tháng trước
+                </p>
+            </div>
+            
+            <div class="bg-white p-5 rounded-2xl border border-gray-150 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-brand-gold/5 rounded-full blur-xl -mr-8 -mt-8"></div>
+                <div class="relative z-10">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Đang tạm giữ bảo chứng</p>
+                    <h3 class="text-xl font-bold text-brand-goldDark mt-1" id="stat-escrow">42.000.000đ</h3>
+                </div>
+                <p class="text-[9px] text-gray-400 mt-4">Cam kết Milestone Payment của Trạm Hỷ</p>
+            </div>
+            
+            <div class="bg-white p-5 rounded-2xl border border-gray-150 shadow-sm flex flex-col justify-between">
+                <div>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Đã giải ngân (Payout)</p>
+                    <h3 class="text-xl font-bold text-brand-text mt-1" id="stat-payout">110.000.000đ</h3>
+                </div>
+                <p class="text-[9px] text-gray-400 mt-4">Tự động rút về ngân hàng liên kết</p>
+            </div>
+            
+            <div class="bg-white p-5 rounded-2xl border border-gray-150 shadow-sm flex flex-col justify-between">
+                <div>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Đơn hàng đang xử lý</p>
+                    <h3 class="text-xl font-bold text-brand-text mt-1" id="stat-active-orders">8 đơn</h3>
+                </div>
+                <p class="text-[9px] text-brand-goldDark font-semibold mt-4">Có đơn cọc mới cần duyệt</p>
+            </div>
+        </section>
+
+        <!-- Kanban Booking Board Section -->
+        <section class="mb-8">
+            <h2 class="serif-title text-lg font-bold text-brand-text mb-4 flex items-center gap-1">
+                <span class="material-symbols-outlined text-brand-gold" style="font-variation-settings: 'FILL' 1;">view_kanban</span> 
+                Bảng Tiến Độ Booking (Kanban Board)
+            </h2>
+            
+            <div class="grid grid-cols-4 gap-4">
+                <!-- Column 1: Chờ duyệt -->
+                <div class="bg-gray-100 rounded-2xl p-4 min-h-[380px] flex flex-col gap-3">
+                    <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                        <span class="text-xs font-bold text-gray-600">CHỜ DUYỆT</span>
+                        <span class="text-[10px] bg-gray-200 px-2 py-0.5 rounded-full font-bold text-gray-600" id="col-count-1">1</span>
+                    </div>
+                    <div id="col-1-cards" class="space-y-3 flex-1 overflow-y-auto">
+                        <!-- Card 1 -->
+                        <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-gray-400">#1084</span>
+                                <span class="text-[8px] bg-red-100 text-red-600 font-bold px-1.5 py-0.5 rounded">NEW</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-brand-text">Nguyễn Văn A</h4>
+                            <p class="text-[9px] text-gray-400">Gói Cát Tường | 12.500.000đ</p>
+                            <p class="text-[9px] text-gray-400">Ngày chụp: 12/07</p>
+                            
+                            <div class="flex gap-2 pt-2 border-t border-gray-50">
+                                <button onclick="rejectOrder('#1084')" class="flex-1 py-1 text-[9px] font-bold bg-gray-100 hover:bg-gray-200 text-gray-600 rounded">Từ chối</button>
+                                <button onclick="acceptOrder('#1084')" class="flex-1 py-1 text-[9px] font-bold gold-gradient text-white rounded">Duyệt đơn</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Đã cọc đợt 1 (30%) -->
+                <div class="bg-gray-100 rounded-2xl p-4 min-h-[380px] flex flex-col gap-3">
+                    <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                        <span class="text-xs font-bold text-brand-goldDark">ĐÃ CỌC ĐỢT 1 (30%)</span>
+                        <span class="text-[10px] bg-brand-gold/20 px-2 py-0.5 rounded-full font-bold text-brand-goldDark" id="col-count-2">1</span>
+                    </div>
+                    <div id="col-2-cards" class="space-y-3 flex-1 overflow-y-auto">
+                        <!-- Card 2 -->
+                        <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-gray-400">#1080</span>
+                                <span class="text-[8px] bg-green-100 text-green-600 font-bold px-1.5 py-0.5 rounded">ĐÃ CỌC 5.4M</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-brand-text">Lê Thị B</h4>
+                            <p class="text-[9px] text-gray-400">Gói Như Ý | 18.000.000đ</p>
+                            <p class="text-[9px] text-gray-400">Đã nhận cọc: 5.400.000đ</p>
+                            
+                            <div class="pt-2 border-t border-gray-50 flex gap-2">
+                                <button onclick="advanceToStage2('#1080')" class="w-full py-1 text-[9px] font-bold bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-goldDark rounded">
+                                    Báo cáo đã chụp xong (Lên đợt 2)
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Dynamic Real-time Booking Card Placeholder -->
+                        <div id="realtime-card-placeholder"></div>
+                    </div>
+                </div>
+
+                <!-- Column 3: Đang thi công/Chụp -->
+                <div class="bg-gray-100 rounded-2xl p-4 min-h-[380px] flex flex-col gap-3">
+                    <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                        <span class="text-xs font-bold text-blue-600">ĐANG THI CÔNG</span>
+                        <span class="text-[10px] bg-blue-100 px-2 py-0.5 rounded-full font-bold text-blue-600" id="col-count-3">1</span>
+                    </div>
+                    <div id="col-3-cards" class="space-y-3 flex-1 overflow-y-auto">
+                        <!-- Card 3 -->
+                        <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-gray-400">#1075</span>
+                                <span class="text-[8px] bg-blue-100 text-blue-600 font-bold px-1.5 py-0.5 rounded">ĐÃ CHỤP - CHỜ DUYỆT</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-brand-text">Trần Đức C</h4>
+                            <p class="text-[9px] text-gray-400">Gói Cát Tường | 12.500.000đ</p>
+                            <p class="text-[9px] text-gray-400">Chụp ngày: 15/07 | Đang chọn ảnh lọc</p>
+                            
+                            <div class="pt-2 border-t border-gray-50">
+                                <button onclick="requestFinalNghiemThu('#1075')" class="w-full py-1 text-[9px] font-bold bg-blue-550 text-blue-600 bg-blue-100 rounded">
+                                    Yêu cầu Nghiệm thu (Đợt cuối 20%)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 4: Chờ nghiệm thu đợt cuối (20%) -->
+                <div class="bg-gray-100 rounded-2xl p-4 min-h-[380px] flex flex-col gap-3">
+                    <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                        <span class="text-xs font-bold text-green-700">CHỜ NGHIỆM THU</span>
+                        <span class="text-[10px] bg-green-100 px-2 py-0.5 rounded-full font-bold text-green-700" id="col-count-4">1</span>
+                    </div>
+                    <div id="col-4-cards" class="space-y-3 flex-1 overflow-y-auto">
+                        <!-- Card 4 -->
+                        <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-gray-400">#1070</span>
+                                <span class="text-[8px] bg-yellow-100 text-yellow-700 font-bold px-1.5 py-0.5 rounded">CHỜ XÁC NHẬN</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-brand-text">Phạm Minh D</h4>
+                            <p class="text-[9px] text-gray-400">Gói Tùy Chọn | 20.000.000đ</p>
+                            <p class="text-[9px] text-gray-400">Nội dung: Đã bàn giao ảnh thô qua Drive</p>
+                            
+                            <div class="pt-2 border-t border-gray-50 flex gap-2">
+                                <button onclick="simulateCustomerNghiemThu('#1070')" class="w-full py-1 text-[9px] font-bold bg-green-600 hover:opacity-95 text-white rounded">
+                                    Xác nhận nghiệm thu (Mô phỏng khách)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transaction & Finance Reconciliation Table -->
+        <section>
+            <h2 class="serif-title text-lg font-bold text-brand-text mb-4 flex items-center gap-1">
+                <span class="material-symbols-outlined text-brand-gold" style="font-variation-settings: 'FILL' 1;">query_stats</span>
+                Bảng Đối Soát Giao Dịch & Khấu Trừ Phí Sàn
+            </h2>
+            
+            <div class="bg-white rounded-2xl border border-gray-150 overflow-hidden shadow-sm">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-gray-550 border-b border-gray-150 text-gray-500 font-bold">
+                            <th class="p-4">Mã Đơn</th>
+                            <th class="p-4">Khách hàng</th>
+                            <th class="p-4">Giá trị đơn</th>
+                            <th class="p-4">Khấu trừ hoa hồng sàn (10%)</th>
+                            <th class="p-4">Thực nhận của Vendor (90%)</th>
+                            <th class="p-4">Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transaction-body">
+                        <!-- Row 1 -->
+                        <tr class="border-b border-gray-50 text-brand-text font-medium">
+                            <td class="p-4 text-gray-400">#1080</td>
+                            <td class="p-4 font-bold">Lê Thị B</td>
+                            <td class="p-4">18.000.000đ</td>
+                            <td class="p-4 text-red-500">-1.800.000đ</td>
+                            <td class="p-4 text-green-600 font-bold">16.200.000đ</td>
+                            <td class="p-4"><span class="px-2 py-0.5 rounded bg-brand-gold/10 text-brand-goldDark font-bold text-[9px]">ĐÃ CỌC ĐỢT 1</span></td>
+                        </tr>
+                        <!-- Row 2 -->
+                        <tr class="border-b border-gray-50 text-brand-text font-medium">
+                            <td class="p-4 text-gray-400">#1068</td>
+                            <td class="p-4 font-bold">Hoàng Văn E</td>
+                            <td class="p-4">9.900.000đ</td>
+                            <td class="p-4 text-red-500">-990.000đ</td>
+                            <td class="p-4 text-green-600 font-bold">8.910.000đ</td>
+                            <td class="p-4"><span class="px-2 py-0.5 rounded bg-green-100 text-green-700 font-bold text-[9px]">ĐÃ HOÀN THÀNH</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Success Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 glass p-4 rounded-2xl shadow-2xl border border-green-300 flex items-start gap-3 z-[99999] hidden max-w-sm">
+        <span class="material-symbols-outlined text-green-600 text-2xl">check_circle</span>
+        <div>
+            <h4 class="text-xs font-bold text-brand-text" id="toast-title">Cập nhật thành công</h4>
+            <p class="text-[10px] text-gray-500 mt-0.5" id="toast-body">Đã cập nhật trạng thái đơn hàng và chuyển ngân thành công.</p>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        function formatMoney(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+        }
+
+        let stats = {
+            revenue: 110000000,
+            escrow: 42000000,
+            payout: 110000000,
+            active: 8
+        };
+
+        window.onload = function() {
+            // Check for real-time booking from detail.html
+            const booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
+            if (booking) {
+                const syncedStatus = localStorage.getItem('tramhy_active_booking_status') || booking.status;
+                booking.status = syncedStatus;
+                showRealtimeBooking(booking);
+            }
+            updateStatsUI();
+        }
+
+        function updateStatsUI() {
+            document.getElementById('stat-revenue').innerText = formatMoney(stats.revenue);
+            document.getElementById('stat-escrow').innerText = formatMoney(stats.escrow);
+            document.getElementById('stat-payout').innerText = formatMoney(stats.payout);
+            document.getElementById('stat-active-orders').innerText = stats.active + " đơn";
+        }
+
+        function showRealtimeBooking(b) {
+            // Remove existing card if any
+            const oldCard = document.getElementById('realtime-card');
+            if (oldCard) oldCard.remove();
+
+            if (b.status === 'completed') {
+                // Add transaction to table
+                const tableBody = document.getElementById('transaction-body');
+                const row = document.getElementById(`row-${b.id.replace('#', '')}`) || document.createElement('tr');
+                row.id = `row-${b.id.replace('#', '')}`;
+                row.className = "border-b border-gray-50 text-brand-text font-medium bg-green-50/20";
+                row.innerHTML = `
+                    <td class="p-4 text-gray-400">${b.id}</td>
+                    <td class="p-4 font-bold">${b.customerName}</td>
+                    <td class="p-4">${formatMoney(b.price)}</td>
+                    <td class="p-4 text-red-500">${formatMoney(-b.price * 0.1)}</td>
+                    <td class="p-4 text-green-600 font-bold">${formatMoney(b.price * 0.9)}</td>
+                    <td class="p-4"><span class="px-2 py-0.5 rounded bg-green-100 text-green-700 font-bold text-[9px]">ĐÃ HOÀN THÀNH</span></td>
+                `;
+                if (!document.getElementById(`row-${b.id.replace('#', '')}`)) {
+                    tableBody.insertBefore(row, tableBody.firstChild);
+                }
+
+                // Adjust stats: disburse all money to vendor
+                stats.escrow = 42000000; // back to baseline
+                stats.revenue = 110000000 + b.price * 0.9;
+                stats.payout = 110000000 + b.price * 0.9;
+                
+                document.getElementById('col-count-2').innerText = "1";
+                document.getElementById('col-count-3').innerText = "1";
+                document.getElementById('col-count-4').innerText = "1";
+                updateStatsUI();
+                return;
+            }
+
+            const card = document.createElement('div');
+            card.id = 'realtime-card';
+            card.className = "bg-white p-3.5 rounded-xl border-2 border-dashed border-brand-gold/45 shadow-sm space-y-2";
+
+            let statusText = '';
+            let btnHtml = '';
+            let columnId = 'col-2-cards';
+
+            if (b.status === 'deposit_paid') {
+                statusText = '<span class="text-[8px] bg-green-100 text-green-600 font-bold px-1.5 py-0.5 rounded">ĐÃ CỌC ĐỢT 1</span>';
+                btnHtml = `
+                    <button onclick="advanceToExecuting('${b.id}')" class="w-full py-1 text-[9px] font-bold bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-goldDark rounded">
+                        Báo cáo đã chụp xong (Lên đợt 2)
+                    </button>
+                `;
+                columnId = 'col-2-cards';
+            } else if (b.status === 'executing') {
+                statusText = '<span class="text-[8px] bg-amber-100 text-amber-700 font-bold px-1.5 py-0.5 rounded">CHỜ KHÁCH CỌC ĐỢT 2</span>';
+                btnHtml = `
+                    <button disabled class="w-full py-1 text-[9px] font-bold bg-gray-100 text-gray-400 rounded cursor-not-allowed">
+                        Chờ khách thanh toán Đợt 2 (50%)
+                    </button>
+                `;
+                columnId = 'col-2-cards';
+            } else if (b.status === 'executing_paid') {
+                statusText = '<span class="text-[8px] bg-blue-100 text-blue-600 font-bold px-1.5 py-0.5 rounded">ĐANG THI CÔNG</span>';
+                btnHtml = `
+                    <button onclick="advanceToToApprove('${b.id}')" class="w-full py-1 text-[9px] font-bold bg-blue-100 text-blue-600 rounded">
+                        Yêu cầu Nghiệm thu (Đợt cuối 20%)
+                    </button>
+                `;
+                columnId = 'col-3-cards';
+            } else if (b.status === 'to_approve') {
+                statusText = '<span class="text-[8px] bg-purple-100 text-purple-600 font-bold px-1.5 py-0.5 rounded">CHỜ NGHIỆM THU</span>';
+                btnHtml = `
+                    <button disabled class="w-full py-1 text-[9px] font-bold bg-gray-100 text-gray-400 rounded cursor-not-allowed">
+                        Chờ khách xác nhận Đợt 3 (20%)
+                    </button>
+                `;
+                columnId = 'col-4-cards';
+            }
+
+            card.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-[9px] font-bold text-brand-goldDark">${b.id}</span>
+                    ${statusText}
+                </div>
+                <h4 class="text-xs font-bold text-brand-text">${b.customerName}</h4>
+                <p class="text-[9px] text-gray-400">${b.package} | ${formatMoney(b.price)}</p>
+                <p class="text-[9px] text-gray-400">Tích lũy ví cọc: ${formatMoney(b.status === 'to_approve' || b.status === 'executing_paid' ? b.price * 0.8 : b.price * 0.3)}</p>
+                <div class="pt-2 border-t border-gray-50 flex gap-2">
+                    ${btnHtml}
+                </div>
+            `;
+
+            // Append to appropriate column
+            const container = document.getElementById(columnId);
+            if (container) {
+                container.appendChild(card);
+            }
+
+            // Update transaction table
+            const tableBody = document.getElementById('transaction-body');
+            const row = document.getElementById(`row-${b.id.replace('#', '')}`) || document.createElement('tr');
+            row.id = `row-${b.id.replace('#', '')}`;
+            row.className = "border-b border-gray-50 text-brand-text font-medium";
+            
+            let badgeText = 'ĐÃ CỌC ĐỢT 1';
+            if (b.status === 'executing_paid') badgeText = 'ĐÃ CỌC ĐỢT 2';
+            else if (b.status === 'to_approve') badgeText = 'CHỜ NGHIỆM THU';
+
+            row.innerHTML = `
+                <td class="p-4 text-gray-400">${b.id}</td>
+                <td class="p-4 font-bold">${b.customerName}</td>
+                <td class="p-4">${formatMoney(b.price)}</td>
+                <td class="p-4 text-red-500">${formatMoney(-b.price * 0.1)}</td>
+                <td class="p-4 text-green-600 font-bold">${formatMoney(b.price * 0.9)}</td>
+                <td class="p-4"><span id="badge-${b.id.replace('#', '')}" class="px-2 py-0.5 rounded bg-brand-gold/10 text-brand-goldDark font-bold text-[9px]">${badgeText}</span></td>
+            `;
+            if (!document.getElementById(`row-${b.id.replace('#', '')}`)) {
+                tableBody.insertBefore(row, tableBody.firstChild);
+            }
+
+            // Adjust statistics based on active escrow amount
+            stats.escrow = 42000000;
+            if (b.status === 'deposit_paid' || b.status === 'executing') stats.escrow += b.price * 0.3;
+            else if (b.status === 'executing_paid' || b.status === 'to_approve') stats.escrow += b.price * 0.8;
+            
+            // Adjust col count indicators
+            document.getElementById('col-count-2').innerText = (b.status === 'deposit_paid' || b.status === 'executing') ? "2" : "1";
+            document.getElementById('col-count-3').innerText = b.status === 'executing_paid' ? "2" : "1";
+            document.getElementById('col-count-4').innerText = b.status === 'to_approve' ? "2" : "1";
+            
+            updateStatsUI();
+        }
+
+        function showToast(title, body) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-body').innerText = body;
+            
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        function acceptOrder(id) {
+            // Approve Nguyễn Văn A
+            showToast("Đã phê duyệt", "Đơn hàng " + id + " đã được xác nhận. Khách hàng nhận được tin nhắn đặt lịch thành công.");
+            // Move to column 2
+            const col1Cards = document.getElementById('col-1-cards');
+            col1Cards.innerHTML = `<div class="text-[10px] text-gray-400 text-center py-6">Không có đơn hàng nào chờ duyệt.</div>`;
+            
+            // Adjust col counters
+            document.getElementById('col-count-1').innerText = "0";
+            
+            // Append card Nguyễn Văn A to column 2 (Mock deposit paid automatically)
+            const col2Cards = document.getElementById('col-2-cards');
+            const newCard = document.createElement('div');
+            newCard.className = "bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm space-y-2";
+            newCard.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-[9px] font-bold text-gray-400">${id}</span>
+                    <span class="text-[8px] bg-green-100 text-green-600 font-bold px-1.5 py-0.5 rounded">ĐÃ CỌC 3.75M</span>
+                </div>
+                <h4 class="text-xs font-bold text-brand-text">Nguyễn Văn A</h4>
+                <p class="text-[9px] text-gray-400">Gói Cát Tường | 12.500.000đ</p>
+                <p class="text-[9px] text-gray-400">Đã nhận cọc: 3.750.000đ</p>
+                <div class="pt-2 border-t border-gray-50 flex gap-2">
+                    <button onclick="advanceToStage2('${id}')" class="w-full py-1 text-[9px] font-bold bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-goldDark rounded">
+                        Báo cáo đã chụp xong (Lên đợt 2)
+                    </button>
+                </div>
+            `;
+            col2Cards.appendChild(newCard);
+            
+            let count2 = parseInt(document.getElementById('col-count-2').innerText) || 1;
+            document.getElementById('col-count-2').innerText = count2 + 1;
+
+            // Add row to table
+            const tableBody = document.getElementById('transaction-body');
+            const row = document.createElement('tr');
+            row.className = "border-b border-gray-50 text-brand-text font-medium";
+            row.innerHTML = `
+                <td class="p-4 text-gray-400">${id}</td>
+                <td class="p-4 font-bold">Nguyễn Văn A</td>
+                <td class="p-4">12.500.000đ</td>
+                <td class="p-4 text-red-500">-1.250.000đ</td>
+                <td class="p-4 text-green-600 font-bold">11.250.000đ</td>
+                <td class="p-4"><span class="px-2 py-0.5 rounded bg-brand-gold/10 text-brand-goldDark font-bold text-[9px]">ĐÃ CỌC ĐỢT 1</span></td>
+            `;
+            tableBody.appendChild(row);
+        }
+
+        function rejectOrder(id) {
+            showToast("Hủy đơn", "Hủy đơn hàng thành công.");
+            const col1Cards = document.getElementById('col-1-cards');
+            col1Cards.innerHTML = `<div class="text-[10px] text-gray-400 text-center py-6">Không có đơn hàng nào chờ duyệt.</div>`;
+            document.getElementById('col-count-1').innerText = "0";
+        }
+
+        function advanceToStage2(id) {
+            showToast("Báo cáo thi công", "Đã cập nhật đơn " + id + " sang chụp/thi công thành công. Khách hàng đã được gửi yêu cầu xác nhận giải ngân đợt 2.");
+            
+            // Remove card from column 2
+            if (id === '#1085') {
+                document.getElementById('realtime-card').remove();
+            } else {
+                // simple removal or refresh
+                // for mock purposes, let's just update counts
+            }
+
+            // Append card to column 3
+            const col3Cards = document.getElementById('col-3-cards');
+            const newCard = document.createElement('div');
+            newCard.className = "bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm space-y-2";
+            newCard.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-[9px] font-bold text-gray-400">${id}</span>
+                    <span class="text-[8px] bg-blue-100 text-blue-600 font-bold px-1.5 py-0.5 rounded">ĐANG THI CÔNG</span>
+                </div>
+                <h4 class="text-xs font-bold text-brand-text">${id === '#1085' ? 'Nguyễn Minh Quân' : 'Lê Thị B'}</h4>
+                <p class="text-[9px] text-gray-400">${id === '#1085' ? 'Gói Cát Tường | 12.5tr' : 'Gói Như Ý | 18tr'}</p>
+                <div class="pt-2 border-t border-gray-50">
+                    <button onclick="requestFinalNghiemThu('${id}')" class="w-full py-1 text-[9px] font-bold bg-blue-100 text-blue-600 rounded">
+                        Yêu cầu Nghiệm thu (Đợt cuối 20%)
+                    </button>
+                </div>
+            `;
+            col3Cards.appendChild(newCard);
+
+            // Update column counts
+            let count2 = parseInt(document.getElementById('col-count-2').innerText) || 1;
+            document.getElementById('col-count-2').innerText = Math.max(0, count2 - 1);
+            let count3 = parseInt(document.getElementById('col-count-3').innerText) || 1;
+            document.getElementById('col-count-3').innerText = count3 + 1;
+        }
+
+        function requestFinalNghiemThu(id) {
+            showToast("Yêu cầu nghiệm thu", "Đã gửi thông báo nghiệm thu đợt cuối tới khách hàng của đơn " + id);
+        }
+
+        function simulateCustomerNghiemThu(id) {
+            // Customer approved final deliverables! 
+            // Disburse all pending funds to vendor: reduce escrow, increase revenue & payouts.
+            showToast("Nghiem thu thành công!", "Khách hàng của đơn " + id + " đã đồng ý nghiệm thu toàn bộ. 20.000.000 VNĐ đã được giải ngân về ví khả dụng.");
+
+            // Remove card from Column 4
+            const col4Cards = document.getElementById('col-4-cards');
+            col4Cards.innerHTML = `<div class="text-[10px] text-gray-400 text-center py-6">Không có đơn hàng nào chờ nghiệm thu.</div>`;
+            document.getElementById('col-count-4').innerText = "0";
+
+            // Recalculate stats: disburse 20tr (minus 10% fee = 18tr to vendor)
+            stats.escrow -= 20000000 * 0.9;
+            stats.revenue += 20000000 * 0.9;
+            stats.payout += 20000000 * 0.9;
+            stats.active -= 1;
+
+            updateStatsUI();
+
+            // Update row in table
+            // For row #1070:
+            const tableBody = document.getElementById('transaction-body');
+            const row = document.createElement('tr');
+            row.className = "border-b border-gray-50 text-brand-text font-medium bg-green-50/30";
+            row.innerHTML = `
+                <td class="p-4 text-gray-400">${id}</td>
+                <td class="p-4 font-bold">Phạm Minh D</td>
+                <td class="p-4">20.000.000đ</td>
+                <td class="p-4 text-red-500">-2.000.000đ</td>
+                <td class="p-4 text-green-600 font-bold">18.000.000đ</td>
+                <td class="p-4"><span class="px-2 py-0.5 rounded bg-green-100 text-green-700 font-bold text-[9px]">ĐÃ HOÀN THÀNH</span></td>
+            `;
+            tableBody.appendChild(row);
+        }
+
+        function advanceToExecuting(id) {
+            localStorage.setItem('tramhy_active_booking_status', 'executing');
+            showToast("Báo cáo thi công", "Đã cập nhật trạng thái đã chụp xong. Khách hàng đã nhận được yêu cầu giải ngân Đợt 2 (50%)!");
+            const booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
+            if (booking) {
+                booking.status = 'executing';
+                showRealtimeBooking(booking);
+
+                // Sync to system bookings
+                let sysBookings = JSON.parse(localStorage.getItem('tramhy_system_bookings'));
+                if (sysBookings) {
+                    const idx = sysBookings.findIndex(b => b.id === booking.id);
+                    if (idx !== -1) {
+                        sysBookings[idx].status = 'executing';
+                        sysBookings[idx].stages.s2 = 'executing';
+                        localStorage.setItem('tramhy_system_bookings', JSON.stringify(sysBookings));
+                    }
+                }
+            }
+        }
+
+        function advanceToToApprove(id) {
+            localStorage.setItem('tramhy_active_booking_status', 'to_approve');
+            showToast("Yêu cầu nghiệm thu", "Đã nộp sản phẩm album hoàn thành & gửi yêu cầu nghiệm thu Đợt cuối (20%)!");
+            const booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
+            if (booking) {
+                booking.status = 'to_approve';
+                showRealtimeBooking(booking);
+
+                // Sync to system bookings
+                let sysBookings = JSON.parse(localStorage.getItem('tramhy_system_bookings'));
+                if (sysBookings) {
+                    const idx = sysBookings.findIndex(b => b.id === booking.id);
+                    if (idx !== -1) {
+                        sysBookings[idx].status = 'to_approve';
+                        sysBookings[idx].stages.s3 = 'executing';
+                        localStorage.setItem('tramhy_system_bookings', JSON.stringify(sysBookings));
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

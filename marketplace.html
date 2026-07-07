@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trạm Hỷ - Chợ Dịch Vụ Cưới Minh Bạch</title>
+    
+    <!-- Tailwind CSS & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blush: '#FDF8F7',
+                            cardBg: '#FFFFFF',
+                            text: '#2A2421',
+                            goldLight: '#F5E6C4',
+                            gold: '#D4AF37',
+                            goldDark: '#AA7C11',
+                            verified: '#1E88E5'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FDF8F7;
+            color: #2A2421;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+        }
+        .blush-glow {
+            box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-24 relative">
+
+    <!-- Global Demo Controller Bar -->
+    <div class="fixed bottom-4 right-4 z-[9999] glass rounded-2xl p-4 shadow-xl flex flex-col gap-2 text-xs font-semibold border border-brand-gold/30 max-w-[260px] blush-glow">
+        <div class="flex items-center justify-between border-b border-gray-200/50 pb-1.5">
+            <span class="text-brand-goldDark flex items-center gap-1 serif-title italic text-xs">
+                <span class="material-symbols-outlined text-sm">construction</span> Demo Controller
+            </span>
+            <button onclick="toggleDemoController()" class="text-gray-400 hover:text-brand-text focus:outline-none"><span class="material-symbols-outlined text-sm" id="demo-toggle-icon">keyboard_arrow_down</span></button>
+        </div>
+        <div class="flex flex-col gap-1.5" id="demo-buttons">
+            <a href="index.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1. Trang chủ B2C</a>
+            <a href="marketplace.html" class="px-3 py-2 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 2. Chợ dịch vụ</a>
+            <a href="detail.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">3. Chi tiết & Đặt cọc</a>
+            <a href="bookings.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">4. Lịch hẹn B2C</a>
+            <a href="dashboard.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">5. Kênh B2B Vendor</a>
+            <a href="invitation.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">6. Tạo thiệp & QR</a>
+            <a href="admin.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">7. Quản trị Admin</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleDemoController() {
+            const btnContainer = document.getElementById('demo-buttons');
+            const icon = document.getElementById('demo-toggle-icon');
+            if (btnContainer.classList.contains('hidden')) {
+                btnContainer.classList.remove('hidden');
+                icon.innerText = 'keyboard_arrow_down';
+            } else {
+                btnContainer.classList.add('hidden');
+                icon.innerText = 'keyboard_arrow_up';
+            }
+        }
+    </script>
+
+    <!-- Mobile Screen Frame -->
+    <div class="max-w-[480px] mx-auto bg-brand-blush min-h-screen shadow-2xl relative border-x border-gray-100 flex flex-col justify-between">
+        
+        <div>
+            <!-- Sticky Top Header & Navigation -->
+            <header class="sticky top-0 z-50 glass border-b border-brand-blush/40 shadow-sm">
+                <!-- Top Branding Line -->
+                <div class="px-4 py-2 flex items-center justify-between border-b border-gray-50/50 bg-white/50">
+                    <div class="flex items-center gap-2">
+                        <a href="index.html" class="material-symbols-outlined text-brand-text text-lg">arrow_back</a>
+                        <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-6 h-6 rounded-full object-cover border border-brand-gold/30">
+                        <h2 class="serif-title font-extrabold italic text-sm text-brand-text">Tìm kiếm dịch vụ</h2>
+                    </div>
+                </div>
+                
+                <!-- Navigation Tabs (Tìm kiếm B2C Active) -->
+                <nav class="px-4 py-2 flex justify-between items-center bg-white/80 border-b border-gray-50/50">
+                    <a href="index.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                        <span class="material-symbols-outlined text-lg">home</span>
+                        <span class="text-[9px] font-medium">Trang chủ</span>
+                    </a>
+                    <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark">
+                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">search</span>
+                        <span class="text-[9px] font-bold">Tìm kiếm</span>
+                    </a>
+                    <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                        <span class="material-symbols-outlined text-lg">calendar_month</span>
+                        <span class="text-[9px] font-medium">Lịch hẹn</span>
+                    </a>
+                    <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                        <span class="material-symbols-outlined text-lg">mail</span>
+                        <span class="text-[9px] font-medium">Thiệp cưới</span>
+                    </a>
+                </nav>
+
+                <!-- Search Inputs Group (Directly below Nav inside sticky header) -->
+                <div class="px-4 py-2 bg-white">
+                    <div class="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-1.5 border border-gray-200">
+                        <span class="material-symbols-outlined text-gray-400 text-base">search</span>
+                        <input type="text" id="search-input" oninput="filterVendors()" class="flex-1 bg-transparent text-xs font-semibold focus:outline-none text-brand-text" placeholder="Tìm tên studio, decor, nhà cung cấp...">
+                        <span class="material-symbols-outlined text-brand-gold text-base cursor-pointer" onclick="clearSearch()">close</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Category Pills (Horizontal Scroll) -->
+            <section class="px-4 py-3 bg-white border-b border-gray-100 overflow-x-auto flex gap-2 no-scrollbar">
+                <button onclick="selectCategory('All')" id="cat-All" class="px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm bg-brand-gold text-white border border-brand-gold">Tất cả</button>
+                <button onclick="selectCategory('Studio')" id="cat-Studio" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white">📸 Studio ảnh</button>
+                <button onclick="selectCategory('Decor')" id="cat-Decor" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white">🎀 Trang trí</button>
+                <button onclick="selectCategory('Makeup')" id="cat-Makeup" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white">👗 Makeup</button>
+                <button onclick="selectCategory('Nhà hàng')" id="cat-Nhà hàng" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white">🍽️ Nhà hàng</button>
+            </section>
+
+            <!-- Interactive Filters (GPS, Price, Verified Checkbox) -->
+            <section class="px-4 py-3 flex justify-between items-center bg-brand-blush border-b border-gray-100">
+                <div class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-brand-gold text-base" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                    <label class="text-[10px] font-bold text-brand-text cursor-pointer flex items-center gap-1">
+                        <input type="checkbox" id="verified-only" onchange="filterVendors()" class="rounded border-gray-300 text-brand-gold focus:ring-brand-gold">
+                        Chỉ tích xanh bảo chứng
+                    </label>
+                </div>
+                
+                <div class="flex gap-2">
+                    <select id="price-sort" onchange="filterVendors()" class="bg-white border border-gray-200 rounded-lg px-2 py-1 text-[10px] font-semibold text-brand-text focus:outline-none">
+                        <option value="default">Giá mặc định</option>
+                        <option value="low-high">Giá: Thấp -> Cao</option>
+                        <option value="high-low">Giá: Cao -> Thấp</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Active Budget Indicator (From AI Planner) -->
+            <section id="budget-badge" class="px-4 py-2 bg-brand-gold/10 border-b border-brand-gold/15 hidden flex justify-between items-center">
+                <div class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-brand-gold text-sm" style="font-variation-settings: 'FILL' 1;">neurology</span>
+                    <span class="text-[9px] font-bold text-brand-goldDark">Bộ lọc AI: Ngân sách phù hợp khoảng <span id="budget-badge-val">150.000.000đ</span></span>
+                </div>
+                <button onclick="resetBudgetFilter()" class="text-[8px] uppercase font-bold text-red-500 hover:underline">Xóa lọc</button>
+            </section>
+
+            <!-- Vendor List Grid -->
+            <section class="p-4">
+                <div id="vendor-grid" class="grid grid-cols-2 gap-3.5">
+                    <!-- Cards will be populated dynamically -->
+                </div>
+                
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden flex flex-col items-center justify-center py-16 text-center">
+                    <span class="material-symbols-outlined text-gray-300 text-5xl mb-2">find_in_page</span>
+                    <p class="text-xs font-bold text-gray-500">Không tìm thấy nhà cung cấp phù hợp</p>
+                    <p class="text-[10px] text-gray-400 mt-1">Vui lòng điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 border-t border-gray-100 py-6 text-center text-[10px] text-gray-400 bg-white">
+            <p>© 2026 Trạm Hỷ. Nền tảng bảo chứng công nghệ cưới hỏi hàng đầu Việt Nam.</p>
+        </footer>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        const allVendors = [
+            {
+                id: 'tuart',
+                name: 'TuArt Wedding',
+                category: 'Studio',
+                price: 9900000,
+                rating: 4.9,
+                reviews: 128,
+                verified: true,
+                location: 'Hai Bà Trưng, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'mimosa',
+                name: 'Mimosa Wedding',
+                category: 'Studio',
+                price: 7500000,
+                rating: 4.8,
+                reviews: 96,
+                verified: true,
+                location: 'Thanh Xuân, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'storyteller',
+                name: '7799 Storyteller',
+                category: 'Decor',
+                price: 25000000,
+                rating: 4.9,
+                reviews: 128,
+                verified: true,
+                location: 'Hoàn Kiếm, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'phidiep',
+                name: 'Phi Điệp Wedding',
+                category: 'Decor',
+                price: 15000000,
+                rating: 4.7,
+                reviews: 54,
+                verified: true,
+                location: 'Ba Đình, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'nupakachi',
+                name: 'Nupakachi Studio',
+                category: 'Studio',
+                price: 15000000,
+                rating: 4.9,
+                reviews: 42,
+                verified: true,
+                location: 'Hoàn Kiếm, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1507504038482-7621c379a64f?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'greenwedding',
+                name: 'Green Wedding',
+                category: 'Studio',
+                price: 8500000,
+                rating: 4.7,
+                reviews: 54,
+                verified: false,
+                location: 'Tây Hồ, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1481653125770-b78c206c59d4?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'maido',
+                name: 'Mai Đỗ Makeup Academy',
+                category: 'Makeup',
+                price: 3500000,
+                rating: 4.9,
+                reviews: 84,
+                verified: true,
+                location: 'Cầu Giấy, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'bulnguyen',
+                name: 'Bul Nguyễn Makeup Academy',
+                category: 'Makeup',
+                price: 4500000,
+                rating: 4.8,
+                reviews: 62,
+                verified: true,
+                location: 'Đống Đa, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'callabridal',
+                name: 'Calla Bridal',
+                category: 'Makeup',
+                price: 18000000,
+                rating: 4.9,
+                reviews: 154,
+                verified: true,
+                location: 'Hoàn Kiếm, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'trongdong',
+                name: 'Trống Đồng Palace',
+                category: 'Nhà hàng',
+                price: 85000000,
+                rating: 4.8,
+                reviews: 210,
+                verified: true,
+                location: 'Tây Hồ, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'lamourvenue',
+                name: 'L\'Amour Wedding Gallery',
+                category: 'Nhà hàng',
+                price: 120000000,
+                rating: 4.9,
+                reviews: 95,
+                verified: true,
+                location: 'Mỹ Đình, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=300'
+            },
+            {
+                id: 'melia',
+                name: 'Melia Hanoi Venue',
+                category: 'Nhà hàng',
+                price: 350000000,
+                rating: 4.9,
+                reviews: 52,
+                verified: true,
+                location: 'Hoàn Kiếm, Hà Nội',
+                image: 'https://images.unsplash.com/photo-1549417229-aa67d3263c09?auto=format&fit=crop&q=80&w=300'
+            }
+        ];
+
+        let selectedCategory = 'All';
+        let filterBudget = null;
+
+        function formatMoney(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+        }
+
+        // Initialize parameters from URL or localStorage
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const catParam = urlParams.get('category');
+            const budgetParam = urlParams.get('budget') || localStorage.getItem('tramhy_selected_budget');
+            const locParam = urlParams.get('location');
+
+            if (catParam) {
+                selectedCategory = catParam;
+            }
+
+            if (budgetParam) {
+                filterBudget = parseFloat(budgetParam);
+                document.getElementById('budget-badge').classList.remove('hidden');
+                document.getElementById('budget-badge-val').innerText = formatMoney(filterBudget);
+            }
+
+            if (locParam) {
+                document.getElementById('search-input').value = locParam;
+            }
+
+            updateCategoryPills();
+            filterVendors();
+        }
+
+        function updateCategoryPills() {
+            const cats = ['All', 'Studio', 'Decor', 'Makeup', 'Nhà hàng'];
+            cats.forEach(c => {
+                const el = document.getElementById(`cat-${c}`);
+                if (!el) return;
+                if (c === selectedCategory) {
+                    el.className = "px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm bg-brand-gold text-white border border-brand-gold";
+                } else {
+                    el.className = "px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white";
+                }
+            });
+        }
+
+        function selectCategory(cat) {
+            selectedCategory = cat;
+            updateCategoryPills();
+            filterVendors();
+        }
+
+        function resetBudgetFilter() {
+            filterBudget = null;
+            localStorage.removeItem('tramhy_selected_budget');
+            document.getElementById('budget-badge').classList.add('hidden');
+            filterVendors();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            filterVendors();
+        }
+
+        function filterVendors() {
+            // Check greenwedding verification override state
+            const greenVerified = localStorage.getItem('tramhy_vendor_greenwedding_verified') === 'true';
+            const greenWedding = allVendors.find(v => v.id === 'greenwedding');
+            if (greenWedding) {
+                greenWedding.verified = greenVerified;
+            }
+
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const verifiedOnly = document.getElementById('verified-only').checked;
+            const priceSort = document.getElementById('price-sort').value;
+
+            let vendors = [...allVendors];
+
+            // 1. Category Filter
+            if (selectedCategory !== 'All') {
+                vendors = vendors.filter(v => v.category === selectedCategory);
+            }
+
+            // 2. Text Search
+            if (query !== '') {
+                vendors = vendors.filter(v => v.name.toLowerCase().includes(query) || v.location.toLowerCase().includes(query));
+            }
+
+            // 3. Verified Toggle
+            if (verifiedOnly) {
+                vendors = vendors.filter(v => v.verified);
+            }
+
+            // 4. Budget Constraint (Filters packages that are less than or equal to their planned budget shares)
+            if (filterBudget) {
+                vendors = vendors.filter(v => {
+                    if (v.category === 'Studio' && v.price > filterBudget * 0.22) return false;
+                    if (v.category === 'Decor' && v.price > filterBudget * 0.25) return false;
+                    if (v.category === 'Makeup' && v.price > filterBudget * 0.15) return false;
+                    if (v.category === 'Nhà hàng' && v.price > filterBudget * 0.60) return false;
+                    return true;
+                });
+            }
+
+            // 5. Price Sort
+            if (priceSort === 'low-high') {
+                vendors.sort((a, b) => a.price - b.price);
+            } else if (priceSort === 'high-low') {
+                vendors.sort((a, b) => b.price - a.price);
+            }
+
+            renderVendors(vendors);
+        }
+
+        function renderVendors(vendors) {
+            const grid = document.getElementById('vendor-grid');
+            const empty = document.getElementById('empty-state');
+            grid.innerHTML = '';
+
+            if (vendors.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            vendors.forEach(v => {
+                // Direct link to detail.html for TuArt, other cards can just mock-link to detail.html as well
+                const card = document.createElement('a');
+                card.href = 'detail.html';
+                card.className = "bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition-all border border-gray-100 flex flex-col justify-between";
+                
+                card.innerHTML = `
+                    <div class="h-32 overflow-hidden relative">
+                        <img src="${v.image}" alt="${v.name}" class="w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[8px] font-bold text-brand-goldDark">
+                            <span class="material-symbols-outlined text-[8px]" style="font-variation-settings: 'FILL' 1;">star</span> ${v.rating}
+                        </div>
+                        ${v.verified ? `
+                        <div class="absolute top-2 left-2 bg-gradient-to-r from-brand-gold to-brand-goldDark text-white px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[7px] font-extrabold uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-[7px]">military_tech</span> Choice 2026
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="p-3">
+                        <div class="flex items-center gap-0.5">
+                            <h4 class="text-xs font-bold text-brand-text truncate flex-1">${v.name}</h4>
+                            ${v.verified ? `<span class="material-symbols-outlined text-xs text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>` : ''}
+                        </div>
+                        <p class="text-[9px] text-gray-400 mt-0.5">${v.location}</p>
+                        <div class="flex justify-between items-center mt-2 border-t border-gray-50 pt-1.5">
+                            <span class="text-[9px] text-gray-400">Trọn gói từ</span>
+                            <span class="text-xs font-bold text-brand-goldDark">${formatMoney(v.price)}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

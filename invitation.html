@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trạm Hỷ - Thiết Kế Thiệp Cưới Online & QR</title>
+    
+    <!-- Tailwind CSS & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blush: '#FDF8F7',
+                            cardBg: '#FFFFFF',
+                            text: '#2A2421',
+                            goldLight: '#F5E6C4',
+                            gold: '#D4AF37',
+                            goldDark: '#AA7C11',
+                            verified: '#1E88E5'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FDF8F7;
+            color: #2A2421;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+        }
+        .blush-glow {
+            box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-24 relative">
+
+    <!-- Global Demo Controller Bar -->
+    <div class="fixed bottom-4 right-4 z-[9999] glass rounded-2xl p-4 shadow-xl flex flex-col gap-2 text-xs font-semibold border border-brand-gold/30 max-w-[260px] blush-glow">
+        <div class="flex items-center justify-between border-b border-gray-200/50 pb-1.5">
+            <span class="text-brand-goldDark flex items-center gap-1 serif-title italic text-xs">
+                <span class="material-symbols-outlined text-sm">construction</span> Demo Controller
+            </span>
+            <button onclick="toggleDemoController()" class="text-gray-400 hover:text-brand-text focus:outline-none"><span class="material-symbols-outlined text-sm" id="demo-toggle-icon">keyboard_arrow_down</span></button>
+        </div>
+        <div class="flex flex-col gap-1.5" id="demo-buttons">
+            <a href="index.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1. Trang chủ B2C</a>
+            <a href="marketplace.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">2. Chợ dịch vụ</a>
+            <a href="detail.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">3. Chi tiết & Đặt cọc</a>
+            <a href="bookings.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">4. Lịch hẹn B2C</a>
+            <a href="dashboard.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">5. Kênh B2B Vendor</a>
+            <a href="invitation.html" class="px-3 py-2 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 6. Tạo thiệp & QR</a>
+            <a href="admin.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">7. Quản trị Admin</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleDemoController() {
+            const btnContainer = document.getElementById('demo-buttons');
+            const icon = document.getElementById('demo-toggle-icon');
+            if (btnContainer.classList.contains('hidden')) {
+                btnContainer.classList.remove('hidden');
+                icon.innerText = 'keyboard_arrow_down';
+            } else {
+                btnContainer.classList.add('hidden');
+                icon.innerText = 'keyboard_arrow_up';
+            }
+        }
+    </script>
+
+    <!-- Mobile Frame -->
+    <div class="max-w-[480px] mx-auto bg-brand-blush min-h-screen shadow-2xl relative border-x border-gray-100 flex flex-col justify-between">
+        
+        <div>
+            <!-- Sticky Top Header & Navigation -->
+            <header class="sticky top-0 z-50 glass border-b border-brand-blush/40 shadow-sm">
+                <!-- Top Branding Line -->
+                <div class="px-4 py-2 flex items-center justify-between border-b border-gray-50/50 bg-white/50">
+                    <div class="flex items-center gap-2">
+                        <a href="index.html" class="material-symbols-outlined text-brand-text text-lg">arrow_back</a>
+                        <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-6 h-6 rounded-full object-cover border border-brand-gold/30">
+                        <span class="serif-title font-extrabold italic text-sm text-brand-text">Tạo Thiệp Cưới & QR</span>
+                    </div>
+                </div>
+                
+                <!-- Navigation Tabs (Thiệp cưới B2C Active) -->
+                <nav class="px-4 py-2 flex justify-between items-center bg-white/80">
+                    <a href="index.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                        <span class="material-symbols-outlined text-lg">home</span>
+                        <span class="text-[9px] font-medium">Trang chủ</span>
+                    </a>
+                    <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                        <span class="material-symbols-outlined text-lg">search</span>
+                        <span class="text-[9px] font-medium">Tìm kiếm</span>
+                    </a>
+                    <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                        <span class="material-symbols-outlined text-lg">calendar_month</span>
+                        <span class="text-[9px] font-medium">Lịch hẹn</span>
+                    </a>
+                    <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark">
+                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">mail</span>
+                        <span class="text-[9px] font-bold">Thiệp cưới</span>
+                    </a>
+                </nav>
+            </header>
+
+            <!-- Mode Selector (Edit Mode vs Guest View Mode) -->
+            <div id="mode-tabs" class="px-4 mt-4 hidden">
+                <div class="bg-white rounded-xl p-1 flex gap-1 border border-gray-100 shadow-sm text-xs font-bold text-gray-400">
+                    <button onclick="toggleViewMode('edit')" id="tab-edit" class="flex-1 py-2 rounded-lg text-brand-gold bg-brand-gold/10">⚙️ Thiết kế thiệp</button>
+                    <button onclick="toggleViewMode('preview')" id="tab-preview" class="flex-1 py-2 rounded-lg hover:text-brand-text transition-colors">👁️ Xem thiệp khách nhận</button>
+                </div>
+            </div>
+
+            <!-- EDITING FORM CONTAINER -->
+            <div id="editor-section" class="px-4 mt-4 space-y-4">
+                
+                <!-- Template Selector (WeddingWire inspired) -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-2">
+                    <h3 class="serif-title text-[11px] font-bold text-brand-text border-b border-gray-50 pb-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-brand-gold text-base">palette</span> Chọn phong cách mẫu thiệp
+                    </h3>
+                    <div class="grid grid-cols-4 gap-2 pt-1">
+                        <button onclick="selectTemplate('gold')" id="tpl-gold" class="flex flex-col items-center gap-1 border-2 border-brand-gold rounded-xl p-1 bg-brand-blush">
+                            <div class="w-full h-8 rounded bg-[#FCF5F3] border border-brand-gold/30"></div>
+                            <span class="text-[8px] font-bold text-brand-text">Champagne</span>
+                        </button>
+                        <button onclick="selectTemplate('red')" id="tpl-red" class="flex flex-col items-center gap-1 border-2 border-transparent hover:border-gray-200 rounded-xl p-1">
+                            <div class="w-full h-8 rounded bg-[#991B1B]"></div>
+                            <span class="text-[8px] font-medium text-gray-500">Đỏ hồng</span>
+                        </button>
+                        <button onclick="selectTemplate('green')" id="tpl-green" class="flex flex-col items-center gap-1 border-2 border-transparent hover:border-gray-200 rounded-xl p-1">
+                            <div class="w-full h-8 rounded bg-[#064E3B]"></div>
+                            <span class="text-[8px] font-medium text-gray-500">Xanh lá</span>
+                        </button>
+                        <button onclick="selectTemplate('pink')" id="tpl-pink" class="flex flex-col items-center gap-1 border-2 border-transparent hover:border-gray-200 rounded-xl p-1">
+                            <div class="w-full h-8 rounded bg-[#FDF2F8] border border-pink-200"></div>
+                            <span class="text-[8px] font-medium text-gray-500">Hồng phấn</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Wedding Information Form -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-3">
+                    <h3 class="serif-title text-sm font-bold text-brand-text border-b border-gray-50 pb-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-brand-gold text-base">edit_note</span> 1. Thông tin cô dâu chú rể
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[9px] font-bold text-gray-400 uppercase">Tên Chú Rể</label>
+                            <input type="text" id="input-groom" oninput="updateCardPreview()" value="Minh Quân" class="w-full bg-brand-blush rounded-xl px-3 py-2 text-xs font-bold focus:outline-none border border-gray-150 text-brand-text">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-gray-400 uppercase">Tên Cô Dâu</label>
+                            <input type="text" id="input-bride" oninput="updateCardPreview()" value="Khánh Linh" class="w-full bg-brand-blush rounded-xl px-3 py-2 text-xs font-bold focus:outline-none border border-gray-150 text-brand-text">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[9px] font-bold text-gray-400 uppercase">Ngày cưới</label>
+                            <input type="date" id="input-date" oninput="updateCardPreview()" value="2026-10-10" class="w-full bg-brand-blush rounded-xl px-3 py-2 text-xs font-bold focus:outline-none border border-gray-150 text-brand-text">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-gray-400 uppercase">Giờ làm lễ</label>
+                            <input type="text" id="input-time" oninput="updateCardPreview()" value="11:00" class="w-full bg-brand-blush rounded-xl px-3 py-2 text-xs font-bold focus:outline-none border border-gray-150 text-brand-text" placeholder="Ví dụ: 11:00">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[9px] font-bold text-gray-400 uppercase">Địa điểm tổ chức</label>
+                        <input type="text" id="input-location" oninput="updateCardPreview()" value="Trung tâm Hội nghị Tiệc cưới L'Amour, Hà Nội" class="w-full bg-brand-blush rounded-xl px-3 py-2 text-xs font-bold focus:outline-none border border-gray-150 text-brand-text">
+                    </div>
+                </div>
+
+                <!-- Step 2: Bank QR / RSVP Config -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-3">
+                    <h3 class="serif-title text-sm font-bold text-brand-text border-b border-gray-50 pb-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-brand-gold text-base">qr_code_2</span> 2. Tích hợp QR Mừng Cưới / RSVP
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[9px] font-bold text-gray-400 uppercase">Tên Ngân hàng</label>
+                            <select id="input-bank" onchange="updateCardPreview()" class="w-full bg-brand-blush rounded-xl px-3 py-2 text-xs font-bold focus:outline-none border border-gray-150 text-brand-text">
+                                <option value="Vietcombank">Vietcombank</option>
+                                <option value="MB Bank">MB Bank</option>
+                                <option value="Techcombank">Techcombank</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-gray-400 uppercase">Số tài khoản</label>
+                            <input type="text" id="input-account" oninput="updateCardPreview()" value="19036789999" class="w-full bg-brand-blush rounded-xl px-3 py-2 text-xs font-bold focus:outline-none border border-gray-150 text-brand-text">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Card Preview Container -->
+                <div class="bg-white rounded-2xl p-5 shadow-lg border border-brand-gold/20 relative overflow-hidden blush-glow">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[9px] bg-brand-gold/10 text-brand-goldDark px-2 py-1 rounded-full font-bold">Xem trước thiệp cưới thiết kế</span>
+                        <span class="material-symbols-outlined text-brand-gold text-lg">preview</span>
+                    </div>
+
+                    <!-- Visual Wedding Card Preview -->
+                    <div id="preview-card-bg" class="border-2 border-brand-gold/40 rounded-xl p-6 bg-[#FCF5F3] relative overflow-hidden text-center flex flex-col justify-between items-center min-h-[360px]">
+                        <!-- Decorative Corners -->
+                        <div class="absolute top-2 left-2 w-6 h-6 border-t-2 border-l-2 border-brand-gold/40"></div>
+                        <div class="absolute top-2 right-2 w-6 h-6 border-t-2 border-r-2 border-brand-gold/40"></div>
+                        <div class="absolute bottom-2 left-2 w-6 h-6 border-b-2 border-l-2 border-brand-gold/40"></div>
+                        <div class="absolute bottom-2 right-2 w-6 h-6 border-b-2 border-r-2 border-brand-gold/40"></div>
+                        
+                        <div class="space-y-1.5 mt-2">
+                            <span class="text-[9px] font-bold text-brand-goldDark tracking-widest uppercase card-title">Trân trọng kính mời</span>
+                            <div class="flex items-center justify-center gap-1.5 py-2">
+                                <span class="serif-title text-base font-bold text-brand-text card-groom" id="preview-groom">Minh Quân</span>
+                                <span class="text-brand-gold text-sm card-heart">❤</span>
+                                <span class="serif-title text-base font-bold text-brand-text card-bride" id="preview-bride">Khánh Linh</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 py-4 flex flex-col items-center">
+                            <p class="text-[9px] font-medium text-gray-500 uppercase tracking-wider card-label">Hôn lễ cử hành vào lúc</p>
+                            <p class="serif-title text-sm font-bold text-brand-goldDark card-date" id="preview-time-date">11:00 | 10/10/2026</p>
+                            <p class="text-[9px] text-gray-400 max-w-[200px] card-loc" id="preview-location">Trung tâm Hội nghị Tiệc cưới L'Amour, Hà Nội</p>
+                        </div>
+
+                        <!-- Real Generated QR Code -->
+                        <div class="bg-white p-2 rounded-xl border border-brand-gold/20 shadow-inner flex flex-col items-center gap-1 mb-2">
+                            <img id="wedding-qr" src="" class="w-24 h-24 object-cover rounded-md" alt="Wedding QR">
+                            <span class="text-[8px] font-extrabold text-brand-goldDark card-qrtext">QUÉT QR GỬI MỪNG CƯỚI / RSVP</span>
+                        </div>
+                    </div>
+
+                    <button onclick="publishInvitation()" class="w-full mt-4 gold-gradient hover:opacity-95 text-white text-xs font-bold py-3.5 rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-sm">publish</span> Xuất bản & Sao chép liên kết chia sẻ
+                    </button>
+                </div>
+            </div>
+
+            <!-- GUEST INVITATION PREVIEW VIEW (Only shown when previewing or URL query has param) -->
+            <div id="guest-preview-section" class="px-4 mt-4 hidden space-y-4">
+                <div id="guest-card-bg" class="border-2 border-brand-gold/40 rounded-3xl p-6 bg-[#FCF5F3] relative overflow-hidden text-center flex flex-col justify-between items-center min-h-[480px]">
+                    <div class="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-brand-gold/40"></div>
+                    <div class="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-brand-gold/40"></div>
+                    <div class="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-brand-gold/40"></div>
+                    <div class="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-brand-gold/40"></div>
+
+                    <div class="space-y-1.5 mt-4">
+                        <span class="text-[10px] font-bold text-brand-goldDark tracking-widest uppercase card-title">Trân trọng kính mời quý khách tới dự hôn lễ</span>
+                        <div class="flex items-center justify-center gap-2 py-3">
+                            <span class="serif-title text-lg font-bold text-brand-text card-groom" id="guest-groom">Minh Quân</span>
+                            <span class="text-brand-gold text-lg animate-pulse card-heart">❤</span>
+                            <span class="serif-title text-lg font-bold text-brand-text card-bride" id="guest-bride">Khánh Linh</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 py-4 flex flex-col items-center">
+                        <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider card-label">Hôn lễ được tổ chức vào lúc</p>
+                        <p class="serif-title text-base font-bold text-brand-goldDark card-date" id="guest-time-date">11:00 | 10/10/2026</p>
+                        <p class="text-[10px] text-gray-400 max-w-[240px] card-loc" id="guest-location">Trung tâm Hội nghị Tiệc cưới L'Amour, Hà Nội</p>
+                    </div>
+
+                    <!-- RSVP Interactivity -->
+                    <div class="bg-white/70 backdrop-blur rounded-2xl p-4 border border-brand-gold/15 w-full max-w-[320px] mb-4">
+                        <h4 class="text-[10px] font-bold text-brand-text uppercase mb-2">Bạn sẽ tham gia cùng chúng tôi chứ?</h4>
+                        <div class="grid grid-cols-2 gap-2" id="rsvp-actions">
+                            <button onclick="submitRsvp(true)" class="bg-green-600 hover:opacity-95 text-white text-[10px] font-bold py-2 rounded-lg shadow-sm">Sẽ tham gia</button>
+                            <button onclick="submitRsvp(false)" class="bg-gray-200 hover:bg-gray-300 text-gray-600 text-[10px] font-bold py-2 rounded-lg shadow-sm">Rất tiếc không thể</button>
+                        </div>
+                        <p id="rsvp-thanks" class="text-[10px] text-green-600 font-bold hidden py-1">Cám ơn phản hồi quý giá của bạn!</p>
+                    </div>
+
+                    <!-- QR Box inside guest view -->
+                    <div class="bg-white p-3 rounded-2xl border border-brand-gold/20 shadow-md flex flex-col items-center gap-1.5 mb-4">
+                        <img id="guest-qr" src="" class="w-32 h-32 object-cover rounded-md" alt="Guest Lucky Money QR">
+                        <span class="text-[9px] font-extrabold text-brand-goldDark card-qrtext">QUÉT QR MỪNG CƯỚI / GỬI LỜI CHÚC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 border-t border-gray-100 py-6 text-center text-[10px] text-gray-400 bg-white">
+            <p>© 2026 Trạm Hỷ. Nền tảng bảo chứng công nghệ cưới hỏi hàng đầu Việt Nam.</p>
+        </footer>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 glass p-4 rounded-2xl shadow-2xl border border-brand-gold/30 flex items-start gap-3 z-[99999] hidden max-w-sm">
+        <span class="material-symbols-outlined text-brand-gold text-2xl" style="font-variation-settings: 'FILL' 1;">share</span>
+        <div>
+            <h4 class="text-xs font-bold text-brand-text">Đã sao chép liên kết!</h4>
+            <p class="text-[9px] text-gray-500 mt-0.5">Liên kết thiệp cưới online đã được copy vào clipboard của bạn.</p>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        function updateCardPreview() {
+            const groomName = document.getElementById('input-groom').value || 'Minh Quân';
+            const brideName = document.getElementById('input-bride').value || 'Khánh Linh';
+            const dateStr = document.getElementById('input-date').value || '2026-10-10';
+            const timeStr = document.getElementById('input-time').value || '11:00';
+            const locationStr = document.getElementById('input-location').value || 'Hà Nội';
+            
+            const bankName = document.getElementById('input-bank').value;
+            const bankAcc = document.getElementById('input-account').value || '19036789999';
+
+            // Format date: YYYY-MM-DD -> DD/MM/YYYY
+            let formattedDate = dateStr;
+            if (dateStr.includes('-')) {
+                const parts = dateStr.split('-');
+                formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+
+            // Update Text Previews
+            document.getElementById('preview-groom').innerText = groomName;
+            document.getElementById('preview-bride').innerText = brideName;
+            document.getElementById('preview-time-date').innerText = `${timeStr} | ${formattedDate}`;
+            document.getElementById('preview-location').innerText = locationStr;
+
+            // Generate real working QR using public QR Server API (MB Bank/VCB VietQR format)
+            // MB Bank VietQR Schema: https://img.vietqr.io/image/<BANK_ID>-<ACCOUNT_NO>-compact.jpg?amount=500000&addInfo=Chuc%20Mung%20Tram%2520Hy
+            const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=2a2421&data=https://vietqr.me/api/qr/${bankName}/${bankAcc}?amount=500000%26addInfo=Mung%2520cuoi%2520${encodeURIComponent(groomName)}%2520va%2520${encodeURIComponent(brideName)}`;
+            
+            document.getElementById('wedding-qr').src = qrImageUrl;
+
+            // Save state to URL so preview can read it
+            const previewUrl = window.location.href.split('?')[0] + 
+                `?preview=true&groom=${encodeURIComponent(groomName)}&bride=${encodeURIComponent(brideName)}&date=${encodeURIComponent(formattedDate)}&time=${encodeURIComponent(timeStr)}&location=${encodeURIComponent(locationStr)}&bank=${encodeURIComponent(bankName)}&acc=${encodeURIComponent(bankAcc)}`;
+            
+            window.latestPreviewUrl = previewUrl;
+        }
+
+        // Initialize Form
+        updateCardPreview();
+        selectTemplate('gold');
+
+        let activeTheme = 'gold';
+        
+        function selectTemplate(theme) {
+            activeTheme = theme;
+            
+            // Update active state in UI templates
+            const themes = ['gold', 'red', 'green', 'pink'];
+            themes.forEach(t => {
+                const btn = document.getElementById(`tpl-${t}`);
+                if (!btn) return;
+                if (t === theme) {
+                    btn.className = "flex flex-col items-center gap-1 border-2 border-brand-gold rounded-xl p-1 bg-brand-blush";
+                    btn.querySelector('span').className = "text-[8px] font-bold text-brand-text";
+                } else {
+                    btn.className = "flex flex-col items-center gap-1 border-2 border-transparent hover:border-gray-200 rounded-xl p-1";
+                    btn.querySelector('span').className = "text-[8px] font-medium text-gray-500";
+                }
+            });
+            
+            // Apply theme styling to preview card and guest view card
+            applyThemeToCard('preview-card-bg', theme);
+            applyThemeToCard('guest-card-bg', theme);
+        }
+        
+        function applyThemeToCard(cardId, theme) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            
+            // Custom font colors
+            const elements = {
+                title: card.querySelector('.card-title'),
+                groom: card.querySelector('.card-groom'),
+                bride: card.querySelector('.card-bride'),
+                date: card.querySelector('.card-date'),
+                loc: card.querySelector('.card-loc'),
+                label: card.querySelector('.card-label'),
+                heart: card.querySelector('.card-heart'),
+                qrtext: card.querySelector('.card-qrtext')
+            };
+            
+            if (theme === 'gold') {
+                card.style.backgroundColor = '#FCF5F3';
+                card.style.borderColor = '#D4AF37';
+                card.style.color = '#2A2421';
+                
+                if (elements.title) elements.title.style.color = '#AA7C11';
+                if (elements.groom) elements.groom.style.color = '#2A2421';
+                if (elements.bride) elements.bride.style.color = '#2A2421';
+                if (elements.date) elements.date.style.color = '#AA7C11';
+                if (elements.loc) elements.loc.style.color = '#9CA3AF';
+                if (elements.label) elements.label.style.color = '#6B7280';
+                if (elements.heart) elements.heart.style.color = '#D4AF37';
+                if (elements.qrtext) elements.qrtext.style.color = '#AA7C11';
+                
+            } else if (theme === 'red') {
+                card.style.backgroundColor = '#991B1B';
+                card.style.borderColor = '#D4AF37';
+                card.style.color = '#FFFFFF';
+                
+                if (elements.title) elements.title.style.color = '#FDE047';
+                if (elements.groom) elements.groom.style.color = '#FFFFFF';
+                if (elements.bride) elements.bride.style.color = '#FFFFFF';
+                if (elements.date) elements.date.style.color = '#FDE047';
+                if (elements.loc) elements.loc.style.color = '#FECACA';
+                if (elements.label) elements.label.style.color = '#FCA5A5';
+                if (elements.heart) elements.heart.style.color = '#FDE047';
+                if (elements.qrtext) elements.qrtext.style.color = '#FDE047';
+                
+            } else if (theme === 'green') {
+                card.style.backgroundColor = '#064E3B';
+                card.style.borderColor = '#D4AF37';
+                card.style.color = '#FFFFFF';
+                
+                if (elements.title) elements.title.style.color = '#A7F3D0';
+                if (elements.groom) elements.groom.style.color = '#FFFFFF';
+                if (elements.bride) elements.bride.style.color = '#FFFFFF';
+                if (elements.date) elements.date.style.color = '#A7F3D0';
+                if (elements.loc) elements.loc.style.color = '#D1FAE5';
+                if (elements.label) elements.label.style.color = '#A7F3D0';
+                if (elements.heart) elements.heart.style.color = '#D4AF37';
+                if (elements.qrtext) elements.qrtext.style.color = '#A7F3D0';
+                
+            } else if (theme === 'pink') {
+                card.style.backgroundColor = '#FDF2F8';
+                card.style.borderColor = '#EC4899';
+                card.style.color = '#2A2421';
+                
+                if (elements.title) elements.title.style.color = '#DB2777';
+                if (elements.groom) elements.groom.style.color = '#2A2421';
+                if (elements.bride) elements.bride.style.color = '#2A2421';
+                if (elements.date) elements.date.style.color = '#DB2777';
+                if (elements.loc) elements.loc.style.color = '#F472B6';
+                if (elements.label) elements.label.style.color = '#EC4899';
+                if (elements.heart) elements.heart.style.color = '#EC4899';
+                if (elements.qrtext) elements.qrtext.style.color = '#DB2777';
+            }
+        }
+
+        function publishInvitation() {
+            // Copy URL to clipboard
+            navigator.clipboard.writeText(window.latestPreviewUrl || window.location.href);
+            showToast();
+            
+            // Auto open Preview Mode
+            toggleViewMode('preview');
+        }
+
+        function toggleViewMode(mode) {
+            const editTab = document.getElementById('tab-edit');
+            const prevTab = document.getElementById('tab-preview');
+            const editSection = document.getElementById('editor-section');
+            const prevSection = document.getElementById('guest-preview-section');
+
+            if (mode === 'preview') {
+                editTab.className = "flex-1 py-2 rounded-lg hover:text-brand-text transition-colors";
+                prevTab.className = "flex-1 py-2 rounded-lg text-brand-gold bg-brand-gold/10";
+                editSection.classList.add('hidden');
+                prevSection.classList.remove('hidden');
+
+                // Read parameters from URL (or current editing state if URL is not yet updated)
+                const urlParams = new URLSearchParams(window.location.search);
+                const isUrlPreview = urlParams.get('preview');
+
+                const groom = isUrlPreview ? urlParams.get('groom') : document.getElementById('input-groom').value;
+                const bride = isUrlPreview ? urlParams.get('bride') : document.getElementById('input-bride').value;
+                const date = isUrlPreview ? urlParams.get('date') : document.getElementById('input-date').value;
+                const time = isUrlPreview ? urlParams.get('time') : document.getElementById('input-time').value;
+                const location = isUrlPreview ? urlParams.get('location') : document.getElementById('input-location').value;
+                const bank = isUrlPreview ? urlParams.get('bank') : document.getElementById('input-bank').value;
+                const acc = isUrlPreview ? urlParams.get('acc') : document.getElementById('input-account').value;
+
+                let formattedDate = date;
+                if (date.includes('-')) {
+                    const parts = date.split('-');
+                    formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+
+                // Render guest view values
+                document.getElementById('guest-groom').innerText = groom;
+                document.getElementById('guest-bride').innerText = bride;
+                document.getElementById('guest-time-date').innerText = `${time} | ${formattedDate}`;
+                document.getElementById('guest-location').innerText = location;
+
+                // QR in guest view
+                const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=2a2421&data=https://vietqr.me/api/qr/${bank}/${acc}?amount=500000%26addInfo=Mung%2520cuoi%2520${encodeURIComponent(groom)}%2520va%2520${encodeURIComponent(bride)}`;
+                document.getElementById('guest-qr').src = qrImageUrl;
+
+            } else {
+                editTab.className = "flex-1 py-2 rounded-lg text-brand-gold bg-brand-gold/10";
+                prevTab.className = "flex-1 py-2 rounded-lg hover:text-brand-text transition-colors";
+                editSection.classList.remove('hidden');
+                prevSection.classList.add('hidden');
+            }
+        }
+
+        // On Load checks
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('preview')) {
+            document.getElementById('mode-tabs').classList.remove('hidden');
+            toggleViewMode('preview');
+        } else {
+            // Keep tabs hidden or show if editor wants to preview
+            document.getElementById('mode-tabs').classList.remove('hidden');
+            toggleViewMode('edit');
+        }
+
+        function submitRsvp(going) {
+            document.getElementById('rsvp-actions').classList.add('hidden');
+            document.getElementById('rsvp-thanks').classList.remove('hidden');
+            if (going) {
+                document.getElementById('rsvp-thanks').innerText = "Cám ơn phản hồi! Bạn đã xác nhận SẼ THAM GIA buổi lễ.";
+            } else {
+                document.getElementById('rsvp-thanks').className = "text-[10px] text-gray-500 font-bold";
+                document.getElementById('rsvp-thanks').innerText = "Đã gửi phản hồi! Bạn đã từ chối tham gia buổi lễ.";
+            }
+        }
+    </script>
+</body>
+</html>

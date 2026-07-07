@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trạm Hỷ Admin - Cổng Quản Trị Hệ Thống</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blush: '#FDF8F7',
+                            gold: '#D4AF37',
+                            goldDark: '#AA7C11',
+                            text: '#2A2421',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            color: #1E293B;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+        }
+        .blush-glow {
+            box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex">
+
+    <!-- Global Demo Controller Bar -->
+    <div class="fixed bottom-4 right-4 z-[9999] glass rounded-2xl p-4 shadow-xl flex flex-col gap-2 text-xs font-semibold border border-brand-gold/30 max-w-[260px] blush-glow">
+        <div class="flex items-center justify-between border-b border-gray-200/50 pb-1.5">
+            <span class="text-brand-goldDark flex items-center gap-1 serif-title italic text-xs">
+                <span class="material-symbols-outlined text-sm">construction</span> Demo Controller
+            </span>
+            <button onclick="toggleDemoController()" class="text-gray-400 hover:text-brand-text focus:outline-none"><span class="material-symbols-outlined text-sm" id="demo-toggle-icon">keyboard_arrow_down</span></button>
+        </div>
+        <div class="flex flex-col gap-1.5" id="demo-buttons">
+            <a href="index.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1. Trang chủ B2C</a>
+            <a href="marketplace.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">2. Chợ dịch vụ</a>
+            <a href="detail.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">3. Chi tiết & Đặt cọc</a>
+            <a href="bookings.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">4. Lịch hẹn B2C</a>
+            <a href="dashboard.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">5. Kênh B2B Vendor</a>
+            <a href="invitation.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">6. Tạo thiệp & QR</a>
+            <a href="admin.html" class="px-3 py-2 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 7. Quản trị Admin</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleDemoController() {
+            const btnContainer = document.getElementById('demo-buttons');
+            const icon = document.getElementById('demo-toggle-icon');
+            if (btnContainer.classList.contains('hidden')) {
+                btnContainer.classList.remove('hidden');
+                icon.innerText = 'keyboard_arrow_down';
+            } else {
+                btnContainer.classList.add('hidden');
+                icon.innerText = 'keyboard_arrow_up';
+            }
+        }
+    </script>
+
+    <!-- Sidebar (Left Slate Panel) -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 h-screen sticky top-0 flex flex-col justify-between p-6 text-slate-300 text-[11px]">
+        <div>
+            <!-- Sidebar Header -->
+            <div class="flex items-center gap-2.5 mb-8 border-b border-slate-800 pb-4">
+                <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-9 h-9 rounded-full object-cover border border-brand-gold/30">
+                <span class="serif-title text-base font-extrabold italic text-white tracking-wide">Trạm Hỷ Admin</span>
+            </div>
+            
+            <!-- Menu Navigation -->
+            <nav class="space-y-1.5">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-white bg-slate-800 rounded-xl transition-all border-l-4 border-brand-gold text-left">
+                    <span class="material-symbols-outlined text-lg">dashboard</span>
+                    Tổng Quan Hệ Thống
+                </button>
+                <button onclick="switchTab('escrow')" id="nav-escrow" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-slate-400 rounded-xl hover:bg-slate-800 hover:text-white transition-all text-left font-sans">
+                    <span class="material-symbols-outlined text-lg">shield</span>
+                    Quản Lý Ví Bảo Chứng
+                </button>
+                <button onclick="switchTab('vendors')" id="nav-vendors" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-slate-400 rounded-xl hover:bg-slate-800 hover:text-white transition-all text-left font-sans">
+                    <span class="material-symbols-outlined text-lg">verified</span>
+                    Xét Duyệt Tích Xanh
+                </button>
+            </nav>
+        </div>
+        
+        <div class="border-t border-slate-800 pt-4 text-[10px] text-slate-500 font-sans">
+            <p>Trạm Hỷ Marketplace Platform</p>
+            <p class="mt-0.5">Hệ thống quản trị v1.0 (Demo)</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="serif-title text-2xl font-bold text-slate-850" id="page-title">Tổng Quan Hệ Thống</h1>
+                <p class="text-xs text-slate-500 mt-1">Giám sát giao dịch bảo chứng, doanh thu phí sàn và đối tác.</p>
+            </div>
+            <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-150">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-xs font-bold text-slate-700">Hệ Thống Trực Tuyến</span>
+            </div>
+        </header>
+
+        <!-- TAB: DASHBOARD -->
+        <div id="tab-content-dashboard" class="space-y-6">
+            <!-- Platform Metrics Card -->
+            <div class="grid grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-brand-gold/5 rounded-full blur-xl -mr-6 -mt-6"></div>
+                    <span class="material-symbols-outlined text-brand-gold text-2xl mb-3">currency_exchange</span>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Tổng Giá Trị Giao Dịch (GMV)</p>
+                    <h3 class="text-2xl font-extrabold text-slate-800 mt-1" id="metric-gmv">62.500.000đ</h3>
+                    <p class="text-[10px] text-green-600 font-bold mt-2 flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-xs">trending_up</span> +15.4% so với tháng trước
+                    </p>
+                </div>
+                
+                <div class="bg-slate-900 p-6 rounded-2xl shadow-xl relative overflow-hidden text-slate-100">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-brand-gold/10 rounded-full blur-xl -mr-6 -mt-6"></div>
+                    <span class="material-symbols-outlined text-brand-gold text-2xl mb-3">shield</span>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Số Dư Ví Bảo Chứng Đang Khóa</p>
+                    <h3 class="text-2xl font-extrabold text-white mt-1 text-brand-gold" id="metric-escrow">21.250.000đ</h3>
+                    <p class="text-[10px] text-brand-gold/80 font-bold mt-2">
+                        Đang tạm giữ bảo hiểm giao dịch cho dâu rể
+                    </p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-xl -mr-6 -mt-6"></div>
+                    <span class="material-symbols-outlined text-blue-500 text-2xl mb-3">account_balance_wallet</span>
+                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Doanh Thu Phí Sàn Thu Nhập (10%)</p>
+                    <h3 class="text-2xl font-extrabold text-slate-800 mt-1" id="metric-commission">2.500.000đ</h3>
+                    <p class="text-[10px] text-slate-400 mt-2">Khấu trừ tự động từ đơn hàng hoàn thành</p>
+                </div>
+            </div>
+
+            <!-- Recent Escrow Activity and Auditing -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="serif-title text-base font-bold text-slate-800 mb-4">Hoạt Động Ký Quỹ Mới Nhất</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left">
+                        <thead>
+                            <tr class="border-b border-gray-150 text-slate-400 font-bold">
+                                <th class="pb-3">MÃ ĐƠN</th>
+                                <th class="pb-3">KHÁCH HÀNG</th>
+                                <th class="pb-3">ĐỐI TÁC CUNG CẤP</th>
+                                <th class="pb-3 text-right">GIÁ TRỊ</th>
+                                <th class="pb-3 text-right">ĐÃ KÝ QUỸ VÍ</th>
+                                <th class="pb-3 text-center">TIẾN ĐỘ VÍ BẢO CHỨNG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-escrow-table">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: ESCROW MANAGEMENT -->
+        <div id="tab-content-escrow" class="space-y-6 hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="serif-title text-base font-bold text-slate-800">Chi Tiết Trạng Thế Ví Escrow</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Giám sát các đợt giải ngân hợp đồng thông minh theo cột mốc nghiệm thu.</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left">
+                        <thead>
+                            <tr class="border-b border-gray-150 text-slate-400 font-bold">
+                                <th class="pb-3">MÃ HĐ</th>
+                                <th class="pb-3">KHÁCH HÀNG</th>
+                                <th class="pb-3">VENDORS</th>
+                                <th class="pb-3">ĐỢT 1 (30%)</th>
+                                <th class="pb-3">ĐỢT 2 (50%)</th>
+                                <th class="pb-3">ĐỢT 3 (20%)</th>
+                                <th class="pb-3 text-right">PHÍ SÀN (10%)</th>
+                                <th class="pb-3 text-center">HÀNH ĐỘNG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="escrow-detail-table">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: VENDOR VERIFICATION -->
+        <div id="tab-content-vendors" class="space-y-6 hidden">
+            <div class="grid grid-cols-2 gap-6">
+                <!-- Verified List -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="serif-title text-base font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span> 
+                        Danh Sách Đối Tác Tích Xanh
+                    </h3>
+                    <p class="text-xs text-slate-400 mb-4 font-sans">Các đơn vị đáp ứng tiêu chuẩn WYSIWYG và được gắn nhãn Choice 2026.</p>
+                    <div class="space-y-3 font-sans" id="verified-vendors-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Moderation List -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="serif-title text-base font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-slate-400">gavel</span> 
+                        Hồ Sơ Chờ Cấp Tích Xanh
+                    </h3>
+                    <p class="text-xs text-slate-400 mb-4 font-sans">Duyệt hồ sơ chứng minh năng lực thực tế để kích hoạt tính năng bảo chứng.</p>
+                    <div class="space-y-3 font-sans" id="moderation-vendors-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JS Logic -->
+    <script>
+        function formatMoney(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+        }
+
+        // Mock Database of System Bookings
+        const defaultBookings = [
+            {
+                id: '#1085',
+                customerName: 'Nguyễn Minh Quân',
+                vendorName: 'TuArt Wedding',
+                price: 12500000,
+                status: 'deposit_paid', // deposit_paid, executing, to_approve, completed
+                stages: {
+                    s1: 'paid', // paid, executing, locked, completed
+                    s2: 'locked',
+                    s3: 'locked'
+                },
+                date: '07/07/2026'
+            },
+            {
+                id: '#1084',
+                customerName: 'Lê Hoàng Hải',
+                vendorName: 'Bul Nguyễn Makeup',
+                price: 4500000,
+                status: 'executing_paid',
+                stages: {
+                    s1: 'paid',
+                    s2: 'paid',
+                    s3: 'locked'
+                },
+                date: '07/07/2026'
+            },
+            {
+                id: '#1082',
+                customerName: 'Phạm Minh D',
+                vendorName: '7799 Storyteller',
+                price: 25000000,
+                status: 'completed',
+                stages: {
+                    s1: 'paid',
+                    s2: 'paid',
+                    s3: 'paid'
+                },
+                date: '05/07/2026'
+            },
+            {
+                id: '#1081',
+                customerName: 'Nguyễn Văn A',
+                vendorName: 'Mimosa Wedding',
+                price: 7500000,
+                status: 'executing',
+                stages: {
+                    s1: 'paid',
+                    s2: 'executing',
+                    s3: 'locked'
+                },
+                date: '06/07/2026'
+            },
+            {
+                id: '#1086',
+                customerName: 'Trần Thu Trang',
+                vendorName: 'L\'Amour Gallery',
+                price: 120000000,
+                status: 'to_approve',
+                stages: {
+                    s1: 'paid',
+                    s2: 'paid',
+                    s3: 'executing'
+                },
+                date: '07/07/2026'
+            }
+        ];
+
+        // Load or initialize system database
+        function getBookings() {
+            let bookings = JSON.parse(localStorage.getItem('tramhy_system_bookings'));
+            if (!bookings) {
+                bookings = [...defaultBookings];
+                localStorage.setItem('tramhy_system_bookings', JSON.stringify(bookings));
+            }
+            
+            // Check B2C Active Booking
+            const activeBooking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
+            if (activeBooking) {
+                const idx = bookings.findIndex(b => b.id === activeBooking.id);
+                const currentStatus = localStorage.getItem('tramhy_active_booking_status') || activeBooking.status;
+                
+                let s1 = 'paid';
+                let s2 = 'locked';
+                let s3 = 'locked';
+                
+                if (currentStatus === 'executing') {
+                    s2 = 'executing';
+                } else if (currentStatus === 'executing_paid') {
+                    s2 = 'paid';
+                } else if (currentStatus === 'to_approve') {
+                    s2 = 'paid';
+                    s3 = 'executing';
+                } else if (currentStatus === 'completed') {
+                    s2 = 'paid';
+                    s3 = 'paid';
+                }
+                
+                if (idx === -1) {
+                    bookings.unshift({
+                        id: activeBooking.id,
+                        customerName: activeBooking.customerName,
+                        vendorName: activeBooking.vendorName || 'TuArt Wedding',
+                        price: activeBooking.price,
+                        status: currentStatus,
+                        stages: { s1, s2, s3 },
+                        date: activeBooking.dateCreated || '07/07/2026'
+                    });
+                } else {
+                    bookings[idx].status = currentStatus;
+                    bookings[idx].stages = { s1, s2, s3 };
+                }
+                localStorage.setItem('tramhy_system_bookings', JSON.stringify(bookings));
+            }
+            
+            return bookings;
+        }
+
+        function calculateMetrics() {
+            const bookings = getBookings();
+            let totalGmv = 0;
+            let totalEscrow = 0;
+            let totalCommission = 0;
+            
+            bookings.forEach(b => {
+                totalGmv += b.price;
+                
+                // s1
+                if (b.stages.s1 === 'paid' || b.stages.s1 === 'executing') {
+                    // check if s2 and s3 are still locked/executing (not paid)
+                    if (b.status !== 'completed') {
+                        if (b.stages.s1 === 'paid') totalEscrow += b.price * 0.30;
+                        if (b.stages.s2 === 'paid') totalEscrow += b.price * 0.50;
+                    } else {
+                        // Completed, commission is taken!
+                        totalCommission += b.price * 0.10;
+                    }
+                }
+            });
+            
+            document.getElementById('metric-gmv').innerText = formatMoney(totalGmv);
+            document.getElementById('metric-escrow').innerText = formatMoney(totalEscrow);
+            document.getElementById('metric-commission').innerText = formatMoney(totalCommission);
+        }
+
+        // Tab switcher
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'escrow', 'vendors'];
+            tabs.forEach(t => {
+                const navBtn = document.getElementById(`nav-${t}`);
+                const content = document.getElementById(`tab-content-${t}`);
+                if (!navBtn || !content) return;
+                if (t === tabId) {
+                    navBtn.className = "w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-white bg-slate-800 rounded-xl transition-all border-l-4 border-brand-gold text-left";
+                    content.classList.remove('hidden');
+                } else {
+                    navBtn.className = "w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-slate-400 rounded-xl hover:bg-slate-800 hover:text-white transition-all text-left font-sans";
+                    content.classList.add('hidden');
+                }
+            });
+            
+            // Set header title
+            const titles = {
+                dashboard: 'Tổng Quan Hệ Thống',
+                escrow: 'Quản Lý Ví Bảo Chứng',
+                vendors: 'Xét Duyệt Tích Xanh'
+            };
+            document.getElementById('page-title').innerText = titles[tabId];
+            
+            renderData();
+        }
+
+        // Render data lists
+        function renderData() {
+            const bookings = getBookings();
+            
+            // 1. Dashboard Table
+            const dTable = document.getElementById('dashboard-escrow-table');
+            if (dTable) {
+                dTable.innerHTML = '';
+                bookings.forEach(b => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-gray-100 hover:bg-slate-50 transition-colors";
+                    
+                    let stageText = '';
+                    if (b.status === 'completed') {
+                        stageText = '<span class="px-2 py-1 rounded bg-green-100 text-green-700 font-bold text-[9px] uppercase">Đã giải ngân hết (100%)</span>';
+                    } else if (b.status === 'deposit_paid') {
+                        stageText = '<span class="px-2 py-1 rounded bg-amber-100 text-amber-700 font-bold text-[9px] uppercase">Đã bảo chứng Đợt 1 (30%)</span>';
+                    } else if (b.status === 'executing') {
+                        stageText = '<span class="px-2 py-1 rounded bg-blue-100 text-blue-700 font-bold text-[9px] uppercase">Đang thi công (Cọc 30% giữ)</span>';
+                    } else if (b.status === 'to_approve') {
+                        stageText = '<span class="px-2 py-1 rounded bg-purple-100 text-purple-700 font-bold text-[9px] uppercase">Chờ nghiệm thu (Cọc 80% giữ)</span>';
+                    }
+                    
+                    tr.innerHTML = `
+                        <td class="py-3 font-bold text-slate-700">${b.id}</td>
+                        <td class="py-3 font-semibold text-slate-805">${b.customerName}</td>
+                        <td class="py-3 text-slate-500">${b.vendorName}</td>
+                        <td class="py-3 text-right font-bold text-slate-800">${formatMoney(b.price)}</td>
+                        <td class="py-3 text-right font-bold text-brand-goldDark">${formatMoney(b.status === 'completed' ? 0 : (b.status === 'to_approve' ? b.price * 0.8 : b.price * 0.3))}</td>
+                        <td class="py-3 text-center">${stageText}</td>
+                    `;
+                    dTable.appendChild(tr);
+                });
+            }
+
+            // 2. Escrow Management Table
+            const eTable = document.getElementById('escrow-detail-table');
+            if (eTable) {
+                eTable.innerHTML = '';
+                bookings.forEach(b => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-gray-100 hover:bg-slate-50 text-[11px] transition-colors";
+                    
+                    const s1Badge = b.stages.s1 === 'paid' ? '<span class="text-green-600 font-bold">✓ Đã chuyển</span>' : '<span class="text-slate-400">Khóa</span>';
+                    const s2Badge = b.stages.s2 === 'paid' ? '<span class="text-green-600 font-bold">✓ Đã chuyển</span>' : (b.stages.s2 === 'executing' ? '<span class="text-blue-500 font-bold">● Đang giữ</span>' : '<span class="text-slate-400">Khóa</span>');
+                    const s3Badge = b.stages.s3 === 'paid' ? '<span class="text-green-600 font-bold">✓ Đã giải ngân</span>' : (b.stages.s3 === 'executing' ? '<span class="text-blue-500 font-bold">● Đang giữ</span>' : '<span class="text-slate-400">Khóa</span>');
+                    
+                    tr.innerHTML = `
+                        <td class="py-3 font-bold text-slate-700">${b.id}</td>
+                        <td class="py-3 font-bold text-slate-800">${b.customerName}</td>
+                        <td class="py-3 text-slate-500">${b.vendorName}</td>
+                        <td class="py-3">${s1Badge} <span class="text-[9px] text-gray-400 block">${formatMoney(b.price * 0.3)}</span></td>
+                        <td class="py-3">${s2Badge} <span class="text-[9px] text-gray-400 block">${formatMoney(b.price * 0.5)}</span></td>
+                        <td class="py-3">${s3Badge} <span class="text-[9px] text-gray-400 block">${formatMoney(b.price * 0.2)}</span></td>
+                        <td class="py-3 text-right font-bold text-blue-600">${formatMoney(b.price * 0.1)}</td>
+                        <td class="py-3 text-center">
+                            ${b.status !== 'completed' ? `<button onclick="forceDisburse('${b.id}')" class="bg-brand-gold text-white text-[9px] font-bold px-2 py-1 rounded hover:opacity-90">Giải ngân tay</button>` : `<span class="text-green-600 font-bold">Đã thanh quyết toán</span>`}
+                        </td>
+                    `;
+                    eTable.appendChild(tr);
+                });
+            }
+
+            // 3. Vendor verification moderation lists
+            renderVendorsList();
+        }
+
+        // Force disburse escrow money
+        function forceDisburse(id) {
+            let bookings = getBookings();
+            const idx = bookings.findIndex(b => b.id === id);
+            if (idx !== -1) {
+                bookings[idx].status = 'completed';
+                bookings[idx].stages.s1 = 'paid';
+                bookings[idx].stages.s2 = 'paid';
+                bookings[idx].stages.s3 = 'paid';
+                localStorage.setItem('tramhy_system_bookings', JSON.stringify(bookings));
+                
+                // If it is the active booking, notify B2C detail/B2B dashboard
+                const active = JSON.parse(localStorage.getItem('tramhy_active_booking'));
+                if (active && active.id === id) {
+                    active.status = 'completed';
+                    localStorage.setItem('tramhy_active_booking', JSON.stringify(active));
+                    localStorage.setItem('tramhy_active_booking_status', 'completed');
+                }
+                
+                calculateMetrics();
+                renderData();
+            }
+        }
+
+        // Render Vendor verification
+        function renderVendorsList() {
+            // Check greenwedding verification override state
+            const greenVerified = localStorage.getItem('tramhy_vendor_greenwedding_verified') === 'true';
+            
+            // Moderation list
+            const modContainer = document.getElementById('moderation-vendors-list');
+            if (modContainer) {
+                modContainer.innerHTML = '';
+                if (!greenVerified) {
+                    modContainer.innerHTML = `
+                        <div class="bg-slate-50 border border-gray-150 rounded-xl p-4 flex justify-between items-center">
+                            <div class="space-y-1">
+                                <h4 class="text-xs font-bold text-slate-800">Green Wedding</h4>
+                                <p class="text-[10px] text-slate-400">Danh mục: Studio Chụp ảnh | Tây Hồ, Hà Nội</p>
+                                <p class="text-[9px] text-amber-600 font-bold bg-amber-50 px-2 py-0.5 border border-amber-200/50 rounded inline-block">Chờ cấp tích xanh</p>
+                            </div>
+                            <button onclick="approveVendor('greenwedding')" class="gold-gradient hover:opacity-95 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-sm">Duyệt cấp</button>
+                        </div>
+                    `;
+                } else {
+                    modContainer.innerHTML = `<p class="text-xs text-slate-400 italic py-4 text-center">Không có hồ sơ nào chờ xét duyệt.</p>`;
+                }
+            }
+
+            // Verified list
+            const verContainer = document.getElementById('verified-vendors-list');
+            if (verContainer) {
+                verContainer.innerHTML = `
+                    <div class="bg-white border border-gray-100 rounded-xl p-3 flex justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-500">verified</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">TuArt Wedding</h4>
+                                <p class="text-[10px] text-slate-400">Studio | Hai Bà Trưng, Hà Nội</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] text-green-600 font-bold uppercase">Hoạt Động</span>
+                    </div>
+                    <div class="bg-white border border-gray-100 rounded-xl p-3 flex justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-500">verified</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">7799 Storyteller</h4>
+                                <p class="text-[10px] text-slate-400">Decor | Hoàn Kiếm, Hà Nội</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] text-green-600 font-bold uppercase">Hoạt Động</span>
+                    </div>
+                    ${greenVerified ? `
+                    <div class="bg-white border border-gray-100 rounded-xl p-3 flex justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-500">verified</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Green Wedding</h4>
+                                <p class="text-[10px] text-slate-400">Studio | Tây Hồ, Hà Nội</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] text-green-600 font-bold uppercase mr-1">Vừa Duyệt</span>
+                            <button onclick="revokeVendor('greenwedding')" class="text-red-500 hover:text-red-700 text-[10px] font-bold">Hủy</button>
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+            }
+        }
+
+        // Approve vendor verification
+        function approveVendor(vendorId) {
+            if (vendorId === 'greenwedding') {
+                localStorage.setItem('tramhy_vendor_greenwedding_verified', 'true');
+                renderData();
+            }
+        }
+
+        // Revoke vendor verification
+        function revokeVendor(vendorId) {
+            if (vendorId === 'greenwedding') {
+                localStorage.setItem('tramhy_vendor_greenwedding_verified', 'false');
+                renderData();
+            }
+        }
+
+        // Initialize Onload
+        window.onload = function() {
+            calculateMetrics();
+            renderData();
+        }
+    </script>
+</body>
+</html>
