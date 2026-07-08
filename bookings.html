@@ -219,7 +219,7 @@
             container.innerHTML = '';
 
             let booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
-            if (!booking) {
+            if (!booking || !booking.vendorName) {
                 booking = {
                     id: '#1085',
                     customerName: 'Nguyễn Minh Quân',
@@ -715,12 +715,18 @@
         function resetDemoStatus() {
             localStorage.setItem('tramhy_active_booking_status', 'deposit_paid');
             
-            // Also update the active booking in localStorage
-            let booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
-            if (booking) {
-                booking.status = 'deposit_paid';
-                localStorage.setItem('tramhy_active_booking', JSON.stringify(booking));
-            }
+            // Force reset the active booking in localStorage to the full initial mock data
+            let booking = {
+                id: '#1085',
+                customerName: 'Nguyễn Minh Quân',
+                vendorName: 'TuArt Wedding',
+                package: 'Gói Cưới Cát Tường',
+                price: 12500000,
+                depositPaid: 3750000,
+                status: 'deposit_paid',
+                dateCreated: '07/07/2026'
+            };
+            localStorage.setItem('tramhy_active_booking', JSON.stringify(booking));
             
             // Also reset the system bookings database status for #1085
             let sysBookings = JSON.parse(localStorage.getItem('tramhy_system_bookings'));
