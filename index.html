@@ -99,138 +99,88 @@
                 icon.innerText = 'keyboard_arrow_down';
             } else {
                 btnContainer.classList.add('hidden');
-                icon.innerText = 'keyboard_arrow_up';
-            }
-        }
-    </script>
-
-    <!-- Header Mobile Container -->
-    <div class="max-w-[480px] mx-auto bg-brand-blush min-h-screen shadow-2xl relative border-x border-gray-100 flex flex-col justify-between">
+                icon.innerText = 'keyboard_arro    <!-- Main Responsive Web Container -->
+    <div class="w-full bg-brand-blush min-h-screen flex flex-col justify-between">
         
         <div>
             <!-- Sticky Top Header & Navigation -->
-            <header class="sticky top-0 z-50 glass border-b border-brand-blush/40 shadow-sm">
-                <!-- Top Branding Line -->
-                <div class="px-4 py-2.5 flex items-center justify-between border-b border-gray-50/50 bg-white/50">
-                    <div class="flex items-center gap-1">
-                        <span class="material-symbols-outlined text-brand-gold text-lg" style="font-variation-settings: 'FILL' 1;">location_on</span>
-                        <select class="bg-transparent text-[10px] font-bold text-brand-text focus:outline-none cursor-pointer" id="global-location">
-                            <option value="Hà Nội">Hà Nội</option>
-                            <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
-                            <option value="Đà Nẵng">Đà Nẵng</option>
-                        </select>
+            <header class="sticky top-0 z-50 glass border-b border-brand-blush/40 shadow-sm bg-white/95">
+                <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <!-- Top Branding Line / Left on Desktop -->
+                    <div class="flex items-center justify-between md:justify-start gap-4">
+                        <div class="flex items-center gap-2">
+                            <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-8 h-8 rounded-full object-cover border border-brand-gold/30">
+                            <h1 class="serif-title text-base font-extrabold text-brand-text tracking-wide italic">Trạm Hỷ</h1>
+                        </div>
+                        <span class="text-[9px] font-bold text-brand-goldDark bg-brand-gold/10 px-2 py-0.5 rounded-full hidden md:inline-block">Bảo Chứng Cưới</span>
                     </div>
-                    <div class="flex items-center gap-1.5 justify-center">
-                        <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-6 h-6 rounded-full object-cover border border-brand-gold/30">
-                        <h1 class="serif-title text-sm font-extrabold text-brand-text tracking-wide italic">Trạm Hỷ</h1>
-                    </div>
-                    <div class="flex items-center gap-2.5 text-brand-text">
-                        <button class="relative hover:opacity-80 active:scale-95 transition-all">
-                            <span class="material-symbols-outlined text-lg">notifications</span>
+                    
+                    <!-- Navigation Tabs (Center on Desktop) -->
+                    <nav class="flex justify-between md:justify-center items-center gap-1 md:gap-4 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent">
+                        <a href="index.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark">
+                            <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 1;">home</span>
+                            <span class="text-[10px] font-bold">Trang chủ</span>
+                        </a>
+                        <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                            <span class="material-symbols-outlined text-base">search</span>
+                            <span class="text-[10px] font-medium">Tìm kiếm</span>
+                        </a>
+                        <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                            <span class="material-symbols-outlined text-base">calendar_month</span>
+                            <span class="text-[10px] font-medium">Lịch hẹn</span>
+                        </a>
+                        <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                            <span class="material-symbols-outlined text-base">mail</span>
+                            <span class="text-[10px] font-medium">Thiệp cưới</span>
+                        </a>
+                    </nav>
+
+                    <!-- Right Controls (Location, Notification) -->
+                    <div class="flex items-center justify-between md:justify-end gap-3 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent">
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-brand-gold text-base" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                            <select class="bg-transparent text-[11px] font-bold text-brand-text focus:outline-none cursor-pointer" id="global-location">
+                                <option value="Hà Nội">Hà Nội</option>
+                                <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                                <option value="Đà Nẵng">Đà Nẵng</option>
+                            </select>
+                        </div>
+                        <button class="relative hover:opacity-80 active:scale-95 transition-all text-brand-text">
+                            <span class="material-symbols-outlined text-base">notifications</span>
                             <span class="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
                         </button>
                     </div>
                 </div>
-                
-                <!-- Navigation Tabs (Trang chủ B2C Active) -->
-                <nav class="px-4 py-2 flex justify-between items-center bg-white/80">
-                    <a href="index.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark">
-                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">home</span>
-                        <span class="text-[9px] font-bold">Trang chủ</span>
-                    </a>
-                    <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
-                        <span class="material-symbols-outlined text-lg">search</span>
-                        <span class="text-[9px] font-medium">Tìm kiếm</span>
-                    </a>
-                    <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
-                        <span class="material-symbols-outlined text-lg">calendar_month</span>
-                        <span class="text-[9px] font-medium">Lịch hẹn</span>
-                    </a>
-                    <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
-                        <span class="material-symbols-outlined text-lg">mail</span>
-                        <span class="text-[9px] font-medium">Thiệp cưới</span>
-                    </a>
-                </nav>
             </header>
 
-            <!-- WeddingWire-inspired Search Section -->
-            <section class="px-4 pt-4 pb-2 bg-gradient-to-b from-brand-blush to-white">
-                <div class="text-center space-y-1 mb-3">
-                    <h2 class="serif-title text-base font-extrabold text-brand-text">Tìm kiếm Đội ngũ Cưới của bạn</h2>
-                    <p class="text-[9px] text-gray-500">Kết nối hơn 500+ nhà cung cấp dịch vụ cưới được bảo chứng chất lượng</p>
-                </div>
-                <div class="bg-white rounded-2xl p-3 shadow-md border border-brand-gold/15 flex flex-col gap-2">
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="flex items-center gap-1.5 bg-brand-blush/60 rounded-xl px-2.5 py-1.5 border border-gray-150">
-                            <span class="material-symbols-outlined text-brand-gold text-base">search</span>
-                            <div class="flex-1">
-                                <span class="text-[8px] text-gray-400 font-bold block uppercase">Dịch vụ</span>
-                                <select id="search-cat-hero" class="w-full bg-transparent text-[10px] font-bold focus:outline-none text-brand-text">
-                                    <option value="Studio">Chụp ảnh cưới</option>
-                                    <option value="Decor">Trang trí tiệc</option>
-                                    <option value="Makeup">Trang điểm & Váy</option>
-                                    <option value="Nhà hàng">Nhà hàng tiệc cưới</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1.5 bg-brand-blush/60 rounded-xl px-2.5 py-1.5 border border-gray-150">
-                            <span class="material-symbols-outlined text-brand-gold text-base">location_on</span>
-                            <div class="flex-1">
-                                <span class="text-[8px] text-gray-400 font-bold block uppercase">Khu vực</span>
-                                <select id="search-loc-hero" class="w-full bg-transparent text-[10px] font-bold focus:outline-none text-brand-text">
-                                    <option value="Hà Nội">Hà Nội</option>
-                                    <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
-                                    <option value="Đà Nẵng">Đà Nẵng</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <button onclick="handleHeroSearch()" class="w-full gold-gradient hover:opacity-95 text-white text-xs font-bold py-2.5 rounded-xl shadow transition-all active:scale-[0.98] flex items-center justify-center gap-1">
-                        <span class="material-symbols-outlined text-sm">search</span> Tìm kiếm đối tác
-                    </button>
-                </div>
-            </section>
-
-            <!-- Hero Section with Background and AI Box -->
-            <section class="relative w-full h-[280px] overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=600" alt="Đám cưới ngoài trời lãng mạn" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-brand-blush via-brand-blush/40 to-black/20"></div>
+            <!-- Main Content Area wrapped in grid / responsive container -->
+            <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 flex-1">
                 
-                <!-- Floating Glass AI Box -->
-                <div class="absolute inset-x-4 bottom-4 glass rounded-2xl p-4 shadow-xl border border-white/50">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="material-symbols-outlined text-brand-gold" style="font-variation-settings: 'FILL' 1;">neurology</span>
-                        <h2 class="text-sm font-bold text-brand-text tracking-wider uppercase">Trợ lý AI - Hoạch định ngân sách</h2>
+                <!-- WeddingWire-inspired Search Section -->
+                <section class="bg-gradient-to-b from-brand-blush to-white rounded-3xl p-6 md:p-8 border border-brand-gold/10">
+                    <div class="text-center space-y-2 mb-6">
+                        <h2 class="serif-title text-xl md:text-3xl font-extrabold text-brand-text">Tìm kiếm Đội ngũ Cưới của bạn</h2>
+                        <p class="text-xs md:text-sm text-gray-500">Kết nối hơn 500+ nhà cung cấp dịch vụ cưới được bảo chứng chất lượng và ký quỹ tiến độ</p>
                     </div>
-                    
-                    <div class="space-y-2 mb-3">
-                        <div class="flex items-center gap-2 bg-white/80 rounded-xl px-3 py-2 border border-gray-100">
-                            <span class="material-symbols-outlined text-brand-gold text-lg">payments</span>
-                            <div class="flex-1">
-                                <p class="text-[9px] text-gray-500 font-semibold uppercase">Tổng ngân sách cưới</p>
-                                <input type="number" id="budget-input" value="150000000" class="w-full bg-transparent text-xs font-bold focus:outline-none" placeholder="Nhập ngân sách của bạn">
-                            </div>
-                            <span class="text-xs font-bold text-brand-text">VNĐ</span>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="flex items-center gap-2 bg-white/80 rounded-xl px-3 py-1.5 border border-gray-100">
-                                <span class="material-symbols-outlined text-brand-gold text-lg">style</span>
+                    <div class="bg-white rounded-2xl p-3.5 shadow-lg border border-brand-gold/15 flex flex-col md:flex-row gap-3 max-w-4xl mx-auto">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+                            <div class="flex items-center gap-2 bg-brand-blush/40 rounded-xl px-3 py-2 border border-gray-150">
+                                <span class="material-symbols-outlined text-brand-gold text-lg">search</span>
                                 <div class="flex-1">
-                                    <p class="text-[9px] text-gray-500 font-semibold uppercase">Phong cách</p>
-                                    <select id="style-select" class="w-full bg-transparent text-xs font-bold focus:outline-none">
-                                        <option value="Tối giản">Tối giản</option>
-                                        <option value="Sang trọng">Sang trọng</option>
-                                        <option value="Cổ điển">Cổ điển</option>
-                                        <option value="Hiện đại">Hiện đại</option>
+                                    <span class="text-[9px] text-gray-400 font-bold block uppercase">Dịch vụ</span>
+                                    <select id="search-cat-hero" class="w-full bg-transparent text-xs font-bold focus:outline-none text-brand-text">
+                                        <option value="Studio">Chụp ảnh cưới</option>
+                                        <option value="Decor">Trang trí tiệc</option>
+                                        <option value="Makeup">Trang điểm & Váy</option>
+                                        <option value="Nhà hàng">Nhà hàng tiệc cưới</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 bg-white/80 rounded-xl px-3 py-1.5 border border-gray-100">
-                                <span class="material-symbols-outlined text-brand-gold text-lg">map</span>
+                            <div class="flex items-center gap-2 bg-brand-blush/40 rounded-xl px-3 py-2 border border-gray-150">
+                                <span class="material-symbols-outlined text-brand-gold text-lg">location_on</span>
                                 <div class="flex-1">
-                                    <p class="text-[9px] text-gray-500 font-semibold uppercase">Khu vực tiệc</p>
-                                    <select id="region-select" class="w-full bg-transparent text-xs font-bold focus:outline-none">
+                                    <span class="text-[9px] text-gray-400 font-bold block uppercase">Khu vực</span>
+                                    <select id="search-loc-hero" class="w-full bg-transparent text-xs font-bold focus:outline-none text-brand-text">
                                         <option value="Hà Nội">Hà Nội</option>
                                         <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
                                         <option value="Đà Nẵng">Đà Nẵng</option>
@@ -238,206 +188,327 @@
                                 </div>
                             </div>
                         </div>
+                        <button onclick="handleHeroSearch()" class="gold-gradient hover:opacity-95 text-white text-xs font-bold py-3.5 px-6 rounded-xl shadow transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 whitespace-nowrap">
+                            <span class="material-symbols-outlined text-sm">search</span> Tìm kiếm đối tác
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Hero Section with Background and AI Box -->
+                <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <!-- Banner Image (Left on desktop, top on mobile) -->
+                    <div class="relative lg:col-span-7 rounded-3xl overflow-hidden min-h-[300px] lg:min-h-full shadow-md border border-brand-gold/10">
+                        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1200" alt="Đám cưới ngoài trời lãng mạn" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-end p-6 md:p-8">
+                            <h2 class="serif-title text-2xl md:text-4xl text-white font-extrabold italic leading-tight">Ngày Cưới Trọn Vẹn,<br>Bảo Chứng An Tâm</h2>
+                            <p class="text-xs md:text-sm text-gray-200 mt-2 max-w-md">Trạm Hỷ là nền tảng đầu tiên tại Việt Nam bảo vệ dòng tiền ngày cưới của bạn bằng cơ chế ký quỹ Milestone Pay.</p>
+                        </div>
+                    </div>
+
+                    <!-- Floating Glass AI Box (Right on desktop, bottom on mobile) -->
+                    <div class="lg:col-span-5 glass rounded-3xl p-6 shadow-xl border border-white/50 flex flex-col justify-between blush-glow">
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="material-symbols-outlined text-brand-gold" style="font-variation-settings: 'FILL' 1;">neurology</span>
+                                <h2 class="text-sm font-extrabold text-brand-text tracking-wider uppercase">Trợ lý AI - Hoạch định ngân sách</h2>
+                            </div>
+                            <p class="text-[11px] text-gray-500 mb-4">Nhập ngân sách cưới của bạn, thuật toán AI của Trạm Hỷ sẽ tự động tính toán tỷ lệ phân bổ ngân sách tối ưu theo thị trường.</p>
+                            
+                            <div class="space-y-3 mb-4">
+                                <div class="flex items-center gap-2 bg-white/80 rounded-xl px-3 py-2.5 border border-gray-150">
+                                    <span class="material-symbols-outlined text-brand-gold text-lg">payments</span>
+                                    <div class="flex-1">
+                                        <p class="text-[9px] text-gray-500 font-bold uppercase">Tổng ngân sách cưới</p>
+                                        <input type="number" id="budget-input" value="150000000" class="w-full bg-transparent text-xs font-bold focus:outline-none" placeholder="Nhập ngân sách của bạn">
+                                    </div>
+                                    <span class="text-xs font-bold text-brand-text">VNĐ</span>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="flex items-center gap-2 bg-white/80 rounded-xl px-3 py-2 border border-gray-150">
+                                        <span class="material-symbols-outlined text-brand-gold text-lg">style</span>
+                                        <div class="flex-1">
+                                            <p class="text-[9px] text-gray-500 font-bold uppercase">Phong cách</p>
+                                            <select id="style-select" class="w-full bg-transparent text-xs font-bold focus:outline-none">
+                                                <option value="Tối giản">Tối giản</option>
+                                                <option value="Sang trọng">Sang trọng</option>
+                                                <option value="Cổ điển">Cổ điển</option>
+                                                <option value="Hiện đại">Hiện đại</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-white/80 rounded-xl px-3 py-2 border border-gray-150">
+                                        <span class="material-symbols-outlined text-brand-gold text-lg">map</span>
+                                        <div class="flex-1">
+                                            <p class="text-[9px] text-gray-500 font-bold uppercase">Khu vực tiệc</p>
+                                            <select id="region-select" class="w-full bg-transparent text-xs font-bold focus:outline-none">
+                                                <option value="Hà Nội">Hà Nội</option>
+                                                <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                                                <option value="Đà Nẵng">Đà Nẵng</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="analyzeBudget()" class="w-full gold-gradient hover:opacity-95 text-white text-xs font-bold py-3.5 rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+                             Phân tích & Đề xuất dịch vụ cưới
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Interactive AI Results Section -->
+                <section id="ai-results-section" class="hidden">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-brand-gold/20 relative overflow-hidden blush-glow max-w-4xl mx-auto">
+                        <!-- Loading Overlay -->
+                        <div id="ai-loading" class="absolute inset-0 bg-white/95 z-50 flex flex-col items-center justify-center gap-2 hidden">
+                            <div class="w-10 h-10 border-4 border-brand-gold/20 border-t-brand-gold rounded-full animate-spin"></div>
+                            <p class="text-xs font-bold text-brand-text">AI đang phân tích thị trường thực tế...</p>
+                        </div>
+
+                        <div class="flex justify-between items-center mb-3">
+                            <div>
+                                <span class="text-[10px] bg-brand-gold/10 text-brand-goldDark px-2 py-1 rounded-full font-bold">Phương án Tối ưu cát tường</span>
+                                <h3 class="serif-title text-lg font-bold text-brand-text mt-1">Phân bổ ngân sách cưới</h3>
+                            </div>
+                            <span class="text-xs font-semibold text-gray-400 cursor-pointer" onclick="closeResults()">Đóng</span>
+                        </div>
+
+                        <div class="flex justify-between items-end mb-4 border-b border-gray-100 pb-3">
+                            <span class="text-xs text-gray-500">Tổng chi phí dự kiến</span>
+                            <span class="text-lg font-bold text-brand-goldDark" id="result-total-budget">148.500.000đ</span>
+                        </div>
+
+                        <div class="space-y-4 mb-5">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-brand-text font-medium">🍽️ Nhà hàng tiệc cưới (50%)</span>
+                                    <span class="font-bold text-brand-text" id="restaurant-cost">75.000.000đ</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="gold-gradient h-2 rounded-full" style="width: 50%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-brand-text font-medium">🎀 Trang trí & Tiệc cưới (20%)</span>
+                                    <span class="font-bold text-brand-text" id="decor-cost">30.000.000đ</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="gold-gradient h-2 rounded-full" style="width: 20%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-brand-text font-medium">📸 Studio ảnh & Quay phim (18%)</span>
+                                    <span class="font-bold text-brand-text" id="studio-cost">27.000.000đ</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="gold-gradient h-2 rounded-full" style="width: 18%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-brand-text font-medium">👗 Makeup & Váy cưới (12%)</span>
+                                    <span class="font-bold text-brand-text" id="makeup-cost">18.000.000đ</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="gold-gradient h-2 rounded-full" style="width: 12%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a id="find-vendors-btn" href="marketplace.html" class="block w-full text-center gold-gradient text-white text-xs font-bold py-3.5 rounded-xl shadow-md transition-all active:scale-[0.98]">
+                            Khám phá nhà cung cấp phù hợp ngân sách
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Core Services 4 Grid -->
+                <section>
+                    <h3 class="serif-title text-base md:text-lg font-bold text-brand-text mb-4">Dịch vụ cưới trọn gói</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <a href="marketplace.html?category=Studio" class="flex items-center gap-3 bg-white p-4 rounded-2xl border border-brand-gold/15 hover:shadow-md transition-all duration-300">
+                            <div class="w-12 h-12 rounded-full bg-brand-blush/60 flex items-center justify-center text-xl shadow-inner">
+                                📸
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-brand-text block">Studio Ảnh</span>
+                                <span class="text-[9px] text-gray-400">120+ Đối tác</span>
+                            </div>
+                        </a>
+                        <a href="marketplace.html?category=Decor" class="flex items-center gap-3 bg-white p-4 rounded-2xl border border-brand-gold/15 hover:shadow-md transition-all duration-300">
+                            <div class="w-12 h-12 rounded-full bg-brand-blush/60 flex items-center justify-center text-xl shadow-inner">
+                                🎀
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-brand-text block">Trang trí</span>
+                                <span class="text-[9px] text-gray-400">80+ Đối tác</span>
+                            </div>
+                        </a>
+                        <a href="marketplace.html?category=Makeup" class="flex items-center gap-3 bg-white p-4 rounded-2xl border border-brand-gold/15 hover:shadow-md transition-all duration-300">
+                            <div class="w-12 h-12 rounded-full bg-brand-blush/60 flex items-center justify-center text-xl shadow-inner">
+                                👗
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-brand-text block">Makeup & Váy</span>
+                                <span class="text-[9px] text-gray-400">95+ Đối tác</span>
+                            </div>
+                        </a>
+                        <a href="marketplace.html?category=Nhà hàng" class="flex items-center gap-3 bg-white p-4 rounded-2xl border border-brand-gold/15 hover:shadow-md transition-all duration-300">
+                            <div class="w-12 h-12 rounded-full bg-brand-blush/60 flex items-center justify-center text-xl shadow-inner">
+                                🍽️
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-brand-text block">Nhà Hàng</span>
+                                <span class="text-[9px] text-gray-400">50+ Đối tác</span>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- E-Invitation Banner -->
+                <section>
+                    <a href="invitation.html" class="block bg-gradient-to-r from-brand-gold/15 to-brand-gold/5 rounded-2xl p-5 border border-brand-gold/25 relative overflow-hidden shadow-sm hover:shadow-md transition-all blush-glow">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-gold/10 rounded-full blur-xl -mr-6 -mt-6"></div>
+                        <div class="relative z-10 flex justify-between items-center">
+                            <div class="space-y-1 flex-1 pr-4">
+                                <span class="text-[8px] bg-brand-gold/20 text-brand-goldDark px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Mới</span>
+                                <h4 class="serif-title text-sm md:text-base font-bold text-brand-text mt-1">Tạo Thiệp Cưới Online & Tích Hợp QR</h4>
+                                <p class="text-[10px] text-gray-500 mt-0.5">Tự tạo thiệp mời online nghệ thuật có tích hợp QR mừng cưới và RSVP xác nhận tham gia.</p>
+                            </div>
+                            <span class="material-symbols-outlined text-brand-goldDark text-3xl">mail</span>
+                        </div>
+                    </a>
+                </section>
+
+                <!-- Value Proposition (Why Trạm Hỷ?) -->
+                <section>
+                    <div class="bg-gradient-to-r from-brand-gold/10 to-brand-gold/5 rounded-3xl p-6 border border-brand-gold/15">
+                        <h3 class="serif-title text-base md:text-lg font-bold text-brand-goldDark mb-4 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-lg">security</span> Trạm Hỷ Bảo Chứng - An Tâm Ngày Vui
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white/80 p-4 rounded-2xl border border-white/50 shadow-sm flex gap-3">
+                                <span class="material-symbols-outlined text-brand-gold text-2xl" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                <div>
+                                    <h4 class="text-xs font-bold text-brand-text">100% WYSIWYG (Đúng Thực Tế)</h4>
+                                    <p class="text-[10px] text-gray-500 mt-1">Ảnh thực tế từ khách hàng đã nghiệm thu, không lo treo đầu dê bán thịt chó.</p>
+                                </div>
+                            </div>
+                            <div class="bg-white/80 p-4 rounded-2xl border border-white/50 shadow-sm flex gap-3">
+                                <span class="material-symbols-outlined text-brand-gold text-2xl" style="font-variation-settings: 'FILL' 1;">lock</span>
+                                <div>
+                                    <h4 class="text-xs font-bold text-brand-text">Ví Ký Quỹ Milestone Pay</h4>
+                                    <p class="text-[10px] text-gray-500 mt-1">Tiền cọc nằm trong ví bảo chứng, chỉ giải ngân từng đợt khi bạn nghiệm thu đạt yêu cầu.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Verified Premium Vendors -->
+                <section>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="serif-title text-base md:text-lg font-bold text-brand-text">Đối tác tích xanh hàng đầu</h3>
+                        <a href="marketplace.html" class="text-xs text-brand-goldDark font-semibold flex items-center">Xem thêm <span class="material-symbols-outlined text-xs">arrow_forward</span></a>
                     </div>
                     
-                    <button onclick="analyzeBudget()" class="w-full gold-gradient hover:opacity-95 text-white text-xs font-bold py-3 rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-1">
-                         Phân tích & Đề xuất dịch vụ cưới
-                    </button>
-                </div>
-            </section>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <!-- Partner card 1 -->
+                        <a href="detail.html" class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition-all border border-gray-100 flex flex-col justify-between">
+                            <div class="h-44 overflow-hidden relative">
+                                <img src="https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&q=80&w=300" alt="TuArt Wedding" class="w-full h-full object-cover">
+                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[9px] font-bold text-brand-goldDark">
+                                    <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span> 4.9
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex items-center gap-1">
+                                    <h4 class="text-xs font-bold text-brand-text truncate">TuArt Wedding</h4>
+                                    <span class="material-symbols-outlined text-xs text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                </div>
+                                <p class="text-[10px] text-gray-400 mt-1">Hai Bà Trưng, Hà Nội</p>
+                                <div class="flex justify-between items-center mt-3 border-t border-gray-50 pt-2">
+                                    <span class="text-[10px] text-gray-400">Trọn gói từ</span>
+                                    <span class="text-xs font-bold text-brand-goldDark">9.900.000đ</span>
+                                </div>
+                            </div>
+                        </a>
+                        
+                        <!-- Partner card 2 -->
+                        <a href="detail.html" class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition-all border border-gray-100 flex flex-col justify-between">
+                            <div class="h-44 overflow-hidden relative">
+                                <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&q=80&w=300" alt="7799 Wedding Storyteller" class="w-full h-full object-cover">
+                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[9px] font-bold text-brand-goldDark">
+                                    <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span> 4.9
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex items-center gap-1">
+                                    <h4 class="text-xs font-bold text-brand-text truncate">7799 Storyteller</h4>
+                                    <span class="material-symbols-outlined text-xs text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                </div>
+                                <p class="text-[10px] text-gray-400 mt-1">Hoàn Kiếm, Hà Nội</p>
+                                <div class="flex justify-between items-center mt-3 border-t border-gray-50 pt-2">
+                                    <span class="text-[10px] text-gray-400">Trọn gói từ</span>
+                                    <span class="text-xs font-bold text-brand-goldDark">25.000.000đ</span>
+                                </div>
+                            </div>
+                        </a>
 
-            <!-- Interactive AI Results Section -->
-            <section id="ai-results-section" class="px-4 mt-4 hidden">
-                <div class="bg-white rounded-2xl p-5 shadow-lg border border-brand-gold/20 relative overflow-hidden blush-glow">
-                    <!-- Loading Overlay -->
-                    <div id="ai-loading" class="absolute inset-0 bg-white/95 z-50 flex flex-col items-center justify-center gap-2 hidden">
-                        <div class="w-10 h-10 border-4 border-brand-gold/20 border-t-brand-gold rounded-full animate-spin"></div>
-                        <p class="text-xs font-bold text-brand-text">AI đang phân tích thị trường thực tế...</p>
+                        <!-- Partner card 3 (Added for grid balance) -->
+                        <a href="marketplace.html" class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition-all border border-gray-100 flex flex-col justify-between">
+                            <div class="h-44 overflow-hidden relative">
+                                <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=300" alt="Mai Do Makeup" class="w-full h-full object-cover">
+                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[9px] font-bold text-brand-goldDark">
+                                    <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span> 4.8
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex items-center gap-1">
+                                    <h4 class="text-xs font-bold text-brand-text truncate">Mai Đỗ Makeup</h4>
+                                    <span class="material-symbols-outlined text-xs text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                </div>
+                                <p class="text-[10px] text-gray-400 mt-1">Cầu Giấy, Hà Nội</p>
+                                <div class="flex justify-between items-center mt-3 border-t border-gray-50 pt-2">
+                                    <span class="text-[10px] text-gray-400">Trọn gói từ</span>
+                                    <span class="text-xs font-bold text-brand-goldDark">4.500.000đ</span>
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Partner card 4 (Added for grid balance) -->
+                        <a href="marketplace.html" class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition-all border border-gray-100 flex flex-col justify-between">
+                            <div class="h-44 overflow-hidden relative">
+                                <img src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&q=80&w=300" alt="Mimosa Wedding" class="w-full h-full object-cover">
+                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[9px] font-bold text-brand-goldDark">
+                                    <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span> 4.9
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex items-center gap-1">
+                                    <h4 class="text-xs font-bold text-brand-text truncate">Mimosa Wedding</h4>
+                                    <span class="material-symbols-outlined text-xs text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                </div>
+                                <p class="text-[10px] text-gray-400 mt-1">Thanh Xuân, Hà Nội</p>
+                                <div class="flex justify-between items-center mt-3 border-t border-gray-50 pt-2">
+                                    <span class="text-[10px] text-gray-400">Trọn gói từ</span>
+                                    <span class="text-xs font-bold text-brand-goldDark">7.500.000đ</span>
+                                </div>
+                            </div>
+                        </a>
                     </div>
-
-                    <div class="flex justify-between items-center mb-3">
-                        <div>
-                            <span class="text-[10px] bg-brand-gold/10 text-brand-goldDark px-2 py-1 rounded-full font-bold">Phương án Tối ưu cát tường</span>
-                            <h3 class="serif-title text-base font-bold text-brand-text mt-1">Phân bổ ngân sách cưới</h3>
-                        </div>
-                        <span class="text-xs font-semibold text-gray-400 cursor-pointer" onclick="closeResults()">Đóng</span>
-                    </div>
-
-                    <div class="flex justify-between items-end mb-4 border-b border-gray-100 pb-3">
-                        <span class="text-xs text-gray-500">Tổng chi phí dự kiến</span>
-                        <span class="text-lg font-bold text-brand-goldDark" id="result-total-budget">148.500.000đ</span>
-                    </div>
-
-                    <div class="space-y-3.5 mb-5">
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-brand-text font-medium">🍽️ Nhà hàng tiệc cưới (50%)</span>
-                                <span class="font-bold text-brand-text" id="restaurant-cost">75.000.000đ</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2">
-                                <div class="gold-gradient h-2 rounded-full" style="width: 50%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-brand-text font-medium">🎀 Trang trí & Tiệc cưới (20%)</span>
-                                <span class="font-bold text-brand-text" id="decor-cost">30.000.000đ</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2">
-                                <div class="gold-gradient h-2 rounded-full" style="width: 20%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-brand-text font-medium">📸 Studio ảnh & Quay phim (18%)</span>
-                                <span class="font-bold text-brand-text" id="studio-cost">27.000.000đ</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2">
-                                <div class="gold-gradient h-2 rounded-full" style="width: 18%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-brand-text font-medium">👗 Makeup & Váy cưới (12%)</span>
-                                <span class="font-bold text-brand-text" id="makeup-cost">18.000.000đ</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2">
-                                <div class="gold-gradient h-2 rounded-full" style="width: 12%"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <a id="find-vendors-btn" href="marketplace.html" class="block w-full text-center gold-gradient text-white text-xs font-bold py-3 rounded-xl shadow-md transition-all active:scale-[0.98]">
-                        Khám phá nhà cung cấp phù hợp ngân sách
-                    </a>
-                </div>
-            </section>
-
-            <!-- Core Services 4 Grid -->
-            <section class="px-4 mt-6">
-                <h3 class="serif-title text-base font-bold text-brand-text mb-3">Dịch vụ cưới trọn gói</h3>
-                <div class="grid grid-cols-4 gap-3">
-                    <a href="marketplace.html?category=Studio" class="flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity">
-                        <div class="w-14 h-14 rounded-full bg-white border border-brand-gold/20 flex items-center justify-center shadow-sm">
-                            <span class="text-xl">📸</span>
-                        </div>
-                        <span class="text-[10px] font-bold text-center text-gray-600">Studio Ảnh</span>
-                    </a>
-                    <a href="marketplace.html?category=Decor" class="flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity">
-                        <div class="w-14 h-14 rounded-full bg-white border border-brand-gold/20 flex items-center justify-center shadow-sm">
-                            <span class="text-xl">🎀</span>
-                        </div>
-                        <span class="text-[10px] font-bold text-center text-gray-600">Trang trí</span>
-                    </a>
-                    <a href="marketplace.html?category=Makeup" class="flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity">
-                        <div class="w-14 h-14 rounded-full bg-white border border-brand-gold/20 flex items-center justify-center shadow-sm">
-                            <span class="text-xl">👗</span>
-                        </div>
-                        <span class="text-[10px] font-bold text-center text-gray-600">Makeup & Váy</span>
-                    </a>
-                    <a href="marketplace.html?category=Nhà hàng" class="flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity">
-                        <div class="w-14 h-14 rounded-full bg-white border border-brand-gold/20 flex items-center justify-center shadow-sm">
-                            <span class="text-xl">🍽️</span>
-                        </div>
-                        <span class="text-[10px] font-bold text-center text-gray-600">Nhà Hàng</span>
-                    </a>
-                </div>
-            </section>
-
-            <!-- E-Invitation Banner -->
-            <section class="px-4 mt-6">
-                <a href="invitation.html" class="block bg-gradient-to-r from-brand-gold/15 to-brand-gold/5 rounded-2xl p-4 border border-brand-gold/25 relative overflow-hidden shadow-sm hover:shadow-md transition-all blush-glow">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-brand-gold/10 rounded-full blur-xl -mr-6 -mt-6"></div>
-                    <div class="relative z-10 flex justify-between items-center">
-                        <div class="space-y-1 flex-1 pr-2">
-                            <span class="text-[8px] bg-brand-gold/20 text-brand-goldDark px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Mới</span>
-                            <h4 class="serif-title text-sm font-bold text-brand-text mt-1">Tạo Thiệp Cưới Online & Tích Hợp QR</h4>
-                            <p class="text-[9px] text-gray-500 mt-0.5">Tự tạo thiệp mời online nghệ thuật có tích hợp QR mừng cưới và RSVP xác nhận tham gia.</p>
-                        </div>
-                        <span class="material-symbols-outlined text-brand-goldDark text-2xl">mail</span>
-                    </div>
-                </a>
-            </section>
-
-            <!-- Value Proposition (Why Trạm Hỷ?) -->
-            <section class="px-4 mt-6">
-                <div class="bg-gradient-to-r from-brand-gold/10 to-brand-gold/5 rounded-2xl p-4 border border-brand-gold/15">
-                    <h3 class="serif-title text-sm font-bold text-brand-goldDark mb-2 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm">security</span> Trạm Hỷ Bảo Chứng - An Tâm Ngày Vui
-                    </h3>
-                    <div class="grid grid-cols-2 gap-3 mt-2">
-                        <div class="bg-white/80 p-2.5 rounded-xl border border-white/50">
-                            <h4 class="text-[10px] font-bold text-brand-text flex items-center gap-0.5">
-                                <span class="material-symbols-outlined text-brand-gold text-sm" style="font-variation-settings: 'FILL' 1;">verified</span> 100% WYSIWYG
-                            </h4>
-                            <p class="text-[9px] text-gray-500 mt-1">Ảnh thực tế từ khách hàng đã nghiệm thu, không lo treo đầu dê bán thịt chó.</p>
-                        </div>
-                        <div class="bg-white/80 p-2.5 rounded-xl border border-white/50">
-                            <h4 class="text-[10px] font-bold text-brand-text flex items-center gap-0.5">
-                                <span class="material-symbols-outlined text-brand-gold text-sm" style="font-variation-settings: 'FILL' 1;">lock</span> Milestone Pay
-                            </h4>
-                            <p class="text-[9px] text-gray-500 mt-1">Tiền cọc nằm trong ví bảo chứng, chỉ giải ngân từng đợt khi bạn nghiệm thu đạt yêu cầu.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Verified Premium Vendors -->
-            <section class="px-4 mt-6">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="serif-title text-base font-bold text-brand-text">Đối tác tích xanh hàng đầu</h3>
-                    <a href="marketplace.html" class="text-xs text-brand-goldDark font-semibold flex items-center">Xem thêm <span class="material-symbols-outlined text-xs">arrow_forward</span></a>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-3.5">
-                    <!-- Partner card 1 -->
-                    <a href="detail.html" class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col justify-between">
-                        <div class="h-32 overflow-hidden relative">
-                            <img src="https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&q=80&w=300" alt="TuArt Wedding" class="w-full h-full object-cover">
-                            <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[8px] font-bold text-brand-goldDark">
-                                <span class="material-symbols-outlined text-[8px]" style="font-variation-settings: 'FILL' 1;">star</span> 4.9
-                            </div>
-                        </div>
-                        <div class="p-3">
-                            <div class="flex items-center gap-0.5">
-                                <h4 class="text-xs font-bold text-brand-text truncate">TuArt Wedding</h4>
-                                <span class="material-symbols-outlined text-xs text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>
-                            </div>
-                            <p class="text-[9px] text-gray-400 mt-0.5">Hai Bà Trưng, Hà Nội</p>
-                            <div class="flex justify-between items-center mt-2 border-t border-gray-50 pt-1.5">
-                                <span class="text-[9px] text-gray-400">Trọn gói từ</span>
-                                <span class="text-xs font-bold text-brand-goldDark">9.900.000đ</span>
-                            </div>
-                        </div>
-                    </a>
-                    
-                    <!-- Partner card 2 -->
-                    <a href="detail.html" class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col justify-between">
-                        <div class="h-32 overflow-hidden relative">
-                            <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&q=80&w=300" alt="7799 Wedding Storyteller" class="w-full h-full object-cover">
-                            <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[8px] font-bold text-brand-goldDark">
-                                <span class="material-symbols-outlined text-[8px]" style="font-variation-settings: 'FILL' 1;">star</span> 4.9
-                            </div>
-                        </div>
-                        <div class="p-3">
-                            <div class="flex items-center gap-0.5">
-                                <h4 class="text-xs font-bold text-brand-text truncate">7799 Storyteller</h4>
-                                <span class="material-symbols-outlined text-xs text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>
-                            </div>
-                            <p class="text-[9px] text-gray-400 mt-0.5">Hoàn Kiếm, Hà Nội</p>
-                            <div class="flex justify-between items-center mt-2 border-t border-gray-50 pt-1.5">
-                                <span class="text-[9px] text-gray-400">Trọn gói từ</span>
-                                <span class="text-xs font-bold text-brand-goldDark">25.000.000đ</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </section>
+                </section>
+            </main>
         </div>
 
         <!-- Footer -->
-        <footer class="mt-8 border-t border-gray-100 py-6 text-center text-[10px] text-gray-400 bg-white">
-            <p>© 2026 Trạm Hỷ. Nền tảng bảo chứng công nghệ cưới hỏi hàng đầu Việt Nam.</p>
+        <footer class="border-t border-gray-150 py-6 text-center text-xs text-gray-400 bg-white">
+            <div class="max-w-7xl mx-auto px-4">
+                <p>© 2026 Trạm Hỷ. Nền tảng bảo chứng công nghệ cưới hỏi hàng đầu Việt Nam.</p>
+            </div>
         </footer>
     </div>
 

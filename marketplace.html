@@ -92,106 +92,140 @@
         }
     </script>
 
-    <!-- Mobile Screen Frame -->
-    <div class="max-w-[480px] mx-auto bg-brand-blush min-h-screen shadow-2xl relative border-x border-gray-100 flex flex-col justify-between">
+    <!-- Main Responsive Web Container -->
+    <div class="w-full bg-brand-blush min-h-screen flex flex-col justify-between">
         
         <div>
             <!-- Sticky Top Header & Navigation -->
-            <header class="sticky top-0 z-50 glass border-b border-brand-blush/40 shadow-sm">
-                <!-- Top Branding Line -->
-                <div class="px-4 py-2 flex items-center justify-between border-b border-gray-50/50 bg-white/50">
-                    <div class="flex items-center gap-2">
-                        <a href="index.html" class="material-symbols-outlined text-brand-text text-lg">arrow_back</a>
-                        <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-6 h-6 rounded-full object-cover border border-brand-gold/30">
-                        <h2 class="serif-title font-extrabold italic text-sm text-brand-text">Tìm kiếm dịch vụ</h2>
+            <header class="sticky top-0 z-50 glass border-b border-brand-blush/40 shadow-sm bg-white/95">
+                <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <!-- Top Branding Line / Left on Desktop -->
+                    <div class="flex items-center justify-between md:justify-start gap-4">
+                        <div class="flex items-center gap-2">
+                            <a href="index.html" class="material-symbols-outlined text-brand-text text-lg hover:opacity-85">arrow_back</a>
+                            <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-8 h-8 rounded-full object-cover border border-brand-gold/30">
+                            <h1 class="serif-title text-base font-extrabold text-brand-text tracking-wide italic">Tìm kiếm dịch vụ</h1>
+                        </div>
+                        <span class="text-[9px] font-bold text-brand-goldDark bg-brand-gold/10 px-2 py-0.5 rounded-full hidden md:inline-block">Trạm Hỷ Marketplace</span>
                     </div>
-                </div>
-                
-                <!-- Navigation Tabs (Tìm kiếm B2C Active) -->
-                <nav class="px-4 py-2 flex justify-between items-center bg-white/80 border-b border-gray-50/50">
-                    <a href="index.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
-                        <span class="material-symbols-outlined text-lg">home</span>
-                        <span class="text-[9px] font-medium">Trang chủ</span>
-                    </a>
-                    <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark">
-                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">search</span>
-                        <span class="text-[9px] font-bold">Tìm kiếm</span>
-                    </a>
-                    <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
-                        <span class="material-symbols-outlined text-lg">calendar_month</span>
-                        <span class="text-[9px] font-medium">Lịch hẹn</span>
-                    </a>
-                    <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
-                        <span class="material-symbols-outlined text-lg">mail</span>
-                        <span class="text-[9px] font-medium">Thiệp cưới</span>
-                    </a>
-                </nav>
+                    
+                    <!-- Navigation Tabs (Tìm kiếm Active) -->
+                    <nav class="flex justify-between md:justify-center items-center gap-1 md:gap-4 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent">
+                        <a href="index.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                            <span class="material-symbols-outlined text-base">home</span>
+                            <span class="text-[10px] font-medium">Trang chủ</span>
+                        </a>
+                        <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark">
+                            <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 1;">search</span>
+                            <span class="text-[10px] font-bold">Tìm kiếm</span>
+                        </a>
+                        <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                            <span class="material-symbols-outlined text-base">calendar_month</span>
+                            <span class="text-[10px] font-medium">Lịch hẹn</span>
+                        </a>
+                        <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                            <span class="material-symbols-outlined text-base">mail</span>
+                            <span class="text-[10px] font-medium">Thiệp cưới</span>
+                        </a>
+                    </nav>
 
-                <!-- Search Inputs Group (Directly below Nav inside sticky header) -->
-                <div class="px-4 py-2 bg-white">
-                    <div class="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-1.5 border border-gray-200">
-                        <span class="material-symbols-outlined text-gray-400 text-base">search</span>
-                        <input type="text" id="search-input" oninput="filterVendors()" class="flex-1 bg-transparent text-xs font-semibold focus:outline-none text-brand-text" placeholder="Tìm tên studio, decor, nhà cung cấp...">
-                        <span class="material-symbols-outlined text-brand-gold text-base cursor-pointer" onclick="clearSearch()">close</span>
+                    <!-- Right Controls (Location, Notification) -->
+                    <div class="flex items-center justify-between md:justify-end gap-3 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent">
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-brand-gold text-base" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                            <span class="text-[11px] font-bold text-brand-text">Việt Nam</span>
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <!-- Category Pills (Horizontal Scroll) -->
-            <section class="px-4 py-3 bg-white border-b border-gray-100 overflow-x-auto flex gap-2 no-scrollbar">
-                <button onclick="selectCategory('All')" id="cat-All" class="px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm bg-brand-gold text-white border border-brand-gold">Tất cả</button>
-                <button onclick="selectCategory('Studio')" id="cat-Studio" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white">📸 Studio ảnh</button>
-                <button onclick="selectCategory('Decor')" id="cat-Decor" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white">🎀 Trang trí</button>
-                <button onclick="selectCategory('Makeup')" id="cat-Makeup" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white">👗 Makeup</button>
-                <button onclick="selectCategory('Nhà hàng')" id="cat-Nhà hàng" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white">🍽️ Nhà hàng</button>
-            </section>
-
-            <!-- Interactive Filters (GPS, Price, Verified Checkbox) -->
-            <section class="px-4 py-3 flex justify-between items-center bg-brand-blush border-b border-gray-100">
-                <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-brand-gold text-base" style="font-variation-settings: 'FILL' 1;">verified_user</span>
-                    <label class="text-[10px] font-bold text-brand-text cursor-pointer flex items-center gap-1">
-                        <input type="checkbox" id="verified-only" onchange="filterVendors()" class="rounded border-gray-300 text-brand-gold focus:ring-brand-gold">
-                        Chỉ tích xanh bảo chứng
-                    </label>
-                </div>
+            <!-- Main Content Area: Sidebar + Grid layout -->
+            <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 flex-1">
                 
-                <div class="flex gap-2">
-                    <select id="price-sort" onchange="filterVendors()" class="bg-white border border-gray-200 rounded-lg px-2 py-1 text-[10px] font-semibold text-brand-text focus:outline-none">
-                        <option value="default">Giá mặc định</option>
-                        <option value="low-high">Giá: Thấp -> Cao</option>
-                        <option value="high-low">Giá: Cao -> Thấp</option>
-                    </select>
-                </div>
-            </section>
+                <!-- Search bar & AI Active Budget Bar -->
+                <div class="space-y-3">
+                    <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-brand-gold/15 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-brand-gold text-xl">search</span>
+                        <input type="text" id="search-input" oninput="filterVendors()" class="flex-1 bg-transparent text-xs font-semibold focus:outline-none text-brand-text" placeholder="Tìm tên studio, decor, nhà cung cấp hoặc địa chỉ...">
+                        <span class="material-symbols-outlined text-gray-400 text-base cursor-pointer hover:text-brand-text" onclick="clearSearch()">close</span>
+                    </div>
 
-            <!-- Active Budget Indicator (From AI Planner) -->
-            <section id="budget-badge" class="px-4 py-2 bg-brand-gold/10 border-b border-brand-gold/15 hidden flex justify-between items-center">
-                <div class="flex items-center gap-1">
-                    <span class="material-symbols-outlined text-brand-gold text-sm" style="font-variation-settings: 'FILL' 1;">neurology</span>
-                    <span class="text-[9px] font-bold text-brand-goldDark">Bộ lọc AI: Ngân sách phù hợp khoảng <span id="budget-badge-val">150.000.000đ</span></span>
+                    <!-- Active Budget Indicator (From AI Planner) -->
+                    <div id="budget-badge" class="bg-brand-gold/10 border border-brand-gold/20 rounded-2xl px-4 py-3 hidden flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-brand-gold text-sm animate-pulse" style="font-variation-settings: 'FILL' 1;">neurology</span>
+                            <span class="text-xs font-bold text-brand-goldDark">Bộ lọc AI: Ngân sách phù hợp khoảng <span id="budget-badge-val" class="underline">150.000.000đ</span></span>
+                        </div>
+                        <button onclick="resetBudgetFilter()" class="text-xs uppercase font-extrabold text-red-500 hover:underline">Xóa lọc</button>
+                    </div>
                 </div>
-                <button onclick="resetBudgetFilter()" class="text-[8px] uppercase font-bold text-red-500 hover:underline">Xóa lọc</button>
-            </section>
 
-            <!-- Vendor List Grid -->
-            <section class="p-4">
-                <div id="vendor-grid" class="grid grid-cols-2 gap-3.5">
-                    <!-- Cards will be populated dynamically -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                    
+                    <!-- Left Sidebar Filters -->
+                    <aside class="bg-white rounded-2xl p-5 border border-brand-gold/15 space-y-5 lg:sticky lg:top-24">
+                        
+                        <!-- Categories -->
+                        <div>
+                            <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider mb-3">Danh mục</h3>
+                            <div class="flex flex-row overflow-x-auto lg:flex-col gap-2 pb-2 lg:pb-0 no-scrollbar">
+                                <button onclick="selectCategory('All')" id="cat-All" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-left whitespace-nowrap">Tất cả</button>
+                                <button onclick="selectCategory('Studio')" id="cat-Studio" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">📸 Studio ảnh</button>
+                                <button onclick="selectCategory('Decor')" id="cat-Decor" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">🎀 Trang trí</button>
+                                <button onclick="selectCategory('Makeup')" id="cat-Makeup" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">👗 Makeup</button>
+                                <button onclick="selectCategory('Nhà hàng')" id="cat-Nhà hàng" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">🍽️ Nhà hàng</button>
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-100">
+
+                        <!-- Verification Toggle -->
+                        <div class="space-y-2">
+                            <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider">Mức độ bảo chứng</h3>
+                            <div class="flex items-center gap-2 bg-brand-blush/60 p-2.5 rounded-xl border border-brand-gold/10">
+                                <input type="checkbox" id="verified-only" onchange="filterVendors()" class="rounded border-gray-300 text-brand-gold focus:ring-brand-gold h-4 w-4 cursor-pointer">
+                                <label for="verified-only" class="text-xs font-bold text-brand-text cursor-pointer flex items-center gap-1 select-none">
+                                    <span class="material-symbols-outlined text-base text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                    Chỉ đối tác Tích xanh
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-100">
+
+                        <!-- Price Sorting -->
+                        <div class="space-y-2">
+                            <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider">Sắp xếp giá</h3>
+                            <select id="price-sort" onchange="filterVendors()" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-brand-text focus:outline-none focus:border-brand-gold">
+                                <option value="default">Mặc định</option>
+                                <option value="low-high">Giá: Thấp -> Cao</option>
+                                <option value="high-low">Giá: Cao -> Thấp</option>
+                            </select>
+                        </div>
+                    </aside>
+
+                    <!-- Right Vendor Grid -->
+                    <div class="lg:col-span-3">
+                        <div id="vendor-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            <!-- Populated Dynamically -->
+                        </div>
+
+                        <!-- Empty State -->
+                        <div id="empty-state" class="hidden text-center py-16 space-y-3 bg-white rounded-2xl border border-gray-150 p-6">
+                            <span class="material-symbols-outlined text-4xl text-gray-300">search_off</span>
+                            <h4 class="text-sm font-bold text-brand-text">Không tìm thấy đối tác phù hợp</h4>
+                            <p class="text-xs text-gray-400">Vui lòng thử điều chỉnh lại bộ lọc hoặc ngân sách hoạch định AI.</p>
+                        </div>
+                    </div>
                 </div>
-                
-                <!-- Empty State -->
-                <div id="empty-state" class="hidden flex flex-col items-center justify-center py-16 text-center">
-                    <span class="material-symbols-outlined text-gray-300 text-5xl mb-2">find_in_page</span>
-                    <p class="text-xs font-bold text-gray-500">Không tìm thấy nhà cung cấp phù hợp</p>
-                    <p class="text-[10px] text-gray-400 mt-1">Vui lòng điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
-                </div>
-            </section>
+            </main>
         </div>
 
         <!-- Footer -->
-        <footer class="mt-8 border-t border-gray-100 py-6 text-center text-[10px] text-gray-400 bg-white">
-            <p>© 2026 Trạm Hỷ. Nền tảng bảo chứng công nghệ cưới hỏi hàng đầu Việt Nam.</p>
+        <footer class="border-t border-gray-150 py-6 text-center text-xs text-gray-400 bg-white">
+            <div class="max-w-7xl mx-auto px-4">
+                <p>© 2026 Trạm Hỷ. Nền tảng bảo chứng công nghệ cưới hỏi hàng đầu Việt Nam.</p>
+            </div>
         </footer>
     </div>
 
@@ -463,26 +497,26 @@
                 card.className = "bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition-all border border-gray-100 flex flex-col justify-between";
                 
                 card.innerHTML = `
-                    <div class="h-32 overflow-hidden relative">
+                    <div class="h-44 overflow-hidden relative">
                         <img src="${v.image}" alt="${v.name}" class="w-full h-full object-cover">
-                        <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[8px] font-bold text-brand-goldDark">
-                            <span class="material-symbols-outlined text-[8px]" style="font-variation-settings: 'FILL' 1;">star</span> ${v.rating}
+                        <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[9px] font-bold text-brand-goldDark">
+                            <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span> ${v.rating}
                         </div>
                         ${v.verified ? `
-                        <div class="absolute top-2 left-2 bg-gradient-to-r from-brand-gold to-brand-goldDark text-white px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[7px] font-extrabold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-[7px]">military_tech</span> Choice 2026
+                        <div class="absolute top-3 left-3 bg-gradient-to-r from-brand-gold to-brand-goldDark text-white px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[8px] font-extrabold uppercase tracking-wider">
+                            <span class="material-symbols-outlined text-[8px]">military_tech</span> Choice 2026
                         </div>
                         ` : ''}
                     </div>
-                    <div class="p-3">
-                        <div class="flex items-center gap-0.5">
-                            <h4 class="text-xs font-bold text-brand-text truncate flex-1">${v.name}</h4>
-                            ${v.verified ? `<span class="material-symbols-outlined text-xs text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>` : ''}
+                    <div class="p-4">
+                        <div class="flex items-center gap-1">
+                            <h4 class="text-sm font-bold text-brand-text truncate flex-1">${v.name}</h4>
+                            ${v.verified ? `<span class="material-symbols-outlined text-sm text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>` : ''}
                         </div>
-                        <p class="text-[9px] text-gray-400 mt-0.5">${v.location}</p>
-                        <div class="flex justify-between items-center mt-2 border-t border-gray-50 pt-1.5">
-                            <span class="text-[9px] text-gray-400">Trọn gói từ</span>
-                            <span class="text-xs font-bold text-brand-goldDark">${formatMoney(v.price)}</span>
+                        <p class="text-xs text-gray-400 mt-1">${v.location}</p>
+                        <div class="flex justify-between items-center mt-3 border-t border-gray-50 pt-2">
+                            <span class="text-xs text-gray-400">Trọn gói từ</span>
+                            <span class="text-sm font-bold text-brand-goldDark">${formatMoney(v.price)}</span>
                         </div>
                     </div>
                 `;
