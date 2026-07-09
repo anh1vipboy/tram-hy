@@ -241,7 +241,7 @@
                 <div class="bg-gray-100 rounded-2xl p-4 min-h-[380px] flex flex-col gap-3">
                     <div class="flex justify-between items-center border-b border-gray-200 pb-2">
                         <span class="text-xs font-bold text-brand-goldDark">ĐÃ CỌC ĐỢT 1 (30%)</span>
-                        <span class="text-[10px] bg-brand-gold/20 px-2 py-0.5 rounded-full font-bold text-brand-goldDark" id="col-count-2">1</span>
+                        <span class="text-[10px] bg-brand-gold/20 px-2 py-0.5 rounded-full font-bold text-brand-goldDark" id="col-count-2">2</span>
                     </div>
                     <div id="col-2-cards" class="space-y-3 flex-1 overflow-y-auto">
                         <!-- Card 2 -->
@@ -260,6 +260,23 @@
                                 </button>
                             </div>
                         </div>
+
+                        <!-- Card 2b -->
+                        <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-gray-400">#1078</span>
+                                <span class="text-[8px] bg-green-100 text-green-600 font-bold px-1.5 py-0.5 rounded">ĐÃ CỌC 3.75M</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-brand-text">Đỗ Hoàng Yến</h4>
+                            <p class="text-[9px] text-gray-400">Gói Tiêu Chuẩn | 12.500.000đ</p>
+                            <p class="text-[9px] text-gray-400">Đã nhận cọc: 3.750.000đ</p>
+                            
+                            <div class="pt-2 border-t border-gray-50 flex gap-2">
+                                <button onclick="advanceToStage2('#1078')" class="w-full py-1 text-[9px] font-bold bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-goldDark rounded">
+                                    Báo cáo đã chụp xong (Lên đợt 2)
+                                </button>
+                            </div>
+                        </div>
                         
                         <!-- Dynamic Real-time Booking Card Placeholder -->
                         <div id="realtime-card-placeholder"></div>
@@ -270,7 +287,7 @@
                 <div class="bg-gray-100 rounded-2xl p-4 min-h-[380px] flex flex-col gap-3">
                     <div class="flex justify-between items-center border-b border-gray-200 pb-2">
                         <span class="text-xs font-bold text-blue-600">ĐANG THI CÔNG</span>
-                        <span class="text-[10px] bg-blue-100 px-2 py-0.5 rounded-full font-bold text-blue-600" id="col-count-3">1</span>
+                        <span class="text-[10px] bg-blue-100 px-2 py-0.5 rounded-full font-bold text-blue-600" id="col-count-3">2</span>
                     </div>
                     <div id="col-3-cards" class="space-y-3 flex-1 overflow-y-auto">
                         <!-- Card 3 -->
@@ -284,7 +301,24 @@
                             <p class="text-[9px] text-gray-400">Chụp ngày: 15/07 | Đang chọn ảnh lọc</p>
                             
                             <div class="pt-2 border-t border-gray-50">
-                                <button onclick="requestFinalNghiemThu('#1075')" class="w-full py-1 text-[9px] font-bold bg-blue-550 text-blue-600 bg-blue-100 rounded">
+                                <button onclick="requestFinalNghiemThu('#1075')" class="w-full py-1 text-[9px] font-bold bg-blue-100 text-blue-600 rounded">
+                                    Yêu cầu Nghiệm thu (Đợt cuối 20%)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 3b -->
+                        <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-gray-400">#1072</span>
+                                <span class="text-[8px] bg-blue-100 text-blue-600 font-bold px-1.5 py-0.5 rounded">ĐANG SỬA ẢNH</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-brand-text">Vũ Minh Đức</h4>
+                            <p class="text-[9px] text-gray-400">Gói Phóng Sự | 15.000.000đ</p>
+                            <p class="text-[9px] text-gray-400">Chụp ngày: 18/07 | Đang hậu kỳ</p>
+                            
+                            <div class="pt-2 border-t border-gray-50">
+                                <button onclick="requestFinalNghiemThu('#1072')" class="w-full py-1 text-[9px] font-bold bg-blue-100 text-blue-600 rounded">
                                     Yêu cầu Nghiệm thu (Đợt cuối 20%)
                                 </button>
                             </div>
@@ -296,7 +330,7 @@
                 <div class="bg-gray-100 rounded-2xl p-4 min-h-[380px] flex flex-col gap-3">
                     <div class="flex justify-between items-center border-b border-gray-200 pb-2">
                         <span class="text-xs font-bold text-green-700">CHỜ NGHIỆM THU</span>
-                        <span class="text-[10px] bg-green-100 px-2 py-0.5 rounded-full font-bold text-green-700" id="col-count-4">1</span>
+                        <span class="text-[10px] bg-green-100 px-2 py-0.5 rounded-full font-bold text-green-700" id="col-count-4">2</span>
                     </div>
                     <div id="col-4-cards" class="space-y-3 flex-1 overflow-y-auto">
                         <!-- Card 4 -->
@@ -311,6 +345,23 @@
                             
                             <div class="pt-2 border-t border-gray-50 flex gap-2">
                                 <button onclick="simulateCustomerNghiemThu('#1070')" class="w-full py-1 text-[9px] font-bold bg-green-600 hover:opacity-95 text-white rounded">
+                                    Xác nhận nghiệm thu (Mô phỏng khách)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 4b -->
+                        <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-gray-400">#1068</span>
+                                <span class="text-[8px] bg-yellow-100 text-yellow-700 font-bold px-1.5 py-0.5 rounded">CHỜ XÁC NHẬN</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-brand-text">Phan Thanh Tùng</h4>
+                            <p class="text-[9px] text-gray-400">Gói Cát Tường | 12.500.000đ</p>
+                            <p class="text-[9px] text-gray-400">Nội dung: Đã bàn giao album in & Drive</p>
+                            
+                            <div class="pt-2 border-t border-gray-50 flex gap-2">
+                                <button onclick="simulateCustomerNghiemThu('#1068')" class="w-full py-1 text-[9px] font-bold bg-green-600 hover:opacity-95 text-white rounded">
                                     Xác nhận nghiệm thu (Mô phỏng khách)
                                 </button>
                             </div>
@@ -350,6 +401,24 @@
                             <td class="p-4"><span class="px-2 py-0.5 rounded bg-brand-gold/10 text-brand-goldDark font-bold text-[9px]">ĐÃ CỌC ĐỢT 1</span></td>
                         </tr>
                         <!-- Row 2 -->
+                        <tr class="border-b border-gray-50 text-brand-text font-medium">
+                            <td class="p-4 text-gray-400">#1075</td>
+                            <td class="p-4 font-bold">Trần Đức C</td>
+                            <td class="p-4">12.500.000đ</td>
+                            <td class="p-4 text-red-500">-1.250.000đ</td>
+                            <td class="p-4 text-green-600 font-bold">11.250.000đ</td>
+                            <td class="p-4"><span class="px-2 py-0.5 rounded bg-blue-100 text-blue-600 font-bold text-[9px]">ĐANG THI CÔNG</span></td>
+                        </tr>
+                        <!-- Row 3 -->
+                        <tr class="border-b border-gray-50 text-brand-text font-medium">
+                            <td class="p-4 text-gray-400">#1070</td>
+                            <td class="p-4 font-bold">Phạm Minh D</td>
+                            <td class="p-4">20.000.000đ</td>
+                            <td class="p-4 text-red-500">-2.000.000đ</td>
+                            <td class="p-4 text-green-600 font-bold">18.000.000đ</td>
+                            <td class="p-4"><span class="px-2 py-0.5 rounded bg-purple-100 text-purple-600 font-bold text-[9px]">CHỜ NGHIỆM THU</span></td>
+                        </tr>
+                        <!-- Row 4 -->
                         <tr class="border-b border-gray-50 text-brand-text font-medium">
                             <td class="p-4 text-gray-400">#1068</td>
                             <td class="p-4 font-bold">Hoàng Văn E</td>
