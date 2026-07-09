@@ -66,11 +66,11 @@
             <button onclick="toggleDemoController()" class="text-gray-400 hover:text-brand-text focus:outline-none"><span class="material-symbols-outlined text-sm" id="demo-toggle-icon">keyboard_arrow_down</span></button>
         </div>
         <div class="flex flex-col gap-1.5" id="demo-buttons">
-            <a href="index.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1. Trang chủ B2C</a>
-            <a href="marketplace.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">2. Chợ dịch vụ</a>
+            <a href="index.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1. Trang chủ</a>
+            <a href="marketplace.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">2. Dịch vụ cưới hỏi</a>
             <a href="detail.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">3. Chi tiết & Đặt cọc</a>
-            <a href="bookings.html" class="px-3 py-2 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 4. Lịch hẹn B2C</a>
-            <a href="dashboard.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">5. Kênh B2B Vendor</a>
+            <a href="bookings.html" class="px-3 py-2 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 4. Lịch hẹn nhà cung cấp</a>
+            <a href="dashboard.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">5. Kênh Nhà cung cấp</a>
             <a href="invitation.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">6. Tạo thiệp & QR</a>
             <a href="admin.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">7. Quản trị Admin</a>
         </div>
@@ -102,7 +102,7 @@
                         <div class="flex items-center gap-2">
                             <a href="index.html" class="material-symbols-outlined text-brand-text text-lg hover:opacity-85">arrow_back</a>
                             <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-8 h-8 rounded-full object-cover border border-brand-gold/30">
-                            <h1 class="serif-title text-base font-extrabold text-brand-text tracking-wide italic">Lịch hẹn B2C</h1>
+                            <h1 class="serif-title text-base font-extrabold text-brand-text tracking-wide italic">Lịch hẹn nhà cung cấp</h1>
                         </div>
                         <span class="text-[9px] font-bold text-brand-goldDark bg-brand-gold/10 px-2 py-0.5 rounded-full hidden md:inline-block">Theo Dõi Cọc</span>
                     </div>
@@ -115,15 +115,15 @@
                         </a>
                         <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
                             <span class="material-symbols-outlined text-base">search</span>
-                            <span class="text-[10px] font-medium">Tìm kiếm</span>
+                            <span class="text-[10px] font-medium">Dịch vụ cưới hỏi</span>
                         </a>
                         <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark">
                             <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
-                            <span class="text-[10px] font-bold">Lịch hẹn</span>
+                            <span class="text-[10px] font-bold">Lịch hẹn nhà cung cấp</span>
                         </a>
                         <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
                             <span class="material-symbols-outlined text-base">mail</span>
-                            <span class="text-[10px] font-medium">Thiệp cưới</span>
+                            <span class="text-[10px] font-medium">Tạo thiệp & QR</span>
                         </a>
                     </nav>
 
@@ -250,7 +250,7 @@
                 actionBtn = `
                     <div class="bg-slate-50 rounded-xl p-3 border border-gray-100 space-y-2">
                         <p class="text-[9px] font-bold text-brand-goldDark flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-brand-gold animate-ping"></span> Chờ Vendor thực hiện chụp ảnh & gửi yêu cầu đợt 2</p>
-                        <p class="text-[8px] text-gray-400">Bạn có thể sang trang Kênh B2B Vendor hoặc bấm nút giả lập nhanh dưới đây để bỏ qua bước chuyển đổi vai trò:</p>
+                        <p class="text-[8px] text-gray-400">Bạn có thể sang trang Kênh Nhà cung cấp hoặc bấm nút giả lập nhanh dưới đây để bỏ qua bước chuyển đổi vai trò:</p>
                         <button onclick="simulateVendorAction('executing')" class="w-full py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-600 font-extrabold text-[9px] rounded-lg transition-all flex items-center justify-center gap-1">
                             <span class="material-symbols-outlined text-[11px]">bolt</span> Giả lập nhanh: TuArt Wedding gửi yêu cầu giải ngân Đợt 2
                         </button>
@@ -271,7 +271,7 @@
                 actionBtn = `
                     <div class="bg-slate-50 rounded-xl p-3 border border-gray-100 space-y-2">
                         <p class="text-[9px] font-bold text-blue-600 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span> Chờ đối tác bàn giao sản phẩm & gửi yêu cầu nghiệm thu</p>
-                        <p class="text-[8px] text-gray-400">Bạn có thể sang trang Kênh B2B Vendor hoặc bấm nút giả lập nhanh dưới đây để bỏ qua bước chuyển đổi vai trò:</p>
+                        <p class="text-[8px] text-gray-400">Bạn có thể sang trang Kênh Nhà cung cấp hoặc bấm nút giả lập nhanh dưới đây để bỏ qua bước chuyển đổi vai trò:</p>
                         <button onclick="simulateVendorAction('to_approve')" class="w-full py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-600 font-extrabold text-[9px] rounded-lg transition-all flex items-center justify-center gap-1">
                             <span class="material-symbols-outlined text-[11px]">bolt</span> Giả lập nhanh: TuArt Wedding yêu cầu Nghiệm thu (Đợt 3)
                         </button>
