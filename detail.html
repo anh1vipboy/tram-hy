@@ -442,17 +442,22 @@
             <!-- Simulated Payment Checkout Actions -->
             <div id="payment-actions">
                 <button onclick="simulatePayment()" class="w-full gold-gradient hover:opacity-95 text-white text-xs font-bold py-3.5 rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
-                    <span class="material-symbols-outlined text-sm">payment</span> Thanh toán cọc Đợt 1 bằng QR VNPay/MoMo
+                    <span class="material-symbols-outlined text-sm">qr_code_scanner</span> Quét mã QR thanh toán cọc Đợt 1 (3.750.000đ)
                 </button>
             </div>
             
-            <div id="success-actions" class="hidden text-center py-2">
-                <div class="flex items-center justify-center gap-1.5 text-green-600 font-bold text-xs mb-3">
+            <div id="success-actions" class="hidden text-center py-2 space-y-3">
+                <div class="flex items-center justify-center gap-1.5 text-green-600 font-bold text-xs">
                     <span class="material-symbols-outlined text-lg">check_circle</span> Đã cọc thành công Đợt 1 bảo chứng!
                 </div>
-                <a href="dashboard.html" class="inline-block bg-brand-text text-white text-[10px] font-bold px-4 py-2.5 rounded-lg shadow hover:opacity-90 transition-all">
-                     👉 Xem Đơn Hàng Tại Kênh Nhà Cung Cấp
-                </a>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-2">
+                    <a href="dashboard.html" class="inline-block bg-brand-text text-white text-[10px] font-bold px-4 py-2.5 rounded-xl shadow hover:opacity-90 transition-all">
+                         👉 Xem Đơn Hàng Tại Kênh Nhà Cung Cấp
+                    </a>
+                    <button onclick="resetModalUIForCheckout()" class="inline-block bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-goldDark text-[10px] font-bold px-3 py-2.5 rounded-xl border border-brand-gold/30 transition-all flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">restart_alt</span> Quét lại mã QR Đợt 1
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -460,25 +465,25 @@
     <!-- QR Code Scan Simulation Pop-up -->
     <div id="qr-modal" class="fixed inset-0 bg-black/85 z-[9999] hidden flex-col items-center justify-center p-6 text-white text-center">
         <h3 class="serif-title text-base font-bold text-brand-gold mb-1">Cổng thanh toán giả lập Trạm Hỷ Pay</h3>
-        <p class="text-[10px] text-gray-300 mb-6">Quét mã QR dưới đây bằng App Ngân hàng hoặc Ví điện tử để hoàn tất thanh toán cọc.</p>
+        <p class="text-[10px] text-gray-300 mb-4">Quét mã QR dưới đây bằng App Ngân hàng hoặc Ví điện tử để hoàn tất thanh toán cọc.</p>
         
         <!-- Mock QR Box -->
-        <div class="bg-white p-4 rounded-2xl shadow-2xl mb-6 relative border border-brand-gold/30">
-            <!-- Simulated QR code from Unsplash -->
-            <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=220" alt="Simulated QR Code" class="w-48 h-48 object-cover rounded-lg">
-            <div class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-brand-gold text-brand-text text-[9px] font-extrabold px-3 py-0.5 rounded-full shadow border border-white">
-                3.750.000 VNĐ
+        <div class="bg-white p-4 rounded-2xl shadow-2xl mb-4 relative border border-brand-gold/30">
+            <!-- Simulated QR code from VietQR API -->
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=2a2421&data=https://vietqr.me/api/qr/Techcombank/19036789999?amount=3750000%26addInfo=TramHy%201085%20Dot%201" alt="Simulated QR Code" class="w-48 h-48 object-cover rounded-lg mx-auto">
+            <div class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-brand-gold text-brand-text text-[9px] font-extrabold px-3 py-0.5 rounded-full shadow border border-white whitespace-nowrap">
+                3.750.000 VNĐ (Cọc Đợt 1)
             </div>
         </div>
         
-        <p class="text-[9px] text-gray-400 mb-6 animate-pulse">Hệ thống đang kiểm tra trạng thái thanh toán từ ngân hàng...</p>
+        <p class="text-[9px] text-gray-400 mb-5 animate-pulse">Hệ thống đang kiểm tra trạng thái thanh toán từ ngân hàng...</p>
         
         <div class="flex gap-3">
             <button onclick="cancelQR()" class="bg-gray-800 text-gray-300 text-xs font-semibold px-4 py-2.5 rounded-xl border border-gray-700 hover:bg-gray-750">
                 Hủy bỏ
             </button>
-            <button onclick="confirmQR()" class="gold-gradient text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow-md hover:opacity-95">
-                Xác nhận đã quét & thanh toán thành công
+            <button onclick="confirmQR()" class="gold-gradient text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow-md hover:opacity-95 flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">check_circle</span> Xác nhận đã quét & thanh toán thành công
             </button>
         </div>
     </div>
@@ -531,12 +536,45 @@
             const booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
             if (booking && booking.status === 'deposit_paid') {
                 updateModalUIForSuccess();
+            } else {
+                resetModalUIForCheckout();
             }
         }
 
         function closeMilestoneModal() {
             document.getElementById('milestone-modal').classList.add('hidden');
             document.getElementById('milestone-modal').classList.remove('flex');
+        }
+
+        function resetModalUIForCheckout() {
+            // Reset active booking status for checkout demo
+            localStorage.removeItem('tramhy_active_booking_status');
+            let booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
+            if (booking) {
+                booking.status = 'pending';
+                localStorage.setItem('tramhy_active_booking', JSON.stringify(booking));
+            }
+
+            // Step 1 Unpaid Styles
+            const step1Card = document.getElementById('step-1-card');
+            step1Card.className = "flex gap-3 bg-brand-gold/5 p-3 rounded-xl border border-brand-gold/30";
+            document.getElementById('step-1-dot').className = "w-5 h-5 rounded-full flex items-center justify-center bg-brand-gold text-white text-[10px] font-bold";
+            document.getElementById('step-1-dot').innerText = "1";
+            document.getElementById('step-1-status').className = "text-[9px] font-bold text-brand-goldDark px-1.5 py-0.5 bg-brand-gold/10 border border-brand-gold/25 rounded";
+            document.getElementById('step-1-status').innerText = "CẦN THANH TOÁN";
+
+            // Step 2 Inactive Styles
+            const step2Card = document.getElementById('step-2-card');
+            step2Card.className = "flex gap-3 bg-white p-3 rounded-xl border border-gray-150";
+            document.getElementById('step-2-dot').className = "w-5 h-5 rounded-full flex items-center justify-center bg-gray-200 text-gray-500 text-[10px] font-bold";
+            document.getElementById('step-2-title').className = "text-xs font-bold text-gray-400";
+            document.getElementById('step-2-val').className = "text-xs font-bold text-gray-400 mt-1";
+            document.getElementById('step-2-status').className = "text-[9px] font-semibold text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-200";
+            document.getElementById('step-2-status').innerText = "CHƯA BẮT ĐẦU";
+
+            // Show Payment Actions, Hide Success Actions
+            document.getElementById('payment-actions').classList.remove('hidden');
+            document.getElementById('success-actions').classList.add('hidden');
         }
 
         function simulatePayment() {
