@@ -1,0 +1,911 @@
+﻿OUTCOME 1 REPORT: TRẠM HỶ - KẾT DUYÊN CÁT HỶ
+Nền tảng Công nghệ cưới thông minh: Thử váy cưới AR & Đặt dịch vụ chụp ảnh
+Môn học: EXE201 – Trải nghiệm Khởi nghiệp
+Lớp: IA1905-SS
+Giảng viên hướng dẫn: Đặng Trần Hiếu 
+Nhóm thực hiện: TRẠM HỶ (6 thành viên)
+TABLE OF CONTENTS (MỤC LỤC BÁO CÁO)
+PRODUCT INTRODUCTION (GIỚI THIỆU SẢN PHẨM & MVP)
+10-WEEK ACTION PLAN & KPIS (KẾ HOẠCH HÀNH ĐỘNG & KPIS 10 TUẦN)
+PRODUCT DEVELOPMENT PLAN (KẾ HOẠCH PHÁT TRIỂN SẢN PHẨM)
+IN-DEPTH INTERVIEW ANALYSIS (PHÂN TÍCH PHỎNG VẤN SÂU SỐ LIỆU THỰC ĐỊA)
+PHẦN 1: PRODUCT INTRODUCTION (GIỚI THIỆU SẢN PHẨM)
+Vấn đề thị trường (Pain Points): Dâu rể Gen Z bận rộn mất quá nhiều thời gian đi lại thử váy cưới trực tiếp tại showroom; ảnh mẫu trên mạng bị photoshop quá đà; chi phí thuê thợ chụp ảnh mập mờ, sợ bị lừa tiền cọc.
+Giải pháp Trạm Hỷ (Core Value):
+AR Try-on (Thử váy online): Mở camera điện thoại là có thể ướm thử ngay phom dáng váy cưới trên người với độ chính xác cao nhờ tích hợp API giả lập của đối tác Elsun.
+Instant Booking: Đặt gói chụp ảnh cưới ngoại cảnh/studio minh bạch giá và thời gian.
+Affiliate Engine: Cho phép người dùng lan tỏa link thử váy cưới AR để nhận hoa hồng giới thiệu.
+Mô hình doanh thu (Revenue Model):
+B2C: Phí micro-payment mở khóa bộ sưu tập váy cưới Premium AR (30k - 50k); Tiền combo thử váy + chụp ảnh.
+B2B: Thu 8% - 10% hoa hồng trên mỗi đơn hàng thành công từ Studio/Tiệm váy và thợ chụp ảnh Freelance.
+PHẦN 2: 10-WEEK ACompetitor survey N PLAN & KPIS (KẾ HOẠCH HÀNH ĐỘNG & KPIS)
+(Thiết kế theo chuẩn biểu mẫu 4 cột: WHAT? - WHEN? - WHO? - HOW MANY? / KPIS. Điều chỉnh KPI User đạt mốc 200 Users theo đúng yêu cầu đề bài web/app tech).
+2.1. Bảng KPI mục tiêu tổng thể 10 tuần (Master KPIs)
+Nhóm KPI
+Chỉ số đo lường (Metric)
+KPI Mục tiêu (Yêu cầu bài tập)
+Landing Page / Web
+Lượt truy cập (Traffic Visits)
+$\ge 2,000$ visits
+Lượt click nút CTA (Thử váy AR / Đặt lịch)
+$\ge 300$ clicks
+User Acquisition
+Tổng số User đăng ký tài khoản mới
+$\ge 200$ User mới (Đạt KPI chuẩn Web)
+MVP AR Testing
+Số lượt trải nghiệm quét camera AR thử váy
+$\ge 150$ lượt trải nghiệm thực tế
+Customer Feedback
+Số phiếu khảo sát/phỏng vấn valid thu về
+$\ge 80$ phản hồi chất lượng
+B2B Partnership
+Studio / Thợ ảnh ký thỏa thuận onboarding
+$\ge 5$ đối tác Vendor
+2.2. Kế hoạch chi tiết 10 tuần (10-Week Action Plan Matrix)
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        TIẾN TRÌNH 10 TUẦN TRIỂN KHAI TRẠM HỶ                           │
+│                                                                                        │
+│ [W1-W3: Tech Setup & API] ──> [W4-W6: Launch Web & 200 Users] ──> [W7-W10: Retarget]  │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+GIAI ĐOẠN 1: SETUP NỀN TẢNG VÀ CHUẨN BỊ API AR (Tuần 1 - Tuần 3)
+WHAT: Kết nối API giả lập từ Elsun; dựng UI/UX Web AR thử váy; biên soạn kịch bản phỏng vấn 8 nhóm.
+WHEN: Tuần 1 - Tuần 3.
+WHO: CTO (Tô Văn Tiến Dũng) + R&D (Phùng Đức Anh) + CEO (Trần Huyền Trang).
+KPIS: Hoàn thành 100% tài liệu User Flow & Tích hợp thành công API AR chạy thử nghiệm nội bộ $\ge 10$ lượt.
+GIAI ĐOẠN 2: PHÁT HÀNH WEB & TĂNG TRƯỞNG 200 USER MỚI (Tuần 4 - Tuần 6)
+WHAT: Ra mắt Landing Page & Tính năng dùng thử AR; chạy phễu "Thiệp cưới điện tử QR miễn phí" để gom user; đi thực địa phỏng vấn 10-12 khách hàng.
+WHEN: Tuần 4 - Tuần 6.
+WHO: CMO (Lê Minh Châu) + CISO (Nguyễn Thị Thanh Tâm) + Security (Nguyễn Duy Quang).
+KPIS: Đạt mốc 200 User đăng ký mới trên Web; $\ge 2,000$ lượt visits; hoàn thành 10-12 bài phỏng vấn gỡ băng.
+GIAI ĐOẠN 3: ĐO LƯỜNG TƯƠNG TÁC AR & KÍCH HOẠT AFFILIATE (Tuần 7 - Tuần 8)
+WHAT: Khởi chạy tính năng tạo link Affiliate chia sẻ nhận hoa hồng 5%; đo độ trễ API camera AR và thu thập feedback sửa lỗi.
+WHEN: Tuần 7 - Tuần 8.
+WHO: Cả nhóm phối hợp.
+KPIS: $\ge 150$ lượt trải nghiệm thử váy AR thành công; thu về $\ge 80$ phản hồi valid.
+GIAI ĐOẠN 4: THU HẸP BẮT LỖI, BÁO CÁO TÀI CHÍNH & FREEZE CODE (Tuần 9 - Tuần 10)
+WHAT: Đóng băng mã nguồn (Freeze V1.0); trích xuất log sự kiện từ server; tổng hợp báo cáo kết quả Outcome 1 gửi giảng viên.
+WHEN: Tuần 9 - Tuần 10.
+WHO: CEO (Trần Huyền Trang) & CTO (Tô Văn Tiến Dũng).
+KPIS: 0 lỗi blocking bugs; hoàn thiện 100% hồ sơ báo cáo đúng hạn.
+PHẦN 3: PRODUCT DEVELOPMENT PLAN (KẾ HOẠCH PHÁT TRIỂN SẢN PHẨM)
+(Mô phỏng quy trình 6 bước phát triển phần mềm Agile/Scrum từ mẫu CyberKnight Slide 11)
+Step 1 - Ideation (Tuần 1): Hình thành ý tưởng giải quyết nỗi đau đi thử váy cưới; chốt mô hình Thử váy AR kết hợp Chụp ảnh cưới.
+Step 2 - Product Definition (Tuần 2): Định nghĩa 3 cấp độ sản phẩm; chốt cấu hình API giả lập hợp tác với nhóm Elsun.
+Step 3 - Prototyping (Tuần 3): Thiết kế giao diện Web AR Try-on; kết nối camera và nhận diện phom dáng người dùng.
+Step 4 - Detailed Design (Tuần 3): Chuẩn hóa kho dữ liệu 50 mẫu váy cưới 2D/3D; hoàn thiện luồng thanh toán Escrow và tính mã Affiliate.
+Step 5 - Validation/Testing (Tuần 4 - 5): Đưa Web vào chạy thử nghiệm với 10-12 khách hàng phỏng vấn sâu để đo độ trễ (latency) của API Trung Quốc.
+Step 6 - Commercialization (Tuần 6 - 7): Mở rộng cho 200 User đăng ký; kích hoạt cổng thu phí micro-payment đối với các bộ sưu tập váy Premium.
+PHẦN 4: IN-DEPTH INTERVIEW ANALYSIS (PHÂN TÍCH PHỎNG VẤN SÂU SỐ LIỆU THỰC ĐỊA)
+(Yêu cầu kỹ thuật quan trọng nhất: Có ảnh chụp thực địa/cuộc thoại + Trích dẫn trực tiếp câu nói của khách hàng (Direct Quotes) theo đúng format).
+4.1. Danh sách Khách hàng phỏng vấn thực địa (Customer Profile Gallery)
+(Phần này chèn Khung ảnh đại diện / Ảnh chụp phỏng vấn thực tế + Thông tin nhân khẩu học)Khách hàng B2B 1: Tuấn Anh (25 tuổi) - Thợ chụp ảnh tự do (Freelance Photographer) tại Hà Nội. Sở hữu máy ảnh cá nhân, chuyên nhận lịch tự do. 
+Khách hàng B2B 2: Hoàng Nam (29 tuổi) - Chủ studio ảnh cưới nhỏ lẻ  quy mô 4 nhân sự tại Cầu Giấy, Hà Nội.
+4.2. Phân tích Insight theo 8 nhóm nội dung chuẩn (kèm Ảnh & Quotes)
+(Bám sát 8 nhóm: Like, Dislike, Ưu/Nhược điểm, MKT, Sales, Promotion, More_Sales, More_Money)
+01. LIKE — Động lực & Trải nghiệm AR thử váy cưới
+Kết quả phân tích: Khách hàng ưu tiên sự nhanh chóng, giao diện dễ dùng và khả năng "ướm thử" phom váy ngay tại nhà để lọc bớt các mẫu không hợp vóc dáng.
+[Hình ảnh minh chứng: Ảnh chị Ngọc đang trải nghiệm tính năng Web AR trên điện thoại]
+Trích dẫn câu nói thực tế (Direct Quote):"Chị không muốn mất cả 3 cuối tuần để lượn khắp các tiệm váy cưới chỉ để thử vài bộ đồ không hợp với mình. Nếu app cho thử AR tại nhà trước để chị biết mình hợp dáng váy xòe hay dáng đuôi cá thì tốt quá." — Chị Minh Ngọc, 26 tuổi (Hà Nội)
+02. DISLIKE — Nỗi sợ & Rào cản API giả lập Trung Quốc
+Kết quả phân tích: Khách hàng sợ nhất hiện tượng "ảnh trên app một đằng, váy thật một nẻo", sợ hình ảnh camera AR bị lag hoặc bị rò rỉ hình ảnh riêng tư.
+[Hình ảnh minh chứng: Ảnh chị Thu Phương trong buổi phỏng vấn tại quán cafe]
+Trích dẫn câu nói thực tế (Direct Quote):"Điều chị sợ nhất là công nghệ AR làm hình ảnh trông rất lung linh ảo diệu, nhưng lúc chị đến tiệm lấy váy thật thì chất liệu vải lại nhìn thô và lệch size hoàn toàn." — Chị Thu Phương, 24 tuổi (Hà Nội)
+03. ƯU / NHƯỢC ĐIỂM — So sánh với việc tìm kiếm truyền thống
+Khoảng trống thị trường: Các trang như Marry.vn hay Facebook chủ yếu đăng ảnh concept đã photoshop quá đà và bắt inbox báo giá. Trạm Hỷ cung cấp ảnh camera thường minh bạch và tính năng thử đồ số.
+[Hình ảnh minh chứng: Ảnh phỏng vấn dâu rể thực địa]
+Trích dẫn câu nói thực tế (Direct Quote):"Cứ inbox hỏi giá từng Studio vừa tốn thời gian vừa bị nhân viên chèo kéo gọi điện liên tục. Thà lên app thấy giá niêm yết rõ ràng rồi bấm chọn thợ chụp luôn chị thấy an tâm hơn hẳn." — Chị Thắm, 27 tuổi
+04. MARKETING — Kênh tìm kiếm & Sự tin tưởng
+Hành vi người dùng: Kênh TikTok/Threads tạo sự chú ý (Awareness), nhưng đánh giá review từ dâu rể trước mới tạo ra niềm tin (Trust).
+[Hình ảnh minh chứng: Màn hình điện thoại hiển thị video TikTok thử váy cưới AR]
+Trích dẫn câu nói thực tế (Direct Quote):"Nếu thấy video cô dâu thực tế dùng app quay camera thường thử váy trên TikTok, mình sẽ bấm vào dùng thử ngay. Mấy ảnh bài đăng chỉn chu của Studio giờ mình ít tin lắm." — Bạn Trà, 23 tuổi
+05. SALES — Động lực quyết định xuống tiền (Purchase Drivers)
+Hành vi quyết định: Khách hàng cần trải nghiệm dùng thử AR miễn phí trước, thấy giá trị rõ ràng mới quyết định chốt cọc combo Chụp ảnh + Thuê váy.
+[Hình ảnh minh chứng: Ảnh làm việc trực tiếp với Studio đối tác B2B]
+Trích dẫn câu nói thực tế (Direct Quote):"Tôi muốn cho dâu rể thử đồ ảo trên app trước để họ thích phom dáng, sau đó họ chốt cọc gói chụp ảnh qua sàn có bảo chứng tiền cọc (Escrow) thì cả hai bên đều an tâm." — Anh Quốc Việt (Chủ Studio ảnh cưới)
+06. PROMOTIONS — Chương trình kích cầu hiệu quả
+Kết quả: Ưu đãi dạng "Freemium" (cho thử miễn phí 3 bộ AR đầu tiên) hoặc quà tặng dịch vụ (Tặng thiệp cưới QR điện tử miễn phí) thu hút người dùng hiệu quả hơn việc giảm giá trực tiếp.
+07. MORE_SALES — Động lực kích hoạt Hệ thống Affiliate
+Kết quả: Người dùng trẻ sẵn sàng chia sẻ link thử váy cưới AR lên các hội nhóm Facebook/Threads nếu ứng dụng chạy mượt và có hoa hồng 5% tiền mặt.
+Trích dẫn câu nói thực tế (Direct Quote):"Ứng dụng hay mà chia sẻ cho bạn bè chuẩn bị cưới vừa giúp họ tiết kiệm công sức vừa mình có thêm chút hoa hồng thì chắc chắn mình sẽ nhiệt tình rải link." — Bạn Huyền, 25 tuổi
+08. MORE_MONEY — Mức sẵn sàng chi trả (Willingness-to-Pay)
+Kết quả: Người dùng sẵn sàng trả khoảng 30.000đ - 50.000đ để mở khóa thử các bộ sưu tập váy cưới thiết kế cao cấp (Premium) trên giao diện AR.
+Trích dẫn câu nói thực tế (Direct Quote):"Nhiều bộ váy thiết kế vài chục triệu ngoài đời mình không có tiền thuê, nhưng bỏ 30-50k để được thử bản AR xem mặt mình có hợp không thì quá rẻ và đáng tiền." — Chị Minh Ngọc, 26 tuổi
+HƯỚNG DẪN HOÀN THIỆN FILE BÁO CÁO (CHECKLIST CHO NHÓM):
+Thiết kế Slide / File Word: Copy khung trên, ghép ảnh phỏng vấn thực tế của 6 thành viên vào đúng các mục trong Phần 4.
+Minh chứng gửi kèm: Xuất 10-12 file ghi âm (.mp3) phỏng vấn sâu + Bản text gỡ băng (Transcription) nộp vào thư mục Phụ lục (Appendix).
+Đo lường KPI User: Đảm bảo hệ thống Web Landing Page có cài mã Google Analytics hoặc đếm database ghi nhận đủ $\ge 200$ User mới để nộp báo cáo chuẩn môn.
+Outcome 1 _ Phỏng vấn
+I. BẢNG PHÂN CHIA NHÓM ĐỐI TƯỢNG PHỎNG VẤN TRỰC TIẾP (6 THÀNH VIÊN)
+Yêu cầu kỹ thuật thực địa EXE201: Phỏng vấn sâu bằng câu hỏi MỞ, thời gian tối thiểu 20 phút/khách hàng, áp dụng kỹ thuật đào sâu "Why? Why? Why?", có ghi âm/ghi hình làm bằng chứng nộp kèm báo cáo.
+Phụ trách
+Số lượng
+Nhóm đối tượng phỏng vấn
+Phân loại
+Đặc điểm chân dung thực tế (EXE201)
+Nhu cầu / Mong muốn kiểm chứng cốt lõi
+Lê Minh Châu
+02
+Cặp đôi trẻ (Dâu rể Gen Z) đang lên kế hoạch cưới
+B2C
+22 - 26 tuổi, bận rộn, thích công nghệ số và sự nhanh chóng.
+Kiểm chứng mức độ sẵn sàng sử dụng tính năng Thử váy cưới online bằng AR tại nhà để tiết kiệm thời gian đi showroom.
+Nguyễn Thị Thanh Tâm
+02
+Cô dâu mới cưới (Đã hoàn thành đám cưới trong 3 tháng qua)
+B2C
+24 - 28 tuổi, văn phòng, có kinh nghiệm thuê váy và chụp ảnh.
+Khảo sát nỗi đau thực tế khi đi thử váy trực tiếp (nóng nực, thử nhiều bộ mệt mỏi) và lỗi sai của thợ chụp ảnh.
+Phùng Đức Anh
+02
+Các bạn trẻ làm Freelance Photo / Studio ảnh cưới nhỏ lẻ
+B2B
+22 - 30 tuổi, sở hữu máy ảnh cá nhân, tự nhận lịch tự do.
+Kiểm chứng nhu cầu tham gia gói Tích hợp dịch vụ chụp ảnh lên sàn và cơ chế ăn chia hoa hồng theo đơn.
+Nguyễn Duy Quang
+02
+Các Bạn trẻ / KOLs / Cặp đôi có network rộng
+B2C
+20 - 25 tuổi, thích sáng tạo nội dung, rành sử dụng MXH.
+Kiểm chứng luồng vận hành của hệ thống Affiliate (Tiếp thị liên kết): Chia sẻ link tạo thiệp/thử váy để nhận chiết khấu.
+Trần Huyền Trang
+01
+Đại diện nhóm công nghệ Elsun (Bên nắm giữ API giả lập Trung Quốc)
+B2B
+Đối tác kỹ thuật phát triển phần mềm hệ thống.
+Đối soát năng lực công nghệ, độ trễ xử lý hình ảnh của API AR thử váy, và chi phí duy trì trên mỗi lượt quét camera.
+Tô Văn Tiến Dũng
+01
+Chủ cửa hàng / Tiệm váy cưới truyền thống
+B2B
+Chủ SMEs kinh doanh váy cưới vật lý tại Hà Nội.
+Kiểm chứng nỗi đau sợ bị khách hủy lịch và mức độ sẵn sàng đẩy váy lên app để tiếp cận tệp khách dùng thử AR.
+II. BỘ CÂU HỎI PHỎNG VẤN SÂU SỐ HÓA THEO CHUẨN EXE201
+1. BẢNG CÂU HỎI CHO KHÁCH HÀNG SỬ DỤNG (B2C — Cặp đôi & Người dùng Affiliate)
+Mục đích: Sử dụng kỹ thuật "Why? Why? Why?" để bóc tách hành vi tương tác với tính năng AR váy cưới và luồng chia sẻ link kiếm tiền.
+1. Like (Động lực công nghệ):
+Khi tìm kiếm váy cưới, điều gì khiến bạn mất thời gian nhất? Tại sao?
+Nếu có một ứng dụng cho phép bạn bật camera điện thoại lên để "ướm thử" 50 mẫu váy cưới AR (nhìn thấy form váy ôm sát người theo thời gian thực) ngay tại nhà, bạn có click vào dùng thử không? Tại sao?
+Bạn kỳ vọng độ chính xác về màu sắc và chất liệu vải của tính năng AR này đạt bao nhiêu % so với váy thật thì bạn mới tin tưởng đặt lịch hẹn? Tại sao?
+2. Dislike (Nỗi sợ lỗi hệ thống):
+Điều gì làm bạn e ngại nhất khi trải nghiệm thử váy cưới qua một bộ lọc AI/AR trực tuyến? (Ví dụ: sợ app làm giả vóc dáng, sợ lag máy, sợ lộ ảnh camera riêng tư). Tại sao?
+Nếu hình ảnh váy cưới AR trên app trông rất lung linh nhưng khi đến tiệm thật váy lại bị cũ hoặc lệch form, bạn sẽ xử lý thế nào? Tại sao điều đó lại khiến bạn block ứng dụng?
+3. Ưu/Nhược điểm (So sánh Showroom vật lý vs AR App):
+Hãy kể lại trải nghiệm mệt mỏi nhất của bạn khi phải đi thử váy cưới trực tiếp tại các showroom (nóng nực, tốn chi phí đi lại, nhân viên ép chốt gói chụp ảnh). Nhược điểm lớn nhất ở đó là gì?
+Tính năng thử váy cưới AR kết hợp gợi ý thợ chụp ảnh cưới ngay trên một màn hình của Trạm Hỷ có giải quyết được sự mệt mỏi đó không? Tại sao?
+4. MKT (Kênh tiếp cận phễu công nghệ):
+Bạn thường xem các video clip cô dâu "biến hình", thử váy cưới ở đâu (TikTok, Facebook Reels hay Instagram)? Tại sao bạn lại bị thu hút bởi các video đó?
+Bạn có tin vào hình ảnh váy cưới do các studio tự đăng không, hay bạn thích xem ảnh chụp camera thường của các cô dâu tự chụp khi dùng app thử váy hơn? Tại sao?
+5. Sales (Hành vi chuyển đổi đơn combo):
+Sau khi thử váy online bằng AR và chọn được mẫu ưng ý, bạn có xu hướng muốn đặt luôn gói chụp ảnh cưới (Pre-wedding) tích hợp sẵn mẫu váy đó trên cùng app không? Tại sao?
+Bạn thích nhắn tin làm việc trực tiếp với thợ chụp ảnh qua cổng chat của app hay thích app tự động xuất hợp đồng điện tử khóa lịch thi công luôn? Tại sao?
+6. Promotions (Kích thích chia sẻ Affiliate):
+Nếu Trạm Hỷ cấp cho bạn một mã Link Tiếp thị liên kết (Affiliate), khi bạn gửi link thử váy AR này vào các hội nhóm cô dâu sắp cưới và có người đặt lịch chụp ảnh thành công, bạn nhận được 5% hoa hồng tiền mặt, bạn có sẵn sàng đi rải link không? Tại sao?
+Chương trình tặng quà gì kèm theo (Ví dụ: Tặng miễn phí voucher quay phóng sự cưới khi đặt gói chụp ảnh) sẽ khiến bạn xuống tiền cọc ngay trên app mà không cần đi khảo giá thêm bên ngoài? Tại sao?
+7. More_Sales (Tần suất tương tác nền tảng):
+Đám cưới chỉ diễn ra một lần, điều gì ở ứng dụng Trạm Hỷ có thể khiến bạn giữ lại app hoặc giới thiệu nhiệt tình cho tất cả bạn bè chuẩn bị cưới sử dụng? Tại sao?
+Yếu tố nào về chất lượng hình ảnh AR và thái độ của thợ chụp ảnh liên kết sẽ quyết định việc bạn đánh giá 5 sao cho nền tảng? Tại sao?
+8. More_Money (Mức độ sẵn sàng chi trả — Willingness to pay):
+Việc thuê coder tối ưu bộ lọc AR này rất tốn chi phí. Bạn có sẵn sàng trả một khoản phí rất nhỏ (ví dụ 50.000đ) để mở khóa các mẫu váy cưới cao cấp (Limited Edition) phiên bản AR để thử không? Tại sao?
+Bạn cho rằng mức giá combo: Thuê 2 váy cưới thật + 1 gói chụp ảnh album ngoại cảnh đặt qua app Trạm Hỷ ở khoảng bao nhiêu tiền là "xứng đáng" và an tâm nhất? Tại sao?
+2. BẢNG CÂU HỎI CHO ĐỐI TÁC CUNG CẤP VÀ KỸ THUẬT (B2B — Studio, Cửa hàng váy & Nhóm API Elsun)
+Mục đích: Đối soát năng lực tích hợp API kỹ thuật và giải quyết điểm đau dòng tiền cho thợ chụp ảnh/chủ tiệm váy.
+Nhóm câu hỏi Đối soát Kỹ thuật API (Dành cho nhóm Elsun):
+Con API giả lập thử đồ của Trung Quốc hiện có tỷ lệ trễ (latency) là bao nhiêu mili-giây khi xử lý luồng video trực tiếp trên camera điện thoại tầm trung? Tại sao tỷ lệ này lại ảnh hưởng đến UI/UX người dùng?
+Quy trình cấu hình và "onboarding" một mẫu váy cưới 2D/3D mới của Việt Nam vào hệ thống API giả lập này mất bao lâu? Cần thợ code tối ưu những thông số nào để váy không bị méo khi cô dâu di chuyển? Tại sao?
+Nhóm câu hỏi Điểm đau Vận hành (Dành cho Studio Chụp ảnh & Cửa hàng váy):
+Khó khăn lớn nhất của các studio khi nhận lịch chụp ảnh cưới thông qua các bên trung gian hiện tại là gì? (Ví dụ: bị giam tiền hoa hồng, khách hủy lịch chụp sát giờ do thời tiết nhưng không được đền bù). Tại sao?
+Khi khách hàng sử dụng tính năng AR thử váy của Trạm Hỷ rồi chọn studio của anh/chị để chụp ảnh, anh/chị có sẵn sàng trích lại 10% phí dịch vụ cho sàn để đổi lấy tệp khách hàng chắc chắn xuống tiền này không? Tại sao?
+Quy trình quyết toán dòng tiền như thế nào (Ví dụ: Sàn giải ngân ngay 50% tiền cọc ngay khi thợ chụp bấm máy xong ngày đầu tiên) sẽ giúp studio giải quyết được bài toán mỏng vốn lưu động? Tại sao?
+Huyền Trang
+PHỎNG VẤN: TEAM ELSUN
+Thời gian: 12/09/2026 Người được phỏng vấn: Chị Phùng Ngọc Ánh (phụ trách sản phẩm) & chị Mai Anh – Dự án ELSUN (AI Virtual Try-On cho thời trang) Mục đích: Tham khảo kinh nghiệm triển khai công nghệ AI Virtual Try-On để áp dụng cho dự án Trạm Hỷ (thử váy cưới online) Hình thức: Phỏng vấn qua tin nhắn (theo đề nghị của người được phỏng vấn)
+I. DANH SÁCH CÂU HỎI ĐÃ HỎI
+Câu 1: AI Virtual Try-On của ELSUN là team tự phát triển từ đầu hay có dùng nền tảng/SDK có sẵn rồi tùy chỉnh lại?
+Câu 2: Nếu có dùng nền tảng có sẵn thì đó là công cụ/thư viện nào?
+Câu 3: Từ lúc bắt đầu làm đến khi có bản demo chạy được thì mất khoảng bao lâu?
+Câu 4: Con API của team là được thuê code riêng hay mua một con API có sẵn?
+Câu 5 (câu hỏi phát sinh từ định hướng của giảng viên): Nếu team đã làm xong phần API mẫu AR hoặc có thuê ngoài, có thể chia sẻ nguồn tham khảo được không?
+II. NỘI DUNG PHỎNG VẤN
+1. Cách team ELSUN triển khai công nghệ qua hai giai đoạn
+Team ELSUN cho biết công nghệ AI Virtual Try-On được triển khai theo hai giai đoạn khác nhau, với hai cách làm hoàn toàn khác nhau:
+Giai đoạn EXE (môn học khởi nghiệp):
+Team có sẵn một thành viên học chuyên ngành AI, bạn này trực tiếp build một bản demo cho team
+Dự án cũng kết hợp với các bạn EXE bên khối kỹ thuật để hoàn thiện phần công nghệ
+Chị Ngọc Ánh nhấn mạnh cách làm khi đó: "chị nhớ là lưu về từ cái web mẫu gì xong chỉnh sửa tí thôi" — tức là tận dụng nền tảng/web mẫu có sẵn rồi tùy chỉnh lại, không phát triển từ con số không
+Chị Mai Anh xác nhận: "Lúc exe cái đó chỉ là sơ khai, không yêu cầu như đồ án"
+Giai đoạn đồ án tốt nghiệp:
+Khi nâng cấp lên đồ án, yêu cầu kỹ thuật cao hơn nhiều nên team chuyển sang thuê bên thứ ba để tiếp tục phát triển
+Chị Mai Anh: "Xong đến lên đồ án thì bọn chị thuê người để tiếp tục"
+2. Lời khuyên trực tiếp cho dự án Trạm Hỷ
+Sau khi biết nhóm chỉ triển khai trong phạm vi môn EXE201, chị Ngọc Ánh đưa ra lời khuyên rất rõ ràng:
+Không cần thuê ngoài nếu chỉ dừng ở EXE: "Nếu k phát triển lên đồ án thì thuê cũng hơi tốn kém và k cần thiết"
+Chỉ cần xuất được bản demo là đủ: "Nếu chỉ làm exe thì các em chỉ cần xuất demo thôi cũng đc"
+Gợi ý cách làm tiết kiệm nhất: nếu team có thành viên khá về kỹ thuật, có thể tải về hoặc phát triển dựa trên một nền tảng web có sẵn của các thương hiệu đã làm trước — "có thể lưu về hoặc làm dựa trên 1 cái web nào đấy có sẵn của những thương hiệu nổi tiếng"
+3. Về việc xin nguồn API
+Theo định hướng của thầy Hiếu, nhóm có hỏi xin nguồn API mẫu AR. Team ELSUN cho biết ở giai đoạn EXE họ tự làm (không mua API thương mại), nên nguồn chủ yếu là web mẫu có sẵn được tùy chỉnh lại, không phải một API bán sẵn cụ thể. Chị Ngọc Ánh cũng đề nghị kết nối thêm thành viên phụ trách phần AI web để nhóm trao đổi sâu hơn về mặt kỹ thuật.
+III. KẾT LUẬN & BÀI HỌC ÁP DỤNG CHO TRẠM HỶ
+1. Chiến lược công nghệ phù hợp với giai đoạn EXE201 Không nên đầu tư thuê ngoài ngay từ đầu. Mức độ yêu cầu của môn học chỉ cần một bản demo chạy được để kiểm chứng nhu cầu thị trường — đúng tinh thần MVP. Việc thuê bên thứ ba chỉ nên cân nhắc nếu dự án được phát triển tiếp lên đồ án tốt nghiệp.
+2. Hướng triển khai tiết kiệm và khả thi nhất Tận dụng nền tảng/web mẫu AI try-on có sẵn rồi tùy chỉnh theo nhu cầu thử váy cưới, thay vì tự phát triển thuật toán từ đầu. Đây chính là cách ELSUN đã làm thành công ở giai đoạn EXE.
+3. Vai trò nhân sự kỹ thuật trong nhóm Thành công của ELSUN ở giai đoạn đầu đến từ việc có thành viên am hiểu AI trong nhóm và kết hợp với sinh viên khối kỹ thuật. Trạm Hỷ nên ưu tiên tìm nguồn lực kỹ thuật tương tự (trong nhóm hoặc hợp tác với sinh viên ngành kỹ thuật) trước khi tính đến phương án trả phí thuê ngoài.
+4. Lộ trình nâng cấp rõ ràng Mô hình hai giai đoạn của ELSUN (demo tự làm ở EXE → thuê ngoài chuyên nghiệp ở đồ án) là lộ trình tham khảo hợp lý để Trạm Hỷ định hình kế hoạch phát triển dài hạn.
+I. TỔNG QUAN MỤC TIÊU VÀ ĐỊNH HƯỚNG 10 TUẦN (10-WEEK OBJECTIVES)
+Mục tiêu sản phẩm MVP: Kiểm chứng độ chấp nhận của người dùng với tính năng thử váy cưới AR trực tuyến (tích hợp API giả lập Elsun), dịch vụ đặt thợ chụp ảnh cưới và luồng Tiếp thị liên kết (Affiliate Plan).
+Chỉ số KPI tổng quan chiến dịch:
+Tổng lượt truy cập Landing Page: 2,000 visits.
+Lượt nhấp vào nút hành động (CTA click thử AR/đặt chụp ảnh): 300 clicks.
+Số tài khoản đăng ký dùng thử hệ thống: 300 users.
+Số người dùng thực tế hoàn thành luồng trải nghiệm: 150 users.
+Mục tiêu nghiên cứu định tính (Customer Interview): Thực hiện phỏng vấn sâu 10 – 12 khách hàng thuộc cả 2 tệp B2C (dâu rể) và B2B (đối tác studio, thợ ảnh, API) với thời lượng : 20 phút/buổi.
+II. KẾ HOẠCH HÀNH ĐỘNG 10 TUẦN THEO MÔ HÌNH WHAT - WHEN - WHO - HOW MANY
+Giai đoạn 1 (Tuần 1 - Tuần 3): Chuẩn bị nền tảng & Thiết kế luồng nghiên cứu
+WHAT: Xây dựng bộ câu hỏi phỏng vấn sâu mở, dựng khung Landing Page, kết nối kỹ thuật thử nghiệm API giả lập AR với đối tác Elsun.
+HOW MANY / KPI: Hoàn thành 100% tài liệu thiết kế và kịch bản phỏng vấn.
+Giai đoạn 2 (Tuần 4 - Tuần 5): Triển khai phễu mồi & Phỏng vấn định tính
+WHAT: Phát hành Landing Page, mở tính năng mồi (Tạo thiệp cưới điện tử QR miễn phí), tiến hành phỏng vấn sâu thực địa 10–12 khách hàng.
+HOW MANY / KPI: Đạt 300 lượt visits Landing Page; thu thập trọn vẹn 10–12 file gỡ băng phỏng vấn valid.
+Giai đoạn 3 (Tuần 6 - Tuần 7): Thử nghiệm luồng AR & Tích hợp dịch vụ chụp ảnh
+WHAT: Kích hoạt tính năng camera AR thử váy cưới và cổng đăng ký dịch vụ chụp ảnh cưới/Affiliate để người dùng trải nghiệm thực tế.
+HOW MANY / KPI: 150 users thực hiện luồng AR; thu về 80 phiếu phản hồi chất lượng.
+Giai đoạn 4 (Tuần 8 - Tuần 10): Đóng băng dữ liệu & Hoàn thiện báo cáo Slot 3
+WHAT: Xuất nhật ký hệ thống (log file), xử lý các lỗi phát sinh về độ trễ AR, đóng gói minh chứng nộp hội đồng.
+HOW MANY / KPI: Hoàn thiện 100% hồ sơ báo cáo Outcome 1 - Slot 3 đúng hạn.
+III. PHÂN CHIA NỘI DUNG VÀ NHIỆM VỤ CHI TIẾT CHO 6 THÀNH VIÊN
+1. Trần Huyền Trang (CEO / Project Leader)
+Nhiệm vụ Slot 3: Quản lý tiến độ chung 10 tuần; trực tiếp làm việc và phỏng vấn sâu đại diện nhóm công nghệ Elsun (đối soát độ trễ và chi phí API AR) cùng các chủ Studio váy cưới lớn.
+KPI & Minh chứng: 02 bài phỏng vấn sâu B2B ( 20 phút/bài); 01 file gỡ băng văn bản (transcription) + file ghi âm cuộc họp API Elsun.
+2. Lê Minh Châu (CMO)
+Nhiệm vụ Slot 3: Lập chiến lược nội dung truyền thông 10 tuần trên Fanpage/Landing Page; phỏng vấn sâu tệp cặp đôi Gen Z sắp cưới về nhu cầu thử váy AR và ngân sách chụp ảnh.
+KPI & Minh chứng: 02 bài phỏng vấn sâu B2C; 01 Bảng ma trận kế hoạch truyền thông đa kênh 10 tuần.
+3. Nguyễn Thị Thanh Tâm (CISO)
+Nhiệm vụ Slot 3: Xây dựng chính sách bảo mật dữ liệu camera AR và điều khoản cọc an toàn (Escrow payment); phỏng vấn sâu tệp cô dâu mới cưới về nỗi đau hình ảnh thực tế không đúng quảng cáo.
+KPI & Minh chứng: 02 bài phỏng vấn sâu B2C; 01 Bộ điều khoản bảo mật & cơ chế giữ cọc minh bạch.
+Chính sách bảo mật - Thanh Tâm
+NỘI DUNG CHI TIẾT CHÍNH SÁCH BẢO MẬT
+Trạm Hỷ cam kết bảo vệ thông tin cá nhân, thông tin giao dịch và thông tin thanh toán của khách hàng và nhà cung cấp dịch vụ. Chính sách dưới đây nhằm tôn trọng quyền riêng tư, bảo vệ thông tin người dùng và đảm bảo an toàn, minh bạch trong quá trình sử dụng các dịch vụ trên nền tảng Trạm Hỷ.
+I. Cam kết bảo mật:
+Trạm Hỷ cam kết bảo mật các thông tin mà khách hàng và nhà cung cấp cung cấp khi đăng ký tài khoản, truy cập và sử dụng các dịch vụ trên nền tảng Trạm Hỷ. Thông tin có thể bao gồm: họ tên, số điện thoại, email, thông tin tài khoản, thông tin đặt dịch vụ, lịch sử giao dịch, nội dung trao đổi, thông tin thanh toán và thông tin liên quan đến tiền cọc.
+Trạm Hỷ không tự ý bán, trao đổi hoặc cung cấp thông tin cá nhân của người dùng cho bên thứ ba vì mục đích thương mại khi chưa có sự đồng ý của người dùng, ngoại trừ những trường hợp cần thiết để thực hiện giao dịch, cung cấp dịch vụ hoặc theo yêu cầu của cơ quan có thẩm quyền.
+Khi khách hàng đặt dịch vụ trên Trạm Hỷ, một số thông tin cần thiết có thể được cung cấp cho nhà cung cấp dịch vụ nhằm phục vụ việc xác nhận đơn đặt dịch vụ, liên hệ và thực hiện dịch vụ theo thỏa thuận giữa hai bên.
+Trong trường hợp xảy ra sự cố bảo mật hoặc nguy cơ ảnh hưởng đến thông tin người dùng, Trạm Hỷ sẽ thực hiện các biện pháp cần thiết để kiểm soát, khắc phục sự cố và thông báo cho người dùng trong phạm vi phù hợp.
+II. Mục đích thu thập thông tin cá nhân:
+Nhằm phục vụ hoạt động của nền tảng và bảo vệ quyền lợi của người dùng, việc thu thập thông tin trên Trạm Hỷ có thể bao gồm: họ tên, số điện thoại, email, thông tin tài khoản, thông tin đặt dịch vụ và các thông tin cần thiết khác. Các thông tin này được sử dụng để xác nhận tài khoản, liên hệ và hỗ trợ khách hàng trong quá trình sử dụng dịch vụ.
+Thông tin đặt dịch vụ được sử dụng để kết nối khách hàng với các nhà cung cấp dịch vụ cưới như studio ảnh cưới, đơn vị trang trí, nhà rạp, cổng hoa, bàn ghế, âm thanh, ánh sáng, backdrop và các dịch vụ liên quan khác.
+Thông tin giao dịch được sử dụng để quản lý quá trình Milestone Payment – thanh toán theo từng mốc, bao gồm số tiền của từng đợt thanh toán, thời điểm thanh toán, mốc công việc tương ứng và trạng thái hoàn thành của từng mốc.
+Trạm Hỷ chỉ thu thập và sử dụng những thông tin cần thiết cho hoạt động của nền tảng. Đối với thông tin thanh toán nhạy cảm, Trạm Hỷ ưu tiên xử lý thông qua các đơn vị cung cấp dịch vụ thanh toán phù hợp và không chủ động lưu trữ thông tin xác thực thanh toán nhạy cảm nếu không cần thiết.
+Thành viên Trạm Hỷ có trách nhiệm bảo mật thông tin đăng nhập, mật khẩu, mã xác thực và các thông tin bảo mật của tài khoản. Nếu phát hiện tài khoản có dấu hiệu bị sử dụng trái phép, thành viên cần thông báo ngay cho Trạm Hỷ để được hỗ trợ.
+III. Phạm vi sử dụng thông tin:
+Trạm Hỷ sử dụng thông tin khách hàng và nhà cung cấp cung cấp để:
+–  Xác nhận và quản lý tài khoản người dùng.
+–  Xác nhận yêu cầu đặt dịch vụ, lịch hẹn và các thông tin cần thiết để thực hiện dịch vụ.
+–  Kết nối khách hàng với nhà cung cấp dịch vụ phù hợp.
+–  Liên hệ với khách hàng hoặc nhà cung cấp khi cần thiết trong quá trình thực hiện giao dịch.
+– Theo dõi tiến độ thực hiện dịch vụ và trạng thái của từng mốc công việc.
+– Xác nhận, xử lý và đối soát các khoản thanh toán theo từng mốc dịch vụ.
+– Ghi nhận việc nhà cung cấp hoàn thành các mốc công việc theo thỏa thuận trước khi thực hiện các khoản thanh toán tiếp theo.
+– Hỗ trợ xử lý các trường hợp dịch vụ chưa hoàn thành, không đúng cam kết hoặc phát sinh tranh chấp giữa khách hàng và nhà cung cấp.
+–  Phát hiện, ngăn chặn các hành vi gian lận, giả mạo, lạm dụng hoặc vi phạm điều khoản sử dụng Trạm Hỷ.
+–  Phân tích và cải thiện chất lượng dịch vụ, tính năng và trải nghiệm người dùng trên nền tảng.
+Trạm Hỷ không sử dụng thông tin khách hàng ngoài các mục đích liên quan đến việc cung cấp, vận hành và cải thiện dịch vụ của nền tảng, trừ trường hợp người dùng đồng ý hoặc pháp luật có quy định khác.
+Trạm Hỷ có thể cung cấp thông tin cần thiết cho các đơn vị cung cấp dịch vụ thanh toán, đơn vị công nghệ, lưu trữ dữ liệu hoặc các đối tác trực tiếp tham gia vào việc thực hiện giao dịch. Các thông tin được chia sẻ chỉ nằm trong phạm vi cần thiết cho mục đích cung cấp dịch vụ.
+Trạm Hỷ sẵn sàng hợp tác với các cơ quan có thẩm quyền như cơ quan công an, tòa án hoặc các cơ quan nhà nước khác khi có yêu cầu hợp pháp liên quan đến việc điều tra, xử lý hành vi vi phạm pháp luật.
+IV. Chính sách bảo mật dữ liệu Camera AR và tính năng thử váy cưới trực tuyến
+Trạm Hỷ tôn trọng quyền riêng tư của người dùng khi sử dụng tính năng thử váy cưới AR trực tuyến. Camera trên thiết bị chỉ được truy cập khi người dùng chủ động cho phép quyền sử dụng camera và kích hoạt tính năng AR.
+Dữ liệu hình ảnh hoặc video từ camera được sử dụng nhằm phục vụ trực tiếp cho quá trình hiển thị và mô phỏng váy cưới trên hình ảnh của người dùng, bao gồm việc nhận diện vị trí, tư thế hoặc các đặc điểm cần thiết để hệ thống hiển thị váy cưới phù hợp.
+Trạm Hỷ không sử dụng hình ảnh hoặc video thu được từ camera AR để quảng cáo, cung cấp cho bên thứ ba hoặc sử dụng cho các mục đích thương mại khác nếu chưa có sự đồng ý của người dùng, trừ trường hợp pháp luật có quy định khác.
+Trạm Hỷ ưu tiên xử lý dữ liệu camera ở mức tối thiểu cần thiết để cung cấp tính năng AR. Khi dữ liệu hình ảnh hoặc video không cần thiết cho việc vận hành tính năng, dữ liệu sẽ không được tiếp tục lưu trữ hoặc sử dụng ngoài phạm vi cần thiết.
+Trường hợp tính năng AR cần sử dụng dịch vụ hoặc công nghệ của bên thứ ba để xử lý hình ảnh, Trạm Hỷ chỉ chia sẻ phạm vi dữ liệu cần thiết cho việc cung cấp tính năng và yêu cầu bên cung cấp dịch vụ tuân thủ các yêu cầu về bảo mật và bảo vệ dữ liệu theo thỏa thuận và quy định pháp luật hiện hành.
+Người dùng có quyền từ chối hoặc tắt quyền truy cập camera thông qua thiết bị của mình. Việc từ chối quyền camera có thể khiến tính năng thử váy AR không hoạt động, nhưng không ảnh hưởng đến việc sử dụng các chức năng khác của Trạm Hỷ.
+Nếu người dùng chủ động chụp, tải lên hoặc lưu hình ảnh trong quá trình sử dụng tính năng AR, hình ảnh đó được xử lý theo mục đích mà người dùng lựa chọn và các quy định về lưu trữ, sử dụng dữ liệu cá nhân của Trạm Hỷ.
+Trạm Hỷ áp dụng các biện pháp kỹ thuật và tổ chức phù hợp để hạn chế nguy cơ truy cập trái phép, mất mát, thay đổi hoặc sử dụng không đúng mục đích đối với dữ liệu hình ảnh và dữ liệu liên quan đến tính năng AR.
+Người dùng có trách nhiệm đảm bảo rằng việc sử dụng hình ảnh của bản thân hoặc hình ảnh của người khác trên tính năng AR là phù hợp với quyền và sự đồng ý của người có hình ảnh.
+V. Bảo mật thông tin thanh toán theo từng mốc dịch vụ (Milestone Payment):
+·         Trạm Hỷ áp dụng cơ chế Milestone Payment – thanh toán theo từng mốc thực hiện dịch vụ nhằm tăng tính minh bạch và giảm rủi ro tài chính cho khách hàng và nhà cung cấp.
+·         Tổng giá trị dịch vụ có thể được chia thành nhiều khoản thanh toán tương ứng với từng mốc công việc cụ thể. Các mốc thanh toán, giá trị từng khoản và điều kiện thanh toán được hiển thị rõ ràng cho khách hàng trước khi xác nhận đặt dịch vụ.
+·         Mỗi khoản thanh toán được gắn với một mốc thực hiện dịch vụ đã được hai bên thống nhất. Nhà cung cấp chỉ nhận được khoản thanh toán tương ứng sau khi hoàn thành mốc công việc và đáp ứng điều kiện đã cam kết.
+·         Trạng thái của từng mốc có thể được cập nhật trên hệ thống, ví dụ: Chưa thực hiện → Đang thực hiện → Chờ xác nhận → Đã hoàn thành → Đã thanh toán.
+·         Khách hàng có thể theo dõi tiến độ dịch vụ, các mốc đã hoàn thành, các khoản đã thanh toán và các khoản thanh toán tiếp theo trên hệ thống Trạm Hỷ.
+·         Cơ chế Milestone Payment nhằm hạn chế việc khách hàng phải thanh toán toàn bộ giá trị dịch vụ ngay từ đầu, đồng thời tạo động lực để nhà cung cấp hoàn thành từng phần công việc đúng tiến độ và đúng cam kết.
+·         Trong trường hợp một mốc dịch vụ chưa được hoàn thành hoặc có dấu hiệu không đúng với thỏa thuận, khoản thanh toán tương ứng có thể được tạm dừng trong thời gian xác minh và xử lý.
+·         Khi phát sinh tranh chấp, Trạm Hỷ có thể xem xét thông tin đơn đặt dịch vụ, lịch sử trao đổi, trạng thái mốc công việc, bằng chứng hoàn thành, thông tin thanh toán và các tài liệu liên quan do các bên cung cấp để hỗ trợ giải quyết.
+VI. Địa chỉ đơn vị thu thập và quản lý thông tin thành viên:
+Đơn vị quản lý: Trạm Hỷ – [Tên pháp nhân/đơn vị quản lý]
+Địa chỉ: [Địa chỉ đăng ký]
+Hotline: [Số điện thoại]
+Email: [Email hỗ trợ]
+Website: [Địa chỉ website Trạm Hỷ]
+Người dùng có thể liên hệ với Trạm Hỷ thông qua các thông tin trên khi có yêu cầu liên quan đến tài khoản, thông tin cá nhân, giao dịch, thanh toán hoặc các vấn đề về bảo mật.
+VII. Thời gian lưu trữ thông tin:
+Thông tin của thành viên được lưu trữ trong khoảng thời gian cần thiết để phục vụ việc quản lý tài khoản, thực hiện và đối soát giao dịch, theo dõi tiến độ dịch vụ, xử lý khiếu nại và giải quyết tranh chấp.
+Thông tin liên quan đến các giao dịch và các mốc thanh toán có thể được lưu trữ để đảm bảo lịch sử giao dịch chính xác và hỗ trợ đối soát giữa khách hàng, nhà cung cấp và Trạm Hỷ.
+Thành viên có thể yêu cầu đóng hoặc xóa tài khoản theo quy định của Trạm Hỷ. Tuy nhiên, một số thông tin liên quan đến giao dịch, các mốc thanh toán hoặc tranh chấp có thể được tiếp tục lưu trữ trong thời gian cần thiết để đảm bảo tính chính xác của lịch sử giao dịch.
+Một số thông tin liên quan đến giao dịch, thanh toán, tiền cọc, khiếu nại hoặc tranh chấp có thể tiếp tục được lưu trữ trong thời gian cần thiết để phục vụ đối soát, giải quyết tranh chấp hoặc đáp ứng nghĩa vụ pháp lý.
+VIII. Phương thức và công cụ để người tiêu dùng tiếp cận và chỉnh sửa dữ liệu cá nhân của mình trên hệ thống:
+Khách hàng có quyền kiểm tra và cập nhật các thông tin cá nhân của mình thông qua tài khoản Trạm Hỷ hoặc yêu cầu Trạm Hỷ hỗ trợ điều chỉnh thông tin.
+Khách hàng có thể yêu cầu cập nhật các thông tin không chính xác, thay đổi thông tin liên hệ hoặc yêu cầu hỗ trợ liên quan đến việc sử dụng dữ liệu cá nhân.
+Khách hàng có thể yêu cầu đóng hoặc xóa tài khoản theo quy định của Trạm Hỷ. Tuy nhiên, một số thông tin liên quan đến giao dịch, thanh toán, tiền cọc hoặc tranh chấp có thể được tiếp tục lưu trữ trong thời gian cần thiết để đảm bảo tính chính xác của lịch sử giao dịch và thực hiện các nghĩa vụ liên quan.
+Mọi yêu cầu liên quan đến thông tin cá nhân có thể được gửi đến Trạm Hỷ thông qua hotline hoặc email hỗ trợ được công bố trên website.
+IX. Trách nhiệm của khách hàng:
+·         Thành viên có trách nhiệm cung cấp thông tin chính xác, đầy đủ và cập nhật khi đăng ký và sử dụng dịch vụ trên Trạm Hỷ.
+·         Khách hàng có trách nhiệm bảo mật tên đăng nhập, mật khẩu, mã xác thực và các thông tin liên quan đến tài khoản của mình.
+·         Khách hàng không được sử dụng thông tin cá nhân hoặc tài khoản của người khác để thực hiện giao dịch trái phép trên Trạm Hỷ.
+·         Khách hàng có trách nhiệm kiểm tra thông tin dịch vụ, giá trị từng mốc thanh toán, điều kiện hoàn thành và các điều khoản liên quan trước khi xác nhận giao dịch.
+·         Nhà cung cấp có trách nhiệm cập nhật chính xác tiến độ thực hiện dịch vụ và cung cấp bằng chứng hoàn thành khi cần thiết để xác nhận các mốc dịch vụ.
+·         Khi phát hiện tài khoản hoặc thông tin giao dịch có dấu hiệu bị truy cập hoặc sử dụng trái phép, khách hàng cần thông báo ngay cho Trạm Hỷ để được hỗ trợ xử lý.
+X. Thay đổi chính sách bảo mật:
+Trạm Hỷ có thể cập nhật hoặc thay đổi Chính sách bảo mật để phù hợp với việc phát triển tính năng, phương thức vận hành của nền tảng hoặc các quy định pháp luật hiện hành.
+Phiên bản Chính sách bảo mật mới nhất sẽ được công bố trên website Trạm Hỷ cùng với thời điểm cập nhật.
+Người dùng nên thường xuyên kiểm tra Chính sách bảo mật để nắm được những thay đổi mới nhất.
+4. Tô Văn Tiến Dũng (CTO)
+Nhiệm vụ Slot 3: Thiết kế kiến trúc hệ thống Web/App, tích hợp API giả lập Elsun; phỏng vấn sâu kỹ thuật viên/nhà cung cấp về chuẩn hóa dữ liệu đồ họa váy cưới 3D/AR.
+KPI & Minh chứng: 01 bài phỏng vấn kỹ thuật/B2B; 01 Sơ đồ luồng dữ liệu (User Flow) tích hợp API AR.
+5. Nguyễn Duy Quang (Security Engineer)
+Nhiệm vụ Slot 3: Rà soát độ an toàn luồng truyền tải dữ liệu hình ảnh người dùng; phỏng vấn sâu tệp bạn trẻ/KOLs có network rộng về mức độ sẵn sàng tham gia phễu Tiếp thị liên kết (Affiliate).
+KPI & Minh chứng: 02 bài phỏng vấn sâu B2C; 01 Sơ đồ theo dõi mã giới thiệu Affiliate.
+RÀ SOÁT ĐỘ AN TOÀN LUỒNG TRUYỀN TẢI DỮ LIỆU HÌNH ẢNH NGƯỜI DÙNG
+Vai trò: Nguyễn Duy Quang – Security Engineer
+Phạm vi: Tính năng thử váy cưới trực tuyến bằng công nghệ AR của Trạm Hỷ.
+Trạng thái đánh giá: Rà soát ở mức thiết kế do sản phẩm chưa có phiên bản MVP hoàn chỉnh để kiểm thử kỹ thuật.
+I. Mục tiêu rà soát
+Hoạt động rà soát nhằm xác định các điểm có thể phát sinh rủi ro trong quá trình hình ảnh người dùng được thu thập, truyền tải, xử lý, lưu trữ và xóa khi sử dụng tính năng thử váy cưới AR. Trọng tâm của phần đánh giá là bảo đảm người dùng chủ động cấp quyền camera, dữ liệu chỉ được sử dụng đúng mục đích, được bảo vệ trong quá trình truyền qua mạng và không bị truy cập hoặc lưu giữ ngoài phạm vi cần thiết.
+Phần này bổ sung góc nhìn kỹ thuật cho Chính sách bảo mật của Trạm Hỷ. Nội dung không thay thế chính sách do CISO xây dựng và không khẳng định hệ thống đã an toàn khi chưa có bằng chứng kiểm thử trên MVP.
+II. Mô tả luồng truyền tải dữ liệu hình ảnh dự kiến
+Luồng xử lý được rà soát theo trình tự sau:
+Người dùng mở tính năng thử váy AR → hệ thống thông báo mục đích sử dụng camera → người dùng chủ động cấp quyền → camera ghi nhận hình ảnh hoặc người dùng tải ảnh lên → ứng dụng kiểm tra định dạng và kích thước → ảnh được xử lý trực tiếp trên thiết bị hoặc truyền qua kết nối HTTPS/TLS tới API của Trạm Hỷ → API chuyển phần dữ liệu tối thiểu cần thiết tới dịch vụ AR → kết quả mô phỏng váy được trả về và hiển thị cho người dùng → ảnh tạm và dữ liệu phiên được xóa theo thời hạn quy định.
+Thiết kế nên ưu tiên xử lý trên thiết bị của người dùng nếu công nghệ cho phép. Trường hợp bắt buộc phải gửi ảnh lên máy chủ hoặc dịch vụ AR bên thứ ba, hệ thống chỉ được truyền dữ liệu cần thiết và phải công khai rõ mục đích, thời hạn lưu trữ và cách yêu cầu xóa dữ liệu.
+III. Dữ liệu và các điểm cần bảo vệ
+Nhóm dữ liệu
+Ví dụ
+Nguy cơ chính
+Hình ảnh gốc
+Ảnh toàn thân, khung hình camera, video ngắn
+Lộ danh tính, khuôn mặt hoặc không gian riêng tư phía sau ảnh.
+Dữ liệu suy ra
+Điểm mốc cơ thể, tư thế, vùng khuôn mặt
+Bị tái sử dụng để nhận dạng hoặc phân tích ngoài mục đích thử váy.
+Dữ liệu định danh
+Họ tên, email, số điện thoại, user_id
+Liên kết trực tiếp người dùng với ảnh và lịch sử sử dụng.
+Dữ liệu kỹ thuật
+Địa chỉ IP, device_id, session_id
+Theo dõi hoạt động hoặc chiếm quyền truy cập phiên.
+Ảnh kết quả
+Ảnh đã ghép váy, ảnh được tải xuống hoặc chia sẻ
+Bị truy cập qua link công khai hoặc phát tán ngoài ý muốn.
+IV. Kết quả rà soát rủi ro sơ bộ
+Mã
+Rủi ro được nhận diện
+Mức ưu tiên
+R1
+Camera được kích hoạt khi người dùng chưa chủ động đồng ý hoặc vẫn hoạt động sau khi rời tính năng.
+Cao
+R2
+Ảnh được truyền qua HTTP, cấu hình TLS yếu hoặc xuất hiện trực tiếp trong URL.
+Cao
+R3
+Ảnh được lưu công khai, lưu không mã hóa hoặc không có thời hạn tự động xóa.
+Cao
+R4
+API kiểm tra quyền không đầy đủ, khiến tài khoản khác có thể xem hoặc xóa ảnh của người dùng.
+Cao
+R5
+Tên file, log, analytics hoặc metadata EXIF làm lộ họ tên, vị trí hoặc thông tin thiết bị.
+Cao
+R6
+Dịch vụ AR bên thứ ba nhận nhiều dữ liệu hơn cần thiết hoặc tái sử dụng ảnh cho quảng cáo/huấn luyện AI.
+Cao
+R7
+File tải lên giả mạo định dạng hoặc chứa dữ liệu bất thường làm ảnh hưởng thư viện xử lý ảnh.
+Trung bình–Cao
+R8
+Link chia sẻ kết quả AR không hết hạn, dễ đoán hoặc không thể thu hồi.
+Cao
+V. Biện pháp kiểm soát được đề xuất
+1. Quyền camera và sự đồng ý của người dùng
+·         Chỉ yêu cầu quyền camera sau khi người dùng chủ động chọn tính năng thử váy AR.
+·         Hiển thị rõ dữ liệu nào được thu thập, mục đích xử lý, dữ liệu có được gửi lên máy chủ hay không và thời hạn lưu trữ.
+·         Dừng camera khi người dùng thoát khỏi màn hình AR; không yêu cầu quyền micro, vị trí hoặc danh bạ nếu không cần thiết.
+·         Nếu muốn sử dụng ảnh cho quảng cáo hoặc huấn luyện mô hình, phải có lựa chọn đồng ý riêng biệt.
+2. Bảo vệ dữ liệu trên đường truyền
+·         Bắt buộc sử dụng HTTPS với TLS hiện đại cho website, API, hệ thống lưu trữ và kết nối tới nhà cung cấp AR.
+·         Không đưa ảnh, token, user_id hoặc thông tin nhạy cảm vào query string của URL.
+·         Token truy cập phải có thời hạn ngắn và được kiểm tra quyền tại máy chủ.
+·         URL dùng để tải ảnh hoặc kết quả phải là URL ký số, khó đoán và tự hết hạn.
+3. Kiểm soát file và dữ liệu lưu trữ
+·         Kiểm tra MIME type và chữ ký file; giới hạn định dạng, dung lượng và độ phân giải ảnh.
+·         Đổi tên file bằng mã ngẫu nhiên; không sử dụng họ tên hoặc số điện thoại làm tên file.
+·         Loại bỏ metadata EXIF không cần thiết, đặc biệt là vị trí GPS và thông tin thiết bị.
+·         Không đặt kho lưu trữ ảnh ở chế độ công khai; mã hóa dữ liệu lưu trữ và phân quyền theo nguyên tắc tối thiểu.
+·         Ưu tiên không lưu ảnh gốc. Nếu cần xử lý tạm, phải thiết lập thời hạn tự động xóa và cho phép người dùng yêu cầu xóa.
+4. Quản lý dịch vụ AR bên thứ ba
+·         Lập danh sách chính xác dữ liệu được gửi cho bên thứ ba và chỉ gửi phần tối thiểu cần thiết.
+·         Thỏa thuận phải nêu rõ mục đích xử lý, nơi lưu trữ, thời hạn giữ dữ liệu, quy trình xóa và trách nhiệm khi xảy ra sự cố.
+·         Không cho phép bên thứ ba tái sử dụng ảnh cho quảng cáo hoặc huấn luyện AI khi chưa có sự đồng ý riêng của người dùng.
+VI. Kế hoạch kiểm chứng khi có MVP
+Hạng mục kiểm thử
+Minh chứng cần thu thập
+Trạng thái
+Quyền camera
+Ảnh chụp luồng cấp quyền, từ chối và thu hồi quyền.
+Chưa kiểm chứng
+Mã hóa đường truyền
+Network log/HAR đã che token; kết quả kiểm tra HTTPS/TLS.
+Chưa kiểm chứng
+Phân quyền API
+Kết quả kiểm tra tài khoản A không thể truy cập ảnh của tài khoản B.
+Chưa kiểm chứng
+Kiểm tra file tải lên
+Kết quả thử file sai định dạng, quá dung lượng và ảnh có EXIF.
+Chưa kiểm chứng
+Lưu trữ và xóa
+Cấu hình storage private; log tác vụ tự xóa và kết quả yêu cầu xóa.
+Chưa kiểm chứng
+Dịch vụ AR bên thứ ba
+Sơ đồ data flow và điều khoản xử lý dữ liệu với nhà cung cấp.
+Chưa kiểm chứng
+Link chia sẻ
+Kết quả truy cập sau khi link hết hạn hoặc bị thu hồi.
+Chưa kiểm chứng
+VII. Kết luận rà soát
+Dữ liệu ảnh và video phục vụ tính năng thử váy AR có mức độ nhạy cảm cao vì có thể nhận diện người dùng và phản ánh không gian riêng tư. Các rủi ro cần ưu tiên xử lý gồm quyền camera thiếu minh bạch, lộ ảnh trên đường truyền hoặc khu vực lưu trữ, phân quyền API không đầy đủ, lưu dữ liệu quá lâu và bên thứ ba sử dụng ảnh ngoài mục đích ban đầu.
+Tại thời điểm lập báo cáo, nhóm chưa có MVP, mã nguồn, cấu hình máy chủ hoặc lưu lượng mạng để kiểm thử. Vì vậy, kết luận phù hợp là: CẦN KIỂM CHỨNG KHI CÓ MVP. Trước khi triển khai cho người dùng thật, nhóm cần hoàn thiện sơ đồ luồng dữ liệu, bắt buộc HTTPS/TLS, sử dụng kho lưu trữ riêng tư, kiểm tra quyền tại API, xác định thời hạn lưu/xóa ảnh và rà soát điều khoản xử lý dữ liệu với nhà cung cấp AR.
+Chỉ sau khi các tiêu chí tại Mục VI được kiểm thử và có minh chứng, nhóm mới được chuyển trạng thái tương ứng từ “Chưa kiểm chứng” sang “Đã xác minh”.
+6. Phùng Đức Anh (Software Engineer)
+Nhiệm vụ Slot 3: Lập trình giao diện hiển thị Portfolio gói chụp ảnh; cài đặt mã Event Tracking đo lượt click nút CTA thử váy AR; phỏng vấn sâu tệp thợ chụp ảnh tự do (Freelance Photographers).
+KPI & Minh chứng: 02 bài phỏng vấn sâu B2B; Đoạn mã code tracking lượt click CTA hoạt động ổn định.
+IV. KHUNG QUY TRÌNH THỰC HIỆN VÀ MINH CHỨNG PHỎNG VẤN SÂU (CUSTOMER INTERVIEW)
+Hình thức phỏng vấn: Phỏng vấn trực tiếp 1:1 bằng hệ thống câu hỏi MỞ, áp dụng kỹ thuật đào sâu "Why? Why? Why?" để bóc tách nguyên nhân tâm lý khách hàng.
+Thời lượng chuẩn: Tối thiểu 20 phút cho mỗi bài phỏng vấn.
+Danh mục minh chứng bắt buộc nộp đính kèm (Slide 15):
+File ghi âm/ghi hình gốc (.mp3/.mp4) của 10–12 buổi phỏng vấn.
+File gỡ băng toàn bộ nội dung thoại sang dạng văn bản (Transcription) cho từng khách hàng.
+Ảnh chụp thực địa hoặc ảnh chụp màn hình cuộc gọi trực tuyến có hiển thị thời gian.
+SCRIPT THUYẾT TRÌNH — TRẠM HỶ (EXE201, Outcome 1)
+"Kết Duyên Cát Hỷ" — AR Wedding & Booking
+SLIDE 1 — TRANG BÌA
+Kính chào thầy/cô và các bạn. Nhóm em xin phép được trình bày đồ án môn EXE201, dự án mang tên Trạm Hỷ, với chủ đề Outcome 1: AR Wedding & Booking, thông điệp mà nhóm em muốn gửi gắm là "Kết Duyên Cát Hỷ".
+Đây là dự án được thực hiện dưới sự hướng dẫn của giảng viên Đặng Trần Hiếu. Trạm Hỷ là một nền tảng ứng dụng công nghệ AR để giải quyết một vấn đề rất thực tế trong ngành cưới hỏi tại Việt Nam: làm sao để cô dâu có thể thử váy cưới mà không cần phải đi lại nhiều nơi.
+SLIDE 2 — GIỚI THIỆU ĐỘI NGŨ
+Trước khi đi vào nội dung chính, xin phép giới thiệu các thành viên trong nhóm:
+Trần Huyền Trang — CEO
+Lê Minh Châu — CMO
+Phùng Đức Anh — CISO
+Nguyễn Duy Quang — CTO
+Tô Văn Tiến Dũng — Software Engineer
+Nguyễn Thị Thanh Tâm — Security Engineer
+Đây là một đội ngũ được phân chia rõ ràng theo chuyên môn: từ kinh doanh, marketing, đến kỹ thuật và bảo mật — đảm bảo dự án được phát triển toàn diện cả về sản phẩm lẫn vận hành.
+SLIDE 3 — MỤC LỤC
+Bài trình bày hôm nay của nhóm em sẽ gồm 4 phần chính:
+Giới thiệu sản phẩm
+Kế hoạch hành động 10 tuần và các chỉ số KPI
+Kế hoạch phát triển sản phẩm
+Phân tích phỏng vấn chuyên sâu
+Chúng ta sẽ đi từ việc hiểu sản phẩm là gì, cách nhóm triển khai trong 10 tuần, quy trình phát triển sản phẩm, và cuối cùng là những insight thực tế thu được từ phỏng vấn khách hàng.
+PHẦN I — GIỚI THIỆU SẢN PHẨM
+SLIDE 4 — MỞ ĐẦU PHẦN I
+Trạm Hỷ là nền tảng ứng dụng AI Virtual Try-On dành riêng cho thị trường cưới hỏi Việt Nam. Đây là phần mà nhóm em sẽ giới thiệu chi tiết sản phẩm của mình.
+SLIDE 5 — ĐỊNH NGHĨA SẢN PHẨM
+Ý tưởng cốt lõi của Trạm Hỷ rất đơn giản: "Thử váy cưới mà không cần rời khỏi nhà."
+Đây là một nền tảng web sử dụng công nghệ AI Virtual Try-On, cho phép cô dâu tương lai thử trực tiếp các mẫu váy cưới lên chính bức ảnh của mình, sau đó kết nối họ với các cửa hàng váy cưới, studio và dịch vụ chụp ảnh thực tế.
+Bốn giá trị cốt lõi mà sản phẩm mang lại:
+AI Virtual Try-On: chỉ cần tải ảnh lên, chọn váy, và xem kết quả chỉ trong vài giây.
+Giảm rủi ro chọn sai váy: không cần phải đi nhiều cửa hàng mới hình dung được phong cách phù hợp.
+Kết nối với thực tế: hệ thống gợi ý ngay cửa hàng hoặc studio đang có mẫu váy đó.
+Đặt lịch chụp ảnh: khách hàng có thể đặt buổi chụp ảnh cưới trực tiếp trên nền tảng.
+Giá trị cốt lõi mà nhóm em muốn nhấn mạnh: loại bỏ sự không chắc chắn khi chọn váy cưới — để khách hàng thấy được mình mặc chiếc váy đó như thế nào trước khi tốn thời gian, tiền bạc hay phải đến tận cửa hàng.
+SLIDE 6 — HỆ SINH THÁI KẾT NỐI
+Trạm Hỷ được xây dựng như một hệ sinh thái kết nối gồm 3 thành phần chính:
+AR Try-On Web — công cụ thử váy chính, truy cập trực tiếp qua trình duyệt, không cần cài đặt ứng dụng.
+Vendor Dashboard — cổng thông tin dành cho các cửa hàng, studio quản lý danh sách váy, theo dõi lượt xem và đơn hàng affiliate.
+Booking & Photography Hub — nơi các cặp đôi đặt lịch chụp ảnh cưới và theo dõi lịch hẹn với đối tác.
+Ba mảnh ghép này giúp Trạm Hỷ không chỉ dừng ở công nghệ thử đồ, mà còn tạo ra một chu trình khép kín từ trải nghiệm đến giao dịch thực tế.
+SLIDE 7 — MÔ HÌNH KINH DOANH & DOANH THU
+Về mô hình kinh doanh, Trạm Hỷ phát triển theo 2 giai đoạn:
+Giai đoạn 1 — Tập trung B2C:
+Doanh thu chính: các gói AR Try-On Premium, thu phí subscription cho việc thử không giới hạn, lưu ảnh chất lượng cao và gợi ý váy theo cá nhân hóa.
+Doanh thu phụ: gói combo thử váy kết hợp tư vấn phong cách cá nhân.
+Giai đoạn 2 — Mở rộng B2B:
+Doanh thu chính: hoa hồng affiliate — trích một phần từ mỗi đơn đặt lịch hoặc mua hàng tại cửa hàng đối tác được Trạm Hỷ giới thiệu.
+Doanh thu phụ: phí ưu tiên hiển thị cho các mẫu váy của đối tác trên nền tảng.
+SLIDE 8 — CÁC GÓI DỊCH VỤ CHO CÔ DÂU
+Với khách hàng B2C, nhóm em thiết kế 3 gói dịch vụ:
+Free Try — Miễn phí: thử 1-2 mẫu váy tiêu chuẩn, ảnh có watermark, độ phân giải thông thường.
+Standard — 149.000 VNĐ (khoảng 6 USD), truy cập 30 ngày: thử không giới hạn toàn bộ catalog, không watermark, tải ảnh HD, lưu và xuất ảnh không giới hạn, kèm voucher giảm 500.000 VNĐ khi thuê váy qua đối tác.
+Premium — 299.000 VNĐ (khoảng 12 USD), truy cập 90 ngày: đầy đủ tính năng của gói Standard, thêm phân tích dáng người bằng AI để gợi ý váy phù hợp, phối phụ kiện (voan, hoa cầm tay, vương miện), và ưu tiên đặt lịch fitting trực tiếp.
+SLIDE 9 — MÔ HÌNH ĐỐI TÁC CHO CỬA HÀNG & STUDIO
+Ở giai đoạn 2, nhóm em xây dựng mô hình hợp tác với các cửa hàng váy cưới và studio theo 3 cấp độ:
+Basic Partner: không mất phí niêm yết, chỉ tính hoa hồng 8-10% trên mỗi đơn hàng thành công.
+Priority Partner: trả phí để được ưu tiên xuất hiện trong gợi ý thử váy, đổi lại hoa hồng giảm còn 5-7%.
+Photography Partner: tính phí theo từng lượt đặt lịch chụp ảnh thành công qua nền tảng.
+Đặc biệt, nhóm em có chương trình khuyến mãi ra mắt: miễn hoa hồng cho 3 đơn hàng đầu tiên của mỗi đối tác tham gia trong tháng ra mắt.
+PHẦN II — KẾ HOẠCH HÀNH ĐỘNG 10 TUẦN VÀ KPI
+SLIDE 10 — MỞ ĐẦU PHẦN II
+Mục tiêu cuối kỳ mà nhóm em đặt ra là đạt hơn 200 người dùng tích lũy trên nền tảng web. Để đạt được con số này, nhóm đã xây dựng kế hoạch hành động chi tiết theo từng tuần, chia theo 3 mảng: Sales/Customer Development, Promotion/Communication, và Product/Technology.
+SLIDE 11 — THU HÚT VÀ CHUYỂN ĐỔI KHÁCH HÀNG B2C
+Về mảng Sales và Customer Development, lộ trình cụ thể như sau:
+Tuần 1-2: xây dựng database khách hàng mục tiêu, hướng tới 30+ khách hàng tiềm năng.
+Tuần 1-3: tuyển tester sớm cho bản MVP đóng (Closed MVP), mục tiêu 15+ tester xác nhận.
+Tuần 3: chạy thử nghiệm Closed MVP với 15+ tester, 10+ phiên hoàn thành.
+Tuần 4: theo dõi và phân loại tester, chọn lọc 5+ người dùng đạt chuẩn.
+Tuần 5-6: tuyển người dùng cho Public Trial, đạt 20+ đăng ký và 30+ user mới ở tuần 6.
+Tuần 6: chính thức ra mắt bản thử nghiệm công khai (Public Trial), đạt 60+ user tích lũy, tỷ lệ hoàn thành trên 70%.
+Tuần 6-10: xây dựng pool khách hàng tiềm năng chất lượng, đạt 15+ lead.
+Tuần 7: ra mắt chính thức Trạm Hỷ phiên bản V1.0, đạt 100+ user tích lũy.
+Tuần 9-10: xác thực khả năng chi trả (willingness to pay), thu về 15+ phản hồi, 5+ lead nóng.
+Tuần 10: dồn lực tăng trưởng cuối cùng để đạt mục tiêu 200+ user.
+SLIDE 12 — KÊNH TRUYỀN THÔNG VÀ TƯƠNG TÁC KHÁCH HÀNG
+Song song với đó là mảng Promotion và Communication:
+Tuần 1: thiết lập fanpage và TikTok của Trạm Hỷ.
+Tuần 2-3: chạy chiến dịch truyền thông giới thiệu công nghệ AR try-on.
+Tuần 2: quảng bá khảo sát và tuyển tester, mục tiêu 100+ phản hồi khảo sát, 15+ tester.
+Tuần 2-3: đăng nội dung teaser cho Closed MVP.
+Tuần 4: chia sẻ phản hồi thực tế từ tester.
+Tuần 5: đăng nội dung cập nhật cải tiến sản phẩm kèm lời kêu gọi tham gia Public Trial.
+Tuần 7: chạy chiến dịch ra mắt chính thức phiên bản V1, mục tiêu 100+ lượt truy cập landing page.
+Tuần 7-8: xây dựng lòng tin qua các testimonial từ cô dâu thật, mục tiêu 5+ testimonial sử dụng được.
+Tuần 9-10: chuẩn bị tài liệu về FAQ, quyền riêng tư ảnh và xử lý phản đối từ khách hàng.
+SLIDE 13 — PHÁT TRIỂN & KIỂM CHỨNG SẢN PHẨM (1/2)
+Về mảng kỹ thuật và nghiên cứu:
+Tuần 1: chốt phạm vi MVP và luồng try-on cốt lõi.
+Tuần 1: phỏng vấn khách hàng để xác thực vấn đề, mục tiêu 10+ cuộc phỏng vấn.
+Tuần 2: khảo sát định lượng, thu về 100+ phản hồi hợp lệ.
+Tuần 1-2: phát triển MVP AR cùng đội dev thuê ngoài, đạt 90%+ hoạt động ổn định.
+Tuần 2: hoàn thiện luồng tải ảnh - chọn váy - xem kết quả.
+Tuần 3: triển khai bản Closed MVP, theo dõi tỷ lệ rời bỏ và lỗi phát sinh.
+Tuần 4: phân tích phản hồi và vấn đề sản phẩm, tổng hợp top 5 pain point và top 5 lỗi.
+Tuần 5: khắc phục lỗi và xây dựng bản Trial V1.1, giải quyết 80%+ lỗi nghiêm trọng.
+SLIDE 14 — PHÁT TRIỂN & KIỂM CHỨNG SẢN PHẨM (2/2)
+Tiếp nối:
+Tuần 6: triển khai Public Trial kèm hệ thống theo dõi phân tích, đạt tỷ lệ hoàn thành trên 70%.
+Tuần 3-10: liên tục thu thập phản hồi người dùng, đạt 30+ phản hồi tích lũy đến tuần 10.
+Tuần 6-10: phát triển mạng lưới đối tác affiliate (cửa hàng, studio) — tuần 6 tiếp cận 5+ đối tác, tuần 7 ký được ít nhất 1 đối tác thí điểm.
+Cuối tuần 6: đánh giá Go/No-Go, yêu cầu tỷ lệ hoàn thành 70%+ và không còn lỗi chặn.
+Tuần 7: ra mắt chính thức Trạm Hỷ V1.0.
+Tuần 8: phân tích hành vi và mức độ giữ chân người dùng, mục tiêu 60%+ ý định tiếp tục sử dụng.
+Tuần 9: xác thực thương mại và khả năng chi trả, tìm ra mức giá được chấp nhận.
+Tuần 10: chốt bản MVP cuối cùng và hoàn thiện lộ trình tăng trưởng tiếp theo.
+PHẦN III — KẾ HOẠCH PHÁT TRIỂN SẢN PHẨM
+SLIDE 15 — MỞ ĐẦU PHẦN III
+Phần này nhóm em sẽ trình bày về 6 bước phát triển sản phẩm, đi từ ý tưởng ban đầu cho đến khi thương mại hóa.
+SLIDE 16 — SÁU BƯỚC XÂY DỰNG TRẠM HỶ
+Quy trình phát triển của Trạm Hỷ gồm 6 bước:
+Ideation (Tuần 1) — Lên ý tưởng về công nghệ AR try-on, xác định các pain point của cô dâu và định hình ý tưởng sản phẩm.
+Product Definition (Tuần 2) — Xác định tính năng cốt lõi, nghiên cứu nhu cầu khách hàng và chốt mô hình kinh doanh.
+Prototyping (Tuần 3) — Thiết kế giao diện, xây dựng MVP với mẫu váy mẫu và nghiên cứu đối thủ cạnh tranh.
+Detailed Design (Tuần 3-4) — Hoàn thiện UI và luồng sử dụng, thiết kế database liên kết API AR và dữ liệu đối tác.
+Validation/Testing (Tuần 4-6) — Kiểm thử độ chính xác AR với cô dâu thật và đánh giá tính khả thi thương mại.
+Commercialization (Tuần 7-10) — Hoàn thiện tính năng, ra mắt chính thức, triển khai go-to-market và hỗ trợ đối tác.
+SLIDE 17 — QUY TRÌNH CÔNG NGHỆ: PIPELINE AI VIRTUAL TRY-ON
+Nói cụ thể hơn về cách công nghệ vận hành, pipeline AI Virtual Try-On của Trạm Hỷ gồm 5 bước:
+Upload photo — Cô dâu tải lên ảnh toàn thân.
+Pose detection — AI xác định các điểm mốc và tư thế cơ thể.
+Dress mapping — Mẫu váy được chọn sẽ được biến đổi khớp theo dáng người.
+AI rendering — Ánh sáng, nếp gấp và chất liệu vải được render để tạo cảm giác chân thực.
+Result export — Ảnh kết quả sẵn sàng để lưu hoặc chia sẻ.
+SLIDE 18 — LUỒNG MÃ GIỚI THIỆU AFFILIATE
+Về hệ thống theo dõi affiliate, quy trình hoạt động như sau: người giới thiệu nhận affiliate_id, chia sẻ link qua TikTok, Facebook, Instagram. Khi người dùng nhấn vào link, hệ thống ghi nhận click_id và referral_id, sau đó dẫn đến bước đăng ký/theo dõi, đặt hàng và thanh toán, cuối cùng hoa hồng 5% được ghi nhận và chuyển khoản.
+Dashboard của người giới thiệu sẽ hiển thị đầy đủ: số lượt click, số lượt đăng ký, số đơn đã đặt, hoa hồng đang chờ, hoa hồng đã trả, và lý do hủy đơn (nếu có) — đảm bảo tính minh bạch cho cả hai bên.
+SLIDE 19 — ĐÁNH GIÁ BẢO MẬT DỮ LIỆU HÌNH ẢNH AR
+Vì sản phẩm sử dụng ảnh cá nhân của khách hàng, bảo mật là yếu tố nhóm em đặc biệt chú trọng. Nhóm đã rà soát 3 rủi ro lớn nhất và đề xuất 3 giải pháp tương ứng:
+Rủi ro 1: Camera có thể kích hoạt mà chưa có sự đồng ý rõ ràng của người dùng → Giải pháp: chỉ yêu cầu quyền camera khi người dùng chủ động chọn tính năng AR.
+Rủi ro 2: Ảnh truyền qua giao thức HTTP hoặc bị lộ trong URL → Giải pháp: bắt buộc sử dụng HTTPS/TLS, không đưa token hay user_id vào query string.
+Rủi ro 3: Ảnh được lưu công khai, không mã hóa và không có giới hạn thời gian xóa → Giải pháp: lưu trữ riêng tư với tên file ngẫu nhiên hóa, tự động xóa sau một khoảng thời gian nhất định.
+Nhóm em cũng xin lưu ý rằng đây là các đề xuất chưa được kiểm chứng thực tế, sẽ cần xác minh lại khi bản MVP hoàn thiện.
+SLIDE 20 — CHÍNH SÁCH BẢO MẬT
+Đi kèm với đó, Trạm Hỷ xây dựng một chính sách bảo mật gồm 9 nội dung chính: cam kết bảo vệ dữ liệu, mục đích thu thập dữ liệu cá nhân, phạm vi sử dụng thông tin, bảo mật dữ liệu camera và ảnh thử váy ảo, an toàn thanh toán theo từng mốc (milestone payment), thời gian lưu trữ dữ liệu, quyền của người dùng trong việc truy cập và cập nhật dữ liệu cá nhân, trách nhiệm của người dùng, và cuối cùng là quy trình thay đổi chính sách bảo mật.
+SLIDE 21 — HÌNH ẢNH MINH HỌA SẢN PHẨM
+Đây là một số hình ảnh minh họa trực quan về sản phẩm Trạm Hỷ: giao diện web cho phép thử váy AR ngay trên ảnh gốc của khách hàng, giao diện di động với đầy đủ chức năng chọn váy và thử ngay, cùng các bao bì, hộp quà và túi đựng mang thương hiệu Trạm Hỷ — thể hiện trải nghiệm khách hàng được nhóm em chăm chút từ online đến offline.
+PHẦN IV — PHỎNG VẤN SÂU
+SLIDE 23 — GIỚI THIỆU
+Để kiểm tra nhu cầu của thị trường, nhóm đã phỏng vấn 1 số người đại diện cho nhiều góc nhìn khác nhau trong hệ sinh thái cưới.
+Về phía khách hàng B2C, chúng tôi có người đang chuẩn bị cưới và người vừa kết hôn được sáu tháng. Ngoài ra, nhóm còn phỏng vấn TikTok creator và sinh viên để tìm hiểu cách người dùng khám phá, đánh giá và chia sẻ nội dung liên quan đến thời trang cưới.
+Về phía đối tác B2B, chúng tôi làm việc với nhiếp ảnh gia tự do, chủ studio ảnh cưới nhỏ và chủ cửa hàng váy cưới.
+Cuối cùng, đại diện dự án Elsun giúp nhóm có thêm góc nhìn về tính khả thi của công nghệ AR và quá trình phát triển sản phẩm.
+Nhờ đó, kết quả phỏng vấn không chỉ phản ánh mong muốn của cô dâu, mà còn bao gồm góc nhìn của người sáng tạo nội dung, đối tác cung cấp dịch vụ và phía công nghệ.
+SLIDE 24, 25 — BỘ CÂU HỎI
+Đối với cả hai nhóm khách hàng và đối tác, bộ câu hỏi được xây dựng theo tám nội dung: Ưa thích, Không thích, Ưu và nhược điểm, Tiếp thị, Bán hàng, Khuyến mãi, Tăng doanh số và Tăng lợi nhuận.
+Với khách hàng, câu hỏi tập trung vào trải nghiệm chọn váy cưới, những lo ngại khi sử dụng công nghệ AR, hành vi tìm kiếm dịch vụ và mức độ sẵn sàng chi trả. Với đối tác, nội dung hướng đến tính khả thi của công nghệ, rủi ro hợp tác, hoạt động kinh doanh, cơ chế thanh toán và khả năng tạo lợi nhuận.
+Các câu hỏi đều được thiết kế theo dạng mở để nhóm có thể tìm hiểu sâu hơn dựa trên trải nghiệm thực tế của từng người tham gia.
+SLIDE 34 - NGƯỜI SẮP CƯỚI
+Đây là chị Xuân, 25 tuổi, đang chuẩn bị kết hôn vào năm 2027. Vì có lịch trình bận rộn, chị đặc biệt quan tâm đến AR như một công cụ giúp thử nhiều mẫu váy tại nhà và giảm thời gian đến showroom.
+Tuy nhiên, yếu tố quyết định booking vẫn là độ chính xác và sự minh bạch. Chị kỳ vọng hình ảnh AR giống váy thật khoảng 80 đến 85%, đồng thời ưu tiên ảnh khách hàng thực tế, giá niêm yết và hợp đồng điện tử rõ ràng.
+Nhìn chung, AR có thể thu hút chị trải nghiệm, nhưng chất lượng hình ảnh và độ tin cậy của dịch vụ mới tạo ra chuyển đổi.
+SLIDE 35 — B2C: EXPERIENCE
+Kết quả đầu tiên cho thấy khách hàng thích khả năng thử nhiều mẫu váy hơn mà không phải di chuyển quá nhiều.
+AR không nhất thiết thay thế hoàn toàn việc thử váy trực tiếp. Giá trị quan trọng hơn là giúp cô dâu thu hẹp danh sách trước khi đến showroom. Một người tham gia kỳ vọng hình ảnh AR cần giống váy thật khoảng 80 đến 85%. Đây là kỳ vọng của người được phỏng vấn, chưa phải độ chính xác đã được kiểm chứng.
+Từ góc nhìn của TikTok creator, AR cũng phù hợp với nội dung làm đẹp và thời trang nếu trải nghiệm đủ tự nhiên.
+Tuy nhiên, một hình ảnh quá khác thực tế có thể làm mất niềm tin ngay lập tức. Những vấn đề như thay đổi hình dáng cơ thể, váy không vừa, ứng dụng bị chậm, quyền riêng tư hoặc cách theo dõi affiliate không rõ ràng đều có thể khiến người dùng dừng sử dụng.
+Đối với creator, tiền hoa hồng không thể bù đắp cho việc mất uy tín với người theo dõi.
+SLIDE 36 — B2C: DISCOVERY
+Ở giai đoạn khám phá, nền tảng số giúp khách hàng tiết kiệm thời gian và so sánh nhiều phong cách nhanh hơn. Từ đó, họ có thể tạo ra một danh sách váy phù hợp trước khi đến thử trực tiếp.
+Tuy nhiên, khoảng cách lớn nhất vẫn là sự khác biệt giữa hình ảnh và sản phẩm thật. Ngoài ra, nếu nội dung xuất hiện quá nhiều đường dẫn affiliate, khách hàng có thể cảm thấy đây chỉ là quảng cáo và giảm niềm tin.
+Về marketing, nội dung cần thu hút sự chú ý trong ba giây đầu tiên, thể hiện rõ vấn đề và kết quả, đồng thời sử dụng ảnh thật từ khách hàng để giảm sự nghi ngờ.
+Những kênh được nhắc đến nhiều nhất là TikTok, Instagram, Facebook và lời giới thiệu từ bạn bè. Điều này cho thấy khách hàng có thể tìm thấy sản phẩm trên mạng xã hội, nhưng bằng chứng thực tế mới là yếu tố giúp họ tin tưởng.
+SLIDE 37 — B2C: CONVERSION
+Khi chuyển từ khám phá sang đặt dịch vụ, khách hàng chỉ cảm thấy an toàn nếu bằng chứng và các điều khoản thống nhất với nhau.
+Quy trình bán hàng nên bắt đầu bằng việc cho khách hàng thấy trải nghiệm thực tế, sau đó đề xuất gói dịch vụ phù hợp, nêu rõ lợi ích và cuối cùng là trình bày minh bạch các điều khoản.
+Đối với Promotion, mức hoa hồng 5% chỉ có ý nghĩa khi creator biết rõ giá trị đơn hàng, cách ghi nhận chuyển đổi và thời điểm hoa hồng được giữ hoặc thanh toán.
+Để tạo thêm lượt đặt lịch, ứng dụng có thể cho phép lưu mẫu váy và gửi lời nhắc đánh giá hoặc đặt lịch thử váy. Những tính năng này giúp chuyển hành vi xem sản phẩm thành một hành động cụ thể.
+Về More money, chúng tôi ghi nhận hai tín hiệu thanh toán. Khách hàng có thể cân nhắc trả từ 50.000 đến 100.000 đồng cho quyền truy cập premium. Trong khi đó, creator muốn hoa hồng được ghi nhận tại thời điểm đặt cọc hoặc tại một mốc chuyển đổi được xác định rõ ràng.
+SLIDE 38 — B2B: RISK
+Từ phía B2B, lợi ích được mong đợi rõ nhất là một nguồn booking ổn định và có chất lượng hơn.
+Studio và nhiếp ảnh gia không chỉ cần nhiều khách hàng. Họ cần những yêu cầu rõ ràng, phù hợp với lịch trống, phong cách và phạm vi dịch vụ để có thể chuyển thành công việc thực sự.
+Như một người tham gia chia sẻ, khó khăn lớn nhất hiện nay là nguồn khách hàng không ổn định.
+Tuy nhiên, đối tác đang phải chịu rủi ro ở cả hai đầu của giao dịch. Trước buổi chụp hoặc lịch thử váy, khách hàng có thể hủy hoặc không phản hồi. Sau khi hoàn thành công việc, đơn vị trung gian lại có thể chậm thanh toán.
+Vì vậy, nền tảng chỉ hấp dẫn với đối tác nếu vừa mang lại khách hàng phù hợp, vừa bảo vệ quyền lợi của họ trong toàn bộ quá trình giao dịch.
+SLIDE 39 — B2B: VISIBILITY
+Bên cạnh nguồn booking, các đối tác còn cần khả năng tiếp cận đúng khách hàng.
+Lợi ích của nền tảng là giúp studio, cửa hàng váy và freelancer tiếp cận nhu cầu mới, đồng thời bảo vệ quá trình booking tốt hơn.
+Tuy nhiên, việc đưa sản phẩm lên nền tảng cũng làm giảm một phần quyền kiểm soát trực tiếp. Các thiết kế độc quyền có nguy cơ bị sao chép. Ngoài ra, các cửa hàng nhỏ có thể chưa có đủ kỹ năng hoặc ngân sách để tạo tài sản 3D phục vụ AR.
+Vì vậy, hoạt động marketing trên nền tảng nên tập trung vào ba yếu tố.
+Thứ nhất là portfolio để thể hiện phong cách riêng của đối tác. Thứ hai là đánh giá đã được xác minh để xây dựng niềm tin. Thứ ba là các bộ lọc phù hợp để kết nối khách hàng và đối tác dựa trên phong cách, vị trí và ngân sách.
+Như vậy, mục tiêu không phải chỉ là tăng độ hiển thị, mà là thu hút đúng nhóm khách hàng có khả năng đặt dịch vụ.
+SLIDE 40 — B2B: TRANSACTION
+Kết quả phỏng vấn cho thấy doanh thu chỉ nên được ghi nhận khi đơn hàng đã hoàn thành và được xác minh.
+Quy trình đề xuất gồm bốn bước. Đầu tiên, hai bên xác nhận ngày thực hiện và phạm vi công việc. Tiếp theo, nền tảng giữ khoản đặt cọc. Sau khi dịch vụ hoàn thành, kết quả được xác minh và cuối cùng khoản thanh toán mới được giải ngân cho đối tác.
+Quy trình này giúp giảm tình trạng hủy đơn, hạn chế tranh chấp và tạo cảm giác an toàn cho cả khách hàng lẫn nhà cung cấp.
+Trong giai đoạn thu hút đối tác, nền tảng có thể thử nghiệm giảm phí tạm thời hoặc cung cấp vị trí hiển thị miễn phí. Đây mới là giả thuyết cần kiểm tra, chưa phải chính sách chính thức.
+Về More sales, khả năng kết nối chính xác hơn có thể giúp đối tác nhận được nhiều đơn phù hợp và giảm tỷ lệ hủy.
+Đối với More money, mức phí thành công 10% được hai người tham gia B2B chấp nhận trong tình huống giả định. Đây là một tín hiệu ban đầu để tiếp tục kiểm chứng, không phải mức phí cuối cùng của nền tảng.
+SLIDE 41 — B2C AND B2B SYNTHESIS
+Khi tổng hợp kết quả từ cả hai phía, chúng tôi nhận thấy giá trị chung quan trọng nhất là niềm tin.
+Đối với B2C, nền tảng cần giúp khách hàng lựa chọn nhanh hơn nhưng vẫn cảm thấy tự tin. Đối với B2B, nền tảng cần mang lại nhu cầu có cam kết và bảo đảm thanh toán đúng thời điểm.
+Cả hai phía đều thích việc giảm thời gian tìm kiếm và tạo ra cam kết rõ ràng hơn. Ngược lại, những yếu tố làm giảm niềm tin gồm hình ảnh không khớp với thực tế, khách hàng hủy lịch và quy trình thanh toán không minh bạch.
+Do đó, sự tiện lợi của công nghệ vẫn cần đi cùng với cơ chế xác minh. Marketing cũng phải dựa trên bằng chứng thực tế và công khai rõ ràng những nội dung có yếu tố affiliate.
+Từ kết quả này, nhóm xác định ba yếu tố cốt lõi của giải pháp là ảnh thật, đánh giá đã được xác minh và booking có thể theo dõi.
+Tóm lại, Trạm Hỷ không chỉ cần giúp khách hàng tìm váy hoặc đặt dịch vụ nhanh hơn. Nền tảng cần trở thành một lớp bảo đảm niềm tin, kết nối đúng nhu cầu của khách hàng với khả năng cung cấp thực tế của đối tác.
+Outline Outcome 2
+1. Lên câu hỏi customer survey - Huyền Trang
+Việc cần làm
+Chốt mục tiêu: khảo sát để trả lời 5 câu hỏi: khách gặp khó gì khi chọn váy, có muốn dùng Trạm Hỷ không, lo ngại gì, trả bao nhiêu, có yên tâm khi đặt cọc qua nền tảng không.
+Soạn bảng hỏi theo 6 nhóm: sàng lọc và thông tin chung, hành vi và pain point hiện tại, phản ứng với concept, tính năng ưu tiên, giá, riêng tư và thanh toán. Thêm 2–3 câu hỏi khách đang dùng công cụ nào để nối sang phần đối thủ.
+Dựng Google Form, cho 5 người làm thử rồi sửa câu khó hiểu.
+Gợi ý: giữ dưới 25 câu, làm trong 5–6 phút. Đừng bỏ câu sàng lọc, câu giá và câu về ảnh cá nhân vì ba câu này ra quyết định nhiều nhất.
+2. Rải customer survey - Duy Quang
+Việc cần làm
+Đặt mục tiêu: 100+ phản hồi hợp lệ (khớp KPI Outcome 1).
+Chọn kênh: nhóm Facebook cưới hỏi, TikTok và fanpage của Trạm Hỷ, bạn bè và người đã phỏng vấn giới thiệu tiếp, nhờ tiệm hoặc studio gửi cho khách.
+Đăng kèm lời mời ngắn, nêu rõ ẩn danh, mất 5 phút, có quà nhỏ nếu nhóm có ngân sách (ví dụ bốc thăm voucher).
+Theo dõi số phản hồi mỗi ngày, kênh nào ra ít thì đổi cách đăng.
+Gợi ý: bạn bè cùng lớp thường không phải cô dâu, nên câu sàng lọc sẽ loại nhiều. Hãy ưu tiên nhóm Facebook cưới và nhờ tiệm vì đây là nơi có đúng đối tượng. Nếu xin đăng vào nhóm lớn, đọc luật nhóm trước để khỏi bị xóa bài.
+3. Phân tích survey - Minh Châu
+Việc cần làm
+Làm sạch dữ liệu: bỏ phản hồi không qua sàng lọc, trùng, làm quá nhanh, sai câu kiểm tra chú ý.
+Tính chỉ số chính: tỷ lệ chọn 4–5 điểm ở câu quan tâm và khả năng dùng; ngưỡng độ giống thật khách chấp nhận; top 3 lo ngại; xếp hạng tính năng; tỷ lệ chọn gói trả phí.
+Phân tích giá bằng 4 câu Van Westendorp để ra khoảng giá chấp nhận được, rồi so với mức 149k và 299k.
+Cắt lớp đơn giản: giai đoạn cưới × mức quan tâm, ngân sách × chọn gói.
+Vẽ biểu đồ và viết mỗi câu theo 3 nhịp: số liệu → ý nghĩa → nên làm gì với sản phẩm.
+Đối chiếu với 9 buổi phỏng vấn ở Outcome 1: chỗ khớp, chỗ lệch.
+Gợi ý: kết quả không đẹp vẫn là kết quả tốt nếu bạn giải thích được. Ví dụ nếu khách chỉ chịu trả dưới 100k thì nêu thẳng và đề xuất điều chỉnh giá, giáo viên đánh giá cao việc này hơn số liệu "đẹp".
+4. Competitor survey: Thanh Tâm, Đức Anh, Tô Dũng
+Chọn 5–6 đối thủ (mỗi nhóm ít nhất một cái):
+2 trực tiếp: công cụ AI thử váy cưới. Perfect Corp (YouCam) là ứng viên đã xác nhận, cần tìm thêm 1 cái.
+1–2 gián tiếp: nền tảng cưới cho người Việt, ví dụ Weddingo (kiểm tra còn chạy không).
+2 truyền thống: một chuỗi studio lớn (ví dụ 2H Studio) và một tiệm nhỏ ở Hà Nội.
+Thu thập thông tin theo 4 cách: tự dùng thử và chụp màn hình, nhắn hỏi giá và quy trình tiệm, đọc review khách, đọc website và chính sách của họ.
+Điền một bảng so sánh chung cho mọi đối thủ với các tiêu chí: đối tượng, tính năng chính, có thử trên ảnh mình không, có gợi ý tiệm và đặt lịch không, giá, chính sách ảnh cá nhân, kênh tiếp cận, điểm mạnh, điểm yếu.
+Chấm điểm trải nghiệm thang 1–5: độ giống thật, tốc độ, dễ dùng, độ tin cậy và riêng tư, độ phủ váy Việt Nam.
+Kết luận: vẽ bản đồ định vị 2 trục, chỉ ra khoảng trống Trạm Hỷ đứng vào và rủi ro cạnh tranh lớn nhất.
+Gợi ý
+Chỉ đưa vào bảng chấm điểm những cái dùng thử được. Cái nào chỉ có trang giới thiệu thì ghi "đánh giá qua tài liệu công khai".
+Khi hỏi giá tiệm, nhắn như một cô dâu bình thường và dùng chung một kịch bản hỏi cho mọi tiệm để so sánh được.
+Ghi lại nguồn và ngày thu thập cho mỗi thông tin, phần này rất dễ bị hỏi lại lúc bảo vệ.
+`
+Ảnh 1 – Tổng quan mẫu khảo sát
+Tiếp theo, em xin trình bày phần phân tích khảo sát của dự án Trạm Hỷ.
+Nhóm thu được 125 phản hồi, gồm 98 khách hàng B2C và 27 nhà cung cấp B2B. Trong nhóm B2C, 82,7% người trả lời thuộc độ tuổi từ 20 đến 30, nên kết quả chủ yếu phản ánh góc nhìn của khách hàng trẻ.
+Nhóm sử dụng khảo sát để tìm hiểu nhu cầu, rào cản sử dụng và điều kiện hợp tác. Tuy nhiên, quy mô mẫu còn giới hạn nên các kết quả sẽ là cơ sở định hướng thử nghiệm ban đầu, chưa đại diện cho toàn bộ thị trường.
+Ảnh 2 – Khó khăn, hành vi tìm kiếm và ảnh hưởng đến quyết định
+Trước hết, về khó khăn khi tìm hoặc thử váy, vấn đề được chọn nhiều nhất là mất thời gian di chuyển và thử nhiều mẫu, chiếm 42,9%. Tiếp theo là áp lực từ nhân viên tư vấn với 40,8% và giá hoặc phụ phí chưa rõ ràng với 38,8%.
+Ở câu hỏi về ảnh hưởng đến quyết định, 40,8% cho biết phải dành thêm thời gian tìm hiểu, còn 23,5% hoãn quyết định đặt dịch vụ. Điều này gợi ý rằng thông tin thiếu rõ ràng và quá trình lựa chọn bất tiện có thể khiến khách hàng mất thêm thời gian trước khi quyết định.
+Về kênh tìm kiếm, mạng xã hội được chọn nhiều nhất với 44,9%, tiếp theo là giới thiệu từ bạn bè hoặc người thân. Vì vậy, nhóm có thể thử tiếp cận khách hàng bằng nội dung minh họa trải nghiệm, kết hợp thông tin và đánh giá đáng tin cậy.
+Một điểm cần lưu ý là 51% người trả lời chưa từng đến studio. Do đó, các khó khăn được nêu có thể bao gồm cả trải nghiệm thực tế và lo ngại dự kiến.
+Ảnh 3 – Mức quan tâm, động lực và lo ngại khi sử dụng AR
+Từ những khó khăn trên, nhóm tiếp tục tìm hiểu mức quan tâm đến thử váy AR tại nhà.
+Kết quả cho thấy 55,1% khách hàng muốn trải nghiệm và 29,6% còn cân nhắc. Đây là tín hiệu quan tâm ban đầu, nhưng vẫn cần kiểm chứng qua việc sử dụng demo thực tế.
+Trong 83 câu trả lời động lực đang hiển thị, 55,4% chọn khả năng hình dung màu sắc và phom dáng trên cơ thể, 48,2% muốn tự do thử nhiều mẫu, còn 41% muốn tiết kiệm thời gian lựa chọn.
+Các kết quả này gợi ý rằng AR nên hỗ trợ khách hàng chọn trước một số mẫu phù hợp, sau đó tiếp tục tìm hiểu hoặc đến thử trực tiếp.
+Tuy nhiên, lo ngại lớn nhất là hình mô phỏng khác chất liệu váy thật, chiếm 49%. Người trả lời cũng quan tâm đến độ ổn định của ứng dụng, quyền riêng tư, độ phù hợp với cơ thể và tình trạng còn mẫu tại cửa hàng.
+Vì vậy, Trạm Hỷ cần kết hợp mô phỏng với ảnh váy thật, thông tin sản phẩm và hướng dẫn rõ về việc sử dụng camera hoặc ảnh cá nhân.
+Ảnh 4 – Mức sẵn sàng chi trả cho Premium AR
+Về mức chi trả cho Premium AR trong 30 ngày, 34,7% chọn miễn phí hoàn toàn. Nếu tính cả các mức dưới 100 nghìn đồng, tỷ lệ này đạt 71,4%.
+Kết quả gợi ý nhóm nên ưu tiên một phiên bản cơ bản miễn phí để khách hàng trải nghiệm, đồng thời xác định rõ quyền lợi bổ sung của gói Premium.
+Khảo sát hiện hỏi theo khoảng giá, nên chưa đủ cơ sở để kết luận khách hàng chấp nhận chính xác mức 149 nghìn hoặc 299 nghìn đồng. Nhóm cần thử gói quyền lợi cụ thể và đo quyết định mua sau demo trước khi chốt giá.
+Ảnh 5 – Ngân sách, giai đoạn cưới và khả năng giới thiệu dịch vụ
+Xét về ngân sách dành cho váy và chụp ảnh cưới, nhóm từ 20 đến 39,9 triệu đồng chiếm tỷ lệ lớn nhất, đạt 40,8%. Tiếp theo là nhóm từ 10 đến 19,9 triệu đồng với 27,6%.
+Điều này giúp nhóm định hướng cách phân loại và hiển thị các gói dịch vụ theo ngân sách. Tuy nhiên, ngân sách dành cho váy và chụp ảnh chưa đủ để suy ra mức khách hàng sẽ trả cho AR.
+Về giai đoạn cưới, 38,8% chưa có kế hoạch cụ thể, trong khi 18,4% dự định tổ chức trong năm 2027. Vì vậy, nhóm cần phân biệt người đang khám phá trải nghiệm với người có nhu cầu đặt dịch vụ trong thời gian cụ thể.
+Đối với chương trình giới thiệu có hoa hồng 5%, 56,1% chỉ sẵn sàng chia sẻ nếu dịch vụ đáp ứng nhu cầu và có uy tín. Có 30,6% cho biết sẵn sàng chia sẻ ngay.
+Kết quả này gợi ý rằng chương trình giới thiệu cần dựa trên trải nghiệm hữu ích và sự tin tưởng của khách hàng. Các tỷ lệ hiện tại vẫn là ý định khai báo, chưa phản ánh lượt chia sẻ hoặc đơn hàng thực tế.
+Ảnh 6 – Đặc điểm, khó khăn và rào cản tham gia của B2B
+Chuyển sang phía nhà cung cấp, nhóm khảo sát 27 đối tác. Studio hoặc thợ ảnh và showroom váy cưới, áo dài đều chiếm 37%. Phần còn lại là các đơn vị decor, makeup và dịch vụ khác.
+Về khó khăn vận hành, 51,9% chọn tình trạng khách ép giá hoặc yêu cầu thêm quyền lợi ngoài hợp đồng. Có 40,7% gặp việc thay đổi yêu cầu sát ngày cưới và 37% lo trung gian giữ tiền cọc hoặc kéo dài công nợ. Ngoài ra, đối tác còn đề cập đến khách hủy lịch sát giờ và hao mòn váy do thử nhiều lần.
+Những vấn đề này gợi ý Trạm Hỷ cần giúp hai bên xác nhận rõ ngân sách, phạm vi dịch vụ và điều kiện thay đổi ngay từ đầu.
+Về tìm kiếm khách hàng, 48,1% đối tác cho biết kênh mang lại doanh thu chính là khách quen hoặc người thân giới thiệu. Có 37% chủ yếu tự chạy quảng cáo trên mạng xã hội.
+Do đó, khi mời đối tác tham gia, nhóm cần giải thích giá trị bổ sung của Trạm Hỷ so với những kênh họ đang sử dụng, chẳng hạn khả năng tiếp nhận yêu cầu phù hợp với dịch vụ và lịch trống.
+Tuy nhiên, rào cản được chọn nhiều nhất khi tham gia nền tảng mới là chưa thấy lợi ích đủ rõ, chiếm 25,9%. Tiếp theo là lo nội dung hoặc thiết kế bị sao chép với 22,2%. Đối tác cũng gặp khó khăn về nhân sự cập nhật, ảnh sản phẩm và chi phí tạo nội dung.
+Vì vậy, nhóm đề xuất hỗ trợ chuẩn bị gian hàng, làm rõ quyền sử dụng nội dung và triển khai thử nghiệm có báo cáo kết quả để đối tác đánh giá lợi ích cụ thể.
+Ảnh 7 – Chính sách phí, niềm tin và điều kiện duy trì hợp tác
+Sau khi xác định những rào cản, nhóm tiếp tục xem xét điều kiện để nhà cung cấp chấp nhận và duy trì hợp tác.
+Về phí, 48,1% chọn hoa hồng từ 8 đến 10%, còn 29,6% chỉ chọn mức từ 5 đến 7%. Bên cạnh đó, 18,5% muốn trả phí niêm yết cố định hằng tháng.
+Kết quả cho thấy đối tác có lựa chọn khác nhau về cách thu và mức thu phí. Nhóm chưa nên áp dụng ngay một mức chung cho tất cả. Những lựa chọn này cũng dựa trên tình huống giả định nền tảng giúp lọc khách có nhu cầu và tạo đơn thành công, nên vẫn cần kiểm chứng khi triển khai.
+Về niềm tin, 51,9% ưu tiên điều khoản hợp đồng bảo vệ khi khách hủy sát giờ. Có 40,7% chọn hỗ trợ đưa gian hàng lên nền tảng miễn phí, còn 7,4% chọn miễn hoa hồng ba tháng đầu.
+Trong các lựa chọn được đưa ra, hợp đồng rõ ràng và hỗ trợ tham gia nhận được nhiều lựa chọn hơn. Vì vậy, nhóm cần ưu tiên làm rõ trách nhiệm và quy trình hợp tác.
+Về thanh toán, 55,6% muốn đối soát hằng tuần. Có 29,6% muốn nhận 50% tiền cọc sau khi hoàn thành ngày cung cấp dịch vụ đầu tiên, còn 14,8% muốn khách thanh toán trực tiếp cho cơ sở. Nhóm cần thống nhất mốc đối soát và điều kiện giải ngân phù hợp với từng nhóm dịch vụ.
+Để quyết định tiếp tục sử dụng sau thử nghiệm, tiêu chí được chọn nhiều nhất là lợi nhuận tăng thêm sau khi trừ mọi khoản phí, đạt 48,1%. Tiếp theo là có thêm đơn hoàn thành với 37% và giảm thời gian tư vấn yêu cầu không phù hợp với 29,6%.
+Do đó, nhóm đề xuất đánh giá hợp tác bằng kết quả kinh doanh cụ thể, đồng thời theo dõi chất lượng khách, thời hạn thanh toán và lịch hủy.
+Ảnh 8 – Ưu tiên sản phẩm và kết luận
+Từ kết quả của cả B2C và B2B, nhóm đề xuất bốn hướng ưu tiên cho Trạm Hỷ.
+Đầu tiên là hỗ trợ chọn mẫu bằng AR, kết hợp ảnh thật, lưu mẫu yêu thích và gửi yêu cầu đặt lịch.
+Tiếp theo là xây dựng niềm tin thông qua giá, phụ phí và quyền sử dụng ảnh rõ ràng, cùng đánh giá dịch vụ có nguồn xác thực.
+Về khả năng trả phí, nhóm đề xuất có bản cơ bản miễn phí và thử gói Premium sau khi khách hàng trải nghiệm demo.
+Đối với B2B, nhóm sẽ thử chính sách phí cùng đối tác, thống nhất cơ chế đối soát và theo dõi đơn hoàn thành, lợi nhuận sau phí.
+Qua khảo sát, nhóm xác định hướng phát triển cần ưu tiên là sự thuận tiện và thông tin đáng tin cậy cho khách hàng, đồng thời tạo ra lợi ích kinh doanh có thể đo lường cho nhà cung cấp. Những ưu tiên này sẽ tiếp tục được kiểm chứng bằng hành vi sử dụng và giao dịch thực tế trước khi mở rộng dự án.
+Competitor survey
+I. WEDDINGMALL.VN - Website nền tảng cưới cho người Việt
+1. Đối tượng khách hàng
+Khách hàng cá nhân (B2C): Những người đang có kế hoạch tổ chức đám cưới, có nhu cầu tìm kiếm các dịch vụ cưới phù hợp và uy tín.
+Khách hàng doanh nghiệp (B2B): Các shop, studio và cơ sở cung cấp dịch vụ cưới muốn quảng bá sản phẩm, dịch vụ đến khách hàng thông qua nền tảng.
+Đặc điểm mô hình: Weddingmall.vn đóng vai trò trung gian kết nối nhu cầu của người chuẩn bị cưới với các nhà cung cấp dịch vụ.
+2. Tính năng chính
+Quảng bá sản phẩm, dịch vụ cưới: Các shop có thể chia sẻ bài viết hình ảnh và tin về sản phẩm, dịch vụ của mình trên nền tảng.
+Tìm kiếm dịch vụ cưới: Người dùng có thể tìm kiếm các đơn vị cung cấp dịch vụ cưới.
+3. Thử váy cưới trên ảnh cá nhân?
+Thông tin xác minh: Dựa trên quá trình sử dụng và trải nghiệm website thì xác nhận Weddingmall.vn không cung cấp tính năng thử váy cưới trên ảnh cá nhân của khách hàng.
+4. Gợi ý studio và đặt lịch
+Gợi ý tiệm: Website chỉ có chức năng tìm kiếm dịch vụ cưới rồi lọc theo địa điểm để người dùng có thể tìm kiếm các dịch vụ cưới phù hợp. Tuy nhiên, website lại không có thuật toán gợi ý cá nhân hóa, bộ lọc tìm kiếm hay cơ chế đề xuất cửa hàng cụ thể.
+Đặt lịch: Không có quy định hoặc mô tả cụ thể về tính năng đặt lịch thử váy, đặt lịch tư vấn hoặc đặt dịch vụ trực tiếp trên nền tảng, chỉ có chức năng để lại thông tin khách hàng để báo giá.
+5. Giá
+Đối với các sản phẩm dịch vụ cưới trên website Weddingmaill.vn thì ko có báo giá củ thể trên từng sản phẩm, các thông tin về giá cả hay mẫu mã chi tiết đều phải làm việc liên hệ trực tiếp với nhà cung cấp.
+6. Chính sách ảnh cá nhân
+Quyền sở hữu nội dung: Điều khoản xác nhận người dùng vẫn giữ quyền sở hữu trí tuệ đối với nội dung do mình tạo và chia sẻ.
+Dữ liệu cá nhân và quảng cáo: Weddingmall.vn tuyên bố không bán dữ liệu cá nhân cho nhà quảng cáo và không chia sẻ thông tin trực tiếp nhận dạng người dùng với họ, trừ khi được người dùng cho phép cụ thể.
+7. Kênh tiếp cận khách hàng
+Website: Weddingmall.vn là nền tảng trực tuyến được điều khoản xác định là nơi các nhà cung cấp giới thiệu dịch vụ và khách hàng tìm kiếm dịch vụ cưới.
+Kênh quảng bá của nhà cung cấp: Các shop và studio có thể sử dụng hình ảnh, tin đăng để giới thiệu sản phẩm, dịch vụ đến người dùng.
+Quảng cáo tài trợ: Nền tảng sử dụng quảng cáo và nội dung được tài trợ để duy trì hoạt động.
+Thông tin chưa xác minh: Chưa xác nhận các kênh mạng xã hội chính thức như Facebook, TikTok, Instagram hoặc hoạt động quảng cáo trên từng kênh.
+8. Điểm mạnh
+Nhận định dưới đây được rút ra từ mô hình dịch vụ và dựa trên kết quả đánh giá trải nghiệm thực tế.
+Kết nối hai nhóm khách hàng: Nền tảng phục vụ cả người chuẩn bị cưới và các shop, studio cung cấp dịch vụ cưới, tạo điều kiện để nhà cung cấp tiếp cận khách hàng tiềm năng.
+Giảm rào cản sử dụng: Người dùng không mất phí sử dụng các dịch vụ thuộc phạm vi điều khoản, giúp giảm trở ngại về chi phí khi bắt đầu tìm kiếm.
+Hỗ trợ nhà cung cấp quảng bá: Các shop có thể chia sẻ hình ảnh và thông tin dịch vụ, tạo thêm một kênh giới thiệu sản phẩm đến khách hàng.
+Có cơ chế quản lý nội dung: Điều khoản quy định các hành vi bị cấm và cho phép xử lý nội dung vi phạm, góp phần xây dựng môi trường sử dụng có quy tắc.
+Có định hướng cải thiện dịch vụ: Weddingmall.vn đề cập đến hoạt động khảo sát, phân tích dữ liệu sử dụng và thử nghiệm tính năng để phát triển sản phẩm.
+9. Điểm yếu và hạn chế
+Các nội dung dưới đây là những khoảng trống thông tin trong điều khoản dịch vụ, chưa đủ cơ sở để khẳng định là lỗi hoặc điểm yếu thực tế của Weddingmall.vn.
+Chưa rõ quy trình đặt lịch: Chưa có thông tin về đặt lịch thử váy, xác nhận lịch, nhắc lịch hoặc quản lý lịch hẹn với nhà cung cấp.
+Chưa rõ cơ chế gợi ý cá nhân hóa: Có chức năng tìm kiếm dịch vụ nhưng không có chức năng đề xuất tiệm theo ngân sách, phong cách hoặc nhu cầu riêng.
+Thiếu thông tin chi tiết về giá sản phẩm dịch vụ (Váy cưới) : Chưa có thông tin về giá của sản phẩm, tất cả thông tin chi tiết đều phải tự liên hệ với các nhà cung cấp.
+Chưa đủ dữ liệu đánh giá chất lượng dịch vụ: Không cung cấp thông tin về mức độ hài lòng của khách hàng, chất lượng nhà cung cấp, tỷ lệ đặt lịch thành công hay quy trình giải quyết khiếu nại giữa khách hàng và shop.
+10. Chấm điểm trải nghiệm (thang 1–5) 
+Nền tảng: Weddingmaill.vn 
+Độ giống thật của sản phẩm: 
+1 
+2
+3
+4
+5
+Khác: Không có hình ảnh, tiêu chí để đánh giá
+Tốc độ: 
+1
+2
+3
+4
+5
+Dễ dùng: 
+1
+2
+3
+4
+5
+Ghi chú: Giao diện trang chủ dễ nhìn, dễ sử dụng nhưng ít chức năng, không có bộ lọc phân hóa nhiều, gây nhiễu khi tìm sản phẩm phù hợp
+Độ tin cậy & riêng tư: 
+1
+2
+3
+4
+5
+Ghi chú: Có các điều khoản bảo mật thông tin hình ảnh của khách hàng nhưng chưa chặt chẽ.
+Độ phủ váy Việt Nam: 
+1
+2
+3
+4
+5
+Ghi chú: Có bộ lọc theo địa điểm, có sự bao phủ rộng các dịch vụ ở nhiều tỉnh và thành phố. 
+Competitor survey
+II. ỨNG DỤNG "BRIDE: AI WEDDING DRESS TRY ON" (ĐỐI THỦ TRỰC TIẾP)
+1. Đối tượng khách hàng
+Khách hàng cá nhân (B2C): Các cô dâu tương lai hoặc phái nữ muốn trải nghiệm ướm thử váy cưới lên người để xem trước phong cách nào phù hợp với bản thân trước khi đi thuê thực tế.
+Đặc điểm mô hình: Đây là mô hình B2C thuần túy, cung cấp công cụ phần mềm như một dịch vụ giải trí và tham khảo hình ảnh cá nhân.
+2. Tính năng chính
+Thay đồ bằng AI (AI Dress Swap): Người dùng tải ảnh chụp thẳng, rõ mặt và dáng người lên, ứng dụng sẽ dùng AI để thay thế trang phục hiện tại thành các mẫu váy cưới có trong thư viện.
+Tùy chọn phong cách: Cung cấp nhiều filter váy cưới theo dáng (đuôi cá, bồng bềnh, chữ A, cúp ngực) với phong cách Âu Mỹ hoặc Trung Quốc.
+3. Thử váy cưới trên ảnh cá nhân?
+Thông tin xác minh: Dựa trên quá trình dùng thử, xác nhận ứng dụng CÓ cung cấp tính năng này. Đây chính là tính năng cốt lõi (Core Feature) của app. Trí tuệ nhân tạo sẽ tự động cắt ghép, khớp góc mặt và dáng người của khách hàng vào mẫu váy.
+4. Gợi ý studio và đặt lịch
+Gợi ý tiệm: Không có. Ứng dụng chỉ sử dụng các mẫu váy cưới giả lập được render bằng AI 3D hoặc lấy từ các cơ sở dữ liệu chung, không thuộc về bất kỳ tiệm váy cưới nào ngoài đời thực.
+Đặt lịch: Không có. Do không liên kết với các studio hay cửa hàng váy cưới thật, nền tảng hoàn toàn thiếu vắng chức năng booking hay tư vấn dịch vụ. Trải nghiệm của người dùng kết thúc ngay sau khi tải bức ảnh AI về máy.
+5. Giá
+Mô hình Freemium: Ứng dụng cho phép tải về miễn phí và dùng thử 1 đến 2 lần đầu (có dán logo/watermark của app và ép xem quảng cáo 30 giây).
+Gói trả phí (VIP): Để gỡ quảng cáo, xóa watermark và thử không giới hạn các mẫu váy thiết kế đẹp hơn, người dùng phải mua gói đăng ký (Subscription) với mức giá khá cao, trung bình từ 99.000đ - 150.000đ/tuần hoặc thanh toán theo năm.
+6. Chính sách ảnh cá nhân
+Quyền riêng tư: Dữ liệu hình ảnh khuôn mặt và cơ thể của người dùng bị đẩy lên máy chủ đám mây (Cloud) của nhà phát triển (thường đặt tại nước ngoài) để AI xử lý.
+Hạn chế: Các ứng dụng dạng này thường có các điều khoản bảo mật rất chung chung, không có cam kết rõ ràng về việc sẽ xóa hình ảnh cá nhân ngay sau khi xử lý xong, tiềm ẩn rủi ro lộ lọt thông tin sinh trắc học.
+7. Kênh tiếp cận khách hàng
+Chợ ứng dụng: Xuất hiện phổ biến trên App Store (iOS) và Google Play (Android).
+Mạng xã hội: Chạy quảng cáo hiển thị (Ads) cực kỳ mạnh mẽ qua các video ngắn "biến hình" trên TikTok Reels, Instagram Reels và Facebook để thu hút lượt tải.
+8. Điểm mạnh
+Trải nghiệm người dùng (UI/UX) thân thiện: Cực kỳ dễ sử dụng, thao tác "1-chạm" (One-tap), người dùng không cần phải biết kỹ thuật máy tính hay nhập các câu lệnh (prompt) phức tạp.
+Tốc độ xử lý nhanh: Trả kết quả ảnh khá nhanh (thường dưới 15 giây).
+Nắm bắt đúng tâm lý: Giao diện và các bộ sưu tập được thiết kế đúng "insight" thích cái đẹp và sự lộng lẫy của các cô dâu trẻ.
+9. Điểm yếu và hạn chế
+Tính ứng dụng thực tế bằng 0 (Khoảng trống thị trường): Bức ảnh tạo ra chỉ mang tính chất "sống ảo". Khách hàng thấy ảnh mình mặc chiếc váy đó rất đẹp nhưng không thể biết phải tìm thuê chiếc váy đó ở đâu ngoài đời thực, và giá bao nhiêu.
+Hình ảnh đôi khi thiếu tự nhiên: AI thường áp thêm các filter làm mịn da, trang điểm (makeup) quá đà, khiến bức ảnh trông giống tranh vẽ đồ họa hơn là một bức ảnh chụp thực tế.
+Không có mẫu váy cưới Việt Nam: Thư viện váy cưới hoàn toàn mang hơi hướng phương Tây hoặc Trung Quốc, không sát với gu thẩm mỹ và các bộ sưu tập thực tế đang có mặt tại thị trường Việt Nam.
+10. Chấm điểm trải nghiệm (thang 1–5) Đánh giá dựa trên trải nghiệm ứng dụng AI Wedding Dress Try On
+Độ giống thật của sản phẩm: 3/5 (Ghi chú: Form váy ghép vào người khá khớp, nhưng chất liệu vải và khuôn mặt bị AI làm "ảo hóa" khá nhiều, thiếu đi độ chân thực của ảnh chụp camera thường).
+Tốc độ: 5/5 (Ghi chú: Xử lý trực tiếp trên app rất mượt mà, render ảnh nhanh).
+Dễ dùng: 5/5 (Ghi chú: Luồng thao tác tối giản: Tải ảnh -> Chọn mẫu váy -> Ra kết quả).
+Độ tin cậy & riêng tư: 2/5 (Ghi chú: Phải xem nhiều quảng cáo rác ở bản miễn phí; chính sách lưu trữ hình ảnh khuôn mặt người dùng trên Cloud không thực sự minh bạch).
+Độ phủ váy Việt Nam: 1/5 (Ghi chú: Không có bất kỳ liên kết hay dữ liệu nào từ các nhà cung cấp dịch vụ cưới tại Việt Nam).
+II. 2H STUDIO (ĐỐI THỦ TRUYỀN THỐNG - CHUỖI STUDIO LỚN)
+1. Đối tượng khách hàng
+Khách hàng cá nhân (B2C): Các cặp đôi chuẩn bị kết hôn có mức thu nhập từ khá đến cao tại Hà Nội và các tỉnh lân cận, có nhu cầu sử dụng dịch vụ cưới trọn gói tiện lợi và sẵn sàng chi trả mức ngân sách từ 6.900.000 VNĐ đến hơn 19.900.00 VNĐ.
+Đặc điểm mô hình: Mô hình studio dịch vụ truyền thống khép kín (End-to-end service), trực tiếp đầu tư trang thiết bị, bối cảnh phòng chụp, đội ngũ nhân sự và kho váy áo vật lý để phục vụ khách hàng từ khâu chụp ảnh đến ngày cưới chính thức.
+2. Tính năng / Dịch vụ chính
+Dịch vụ chụp ảnh cưới trọn gói: Thực hiện các gói chụp ảnh tại Studio, phim trường hoặc chụp ngoại cảnh trong ngày.
+Cung cấp trang phục cưới: Cho thuê và cho mượn váy cưới (dòng Studio, Luxury, Thiết kế), Veston, áo dài cô dâu chú rể và áo dài đội đỡ tráp.
+Dịch vụ bổ trợ: Trang điểm (Makeup), làm tóc, stylist định hình concept và trợ lý hỗ trợ khách hàng trong suốt buổi chụp.
+Sản xuất ấn phẩm hoàn thiện: Xử lý hậu kỳ (Photoshop), in album bìa da cao cấp, ảnh phóng pha lê hoặc ảnh ép gỗ viền titan.
+3. Thử váy cưới trên ảnh cá nhân
+Thông tin xác minh: Dựa trên trải nghiệm thực tế và tài liệu cung cấp, 2H Studio hoàn toàn không có tính năng thử váy trên ảnh cá nhân hay công nghệ mô phỏng AR. Khách hàng bắt buộc phải đặt lịch và đến trực tiếp showroom để thử váy vật lý.
+4. Gợi ý studio và đặt lịch
+Gợi ý tiệm: Không có cơ chế gợi ý hay cá nhân hóa tự động theo thuật toán; studio tự quảng bá các cơ sở và chi nhánh của chính mình.
+Đặt lịch: Khách hàng đặt lịch thủ công bằng cách nhắn tin qua Fanpage, Zalo hoặc đến trực tiếp showroom. Quá trình xác nhận lịch, dời lịch phụ thuộc vào nhân viên tư vấn trực ca, không có hệ thống quản lý lịch trình tự động dành riêng cho khách.
+5. Giá
+2H Studio có bảng giá dịch vụ niêm yết rõ ràng theo từng gói chụp:
+Gói Studio Ảnh Phóng Đẹp: 6.900.000 VNĐ (chụp 1 tiếng, 1 váy + 1 vest, 02 ảnh phóng pha lê).
+Gói Studio Basic: 8.900.000 VNĐ (chụp 1 buổi, 2 váy + 2 vest, 01 album bìa da).
+Gói Studio Luxury: 11.900.000 VNĐ (chụp 1 buổi, mượn 1 váy Luxury ngày cưới và 10 bộ áo dài đỡ tráp).
+Gói Studio Signature: 15.900.000 VNĐ (chụp 1 ngày, thiết kế concept riêng, mượn váy cưới Thiết kế).
+Các gói Ngoại cảnh: Dao động từ 9.500.000 VNĐ đến 19.900.000 VNĐ tùy theo thời gian nửa ngày hay cả ngày và số điểm chụp nội thành Hà Nội.
+6. Chính sách ảnh cá nhân
+Studio sử dụng các bộ ảnh của khách hàng sau khi hoàn thiện để làm tư liệu truyền thông, quảng cáo trên Fanpage và TikTok.
+Khách hàng muốn bảo mật hình ảnh cá nhân (không đăng tải công khai) thường phải thỏa thuận miệng hoặc yêu cầu riêng trong điều khoản hợp đồng dịch vụ.
+7. Kênh tiếp cận khách hàng
+Showroom vật lý: Không gian trưng bày váy và phòng chụp quy mô lớn tại các trục đường chính ở Hà Nội.
+Kênh mạng xã hội: Fanpage Facebook có lượng tương tác tốt, kênh TikTok đăng tải các video hậu trường và hình ảnh cô dâu thử váy.
+Quảng cáo trả phí: Đầu tư ngân sách chạy Facebook Ads và TikTok Ads vào mùa cưới cao điểm.
+8. Điểm mạnh
+Dịch vụ All-in-one hoàn chỉnh: Khách hàng chỉ cần làm việc với một đầu mối là được lo trọn gói từ chụp ảnh, trang điểm đến trang phục ngày cưới.
+Chính sách ưu đãi và quà tặng kích cầu hấp dẫn: Thiết kế các gói quà tặng đánh trúng tâm lý như tặng mượn bộ đôi áo dài ăn hỏi, mượn vest cưới, miễn phí xe di chuyển ngoại cảnh hoặc nâng cấp ảnh tráng gương.
+Chất lượng sản phẩm đồng đều: Đội ngũ nhiếp ảnh gia và thợ trang điểm được đào tạo bài bản, váy cưới cập nhật liên tục theo xu hướng.
+9. Điểm yếu và hạn chế
+Tốn nhiều thời gian và công sức của khách hàng: Khách phải đến tận nơi thử trực tiếp 5–7 bộ váy mới chọn được mẫu ưng ý, dễ gây kiệt sức và mệt mỏi.
+Khoảng cách giữa ảnh mẫu và thực tế: Ảnh mẫu trên Fanpage đã qua chỉnh sửa màu sắc và dáng người chuyên nghiệp, dễ khiến khách hàng thất vọng khi mặc thử thực tế.
+Áp lực tư vấn trực tiếp: Khách hàng dễ gặp áp lực tâm lý từ nhân viên bán hàng trong việc nâng hạng gói váy (upsell).
+Rủi ro hủy lịch (No-show): Quy trình đặt lịch thử váy thủ công không có cơ chế giữ cọc tự động, dẫn đến tỷ lệ khách đặt nhưng không đến cao.
+10. Chấm điểm trải nghiệm (thang 1–5)
+Nền tảng: 2H Studio (Mô hình dịch vụ Studio trực tiếp)
+Độ giống thật của sản phẩm: 3/5Sản phẩm thực tế có chất lượng tốt nhưng có độ chênh lệch đáng kể so với ảnh quảng cáo đã can thiệp photoshop sâu.
+Tốc độ: 2/5Quy trình tư vấn, đặt lịch và đến thử váy trực tiếp mất nhiều thời gian di chuyển và chờ đợi.
+Dễ dùng: 2/5Không có nền tảng số hóa tự phục vụ; mọi thao tác đều phải trao đổi thủ công với tư vấn viên.
+Độ tin cậy & riêng tư: 4/5Doanh nghiệp có pháp nhân và bảng giá niêm yết rõ ràng, tuy nhiên chính sách bảo mật dữ liệu hình ảnh kỹ thuật số chưa được tiêu chuẩn hóa bằng văn bản công nghệ.
+Độ phủ váy Việt Nam: 5/5Kho váy vật lý đa dạng, chuẩn theo form dáng và thị hiếu của cô dâu Việt Nam.
+Bố sung về ảnh của ng pv và câu nói của họ.
+- Xét cả trả phí để chạy
+- Tìm kiếm đối tác làm sớm, chạy markrting (tuần 6)
+- Khai thác insight như nào cho chuẩn
+(- Phỏng vấn bị chung chung
+- Có cho khách dùng thử sẩn phẩm bên mình 0)
+- Hỏi đến tạn cùng vấn đề để cải thiện. 
+- Cần phải có evidence
+- interview hơi ngắn
+- 10silde giới thiệu profile, câu nói , mặt của ng pv
+- Evidence cục kì qtrong, câu nói pro5 phải đưa vào
+Đề xuất ra đc học dc những điểm tốt của nó
+kênh bán lựa chọn kênh nào là kênh khách hàng đề xuất
+0 xác định đc điểm chạm để đánh sẽ fail
+câu hỏi đang thiếu về markting
+có cách nào tư vấn đề kiếm tiền hơn không

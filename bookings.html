@@ -66,13 +66,14 @@
             <button onclick="toggleDemoController()" class="text-gray-400 hover:text-brand-text focus:outline-none"><span class="material-symbols-outlined text-sm" id="demo-toggle-icon">keyboard_arrow_down</span></button>
         </div>
         <div class="flex flex-col gap-1.5" id="demo-buttons">
-            <a href="index.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1. Trang chủ</a>
-            <a href="marketplace.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">2. Dịch vụ cưới hỏi</a>
-            <a href="detail.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">3. Chi tiết & Đặt cọc</a>
-            <a href="bookings.html" class="px-3 py-2 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 4. Lịch hẹn nhà cung cấp</a>
-            <a href="dashboard.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">5. Kênh Nhà cung cấp</a>
-            <a href="invitation.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">6. Tạo thiệp & QR</a>
-            <a href="admin.html" class="px-3 py-2 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">7. Quản trị Admin</a>
+            <a href="index.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1. Trang chủ</a>
+            <a href="tryon.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-goldDark font-bold hover:bg-brand-blush shadow-sm transition-all border border-brand-gold/40 text-left flex items-center justify-between"><span>2. Thử váy AR (EXE201)</span> <span class="bg-red-500 text-white text-[9px] px-1.5 py-0.2 rounded-full">Hot</span></a>
+            <a href="marketplace.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">3. Dịch vụ cưới hỏi</a>
+            <a href="detail.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">4. Chi tiết & Đặt cọc</a>
+            <a href="bookings.html" class="px-3 py-1.5 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 5. Lịch hẹn nhà cung cấp</a>
+            <a href="dashboard.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">6. Kênh Nhà cung cấp</a>
+            <a href="invitation.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">7. Tạo thiệp & QR</a>
+            <a href="admin.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">8. Quản trị Admin</a>
         </div>
     </div>
 
@@ -108,20 +109,24 @@
                     </div>
                     
                     <!-- Navigation Tabs -->
-                    <nav class="flex justify-between md:justify-center items-center gap-1 md:gap-4 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent">
-                        <a href="index.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                    <nav class="flex justify-between md:justify-center items-center gap-1 md:gap-3 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent overflow-x-auto pb-1 md:pb-0">
+                        <a href="index.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
                             <span class="material-symbols-outlined text-base">home</span>
                             <span class="text-[10px] font-medium">Trang chủ</span>
                         </a>
-                        <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                        <a href="tryon.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-goldDark whitespace-nowrap">
+                            <span class="material-symbols-outlined text-base">styler</span>
+                            <span class="text-[10px] font-medium">Thử váy AR</span>
+                        </a>
+                        <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
                             <span class="material-symbols-outlined text-base">search</span>
                             <span class="text-[10px] font-medium">Dịch vụ cưới hỏi</span>
                         </a>
-                        <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark">
+                        <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark whitespace-nowrap">
                             <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
-                            <span class="text-[10px] font-bold">Lịch hẹn nhà cung cấp</span>
+                            <span class="text-[10px] font-bold">Lịch hẹn</span>
                         </a>
-                        <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-400 hover:text-brand-text">
+                        <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
                             <span class="material-symbols-outlined text-base">mail</span>
                             <span class="text-[10px] font-medium">Tạo thiệp & QR</span>
                         </a>
@@ -218,6 +223,99 @@
             const container = document.getElementById('booking-container');
             container.innerHTML = '';
 
+            // 1. Render AR Virtual Try-On Studio Appointments (from tryon.html)
+            let tryOnBookings = JSON.parse(localStorage.getItem('tramhy_bookings'));
+            if (!tryOnBookings || tryOnBookings.length === 0) {
+                tryOnBookings = [
+                    {
+                        id: "BK-829104",
+                        customerName: "Nguyễn Minh Ngọc",
+                        phone: "0987 654 321",
+                        dressName: "Váy cưới Đuôi cá đính pha lê Royal",
+                        studio: "2H Studio (Cầu Giấy, Hà Nội)",
+                        price: "3.500.000đ",
+                        date: "28/09/2026",
+                        time: "14:00 - 15:30",
+                        includePhoto: true,
+                        includeMakeup: true,
+                        depositStatus: "Đã giữ cọc an toàn (Milestone Pay)",
+                        createdAt: "2026-09-26T14:30:00.000Z"
+                    }
+                ];
+                localStorage.setItem('tramhy_bookings', JSON.stringify(tryOnBookings));
+            }
+
+            tryOnBookings.forEach(item => {
+                const tryonCard = document.createElement('div');
+                tryonCard.className = "bg-white rounded-2xl border-2 border-brand-gold/40 p-5 shadow-sm space-y-4 blush-glow relative overflow-hidden";
+                tryonCard.innerHTML = `
+                    <div class="absolute top-0 right-0 bg-brand-gold text-white text-[9px] font-extrabold uppercase px-3 py-1 rounded-bl-xl tracking-wider flex items-center gap-1 shadow-sm">
+                        <span class="material-symbols-outlined text-[11px]">styler</span> Thử Váy AR (EXE201)
+                    </div>
+
+                    <!-- Partner Info Header -->
+                    <div class="flex justify-between items-start border-b border-gray-100 pb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 text-brand-goldDark flex items-center justify-center border border-brand-gold/30">
+                                <span class="material-symbols-outlined text-xl">storefront</span>
+                            </div>
+                            <div>
+                                <h3 class="serif-title text-sm font-bold text-brand-text flex items-center gap-1">
+                                    ${item.studio}
+                                    <span class="material-symbols-outlined text-blue-500 text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                </h3>
+                                <p class="text-[9px] text-gray-400">Mã lịch hẹn: ${item.id} • Dâu rể: <b class="text-brand-text">${item.customerName}</b> (${item.phone})</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dress & Appointment Details -->
+                    <div class="grid grid-cols-2 gap-3 bg-brand-blush/60 p-3 rounded-xl border border-brand-gold/15 text-xs font-semibold">
+                        <div>
+                            <span class="text-gray-400 text-[9px] uppercase tracking-wider block">Mẫu váy thử trực tiếp</span>
+                            <span class="text-brand-text text-[11px] font-bold block">${item.dressName}</span>
+                            <span class="text-[10px] text-brand-goldDark font-extrabold">Giá thuê niêm yết: ${item.price}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-gray-400 text-[9px] uppercase tracking-wider block">Thời Gian Hẹn Showroom</span>
+                            <span class="text-brand-text text-[11px] font-bold block">${item.date}</span>
+                            <span class="text-[10px] text-gray-500">${item.time}</span>
+                        </div>
+                    </div>
+
+                    <!-- Add-on combo info -->
+                    <div class="flex items-center gap-2 text-[10px] text-gray-600">
+                        <span class="font-bold text-gray-400">Dịch vụ kèm:</span>
+                        ${item.includePhoto ? '<span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md font-semibold">✓ Chụp Pre-wedding</span>' : ''}
+                        ${item.includeMakeup ? '<span class="bg-pink-50 text-pink-700 px-2 py-0.5 rounded-md font-semibold">✓ Makeup cô dâu</span>' : ''}
+                    </div>
+
+                    <!-- Escrow Protection Badge -->
+                    <div class="p-3 bg-green-50 border border-green-200 rounded-xl text-xs space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-green-800 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm text-green-600">shield</span>
+                                Cọc bảo chứng Trạm Hỷ Escrow: 200.000đ
+                            </span>
+                            <span class="text-[9px] font-bold text-green-700 bg-green-200/60 px-2 py-0.5 rounded-full">Đã Khóa Giữ Chỗ</span>
+                        </div>
+                        <p class="text-[9px] text-green-700 leading-tight">Số tiền cọc được giữ an toàn bởi Trạm Hỷ. Studio cam kết giữ đúng mẫu váy theo lịch hẹn. Nếu váy không đúng phom hoặc tiệm hủy hẹn, dâu rể được hoàn 100%.</p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center gap-2 pt-1 border-t border-gray-100">
+                        <a href="tel:${item.phone}" class="flex-1 text-center py-2 bg-slate-900 text-white text-[11px] font-bold rounded-xl shadow-sm hover:bg-black transition-all flex items-center justify-center gap-1">
+                            <span class="material-symbols-outlined text-xs text-brand-gold">call</span> Gọi Hotline Studio
+                        </a>
+                        <a href="tryon.html" class="px-3 py-2 bg-brand-gold/15 text-brand-goldDark text-[11px] font-bold rounded-xl hover:bg-brand-gold/25 transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs">refresh</span> Thử mẫu khác
+                        </a>
+                    </div>
+                `;
+                container.appendChild(tryonCard);
+            });
+
+            // 2. Render Traditional Marketplace Escrow Contracts
             let booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
             if (!booking || !booking.vendorName) {
                 booking = {

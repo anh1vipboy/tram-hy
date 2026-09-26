@@ -1,0 +1,2188 @@
+﻿Final
+                           FINAL REPORT 
+                 GENERAL INFORMATION 
+Subject: EXE101 
+Topic: Trạm Hỷ
+Class: SE1936-NET
+Lecture: Đoàn Thị Thanh Hương
+Tên nhóm: Group 5
+Mentor: Bùi Mai Phương
+                            MEMBER INFORMATION
+1. Trần Huyền Trang - HS194065
+2. Lê Minh Châu - HS186348
+3. Nguyễn Thị Thanh Tâm - HE180879
+4. Nguyễn Duy Quang - HE181202
+5. Phùng Đức Anh - HE182553
+6. Tô Văn Tiến Dũng - HE182025
+TABLE OF CONTENT
+I. INTRODUCTION 5
+1.1. Project Formation Reason5
+1.2. Project Introduction5
+1.3. Team Members6
+1.4. Logo and Slogan8
+II. THE GROWTH OF THE MARKET 8
+2.1. Market Outlook8
+2.2. Market Trends9
+2.3. Market Segments & Market Share10
+2.4. Key Players12
+2.5. Product Pricing12
+III. COMPETITOR ANALYSIS 13
+3.1. Strategic Competitive Matrix13
+3.2. Detailed Competitor Analysis14
+3.2.1. Marry.vn14
+3.2.2. VDES16
+3.2.3. Weddingbook18
+3.2.4. Zola20
+3.3. Trạm Hỷ’s Competitive Edge22
+3.4. SWOT of Trạm Hỷ23
+IV. LEVELS OF PRODUCT 24
+4.1. Core Product24
+4.2. Actual Product24
+4.3. Augmented Product24
+V. CUSTOMER INSIGHTS SURVEY 25
+5.1. Survey Question & Analysis25
+VI. CUSTOMER PERSONA 27
+6.1. Customer27
+6.2. Value Proposition27
+VII. CUSTOMER'S JOURNEY MAP 28
+VIII. PRODUCT & MARKET FIT CANVAS 30
+IX. BUSINESS MODEL CANVAS 32
+9.1. Customer Segments32
+9.2. Value Proposition33
+9.3. Channels34
+9.4. Customer Relationships34
+9.5. Revenue Streams35
+9.6. Key Resources35
+9.7. Key Activities35
+9.8. Key Partners36
+9.9. Cost Structure36
+X. FINANCIAL ANALYSIS 37
+10.1. Investment Overview37
+10.2. Revenue Projection39
+10.3. Operating Expenses40
+10.4. P&L Summary (Profit & Loss)41
+10.5. Break-even Point & Payback Period42
+10.6. Cash Flow & Cumulative Balance43
+10.7. Key Takeaways & Risk Factors43
+XI. PROJECT EVALUATION CRITERIA 44
+11.1. Innovation (Operations/ Channels/ Markets)44
+11.2. Market Size (Country/ Provinces - in Vietnam)44
+11.3. Impact on Technology, Environment, Society, or Economic46
+11.4. Feasibility of Idea46
+11.5. Scale-Up Ability (Company Size)47
+XII. INVESTOR DECISION MAKING 48
+12.1. Internal Assessment Criteria48
+12.2. External Evaluation Criteria51
+12.2.1. Market Criteria51
+12.2.2. Investor Criteria52
+I. INTRODUCTION
+1.1. Project Formation Reason
+Couples preparing for their weddings in Vietnam frequently encounter significant challenges due to a highly fragmented and non-transparent traditional service market. The primary pain points include:
+For Consumers (Couples): Finding reliable vendors, manually cross-checking prices across disjointed social media groups, and verifying service quality are intensely stressful and time-consuming. This decentralization leaves couples highly vulnerable to seasonal price gouging and misleading advertising.
+For Local Vendors (SMEs): Small-scale service providers—such as independent decorators, local caterers, and marquee builders—possess excellent craftsmanship and competitive pricing but lack the digital marketing capabilities to reach young, tech-savvy consumers. Consequently, they remain heavily dependent on large, costly intermediaries.
+These dual-sided market inefficiencies are the catalyst for Trạm Hỷ. Our overarching goal is to shatter information asymmetry, streamline the wedding preparation journey, and forge a transparent connection between couples and vendors. We envision a digital marketplace that not only shields couples from hidden costs but also empowers traditional micro-businesses with equal digital transformation opportunities.
+1.2. Project Introduction
+Trạm Hỷ is a pioneering One-stop Digital Marketplace (Website/App) designed to centralize and revolutionize the Vietnamese wedding industry. Our platform empowers couples to seamlessly search, compare, book, and pay for reliable wedding services within a unified ecosystem.
+Key pillars of our platform include:
+- Technological Integration: Leveraging an AI Budget Configuration algorithm for tailored service combo suggestions, alongside 3D/VR spatial simulations that allow couples to virtually "try on" their wedding decor before execution.
+- Smart Booking Infrastructure: Featuring Instant Booking, secure Third-party Escrow (Milestone-based Payment) mechanisms, and integrated digital utilities like free QR-code wedding invitations.
+- Vendor Empowerment: Serving as a direct B2C channel that allows local suppliers to reach their exact target audience without exorbitant marketing overheads.
+- Community Trust (UGC): Fostering a genuine, verified review system and storytelling community where couples can share real experiences, effectively eliminating low-quality vendors.
+Starting with the MVP phase in Hanoi, Trạm Hỷ aims for aggressive geographical expansion across major northern cities and, ultimately, nationwide. Our mission is to establish the definitive, transparent, and fair digital standard for the wedding industry in Vietnam.
+1.3. Team Members
+Name
+Position
+Details
+Percentage of Shares (Effort-based)
+Trần Huyền Trang
+CEO / Project Leader
+- Directs the overall vision, communications, and business development strategy.
+- Orchestrates team workflows, monitors project milestones, and ensures cross-functional alignment and timely execution.
+- Acts as the primary representative to partners and investors.
+110%
+Lê Minh Châu
+CMO
+- Develops and executes comprehensive marketing strategies.
+- Drives product promotion, brand recognition, and market expansion.
+110%
+Nguyễn Thị Thanh Tâm
+CISO
+- Aligns information security strategy with business objectives.
+- Manages data privacy, platform security infrastructure, and compliance risk.
+100%
+Tô Văn Tiến Dũng
+CTO
+- Architects the technology strategy and system infrastructure.
+- Leads R&D efforts and ensures optimal platform performance and scalability.
+95%
+Nguyễn Duy Quang
+Security Engineer
+- Implements robust security protocols and monitors system vulnerabilities.
+- Supports the CISO in executing day-to-day security operations.
+95%
+Đức Anh
+Software Engineer
+- Develops and optimizes core software features.
+- Maintains code quality, resolves bugs, and supports the CTO in technical execution.
+92%
+1.4. Logo and Slogan 
+The Trạm Hỷ logo embodies the spirit of a traditional Vietnamese wedding. At its center, a newlywed couple in ceremonial attire is surrounded by a dragon, phoenix, lotus flowers, auspicious clouds, and classical decorative patterns. The circular composition symbolizes completeness, unity, and a lasting marriage. Deep red represents love, celebration, and good fortune, while gold conveys elegance, prosperity, and blessings.
+The slogan “Kết duyên cát hỷ” expresses Trạm Hỷ’s mission to unite two individuals and two families as they begin a joyful marital journey. Kết duyên means bringing together a destined couple, while cát hỷ refers to auspicious happiness, good fortune, and celebration. 
+Together, the logo and slogan communicate that Trạm Hỷ does more than create a beautiful wedding—it helps begin a harmonious, fulfilling, and blessed lifelong union.
+II. THE GROWTH OF THE MARKET 
+2.1. Market Outlook
+Vietnam's wedding service market is large and relatively stable, with hundreds of thousands of weddings held every year. However, the market remains fragmented, lacks transparency, and relies heavily on social media, personal referrals, and individual service providers. As a result, customers often struggle to compare prices, verify service quality, manage schedules, and control unexpected costs.
+According to the PAM–TAM–SAM–SOM model presented in the project documents:
+Indicator
+Estimated market size
+PAM – Total wedding market in Vietnam
+VND 82.56 trillion
+TAM – Young, technology-oriented customers in major cities
+VND 37.152 trillion
+SAM – Hanoi and surrounding areas
+VND 6 trillion
+SOM – Trạm Hỷ’s target during the first two years
+Approximately 2,500 successful bookings (~5% of the Hanoi market) 
+The PAM estimate is based on approximately 688,000 couples getting married each year and an assumed average wedding expenditure of VND 120 million per wedding.
+The SOM target is built bottom-up from the platform's own financial model: Year 1 is projected to reach 855 bookings, starting at 40 bookings/month and growing 10% month-over-month. Year 2 assumes this growth rate moderates as the platform matures and vendor supply stabilizes, adding approximately 1,645 further bookings and bringing the two-year cumulative total to approximately 2,500 bookings — equivalent to roughly VND 3.75 billion in direct commission revenue at the standard 10% commission rate.
+Trạm Hỷ has selected Hanoi as its initial MVP market because the city has strong wedding demand, a high concentration of service providers, and favorable conditions for testing the booking, payment, and quality-control systems. After refining the model, the project can expand to Ho Chi Minh City, Da Nang, Hai Phong, Can Tho, and eventually nationwide.
+2.2. Market Trends
+The wedding market is shifting from fragmented and manual service discovery toward integrated digital wedding ecosystems. Young couples increasingly want to use one platform to search for vendors, compare prices, view service samples, make bookings, complete payments, and manage the entire wedding preparation process.
+The major market trends include:
+- Digitalization of wedding planning: Customers increasingly prefer online service searches, electronic contracts, centralized booking, and secure digital payments.
+- AI-powered personalization: Users want to enter their budget and preferred style and receive automatically generated service combinations instead of searching for each vendor separately.
+- Transparent pricing and deposit protection: Customers expect clear prices without hidden charges and prefer milestone-based payments to reduce the risk of losing deposits.
+- Verified reviews and real-life images: Customers trust reviews from verified buyers and photographs taken at actual events more than highly edited advertising images.
+- Minimalist and personalized weddings: Gen Z customers increasingly prefer pastel colors, customized designs, electronic invitations, QR codes, minimalist wedding dresses, and cinematic-style visual content.
+- Early wedding planning: Approximately 65% of customers begin searching for and booking wedding services three to twelve months before the wedding. Therefore, early-bird promotions offered three to six months in advance may be highly effective.
+Survey findings also show that 39.2% of customers experience difficulty comparing prices and service quality, while 32.5% are concerned that the actual service may not match the advertised images. This creates a strong opportunity for Trạm Hỷ to provide transparent pricing, verified reviews, real-life portfolios, and secure transaction mechanisms.
+2.3. Market Segments & Market Share
+Trạm Hỷ operates as a two-sided marketplace serving both B2C customers and B2B service providers.
+B2C Segment – Service Users
+The main customers are young couples from the Gen Z and Millennial generations, particularly those aged between 22 and 35 and living in Hanoi and nearby urban areas.
+Their main characteristics include:
+Medium-to-high income.
+Primarily office workers and self-employed individuals.
+Busy lifestyles with limited time for direct vendor visits.
+Strong preference for convenience, personalization, and transparent pricing.
+Frequent use of TikTok, Pinterest, Instagram, Facebook, and Threads for wedding inspiration.
+A tendency to compare several vendors before making a booking.
+Preference for complete service packages with the ability to customize individual items.
+Parents of couples preparing to marry are also an important customer segment because they may control the wedding budget or influence the final purchasing decision.
+B2B Segment – Wedding Service Providers
+This segment includes:
+Wedding photography studios.
+Wedding decoration and family-ceremony decoration providers.
+Wedding tent and floral gate suppliers.
+Makeup artists.
+Bridal dress shops.
+Restaurants and wedding venues.
+Photography and videography providers.
+Sound and lighting suppliers.
+Wedding gift-tray, wedding car, and invitation providers.
+Most of these businesses are small enterprises or household businesses that depend heavily on personal referrals, Facebook, and Zalo. Many lack professional websites, booking systems, customer relationship management tools, and stable customer acquisition channels.
+Target Market Share
+Trạm Hỷ aims to serve approximately 2,500 weddings during its first two years, representing around 5% of the Hanoi wedding market according to the project’s calculations.
+This figure represents the project’s target market share, not its current market share, because Trạm Hỷ is still in the startup stage and does not yet have enough completed transaction data to calculate an actual share.
+2.4. Key Players
+The main competitors in Vietnam’s wedding market include Marry.vn, VDES, and Weddingbook, while Zola are important international reference models.
+Marry.vn has strong brand recognition and a large vendor network but mainly operates as a directory. VDES offers quotation comparison and booking support but focuses heavily on venues and corporate events. Weddingbook provides high-quality wedding packages but requires significant investment in showrooms and physical operations.
+Trạm Hỷ differentiates itself through transparent pricing, AI-based recommendations, verified reviews, secure milestone payments, real-life vendor images, and an all-in-one booking experience designed for Vietnamese couples and local service providers.
+2.5. Product Pricing
+Trạm Hỷ applies a freemium and performance-based pricing model. Couples can register, search, compare vendors, view portfolios, and use basic planning tools free of charge. Vendors can also join the platform without an initial registration fee and only pay when a booking is successfully completed.
+Pricing item
+Proposed fee
+Basic services for customers
+Free
+Vendor registration
+Free
+Commission per successful booking
+10% of contract value
+Priority search placement
+VND 500,000–2 million/month
+Homepage banner
+VND 2–5 million/month
+Featured service package
+VND 5–10 million/month
+Premium digital services
+Optional fee
+The main revenue source during the MVP stage is commission from successful bookings. Additional revenue comes from advertising, featured vendor packages, premium wedding websites, electronic invitations, guest-management tools, and wedding-planning consultations. All fees are processed transparently through the milestone-payment system after customers confirm service completion.
+III. COMPETITOR ANALYSIS
+3.1. Strategic Competitive Matrix 
+Competitor
+Business Model
+Digital Tech Level
+Localized Support
+Primary Value Prop
+Marry.vn
+Traditional Directory
+Low
+Medium
+Mass market reach
+VDES
+E-commerce Marketplace
+High
+Low
+Event/Corporate focus
+Weddingbook
+O2O (Offline-to-Online)
+Medium
+High
+High-end consistency
+Trạm Hỷ
+AI-Driven Ecosystem
+Very High
+High
+Transparency & AI-Optimization
+3.2. Detailed Competitor Analysis 
+3.2.1. Marry.vn
+Criteria
+Details
+Reason to choose?
+- Shares the marketplace model connecting couples with wedding service providers in Vietnam. 
+- The largest & oldest wedding platform in Vietnam (since 2010).
+1. Product
+- Nationwide wedding service directory including wedding venues, dresses, rings, photography, flowers, cars, invitations, wedding planners…
+- Includes M-Magazine and planning & budgeting tools. 
+- Over 8,000 providers nationwide, 600+ wedding venues, 100,000+ wedding ideas.
+2. Price
+- Free for users to search. 
+- Charges listing/advertising packages from providers (specific prices not disclosed).
+3. Place
+- Website marry.vn (strong SEO optimization on Google) + Facebook with 719,049 likes (largest wedding community in VN) + Golden Promise offline wedding exhibitions in Hanoi & HCMC.
+4. Promotion
+- Content Marketing via M-Magazine + Continuous vouchers/offers from partners + Organizes periodic Golden Promise Wedding Fairs in HN & HCM.
+SWOT Analysis 
+Strengths 
+Weaknesses 
+- Longest-standing brand with the largest wedding community in Vietnam (since 2010).
+- Massive database of over 8,000 vendors and strong SEO authority on Google.
+- Outdated user interface and traditional directory model lack interactive experiences.
+- Does not handle transactional cash flows, leading to high user leakage.
+Opportunities 
+Threats 
+- Can leverage its massive historical data to integrate AI-driven personalization.
+- Potential to expand into digital wedding invitation and planning services.
+- Aggressive competition from agile, tech-focused Gen Z wedding startups.
+- Decline in organic traffic if search engine algorithms favor direct-booking apps.
+3.2.2. VDES 
+Criteria
+Details
+Reason to choose?
+Vietnamese event & wedding tech startup, founded in 2016, the first e-commerce platform for the event industry in Vietnam. Online booking model closest to Trạm Hỷ.
+1. Product
+Online venue & wedding service booking platform, detailed quote comparison, 360-degree VR technology for virtual venue tours, free 24/7 consultation. Connects over 1,000 venue & service brands.
+2. Price
+Completely free for customers searching & receiving consultation. Collects commission/discount from providers.
+3. Place
+Website vdes.vn + Facebook Fanpage (facebook.com/Vdes.event) + Instagram (vdes.vn) + Hotline 1800 6872.
+4. Promotion
+Vietnam Wedding Directory 2024 (250+ brands, 300+ unlimited offers, in collaboration with Marry.vn) + Vietnam Wedding Week (80+ reputable brands) + Wedding Deal Hunting + Cash vouchers + Good price wedding combos.
+SWOT Analysis 
+Strengths 
+Weaknesses 
+- Pioneer in applying 360-degree VR technology for virtual venue tours in Vietnam.
+- Established network with over 1,000 venue and service brands.
+- Brand recognition is mostly limited to corporate events rather than specialized weddings.
+- High operational cost to maintain tech features like VR and 24/7 manual consultation.
+Opportunities 
+Threats 
+- Growing demand for remote and destination wedding planning among modern couples.
+- Strategic partnerships with high-end hospitality brands for exclusive venue packages.
+- Rapid technological obsolescence if competitors offer smoother, cheaper tech alternatives.
+- Economic downturns directly affecting large-scale venue bookings.
+3.2.3. Weddingbook
+Criteria
+Details
+Reason to choose?
+Representative of the premium O2O (Online-to-Offline) model, currently dominating the Gen Z customer base who love convenience and Korean style.
+1. Product
+Standard Korean all-inclusive wedding services (Photography studio, wedding dresses, makeup). Integrates VENUE system for banquet hall booking consultation. Highly consistent quality as it operates as an in-house executing agency.
+2. Price
+Segment: Mid to High-end. Directly sells product packages, collects fixed fees priced according to international standards.
+3. Place
+Website integrated with wedding trend blog. Massive physical showroom in HCMC (Excellent direct experience).
+4. Promotion
+Cross-sell offers: Free vouchers, wedding dress upgrades when customers combine photography and venue booking via the VENUE platform.
+SWOT Analysis
+Strengths 
+Weaknesses 
+- Premium O2O (Online-to-Offline) model with a massive, high-end physical showroom.
+- High service consistency and quality control as a direct execution agency.
+- High price points limit accessibility to middle- and low-income segments.
+- Geographically restricted; difficult to scale rapidly due to heavy physical asset requirements.
+Opportunities 
+Threats
+- Strong appeal to the affluent Gen Z segment that prioritizes Korean-style aesthetics.
+- Franchising or expanding the O2O showroom model to other major tier-1 cities.
+- Changes in youth fashion and wedding style preferences away from the Korean concept.
+- High fixed overhead costs (rent, inventory) during inflation or low seasons.
+3.2.4. Zola
+Criteria
+Details
+Reason to choose?
+The most successful Wedding Tech startup in the world, an ideal model for Trạm Hỷ's long-term roadmap. Reached 2 million couples using it as of 2025.
+1. Product
+All-in-one platform including: Wedding Registry (gifts & cash funds) + Digital Planning (free wedding website with 600+ templates, guest management, checklist, digital invitations) + Vendor Marketplace (connecting providers) + Paper & Stationery (printed invitations). Integrated iOS & Android app.
+2. Price
+Free for couples. Custom domain: $14.95/year. Registry: 2.5% fee on gifts paid by credit card (free if bank transfer). Stationery averages $600-$1,200/couple (up 20% YoY in 2024). Average wedding cost via Zola in 2025: $36,000/wedding.
+3. Place
+Website zola.com + Mobile App (iOS & Android) + Pinterest/Instagram/TikTok + Personalized Email Marketing. Mainly US market, multi-language not yet supported.
+4. Promotion
+Wedding gift discount codes + 20% off post-wedding (within 6 months) + PR in major wedding magazines (30% traffic increase in 2024) + Referral Program ($20 reward/referrer) + Focuses on long-term value for members, rarely runs site-wide sales.
+SWOT Analysis 
+Strengths 
+Weaknesses 
+- Ultimate all-in-one platform with highly successful monetization via Registry and Stationery.
+- Massive global brand equity with 2 million users as of 2025.
+- Highly localized for the US market; lacks multi-language and multi-currency support.
+- High average wedding costs on the platform ($36,000) alienate budget-conscious global users.
+Opportunities 
+Threats 
+- International expansion by adapting the registry model to Asian cash-gifting cultures.
+- Integrating advanced Fintech solutions for wedding loans and financing.
+- Data privacy regulations slowing down personalized email marketing and tracking.
+- Niche local competitors who understand domestic wedding customs better in target expansion countries.
+3.3. Trạm Hỷ’s Competitive Edge
+Based on the competitor analysis, Trạm Hỷ defines its strategic positioning by filling critical market gaps that current competitors have overlooked:
+- Overcoming Legacy Barriers (vs. Marry.vn): While Marry.vn maintains a strong market history and SEO dominance, it remains limited by an outdated directory model. Trạm Hỷ modernizes the wedding journey with an AI-driven booking system and a secure escrow payment mechanism, effectively solving the industry's deep-rooted issues of non-transparency and high user leakage.
+- Optimizing Niche Relevance (vs. VDES): While VDES possesses solid technical infrastructure, it primarily focuses on corporate event planning. Trạm Hỷ focuses strictly on Vietnam’s local wedding culture—specifically optimizing for ancestral altar decor, traditional marquees, and ceremonial offerings—ensuring a more intuitive and relevant user experience than generalized event platforms.
+- Scalability & Cost-Efficiency (vs. Weddingbook): Weddingbook delivers high quality but relies on a capital-intensive O2O (Offline-to-Online) model requiring large physical showrooms. Trạm Hỷ employs an asset-light strategy, leveraging existing local vendor networks to ensure rapid scalability while keeping costs accessible for the mass market.
+- Localization Strategy (vs. Zola): We regard Zola as the global benchmark. However, Trạm Hỷ does not merely replicate; we localize the "All-in-one" ecosystem vision. By adapting Zola’s features to fit local customs—such as managing local wedding marquees, traditional ritual services, and cash-gifting etiquette—we aim to become the definitive "Super-App" for the Vietnamese wedding industry.
+3.4. SWOT of Trạm Hỷ
+In the context of the current landscape, Trạm Hỷ’s strategic outlook is summarized as follows:
+STRENGTHS
+WEAKNESSES
+- AI-powered personalization (Budget & Style configuration).
+- Asset-light, highly scalable business model.
+-  Enhanced transparency via an identity-verified system.
+- Brand awareness currently in the building phase.
+- Initial dependence on vendor onboarding during the MVP stage.
+OPPORTUNITIES
+THREATS
+- Growing Gen Z demand for "Digital-first" wedding services.
+- Potential integration with Fintech/Wedding financing.
+- Massive untapped potential in Tier-2 and Tier-3 cities.
+- Intense SEO competition from well-established incumbents.
+- Segment-specific risk: the shift toward minimalist, non-traditional weddings may reduce demand for legacy, higher-ticket decor services 
+IV. LEVELS OF PRODUCT 
+4.1. Core Product
+Trạm Hỷ provides an efficient connection between couples and wedding service providers. Customers can access various services on one platform, including wedding decoration, tents, floral gates, wedding gift trays, sound and lighting, photography, and videography.
+The core benefits are saving time, optimizing costs, reducing unexpected risks, and creating a more convenient and modern wedding-planning experience. The platform also standardizes the process through transparent pricing, real customer reviews, and centralized wedding-progress management.
+4.2. Actual Product
+Trạm Hỷ is developed as a website that allows users to search for services according to budget, wedding style, location, and event size.
+The platform includes image and video libraries, AI-powered style and color recommendations, and personalized service suggestions based on each customer’s budget. It also provides centralized booking, online payment, progress tracking, and service management through one dashboard.
+4.3. Augmented Product
+Trạm Hỷ offers additional support through wedding guides, preparation checklists, budget-saving advice, and updates on current wedding trends. These resources help couples gain knowledge and reduce stress during the planning process.
+The platform also develops a community for sharing real experiences and transparent reviews. This helps customers select suitable vendors while encouraging service providers to improve their quality and reputation.
+V. CUSTOMER INSIGHTS SURVEY - Đức Anh
+5.1. Survey Question & Analysis 
+Area
+B2C – Couples
+B2B – Wedding Service Providers
+Survey Questions
+- What is your age, occupation, location, and marital status?
+- How early do you begin searching for wedding services?
+- Which channels do you use to find vendors?
+- What difficulties do you experience when planning a wedding?
+- How important are price transparency and verified reviews?
+- Which platform features would be most useful?
+- What types of promotions influence your booking decision?
+- How do you currently find customers?
+- What are the main difficulties in serving wedding clients?
+- Do customers frequently negotiate prices or request additional services?
+- What problems occur when customers change their requirements?
+- Which platform features would support business operations?
+- What commission rate would vendors be willing to pay?
+Main Findings
+78%: Aged 18–30 (Gen Z & Millennials).
+65%: Start planning 3–12 months ahead.
+39.2%: Struggle to compare prices and quality.
+32.5%: Fear mismatch between ads and actual services. (43.4% aged 25-30 & 34.6% aged 18-24).
+Out of surveyed vendors (N=50): 46.2% identified price pressure and extra requests without additional payment as major difficulties. Many vendors still relied on referrals, Facebook, and Zalo to find customers. 
+Analysis
+Couples need transparent pricing, verified reviews, real-life portfolios, AI budget recommendations, secure deposits, and centralized booking.
+Vendors need stable customer leads, clear contracts, booking-management tools, transparent commissions, and timely payments.
+Implications for Trạm Hỷ
+Develop an all-in-one, personalized, transparent, and secure wedding-planning platform.
+Provide vendor dashboards, verified profiles, milestone payments, promotional tools, and professional digital support.
+VI. CUSTOMER PERSONA 
+6.1. Customer
+As a two-sided marketplace, Trạm Hỷ also serves B2B customers such as wedding studios, decorators, makeup artists, local tent providers, and other small wedding businesses. These vendors need stable customer leads, transparent contracts, timely payments, and affordable digital marketing support.
+6.2. Value Proposition
+Trạm Hỷ provides a wedding ecosystem based on four core values: time-saving, personalization, transparency, and safety.
+For couples, the platform offers:
+An all-in-one wedding-planning experience.
+AI-powered matching based on budget and preferred style.
+Transparent prices and easy vendor comparison.
+Verified reviews and real-life service images.
+Milestone-based payments that protect customer deposits.
+Centralized booking, planning, and service management.
+For wedding service providers, Trạm Hỷ offers:
+Access to young customers with genuine wedding demand.
+Free registration and no fixed maintenance fee.
+A commission of 10% only after a successful transaction.
+Timely milestone payments to support business cash flow.
+Professional vendor profiles, booking management, and transparent contracts.
+Greater visibility without requiring a separate website or marketing team.
+This value proposition creates a win-win model in which couples receive a more convenient and secure wedding experience, while vendors gain stable business opportunities and fair payment protection.
+VII. CUSTOMER'S JOURNEY MAP
+Stage
+Customer Actions
+Customer Pain Points
+Main Touchpoints
+Trạm Hỷ’s Support
+Awareness
+Searches for wedding inspiration and discovers Trạm Hỷ.
+Information overload, fragmented sources, and uncertainty about where to begin.
+TikTok, Instagram, Facebook, Threads, wedding groups, referrals.
+Provides practical wedding content, real decoration videos, planning tips, and customer stories.
+Consideration
+Searches for vendors, compares prices, and reads reviews.
+Difficult to compare prices and quality; fear of fake reviews and misleading advertising.
+Website, vendor profiles, verified reviews, Zalo OA.
+Offers transparent pricing, vendor comparison, verified reviews, and real on-site photographs.
+Booking
+Enters budget and style, selects a package, signs the contract, and pays the deposit.
+Hidden fees, unclear contracts, fear of losing the deposit, and difficulty selecting the right package.
+Website, AI Budget Allocator, digital contract, payment gateway.
+Recommends personalized packages and protects deposits through milestone payments.
+Service Experience
+Tracks progress, communicates with vendors, and approves each stage.
+Time-consuming coordination, last-minute changes, delays, and concern that the final service may not match the agreed design.
+Customer dashboard, Zalo, notifications, customer support.
+Records requirements, manages schedules, monitors progress, and releases payments after each completed milestone.
+Post-Service and Advocacy
+Confirms completion, submits a review, and recommends the platform.
+Slow dispute resolution, difficulty giving trustworthy feedback, and lack of after-service support.
+Verified review system, social media, referral program.
+Resolves complaints, collects verified reviews, provides referral rewards, and maintains after-service support.
+VIII. PRODUCT & MARKET FIT CANVAS 
+Component
+B2C – Couples
+B2B – Wedding Service Providers
+Target Customers
+Gen Z and Millennial couples aged 22–35, especially busy office workers and self-employed customers preparing for marriage in Hanoi.
+Local wedding studios, decorators, makeup artists, tent providers, venues, photographers, and other wedding SMEs.
+Customer Jobs
+Find reliable vendors, compare prices, control the budget, coordinate services, book securely, and reduce wedding-planning stress.
+Find stable customers, promote services, manage bookings, receive payments on time, and improve business visibility.
+Customer Pains
+Fragmented information, hidden costs, fake reviews, misleading images, deposit risks, and difficult coordination between multiple vendors.
+Unstable customer demand, price pressure, last-minute changes, delayed payments, limited marketing resources, and weak digital management.
+Customer Gains
+Transparent pricing, verified vendors, real-life portfolios, personalized packages, secure payments, and convenient all-in-one planning.
+More qualified leads, lower marketing costs, professional vendor profiles, transparent commissions, timely payments, and better booking management.
+Products and Services
+Vendor search, price comparison, AI budget recommendations, customized service packages, digital contracts, online booking, milestone payments, and verified reviews.
+Vendor dashboard, portfolio management, booking calendar, customer data management, payment tracking, promotional packages, and verified vendor badges.
+Pain Relievers
+Public prices reduce hidden fees; verified reviews reduce fake feedback; real images prevent misleading advertising; milestone payments protect deposits.
+Clear contracts reduce disputes; milestone payments improve cash flow; centralized booking reduces operational confusion; customer verification limits unreliable requests.
+Gain Creators
+AI suggests suitable packages based on budget and style; digital tools save time; early-booking offers increased value and convenience.
+Featured listings increase visibility; the platform provides access to younger customers; digital tools improve efficiency and strengthen vendor reputation.
+Evidence of Market Fit
+39.2% of customers struggle to compare prices and quality, 32.5% fear that actual services will not match advertisements, and around 65% plan their weddings three to twelve months in advance.
+46.2% of vendors report difficulties caused by price pressure and additional customer requests without increased budgets. Many also depend heavily on referrals and social media.
+Core Product–Market Fit
+Trạm Hỷ provides an all-in-one, transparent, personalized, and secure wedding-planning experience.
+Trạm Hỷ helps vendors reach qualified customers, digitize operations, reduce marketing costs, and receive payments more safely.
+IX. BUSINESS MODEL CANVAS 
+9.1. Customer Segments
+The platform serves a two-sided market, catering to both individual consumers and business partners:
+B2C (Couples & Families):
+- Engaged couples: Primarily Gen Z & Millennials who are tech-savvy and seek convenience and personalization.
+- Parents with children preparing for marriage: Older demographics looking for traditional and reputable services.
+- Families: Relatives involved in the wedding budget decisions.
+B2B (Wedding Service Providers):
+- Wedding studios.
+- Wedding planners.
+- Wedding venues & banquet halls.
+- Decorators.
+- Makeup artists.
+- Local wedding service providers.
+9.2. Value Proposition
+The core offerings that differentiate Trạm Hỷ in the market:
+For B2C (Couples):
+- All-in-one Wedding Platform: Fulfilling all wedding needs on a single website/app.
+- Personalized Experience & AI Matching: Recommending vendors that perfectly fit the couple's style and budget.
+- Budget Optimization & Transparent Pricing: Clear cost comparisons with no hidden fees.
+- Trust & Authenticity: Verified reviews and WYSIWYG (What You See Is What You Get) verification to ensure product/service quality.
+- Secure Transactions: Milestone payments to protect funds, along with dispute resolution support.
+- Convenience: Digital planning, time-saving tools, and 24/7 customer support.
+For B2B (Service Providers):
+- Qualified Leads & Revenue Growth: Delivering high-intent customers to boost sales.
+- Cost-Effective: Low Customer Acquisition Cost (CAC), no maintenance fees, and performance-based commissions.
+- Cash Flow Security: Milestone payments and reduced cancellation risk.
+- Operational Support: Booking management tools and business digitization.
+- Brand Growth: Increased brand visibility, marketing support, and market expansion through a partner ecosystem.
+9.3. Channels
+How Trạm Hỷ reaches and communicates with its segments:
+- Digital: Official Website & Mobile App, Social Media (Facebook, TikTok, Pinterest, Instagram, Threads), Email & Zalo Marketing.
+- Communities: Wedding communities and online groups.
+- Direct & Physical: Local sales representatives, Wedding fairs & exhibitions.
+- Referral: Word-of-Mouth marketing and referral programs.
+9.4. Customer Relationships
+Strategies to acquire, retain, and grow the user base:
+- Consultation & Care: Personalized experience, one-on-one consultation, and comprehensive after-sales support.
+- Trust & Safety: Secure transaction protection, verified reviews, and fair dispute resolution support.
+- Engagement: Continuous customer feedback collection and community building.
+- Retention: Loyalty programs and community & referral programs.
+9.5. Revenue Streams
+How the platform generates income:
+- Transaction Commissions: Performance-based fees collected from successful bookings.
+- Premium & Value-added Services: Revenue from premium placements for B2B or VIP planning packages for B2C.
+- Software Solutions (SaaS/Digital tools): Subscription or usage fees for vendors utilizing Trạm Hỷ's advanced management tools.
+9.6. Key Resources
+The fundamental assets required to operate the business:
+- Technology & Data: The technology platform (Web/App), Customer & partner database, and payment system.
+- Human Resources: IT development team, customer service team, and sales staff.
+- Network & Brand: Verified partner network, brand reputation, and established operational processes.
+- Financial & Physical: Operating capital and office equipment.
+9.7. Key Activities
+The core tasks required to execute the business model:
+- Platform Development: Building, managing, and updating the Website/App.
+- Matching & Operations: Connecting couples with wedding service providers, booking, and transaction management.
+- Growth: Marketing, customer acquisition, and partner relationship management.
+- Customer Care: Customer consultation and ongoing support.
+- R&D: Data analysis and continuous service improvement.
+9.8. Key Partners
+The external organizations that help the business function:
+- Wedding Service Providers: Studios, planners, venues, decorators, makeup artists, etc.
+- Customer Referral Partners: KOLs/KOCs, wedding communities, wedding fairs & exhibitions.
+- Technology Partners: Hosting and domain providers, CRM systems, website development agencies.
+- Payment Partners: MoMo, ZaloPay, VNPay, and banks.
+- Media & Marketing Partners: Marketing agencies, media outlets, and community fan pages.
+- Value-added Partners: Resorts, hotels, spas, and wedding jewelry providers.
+9.9. Cost Structure
+The expenses incurred to operate Trạm Hỷ:
+Initial Investment:
+- Website & technology development.
+- Brand identity, Sales Kit & POSM materials.
+- Legal & registration costs.
+- Office equipment and an initial reserve fund.
+Fixed Costs:
+- Marketing & advertising budgets.
+- Software, server, and management tool subscriptions.
+- Salaries (Customer service, IT, administration, partner development).
+- Administrative and office expenses.
+Variable Costs:
+- Partner commissions (for affiliates/sales).
+- Payment gateway fees.
+- Physical products (QR cards, gifts, invitations).
+- Customer support costs per booking and transaction-related expenses.
+X. FINANCIAL ANALYSIS 
+Link chi tiết
+VND 102.5M
+Initial Investment
+VND 1,283M
+Year 1 Revenue
+VND 179.8M
+Year 1 EBIT
+10.7 months
+Payback Period
+10.1. Investment Overview
+Total initial investment is VND 102,500,000, split between one-time setup costs (VND 36,000,000 — 35%) and a working capital reserve (VND 66,500,000 — 65%). The setup cost is dominated by launch marketing at wedding fairs (VND 20,000,000), followed by portfolio/case-study production and the website build. This is a capital-light, digital-first entry model typical of a commission-based marketplace.
+Figure 1. Initial setup cost breakdown by item
+Figure 2. Total initial investment: setup cost vs. working capital
+10.2. Revenue Projection
+Revenue is driven by a single stream: a booking commission of VND 1,500,000 per order, starting at 40 bookings/month with 10% month-over-month growth. Volume compounds from 40 to approximately 114 bookings by Month 12, driving revenue from VND 60M (Month 1) to VND 171M (Month 12). Year 1 total revenue is projected at VND 1,283,057,026. The growth curve is back-loaded — Q4 alone contributes 36% of full-year revenue — meaning the forecast is highly sensitive to whether the 10% monthly growth rate holds beyond mid-year.
+Figure 3. Monthly booking volume growth vs. break-even threshold
+Figure 4. Monthly revenue growth (VND)
+"Each 'order' represents an individual service order (e.g., decoration package, photography package) with an average contract value of VND 15,000,000, on which Tram Hy receives a standard commission of 10% — consistent with the pricing model. The 0% commission on joining the system is applied to the preceding supplier search phase. The 12-month timeframe simulated here begins when suppliers switch to standard commission terms."
+10.3. Operating Expenses
+Total Year 1 operating expenses are projected at VND 1,103,235,070: fixed costs of VND 32,416,666/month (VND 389M/year — marketing, fixed operations, promotion) and variable costs of VND 835,000/booking (VND 714M/year — referral commission, payment fees, customer care, gifts, partner support). Variable costs represent 65% of total expenses and scale directly with volume, so per-booking cost discipline becomes increasingly important as volume grows.
+Figure 5. Fixed vs. variable cost by month (VND)
+Figure 6. Variable cost composition per booking
+10.4. P&L Summary (Profit & Loss)
+The project posts operating losses in Months 1–3 (cumulative EBIT of -VND 9.2M through Q1) as fixed costs outweigh a still-small revenue base. EBIT turns positive from Month 4 and accelerates sharply through the year, reaching VND 43.5M in Month 12 alone. Full-year EBIT is VND 179,821,956, an implied ~14% margin on revenue. The quarter-on-quarter jump (Q1: -VND 9.2M → Q4: +VND 110.4M) illustrates strong operating leverage: because most costs are semi-fixed, incremental revenue drops through to profit at a high rate once break-even is passed.
+Figure 7. Revenue vs. total cost vs. EBIT by month
+10.5. Break-even Point & Payback Period
+With a contribution margin of VND 665,000/booking (unit price VND 1,500,000 minus variable cost VND 835,000), the break-even volume is 49 bookings/month. Actual monthly volume first exceeds this threshold around Month 4–5, matching the point where EBIT turns positive. Based on average monthly net profit of VND 14,985,163, the VND 102,500,000 initial investment is recovered in approximately 10.1 months — full payback within Year 1, a favorable signal for a low-capital digital venture.
+Figure 8. Actual booking volume vs. break-even threshold
+10.6. Cash Flow & Cumulative Balance
+Cumulative cash balance (starts at -VND 102.5M before Month 1, deepens to -VND 108.3M by the end of Month 1) deepens to a trough of about -VND 111.7M in Month 3, then steadily recovers as monthly net cash flow turns positive. The balance crosses zero between Month 10 and Month 11, confirming the ~10.1-month payback period, and ends Year 1 at +VND 77.3M. This means the business needs enough working-capital buffer to absorb roughly nine months of negative cumulative cash flow before becoming self-funding.
+Figure 9. Cumulative cash balance by month (VND)
+10.7. Key Takeaways & Risk Factors
+- Low capital-entry, commission-based marketplace model with a single, clearly defined revenue driver.
+- Profitability inflection point at Month 4; monthly break-even at 49 bookings.
+- Payback period of approximately 10.7 months — attractive for investors seeking fast capital recovery.
+Key risk 1: sustainability of the assumed 10% month-over-month booking growth beyond Year 1.
+Key risk 2: reliance on a single revenue stream (booking commission only); no ancillary/upsell revenue modeled.
+Key risk 3: variable cost equals 56% of unit price, leaving thin per-transaction margin — cost discipline is critical as volume scales.
+- Working capital must cover roughly nine months of negative cumulative cash flow before the business becomes self-funding.
+XI. PROJECT EVALUATION CRITERIA 
+11.1. Innovation (Operations/ Channels/ Markets)
+Trạm Hỷ is not merely an information website; it is a revolutionary breakthrough in Vietnam's wedding service industry, built on three core pillars of innovation:
+- Operations (Structural Digitalization): We are shifting the traditional wedding service model from a "Fragmented - Offline" approach to a "Centralized - Online" ecosystem (Platformization). By digitizing the entire infrastructure, Trạm Hỷ allows customers to Search, Compare, Book, and Pay on a single platform. We also integrate an AI Budget Configuration algorithm that automatically tailors the optimal vendor combos based on the user's budget and style, saving up to 80% of planning time.
+- Channels (High-Tech Personalization): Trạm Hỷ transforms the customer interaction channel by pioneering 3D/VR Technology. Instead of viewing static 2D images, couples can virtually interact with decor templates in a 3D space. This allows them to "try on" their wedding setup, altering angles and colors for the most realistic visualization before actual construction.
+- Markets (Trust-based Innovation): We are standardizing a fragmented market by enforcing public and stable pricing, eliminating the long-standing issue of price gouging during peak seasons. Furthermore, our identity-verified, two-way review system forces local suppliers to continuously improve their service quality, establishing a transparent and fair digital marketplace.
+11.2. Market Size (Country/ Provinces - in Vietnam)
+The Vietnamese wedding market possesses immense untapped potential, which Trạm Hỷ evaluates using the PAM - TAM - SAM - SOM financial model:
+Market Metric
+Calculation Basis & Data Reference
+Estimated Market Size (VND)
+PAM (Potential Available Market)
+Total wedding market in Vietnam. In 2023, there were approx. 688,000 marriages with an average cost of 120,000,000 VND/wedding.
+82,560 billion VND
+TAM (Total Addressable Market)
+Tech-savvy young couples (22-35 years old) in major urban areas (approx. 45% of total marriages). Estimated at 309,600 couples.
+37,152 billion VND
+SAM (Serviceable Available Market)
+Target customers in Hanoi and surrounding areas during the MVP phase. Estimated at 50,000 marriages/year. 
+6,000 billion VND
+SOM (Serviceable Obtainable Market)
+Target: 2,500 successful service bookings within the first 2 years (at a 10% commission on an average service-booking value of VND 15,000,000)
+3,75 billion VND (Platform's direct commission revenue)
+11.3. Impact on Technology, Environment, Society, or Economic
+- Economic: The project creates sustainable livelihoods for thousands of local, small-scale wedding vendors (decor, marquees, sound/lighting). By empowering them with direct online customer access and cutting out middlemen, vendors can increase their steady annual revenue by 30% - 50%.
+- Technology: Trạm Hỷ is a practical model of introducing digital tech (AI, 3D) into a highly traditional, manual service sector. This not only modernizes the industry but also improves tech-literacy among older local business owners, driving the national digital transformation agenda.
+- Society: The platform establishes a civilized consumer culture by eliminating information asymmetry and the risk of scams. Standardized digital contracts and secure deposits minimize disputes. Additionally, as a student-led project, Trạm Hỷ strongly inspires the youth by proving that even the most traditional societal problems can be solved through tech innovation.
+- Environment: By providing a comprehensive "One-stop-shop" platform and 3D previews, Trạm Hỷ significantly reduces the need for multiple physical site surveys, commuting, and paper-based quotations, contributing to greener operational processes.
+11.4. Feasibility of Idea
+The project is highly feasible, backed by a strategic analysis of operational zones and a robust risk mitigation plan:
+The Winning Zone (Competitive Edge)
+Trạm Hỷ builds a sustainable competitive "moat" through the continuous accumulation of user and vendor data. Over time, this expanding dataset becomes the project's most valuable asset, training our AI to provide increasingly personalized and accurate wedding planning recommendations. While the platform offers immediate utility through Verified Visual Portfolios and AI Budget Configuration, its true strength lies in this long-term, data-driven flywheel effect that grows more powerful as more couples use the service. 
+Risk Mitigation (The Risky Zone)
+- Payment & Security Risks: Trạm Hỷ integrates PCI-DSS certified payment gateways (VNPAY, MoMo) and applies a Third-party Escrow Mechanism. The platform holds the deposit and only releases funds to vendors upon customer approval of the final setup.
+- Quality Control (Reality vs. 3D): To prevent discrepancies between 3D designs and actual execution, we enforce the WYSIWYG (What You See Is What You Get) principle. Vendors must upload on-site photos to earn a "Verified Badge," backed by an identity-based review system to prevent fake seeding.
+- Seasonal Demand Risk: Mitigated by launching off-peak promotions and expanding services into related life events (engagements, family anniversaries) to secure year-round cash flow.
+Overcoming Market Barriers (MVP Execution)
+The biggest barrier is the tech-hesitancy of middle-aged traditional vendors. Trạm Hỷ overcomes this in the MVP phase via:
+- Zero-learning curve Vendor App: An interface designed identically to Zalo for immediate familiarity.
+- Direct Onboarding: A Direct Sales team physically visits craft villages to digitize vendor profiles "by hand."
+- 0% Commission Strategy: Free usage for the first 3-6 months to prove real value and customer traffic before monetizing.
+11.5. Scale-Up Ability (Company Size)
+The scalability of the Trạm Hỷ project is driven by a structured 3-phase strategy, gradually expanding from a niche MVP to a comprehensive "super-app" ecosystem for the wedding industry across Vietnam.
+Phase 1: Late 2026 - 2027 | MVP & Market Penetration in Hanoi
+Late 2026: Complete the development of the MVP platform. Focus on onboarding local vendors for core services (wedding marquees, ancestral altar decor, floral arches) using the direct "hand-holding" (Direct Sales) and 0% commission strategy to build initial supply.
+2027: Officially roll out to young couples in Hanoi. The goal is to reach our SOM target of connecting 2,500 successful weddings. We will use this period to gather real user feedback, test the escrow payment system, and refine the AI Recommendation algorithm.
+Phase 2: 2028 - 2029 | Geographical & Vertical Expansion
+2028: After stabilizing operations in Hanoi, replicate the successful model in other major cities with high tech-adoption rates, prioritizing Ho Chi Minh City, Da Nang, and Hai Phong.
+2029: Integrate highly requested related services into the platform (Vertical Expansion) such as wedding photography studios, bridal makeup, wedding car rentals, and professional sound/lighting systems. This step aims to increase the platform's average order value and diversify revenue streams.
+Phase 3: 2030 - 2031 | Complete Wedding Ecosystem (Super-App)
+2030 - 2031: Launch advanced ecosystem features to support the entire wedding journey. This includes Electronic Wedding Invitations, digital Guest Management tools, AI-driven Wedding Itinerary Planners, and linked Honeymoon travel packages. This phase officially positions Trạm Hỷ as the definitive digital standard for organizing a wedding in Vietnam.
+XII. INVESTOR DECISION MAKING 
+12.1. Internal Assessment Criteria
+a) Management Team
+Criteria
+Details
+Experiences (Individual/Group)
+- Individual Experience: The team has clearly divided expertise — Trần Huyền Trang (CEO) brings experience in coordination and business development; Lê Minh Châu (CMO) specializes in marketing and brand building; Nguyễn Thị Thanh Tâm (CISO) has a background in security and data compliance; Tô Văn Tiến Dũng (CTO), together with Nguyễn Duy Quang (Security Engineer) and Đức Anh (Software Engineer), handles the entire technology architecture, system security, and product development.
+- Group Experience: The team has jointly built a complete business model (Business Model Canvas, Product-Market Fit Canvas, detailed financial analysis), demonstrating strong cross-functional collaboration — a critical factor for operating a two-sided marketplace that simultaneously requires technology, operations, and partner-development capabilities.
+Strategy & a Clear Plan
+- Short-term Strategy: The MVP phase focuses on Hanoi (late 2026–2027), using a "hand-holding" Direct Sales approach and a 0% commission policy for the first 3–6 months to attract vendors, alongside building a verified portfolio and the AI Budget Configuration algorithm.
+- Long-term Strategy: A clear three-phase roadmap — geographic expansion to Ho Chi Minh City, Da Nang, and Hai Phong (2028), vertical expansion into related services such as photography studios, makeup artists, and wedding cars (2029), and completion of the "Super-App" ecosystem with digital invitations, guest management, and honeymoon planning (2030–2031).
+Motivation and Vision
+- Motivation: The team's motivation stems from clearly identifying the market's dual pain points — couples losing time and money due to fragmented information, and small vendors lacking digital capabilities. This is a real, data-backed problem (39.2% of customers struggle to compare prices; 32.5% fear services won't match advertisements).
+- Vision: To build the "transparent digital standard" for Vietnam's wedding industry, using Zola (US) as a global benchmark while localizing for Vietnamese wedding culture and traditions.
+Ability to Run Business
+- The team has already built a detailed financial model (P&L, cash flow, break-even, payback period), a full Business Model Canvas, and a structured competitor analysis — demonstrating multi-dimensional management capability (financial, technological, human resources) and data-driven decision-making even at the pre-MVP stage.
+b) Business & Deal Criteria
+Revenue Streams:
+- Transaction Commission: 10% of contract value per successful booking — the primary revenue source in Year 1.
+- Value-added Services: Priority search placement, homepage banners, featured service packages (VND 500,000 – 10 million/month).
+- SaaS for Vendors: Booking management tools and professional vendor profiles, monetized via subscription in later expansion phases.
+Costs and Financial Estimates: Total initial investment is VND 102.5 million (35% setup costs, 65% working capital). The project turns EBIT-positive from Month 4, with a payback period of approximately 10.1 months — a fast recovery timeline consistent with an asset-light marketplace model.
+c) Product/Service Criteria
+i. Product:
+Quality: The platform delivers a transparent, verified booking experience (WYSIWYG — actual images must match advertised images), with secure milestone-based escrow payments.
+Differentiation: The combination of AI Budget Configuration, 3D/VR spatial simulation, and an identity-verified review system are features no local competitor (Marry.vn, VDES, Weddingbook) currently integrates simultaneously.
+ii. Technological Differentiation:
+AI and Personalization: The AI algorithm recommends optimal service combos based on budget and style, saving up to 80% of planning time.
+3D/VR: Allows couples to "try on" decor setups virtually before actual execution — reducing the risk of mismatch between design and reality.
+d) Financial Criteria
+Profit Potential: Year 1 revenue is projected at VND 1,283 million, with Year 1 EBIT at VND 179.8 million (~14% margin). The break-even point is 49 bookings/month, reached around Month 4–5. The model exhibits strong operating leverage, as most costs are semi-fixed — meaning profit accelerates rapidly once break-even is passed.
+12.2. External Evaluation Criteria
+12.2.1. Market Criteria
+- Growth Potential: Vietnam's wedding market has a PAM of VND 82.56 trillion, with a TAM (tech-savvy young customers) of VND 37.152 trillion. Trends toward digital wedding planning, AI-driven personalization, and demand for price transparency are accelerating — especially among Gen Z and Millennials.
+- Competitive Landscape: Current competitors include Marry.vn (traditional directory, lacking online transactions), VDES (focused on corporate events), and Weddingbook (a capital-intensive O2O model). No existing platform integrates AI, escrow payments, and culturally-tailored service verification for Vietnamese weddings simultaneously — representing a clear market niche for Trạm Hỷ.
+12.2.2. Investor Criteria
+Types of Investors: Trạm Hỷ is targeting investors interested in Marketplace/E-commerce, PropTech/EventTech, and Fintech (given its integrated payment and escrow features).
+General Background and Experience: Best suited for investors with a background in two-sided digital platforms, e-commerce, or prior investment in similar models such as Zola or Marry.vn within Southeast Asia.
+Emotional and Intrinsic Factors: Impact-focused investors will find value in the project's role in protecting consumers from deposit fraud and misleading advertising, while also creating sustainable livelihoods for small wedding-industry businesses (increasing vendor revenue stability by 30–50%).
+Personal Network and Contribution: The team is seeking investors who can contribute not only capital but also connections to payment partners (VNPay, MoMo), relationships with wedding fair organizers, and expertise in scaling into Tier-2 and Tier-3 cities during Phase 2–3.
+REFERENCES
+[1] CareerLink Vietnam. (2024). Escrow payment mechanisms and milestone verification in digital-first service platforms. CareerLink Employment Portal. https://www.careerlink.vn/cam-nang-viec-lam/kien-thuc-kinh-te/escrow-la-gi-dac-diem-va-cach-hoat-dong
+[2] General Statistics Office of Vietnam. (2024). Vietnam social-economic report 2023 and marriage statistics. Statistical Publishing House. 
+https://www.gso.gov.vn
+[3] Hanoi Department of Culture and Sports. (2023). Ten-year review (2012–2022) of wedding culture and lifestyle regulations in Hanoi capital. Hanoi Portal. https://laodong.vn/van-hoa/90-dam-cuoi-o-ha-noi-da-thuc-hien-cuoi-van-minh-1096429.ldo
+[4] Marry.vn. (2024). Introduction to Vietnam's largest online wedding directory and service marketplace. Marry Network. 
+https://www.marry.vn
+[5] McKinsey & Company. (2024). The digital-first consumer: How Gen Z is reshaping service marketplaces in Southeast Asia. McKinsey Insights.
+https://www.mckinsey.com
+[6] Q&Me Vietnam Market Research. (2024). Vietnam consumer behavior on wedding planning, budgets, and digital platform adoption. Asia Plus Inc. 
+https://qandme.net
+[7] Star Galaxy Center. (2024, May 15). Gen Z and the modern wedding trends: Minimalist designs and experience-driven ceremonies. Star Galaxy Event & Wedding. https://stargalaxy.vn/blogs/news/gen-z-va-xu-huong-to-chuc-dam-cuoi-thoi-hien-dai
+[8] Thanh Nien News. (2023, March 23). QR code integration on wedding invitations: Contemporary convenience vs. cultural etiquettes. Thanh Nien Life. https://thanhnien.vn/ban-nghi-gi-khi-thiep-moi-cuoi-in-han-ma-qr-chuyen-khoan-185260323140839172.htm
+[9] The Knot. (2023). Global wedding report: Cost, culture, and tech integration across 15 countries. The Knot Worldwide. 
+https://www.theknot.com
+[10] Trạm Hỷ Project Team. (2026). Wedding market demands and vendor digital transformation in Hanoi: An empirical survey (N=136 couples & N=50 vendors).
+[11] VDES. (2024). E-commerce integration and VR 360-degree interactive tours in Vietnam's event sector. VDES Event Technology. 
+https://vdes.vn
+[12] Vietnamnet. (2026, July 15). The Vietnam Grand Weddx 2026: Ushering in a new era for the Vietnamese wedding industry and service standards. Vietnamnet Media. https://vietnamnet.vn/the-vietnam-grand-weddx-2026-mo-ky-nguyen-moi-cho-tuong-lai-nganh-cuoi-2533433.html
+[13] VnExpress. (2024, November 12). Minimalist wedding concepts and digital utility adoption among Vietnamese youth. VnExpress Life. 
+https://vnexpress.net/xu-huong-dam-cuoi-toi-gian
+[14] Weddingbook Vietnam. (2024). Korean-style O2O (Online-to-Offline) wedding concepts and high-end showroom experiences. Weddingbook. 
+https://www.weddingbook.vn
+[15] Zola. (2025). Zola's 2025 wedding planning & registry report: Navigating pricing, stationery, and technology trends. Zola Inc. 
+https://www.zola.com/expert-advice/wedding-planning-trends-report
+Câu hỏi phản biện
+I. VỀ SẢN PHẨM & CÔNG NGHỆ (Product & Tech) - Đức Anh
+1. Tính khả thi của Công nghệ AI & 3D/VR
+Câu hỏi: Nhóm giới thiệu tính năng AI Budget Configuration và Mô phỏng không gian 3D/VR. Tuy nhiên, kinh phí ban đầu cho mảng Website/Công nghệ chỉ rơi vào khoảng 16 triệu VNĐ. Làm sao nhóm có đủ nguồn lực tài chính và kỹ thuật để phát triển/tích hợp AI & 3D/VR chạy mượt mà ngay từ giai đoạn MVP?
+Trả lời:
+Về lộ trình phát triển (Roadmap): Ở giai đoạn MVP (Tháng 1–6), nhóm chưa xây dựng mô hình AI hay Engine 3D riêng để tránh dàn trải chi phí. 16 triệu VNĐ tập trung hoàn toàn vào việc dựng khung Website/WebApp kết nối cơ bản, tích hợp các API có sẵn và chuẩn hóa cơ sở dữ liệu (Database).
+Về thuật toán AI: Giai đoạn đầu, "AI Budget" hoạt động dưới dạng Rule-based Logic (thuật toán phân bổ ngân sách theo bộ quy tắc toán học có sẵn dựa trên tỷ lệ % trung bình của ngành cưới).
+Về 3D/VR: Nhóm sử dụng công nghệ WebXR/Panorama 360° tích hợp qua API bên thứ 3 (như Kuula hoặc Sketchfab) thay vì tự dựng engine 3D từ đầu. Việc này giúp tối ưu chi phí mà vẫn đảm bảo trải nghiệm thị giác cho người dùng trước khi nâng cấp ở Phase 2.
+2. Cơ chế WYSIWYG & Kiểm soát chất lượng
+Câu hỏi: Làm thế nào để Trạm Hỷ đảm bảo tính WYSIWYG khi dịch vụ cưới mang tính thẩm mỹ cao? Nếu hình ảnh 3D/mẫu dựng rất đẹp nhưng thực tế vendor trang trí không đạt cam kết, Trạm Hỷ giải quyết tranh chấp thế nào?
+Trả lời:
+Quy chuẩn hóa danh mục (Standardized Specs): Mỗi gói trang trí trên Trạm Hỷ không chỉ có hình ảnh mà đi kèm bảng mô tả vật liệu chi tiết (loại hoa, kích thước cổng, số lượng đèn, chất liệu vải...).
+Cơ chế nghiệm thu 2 bước:
+Vendor phải gửi ảnh/video bàn giao tại hiện trường lên hệ thống trước giờ cử hành lễ 2–3 tiếng.
+Dâu - Rể (hoặc đại diện) xác nhận nghiệm thu thực tế trên ứng dụng.
+Quy trình xử lý tranh chấp (Dispute Resolution): Nếu không đạt cam kết, Trạm Hỷ sẽ kích hoạt cơ chế đóng băng tiền cọc (Escrow Hold). Đội ngũ CSKH sẽ căn cứ vào Bảng mô tả vật liệu và Ảnh nghiệm thu để làm trọng tài giải quyết, hoàn tiền hoặc khấu trừ chi phí của Vendor theo tỷ lệ vi phạm đã quy định trong hợp đồng điện tử.
+3. Cơ chế giữ tiền (Escrow / Milestone Payment)
+Câu hỏi: Dịch vụ Escrow/Giữ tiền ký quỹ đòi hỏi thủ tục pháp lý phức tạp. Trạm Hỷ đã chuẩn bị các thủ tục pháp lý nào để nắm giữ và điều phối dòng tiền cọc của khách hàng hợp pháp?
+Trả lời:
+Mô hình hợp tác: Trạm Hỷ không tự nắm giữ tiền như một tổ chức tín dụng. Chúng tôi hợp tác với các Cổng thanh toán đã được Ngân hàng Nhà nước cấp phép (như VNPay, MoMo, ZaloPay, hoặc dịch vụ VietQR có tính năng giữ tiền theo mã định danh).
+Bản chất pháp lý: Dòng tiền thanh toán được treo trên Tài khoản đảm bảo thanh toán (Escrow Account) của đối tác cổng thanh toán. Trạm Hỷ đóng vai trò là đơn vị phát lệnh giải ngân (Trigger Engine) dựa trên sự xác nhận điện tử (OTP/Xác nhận giao dịch) từ cả 2 bên (Dâu Rể và Vendor) theo từng mốc hợp đồng.
+II. VỀ MÔ HÌNH KINH DOANH & THỊ TRƯỜNG (Business Model & Market) - Minh Châu
+4. Vấn đề "User Leakage" (Luồn cò / Giao dịch chui ngoài sàn)
+Câu hỏi: Sau khi Trạm Hỷ kết nối Dâu - Rể với Vendor, làm sao ngăn họ tự liên hệ trực tiếp với nhau để cắt hoa hồng 10%?
+Trả lời:
+Lợi ích đối với Dâu - Rể: Nếu giao dịch ngoài sàn, họ sẽ mất hoàn toàn quyền bảo vệ tiền cọc (Escrow) và bảo hiểm dịch vụ từ Trạm Hỷ khi xảy ra sự cố (vendor bùng lịch, làm sai mẫu).
+Lợi ích đối với Vendor: Trạm Hỷ cung cấp hệ thống quản lý lịch trình, hợp đồng điện tử và thăng hạng điểm uy tín (Rating/Review). Các giao dịch chui sẽ không được tích điểm uy tín, mất cơ hội xuất hiện ở vị trí ưu tiên (Top Placement) trên nền tảng.
+Chính sách ưu đãi: Áp dụng chương trình Tích điểm hoàn tiền (Cashback) hoặc Voucher giảm giá dịch vụ tiếp theo cho Dâu Rể khi thanh toán qua sàn, giúp mức giá sau cùng trên sàn tương đương hoặc tốt hơn giao dịch trực tiếp.
+5. Giải quyết bài toán "Con gà - Quả trứng" (Chicken-and-Egg Problem)
+Câu hỏi: Là một Two-sided Marketplace, nhóm sẽ tập trung kéo Người mua (Couples) hay Người bán (Vendors) trước?
+Trả lời:
+Chiến lược: "Supply-first" (Tập trung nguồn cung trước): Nhóm tập trung onboard Vendors trước. Ở giai đoạn khởi chạy, Trạm Hỷ cung cấp cho Vendor bộ công cụ SaaS miễn phí (Quản lý lịch trình, tạo Profile đẹp, tạo báo giá tự động) để giải quyết đau khổ trong quản lý của họ.
+Kích hoạt cầu (Demand): Khi đã có sẵn danh mục 50–100 Vendors uy tín được chuẩn hóa thông tin, Trạm Hỷ bắt đầu triển khai các chiến dịch Marketing nhắm vào Dâu - Rể. Người dùng vào sàn sẽ thấy ngay nhiều lựa chọn đa dạng và minh bạch giá, từ đó thúc đẩy tỷ lệ chuyển đổi booking.
+6. Tính giáo dục thị trường đối với Vendor truyền thống
+Câu hỏi: Nhiều vendor là hộ kinh doanh nhỏ, thiếu kỹ năng công nghệ. Làm cách nào nhóm vượt qua rào cản này để họ chịu sử dụng ứng dụng?
+Trả lời:
+Tối giản UX/UI: Giao diện dành cho Vendor được thiết kế cực kỳ đơn giản, tập trung vào thao tác qua smartphone (tương tự như ứng dụng nhận đơn của Grab/Gojek).
+Hỗ trợ Onboarding trực tiếp (Field Sales): Lực lượng kinh doanh của Trạm Hỷ sẽ đến tận nơi hỗ trợ chụp ảnh, số hóa bảng giá và tạo tài khoản mẫu cho Vendor trong 30 ngày đầu.
+Tính năng nhận đơn qua Zalo OA: Nhóm tích hợp thông báo đơn hàng và xác nhận nhanh qua Zalo – ứng dụng mà hầu hết các chủ hộ kinh doanh tại Việt Nam đều sử dụng thành thạo.
+III. VỀ TÀI CHÍNH & TĂNG TRƯỞNG (Financials & Growth) - Huyền Trang
+7. Giả định tốc độ tăng trưởng đơn hàng 10%/tháng
+Câu hỏi: Cơ sở thực tế nào cho con số tăng trưởng booking 10%/tháng khi ngành cưới mang tính mùa vụ rất cao (tháng 7 Âm lịch thấp điểm)?
+Trả lời:
+Con số 10%/tháng là tốc độ tăng trưởng trung bình bình quân năm (CAGR tính theo tháng), đã được san bằng rủi ro mùa vụ.
+Chiến lược san phẳng mùa vụ: Vào các tháng thấp điểm (như Tháng 7 Âm lịch), Trạm Hỷ tập trung đẩy mạnh các dịch vụ đặt trước xa (Early-bird Booking) cho mùa cưới cuối năm, kết hợp tung các gói dịch vụ Chụp ảnh cưới ngoại cảnh, Đăng ký dịch vụ trọn gói với ưu đãi sâu để duy trì dòng tiền booking.
+8. Rủi ro phụ thuộc vào 1 nguồn thu nhập duy nhất
+Câu hỏi: Trong Năm 1, doanh thu hoàn toàn đến từ 10% hoa hồng booking. Nếu lượng booking không đạt kỳ vọng, Trạm Hỷ có phương án dự phòng dòng tiền nào?
+Trả lời:
+Nguồn thu phụ trợ (Secondary Revenue Streams):
+Thu phí niêm yết ưu tiên (Sponsored Listing / Ad Spots): Cho phép các Vendor lớn trả phí để hiển thị ở các banner trang chủ hoặc top tìm kiếm.
+Phí dịch vụ VIP/SaaS mở rộng: Bán các tính năng nâng cao cho Vendor (như gửi SMS Marketing tự động cho khách hàng, phân tích báo cáo doanh thu sâu).
+Gói tư vấn Wedding Planner 1-1: Thu phí dịch vụ tư vấn trực tiếp từ đội ngũ chuyên viên của Trạm Hỷ cho các cặp đôi có ngân sách lớn nhưng không có thời gian tự chọn.
+9. Chi phí Marketing & Lợi điểm hòa vốn
+Câu hỏi: Ngân sách Marketing khoảng 32.4 triệu VNĐ/tháng có đủ để mang về 49 bookings/tháng nhằm đạt điểm hòa vốn không?
+Trả lời:
+Tối ưu hóa kênh CAC thấp: Ngân sách 32.4 triệu VNĐ tập trung chủ yếu vào Performance Ads (Chuyển đổi trực tiếp) kết hợp với chiến lược Organic Content Marketing trên TikTok/Facebook Reels (sản xuất nội dung drama/mẹo cưới hỏi với chi phí sản xuất thấp nhưng lan truyền cao).
+Chiến lược B2B2C: Tận dụng chính tệp khách hàng có sẵn của các Vendor trên sàn. Khi Vendor chia sẻ link Profile Trạm Hỷ của họ lên mạng xã hội, Trạm Hỷ kéo được lượng traffic tự nhiên (Organic Traffic) mà không mất chi phí quảng cáo.
+IV. VỀ ĐỐI THỦ CẠNH TRANH & LỢI THẾ CẠNH TRANH (Competition & Strategy) - Tô Dũng
+10. Sự đáp trả từ đối thủ lớn (Marry.vn, VDES, Weddingbook)
+Câu hỏi: Nếu các đối thủ lớn cập nhật giao diện và tích hợp AI booking tương tự, Trạm Hỷ dùng lợi thế gì để bảo vệ thị phần?
+Trả lời:
+Sự khác biệt về Mô hình: Marry.vn hoạt động theo mô hình Trang tin tức/Cổng thông tin (Listing & Ads) – thu phí quảng cáo của Vendor nên không chịu trách nhiệm về chất lượng dịch vụ cuối. Trạm Hỷ hoạt động theo mô hình Transaction-based Platform (Giao dịch khép kín có Escrow giữ tiền), bảo vệ Dâu Rể đến tận ngày cưới.
+Sự am hiểu phân khúc: Trạm Hỷ tập trung xoáy sâu vào phân khúc Gen Z & Millennials thích sự cá nhân hóa, minh bạch về giá và trải nghiệm công nghệ tự động, linh hoạt hơn so với các nền tảng cũ kỹ.
+11. Mở rộng quy mô (Scale-up Strategy)
+Câu hỏi: Mô hình giai đoạn 1 phụ thuộc nhiều vào Direct Sales. Khi mở rộng sang TP.HCM hay các tỉnh thành khác, phương pháp này có còn hiệu quả?
+Trả lời:
+Direct Sales chỉ là phương pháp kích hoạt thị trường mồi (Seed Market) tại Hà Nội để chuẩn hóa quy trình.
+Khi mở rộng quy mô (Phase 2), Trạm Hỷ sẽ chuyển sang Inbound Vendor Onboarding dựa trên:
+Hiệu ứng mạng lưới (Network Effect): Vendor ở thị trường mới tự đăng ký khi thấy các Vendor khác có đơn hàng từ Trạm Hỷ.
+Hợp tác với các Hiệp hội/Cộng đồng ngành cưới: Ký kết hợp tác chiến lược với các nhóm/hội nhiếp ảnh, trang điểm, studio tại địa phương để phủ rộng nguồn cung nhanh chóng thay vì đi gõ cửa từng nhà.
+Text
+I. INTRODUCTION 
+1. Lý do ra đời (Project Formation Reason)
+Thị trường cưới hỏi truyền thống hiện đang rất phân mảnh và thiếu minh bạch, dẫn đến hai vấn đề lớn:
+Với các cặp đôi: Tốn thời gian, áp lực vì phải tự so sánh giá, dễ gặp rủi ro bị ép giá hoặc quảng cáo sai sự thật.
+Với các đơn vị cung cấp nhỏ (SMEs): Tay nghề cao nhưng thiếu kỹ năng Marketing số, phải phụ thuộc vào trung gian đắt đỏ.
+Giải pháp: Trạm Hỷ ra đời để xóa bỏ bất đồng thông tin, kết nối trực tiếp hai bên và hỗ trợ chuyển đổi số cho các đơn vị địa phương.
+2. Tổng quan nền tảng (Project Introduction)
+Trạm Hỷ là nền tảng số "One-stop Digital Marketplace" (Website/App) giúp tìm kiếm, so sánh, đặt lịch và thanh toán dịch vụ cưới hỏi trọn gói.
+4 trụ cột chính của nền tảng bao gồm:
+Công nghệ: Tích hợp AI gợi ý ngân sách và mô phỏng không gian 3D/VR.
+Đặt lịch thông minh: Đặt lịch tức thì, thanh toán an toàn Escrow theo tiến độ và tặng thiệp cưới QR miễn phí.
+Hỗ trợ nhà cung cấp: Kênh tiếp cận khách hàng B2C trực tiếp, tối ưu chi phí MKT.
+Cộng đồng tin cậy: Hệ thống đánh giá thực (UGC) giúp minh bạch hóa chất lượng dịch vụ.
+3. Đội ngũ nhân sự (Team Members)
+Dự án được vận hành bởi đội ngũ 6 thành viên nòng cốt:
+Trần Huyền Trang – CEO & Project Leader: Quản trị tầm nhìn, chiến lược phát triển và đại diện kết nối đầu tư.
+Lê Minh Châu – CMO: Phụ trách chiến lược Marketing và phát triển thương hiệu.
+Nguyễn Thị Thanh Tâm – CISO: Quản trị an toàn thông tin và bảo mật dữ liệu.
+Tô Văn Tiến Dũng – CTO: Kiến trúc sư trưởng hạ tầng công nghệ và R&D.
+Nguyễn Duy Quang – Security Engineer: Triển khai giao thức và giám sát an ninh mạng.
+Đức Anh – Software Engineer: Phát triển và tối ưu hóa các tính năng phần mềm cốt lõi.
+4. Nhận diện thương hiệu (Logo & Slogan)
+Logo: Bố cục tròn tượng trưng cho sự trọn vẹn; hình ảnh cặp đôi cùng Long - Phụng, hoa sen, mây lành mang đậm nét văn hóa cưới Việt Nam. Màu Đỏ tượng trưng cho tình yêu, may mắn; màu Vàng kim tượng trưng cho sự thịnh vượng.
+Slogan: "Kết duyên cát hỷ" – mang ý nghĩa gắn kết hai con người, hai gia đình và mang lại phước lành, hạnh phúc trọn vẹn.
+KẾT LUẬN
+Tóm lại, Trạm Hỷ không chỉ đơn thuần là một nền tảng công nghệ giúp đơn giản hóa việc tổ chức đám cưới, mà chúng tôi hướng tới việc thiết lập một chuẩn mực mới Minh bạch – Fair-play – Số hóa cho ngành cưới hỏi tại Việt Nam, đồng hành cùng các cặp đôi khởi đầu một cuộc sống hôn nhân trọn vẹn!
+II. THE GROWTH OF THE MARKET 
+2.1. Market Outlook
+Đầu tiên, về triển vọng thị trường.
+Thị trường cưới Việt Nam có quy mô rất lớn,với giá trị ước tính khoảng 82,56 nghìn tỷ đồng. 
+Trạm Hỷ lựa chọn Hà Nội là thị trường MVP vì nhu cầu cưới cao và tập trung nhiều nhà cung cấp. 
+Trong hai năm đầu, mục tiêu của dự án là đạt khoảng 2.500 đơn đặt dịch vụ thành công, trước khi mở rộng ra các thành phố lớn khác. 
+2.2. Market Trends
+Xu hướng hiện nay cho thấy khách hàng ngày càng ưu tiên lập kế hoạch cưới trực tuyến, AI cá nhân hóa, giá minh bạch và thanh toán an toàn. 
+Khảo sát của nhóm cũng cho thấy gần 40% khách hàng gặp khó khăn khi so sánh giá
+Hơn 32% lo ngại chất lượng thực tế không giống quảng cáo. 
+Đây chính là khoảng trống mà Trạm Hỷ hướng tới giải quyết.
+2.3. Market Segment & Market Share
+Trạm Hỷ hoạt động theo mô hình marketplace hai chiều.
+Ở phía khách hàng, chúng tôi tập trung vào các cặp đôi Gen Z và Millennials từ 22 đến 35 tuổi, có thu nhập ổn định và ưu tiên sự tiện lợi.
+Ở phía đối tác là các nhà cung cấp dịch vụ cưới như studio, makeup, nhà hàng, váy cưới và trang trí.
+Trong hai năm đầu, mục tiêu của dự án là phục vụ khoảng 2.500 đám cưới, tương đương khoảng 5% thị phần Hà Nội.
+2.4. Key Players 
+Hiện nay, các đối thủ chính trên thị trường gồm Marry.vn, VDES và Weddingbook. Mỗi nền tảng đều có thế mạnh riêng, nhưng chưa tích hợp đầy đủ các tính năng như AI, thanh toán ký quỹ và đánh giá xác thực.
+Đó cũng là lợi thế cạnh tranh của Trạm Hỷ, với trải nghiệm đặt dịch vụ trọn gói, giá minh bạch và cơ chế thanh toán an toàn.
+2.5. Product Pricing
+Về mô hình doanh thu, Trạm Hỷ áp dụng mô hình Freemium. 
+Khách hàng và nhà cung cấp đều có thể sử dụng nền tảng miễn phí
+Còn doanh thu chủ yếu đến từ 10% hoa hồng trên các giao dịch thành công, kết hợp với các gói quảng cáo và dịch vụ số dành cho nhà cung cấp."
+Kết luận Part II
+"Tóm lại, với quy mô thị trường lớn, xu hướng chuyển đổi số rõ ràng và những khoảng trống mà các đối thủ hiện tại chưa giải quyết, chúng tôi tin rằng Trạm Hỷ có đủ tiềm năng để xây dựng một nền tảng cưới minh bạch, hiện đại và có khả năng mở rộng trên toàn quốc."
+III. COMPETITOR ANAlYSIS 
+Trạm Hỷ định vị mình hoàn toàn tách biệt. Nếu các đối thủ hiện tại chỉ dừng lại ở mô hình danh bạ truyền thống hoặc O2O với mức độ công nghệ hạn chế, thì Trạm Hỷ là một Hệ sinh thái vận hành bằng AI. 
+Trạm Hỷ không chỉ cung cấp thông tin, mà còn mang đến sự minh bạch tuyệt đối và tối ưu hóa trải nghiệm bằng công nghệ cao."
+Nhìn vào nhóm đối thủ trong nước. Marry.vn có dữ liệu khổng lồ nhưng thiếu tính năng giao dịch trực tuyến. VDES có công nghệ tốt nhưng lại quá tập trung vào khách hàng doanh nghiệp.
+Trạm Hỷ lấp đầy lỗ hổng này bằng cách tập trung 100% vào ngách cưới hỏi bản địa, đồng thời trang bị Quy trình giao dịch khép kín với tính năng thanh toán giữ cọc an toàn. Khách chốt đơn trên Trạm Hỷ, rủi ro mất cọc bằng 0."
+"Nhìn sang các chuẩn mực quốc tế. Weddingbook dịch vụ rất tốt nhưng bị giới hạn bởi các showroom vật lý khổng lồ, giá thành đắt đỏ và cực kỳ khó nhân rộng. Còn Zola là nền tảng siêu ứng dụng thành công nhất nhưng chỉ dành cho thị trường Mỹ. 
+Trạm Hỷ giải bài toán này bằng mô hình Tài sản nhẹ (Asset-light), kết nối thay vì sở hữu để mở rộng quy mô thần tốc. Trạm Hỷ chính là phiên bản siêu ứng dụng của Zola, nhưng được bản địa hóa hoàn hảo cho văn hóa Việt Nam."
+Cuối cùng, nhìn vào bức tranh SWOT. Giai đoạn đầu, Trạm Hỷ chắc chắn phải đối mặt với thách thức về nhận diện thương hiệu và cạnh tranh SEO khốc liệt. Nhưng với 3 thế mạnh cốt lõi: AI cá nhân hóa ngân sách, mô hình Asset-light mở rộng siêu tốc, và hệ thống kiểm duyệt danh tính minh bạch... Trạm Hỷ tự tin nắm bắt cơ hội khổng lồ từ tệp khách hàng Gen Z và thị trường tại các thành phố đang bị bỏ ngỏ.
+IV. LEVELS OF PRODUCT -Đức Anh. Để đáp ứng được bức tranh thị trường vừa nêu, nhóm em đã xây dựng Trạm Hỷ dựa trên mô hình Cấp độ Sản phẩm 3 cấp độ sản phẩm của dự án Trạm Hỷ:
+Giá trị cốt lõi (Core Value): Thứ chúng em mang lại không chỉ là danh bạ dịch vụ, mà là 'Sự an tâm tuyệt đối' cho các cặp đôi và một môi trường kinh doanh minh bạch cho nhà cung cấp.
+Sản phẩm thực tế (Actual Product): Chính là nền tảng số Trạm Hỷ với giao diện trực quan, tính năng tìm kiếm thông minh và 100% hồ sơ, đánh giá (review) của Vendor đều được xác thực.
+Sản phẩm gia tăng (Augmented Product) - Điểm khác biệt lớn nhất: Bao gồm công cụ AI tối ưu ngân sách, hệ thống hợp đồng điện tử và đặc biệt là cơ chế trung gian bảo lãnh thanh toán theo tiến độ, giúp loại bỏ hoàn toàn rủi ro lừa đảo hay bùng tiền cho cả hai bên."
+Tóm lại ở phần Cấu trúc sản phẩm, có thể thấy Trạm Hỷ không đơn thuần chỉ dừng lại ở một trang web tìm kiếm dịch vụ cưới thông thường. Giá trị cốt lõi lớn nhất mà chúng em mang lại chính là 'Sự an tâm'. Thông qua lớp sản phẩm gia tăng (Augmented Product) là hệ thống hợp đồng số và cơ chế thanh toán theo tiến độ, Trạm Hỷ tự tin xây dựng được một hệ sinh thái toàn diện — nơi quyền lợi của cả cô dâu chú rể lẫn nhà cung cấp đều được bảo vệ tối đa. 
+V. CUSTOMER INSIGHTS SURVEY  - Đức Anhkhảo sát từ 136 khách hàng và 50 đối tác nhà cung cấp:
+Đối với Cặp đôi (B2C): Nỗi đau lớn nhất của họ là rất khó so sánh giá (chiếm 39,2%) và luôn lo sợ quảng cáo sai sự thật (chiếm 32,5%). Cái họ cần là giá cả minh bạch và đặt cọc an toàn.
+Đối với Nhà cung cấp (B2B): Vấn đề nhức nhối nhất là có tới 46,2% Vendor đang bị áp lực ép giá và phải làm thêm các yêu cầu phát sinh không công. Cái họ cần là nguồn khách ổn định và được bảo vệ dòng tiền.
+kết lại phần Khảo sát khách hàng: Những con số thu thập được đã khẳng định một thực tế rõ ràng — thị trường đang cực kỳ khao khát một nền tảng minh bạch về giá cả, xác thực về chất lượng và an toàn về dòng tiền. Có thể khẳng định, sự ra đời của Trạm Hỷ không phải là phỏng đoán chủ quan của nhóm, mà chính là lời giải đáp thực tế và cấp thiết nhất cho những 'nỗi đau' mà cả khách hàng B2C lẫn đối tác B2B đang gặp phải hiện nay. 
+VI. CUSTOMER PERSONA 
+ Ở phần Customer Persona, khách hàng B2C mục tiêu của Trạm Hỷ là các cặp đôi thuộc thế hệ Gen Z và Millennials, từ 22 đến 35 tuổi, đang chuẩn bị kết hôn tại Hà Nội.    
+Persona đại diện là Minh Anh, 27 tuổi, có thu nhập khá, độc lập về tài chính. Cô khá bận rộn nhưng am hiểu công nghệ, thường tìm kiếm thông tin trên TikTok, Facebook, Instagram và Threads, đồng thời bắt đầu chuẩn bị đám cưới từ khá sớm.
+    Theo khảo sát, 65% khách hàng bắt đầu chuẩn bị trước từ 3 đến 12 tháng. Tuy nhiên, họ gặp khó khăn vì thông tin bị phân tán, khó so sánh giá với chất lượng và lo ngại hình ảnh quảng cáo không giống dịch vụ thực tế. Vì vậy, khách hàng cần một nền tảng all-in-one để tìm nhà cung cấp, so sánh giá, kiểm tra review thật, quản lý ngân sách và phối hợp các dịch vụ.
+    Trạm Hỷ tập trung vào bốn giá trị chính: tiết kiệm thời gian, cá nhân hóa, minh bạch và an toàn, thông qua AI gợi ý nhà cung cấp, công khai giá, hình ảnh thực tế và review đã xác minh.
+VII. CUSTOMER'S JOURNEY MAP 
+Customer Journey của Trạm Hỷ gồm năm giai đoạn.
+    Ở Awareness, khách hàng tìm cảm hứng cưới trên mạng xã hội và biết đến Trạm Hỷ qua nội dung thực tế, video trang trí, kinh nghiệm lập kế hoạch và câu chuyện khách hàng.
+    Sang Consideration, họ bắt đầu tìm nhà cung cấp, so sánh giá và đọc review. Trạm Hỷ hỗ trợ bằng hồ sơ nhà cung cấp rõ ràng, công cụ so sánh, giá minh bạch và review đã xác minh.
+    Tại Booking, khách hàng nhập ngân sách và phong cách mong muốn để nhận package phù hợp từ AI. Hợp đồng được số hóa, còn tiền đặt cọc được bảo vệ bằng milestone payment, chỉ giải ngân khi từng giai đoạn hoàn thành và được khách hàng xác nhận.
+    Trong Service Experience, lịch trình, yêu cầu và tiến độ được quản lý tập trung trên dashboard. Điều này giúp giảm việc liên hệ riêng lẻ với nhiều nhà cung cấp và hạn chế sai lệch trong quá trình thực hiện.
+    Cuối cùng, sau khi dịch vụ hoàn tất, khách hàng có thể để lại verified review, được hỗ trợ giải quyết tranh chấp và tham gia chương trình giới thiệu.
+    Như vậy, Trạm Hỷ biến quá trình chuẩn bị đám cưới từ rời rạc và nhiều rủi ro thành một hành trình xuyên suốt, minh bạch, cá nhân hóa và an toàn hơn. 
+VIII. PRODUCT & MARKET FIT CANVAS
+Với người dùng cuối — các cặp đôi Gen Z, Millennial 22–35 tuổi — nỗi đau lớn nhất là thông tin phân mảnh, giá ảo, review giả và rủi ro mất cọc. Trạm Hỷ giải quyết bằng giá công khai, nhà cung cấp được kiểm chứng, thanh toán chia theo từng mốc.
+Phía nhà cung cấp — các studio, đơn vị trang trí, ê-kíp trang điểm — lại đau đầu vì nhu cầu bấp bênh, bị ép giá, thanh toán chậm trễ. Trạm Hỷ mang đến khách hàng chất lượng hơn, chi phí marketing rẻ hơn, và dòng tiền đều đặn hơn.
+Đây không phải phỏng đoán — khảo sát 135 người của nhóm mình cho thấy **39,2%** khách hàng khó so sánh giá và chất lượng, còn **46,2%** nhà cung cấp thừa nhận đang chịu áp lực giá và phụ thuộc vào truyền miệng để có khách. 
+Hai nỗi đau của khách hàng và nhà cung cấp tưởng như khác nhau — một bên sợ bị lừa, một bên sợ ế khách — thực chất là hai mặt của cùng một vấn đề: thị trường thiếu một nơi đủ tin cậy để kết nối. Đó chính là khoảng trống mà Trạm Hỷ sinh ra để lấp đầy. 
+ IX. BUSINESS MODEL CANVAS  
+1. Phân khúc khách hàng (Customer Segments)
+Mô hình hai chiều (Two-sided Market) phục vụ:
+B2C: Các cặp đôi trẻ (Gen Z, Millennials), phụ huynh và gia đình tham gia quyết định ngân sách.
+B2B: Toàn bộ hệ sinh thái dịch vụ cưới (Studio, Planner, Trung tâm tiệc cưới, Trang trí, Makeup,...).
+2. Tuyên bố giá trị (Value Proposition)
+Với B2C: Nền tảng Tất-cả-trong-một (All-in-one), gợi ý chuẩn gu bằng AI, minh bạch chi phí, cam kết chất lượng chuẩn WYSIWYG và bảo vệ dòng tiền nhờ thanh toán theo tiến độ.
+Với B2B: Mang lại nguồn khách hàng chất lượng, chi phí tiếp thị tối ưu (chỉ trả hoa hồng khi có đơn), đảm bảo dòng tiền và hỗ trợ công cụ số hóa vận hành.
+3. Kênh tiếp cận (Channels)
+Digital: Website/App chính thức, Mạng xã hội (Facebook, TikTok, IG,...), Email & Zalo Marketing.
+Trực tiếp & Cộng đồng: Triển lãm cưới (Wedding Fair), nhóm cộng đồng cưới hỏi và kênh giới thiệu (Referral).
+4. Mối quan hệ khách hàng (Customer Relationships)
+Tư vấn 1-1 cá nhân hóa, bảo vệ giao dịch an toàn, xử lý tranh chấp công bằng và nuôi dưỡng cộng đồng người dùng gắn kết.
+5. Dòng doanh thu (Revenue Streams)
+Phí hoa hồng giao dịch: Thu trên các đơn đặt lịch thành công.
+Dịch vụ giá trị gia tăng: Gói hiển thị ưu tiên (B2B) và gói quy hoạch tiệc cưới VIP (B2C).
+Giải pháp phần mềm (SaaS): Phí sử dụng công cụ quản lý nâng cao cho nhà cung cấp.
+6. Nguồn lực cốt lõi (Key Resources)
+Hạ tầng công nghệ (Web/App), Dữ liệu khách hàng/đối tác.
+Đội ngũ nhân sự (IT, CSKH, Sales).
+Mạng lưới nhà cung cấp uy tín & Thương hiệu.
+7. Hoạt động trọng yếu (Key Activities)
+Phát triển & vận hành nền tảng Web/App.
+Kết nối, quản lý đặt lịch và giao dịch.
+Marketing thu hút khách hàng & Đẩy mạnh R&D.
+8. Đối tác chiến lược (Key Partners)
+Các nhà cung cấp dịch vụ cưới địa phương.
+KOLs/KOCs và các cộng đồng cưới hỏi.
+Đối tác công nghệ, cổng thanh toán (MoMo, ZaloPay, VNPay) và đơn vị truyền thông.
+9. Cấu trúc chi phí (Cost Structure)
+Chi phí đầu tư ban đầu: Phát triển Web/App, nhận diện thương hiệu, pháp lý.
+Chi phí cố định: Marketing, Server, lương nhân sự và vận hành văn phòng.
+Chi phí biến đổi: Phí cổng thanh toán, hoa hồng đối tác và quà tặng/ấn phẩm đi kèm.
+KẾT LUẬN
+Tóm lại, Trạm Hỷ sở hữu một mô hình kinh doanh toàn diện, đa dạng hóa nguồn thu và tạo ra giá trị cộng hưởng rõ ràng: giúp khách hàng tối ưu chi phí - giúp nhà cung cấp tăng trưởng doanh thu, từ đó tạo đòn bẩy vững chắc để nâng tầm toàn bộ ngành cưới Việt Nam trên nền tảng số!
+X. FINANCIAL ANALYSIS  
+1. Vốn đầu tư (Investment Overview)
+Tổng vốn đầu tư ban đầu: 102,5 triệu VNĐ (mô hình Capital-light nhẹ vốn).
+Phân bổ: 35% cho chi phí thiết lập (MKT tại Wedding Fair, làm web, sản xuất nội dung mẫu) và 65% là quỹ vốn lưu động dự phòng.
+2. Dự phóng doanh thu (Revenue Projection)
+Nguồn thu: Phí hoa hồng 10% trên mỗi đơn hàng (trung bình 1,5 triệu VNĐ/đơn).
+Tăng trưởng: Bắt đầu từ 40 đơn/tháng (Tháng 1) và tăng 10%/tháng, đạt 114 đơn/tháng vào Tháng 12.
+Tổng doanh thu Năm 1: Dự kiến đạt hơn 1,28 tỷ VNĐ (trong đó riêng Quý 4 đóng góp 36% nhờ mùa cao điểm).
+3. Chi phí vận hành (Operating Expenses)
+Tổng chi phí Năm 1: Dự kiến 1,1 tỷ VNĐ.
+Chi phí cố định: Khoảng 32,4 triệu VNĐ/tháng (389 triệu/năm - MKT, vận hành, khuyến mãi).
+Chi phí biến đổi: Khoảng 835.000 VNĐ/đơn (714 triệu/năm - hoa hồng giới thiệu, phí thanh toán, CSKH, quà tặng).
+4. Lợi nhuận & Điểm hòa vốn (P&L & Break-even)
+Điểm bùng phát lợi nhuận: Chịu lỗ nhẹ trong 3 tháng đầu; bắt đầu có lãi từ Tháng 4 và bứt phá mạnh về cuối năm.
+Tổng EBIT Năm 1: Đạt 179,8 triệu VNĐ (biên lợi nhuận ~14%).
+Điểm hòa vốn: Đạt ở mốc 49 đơn/tháng (vượt ngưỡng này từ Tháng 4).
+5. Dòng tiền & Hoàn vốn (Cash Flow & Payback)
+Dòng tiền: Chạm đáy âm ở Tháng 3 (-111,7 triệu VNĐ), sau đó phục hồi và chính thức dương từ Tháng 11.
+Thời gian hoàn vốn: Khoảng 10,1 tháng (thu hồi toàn bộ vốn 102,5 triệu VNĐ ngay trong Năm 1 và kết thúc năm với số dư tiền mặt 77,3 triệu VNĐ).
+6. Rủi ro cốt lõi & Quản trị (Key Risks)
+Tốc độ tăng trưởng 10%/tháng: Cần duy trì đà MKT liên tục theo mùa cưới.
+Phụ thuộc 1 nguồn thu: Sẽ mở rộng sang gói VIP B2C và phần mềm SaaS B2B ở giai đoạn sau.
+Chi phí biến đổi cao (56% hoa hồng): Cần kỷ luật tối ưu chi phí CSKH và đàm phán phí thanh toán khi quy mô tăng.
+KẾT LUẬN
+Tóm lại, Trạm Hỷ là một dự án vốn đầu tư ban đầu thấp, khả năng hoàn vốn nhanh (chỉ sau 10 tháng) và biên lợi nhuận an toàn (~14%). Với lượng vốn dự phòng đủ gánh dòng tiền trong 9 tháng đầu, dự án hoàn toàn tự chủ về mặt tài chính và sở hữu nền tảng vững chắc để bứt phá từ Năm 2!
+XI. PROJECT EVALUATION CRITERIA
+Vậy Trạm Hỷ đổi mới ở đâu? vận hành — biến một ngành offline, phân mảnh thành một nền tảng tập trung, nơi AI tự động ghép combo nhà cung cấp theo ngân sách, tiết kiệm tới 80% thời gian lên kế hoạch. niềm tin thị trường — giá không bị thổi lên mùa cao điểm, và đánh giá hai chiều được xác thực danh tính thật, chấm dứt tình trạng review ảo.
+Về độ lớn cơ hội, theo mô hình PAM–TAM–SAM–SOM: toàn thị trường cưới Việt Nam là 82.560 tỷ đồng; nhóm khách hàng trẻ tại đô thị lớn — đối tượng chính — là 37.152 tỷ; riêng Hà Nội trong giai đoạn MVP là 6.000 tỷ; và mục tiêu thực tế, khiêm tốn trong 2 năm đầu là 2.500 lượt đặt dịch vụ thành công, mang lại 3,75 tỷ đồng doanh thu hoa hồng trực tiếp.
+Xa hơn con số, dự án sẽ còn tạo tác động thật: nhà cung cấp nhỏ lẻ tăng doanh thu 30–50% nhờ tiếp cận khách trực tiếp; công nghệ AI được đưa vào một ngành vốn rất thủ công; hợp đồng số và đặt cọc an toàn giúp giảm tranh chấp; và việc hạn chế khảo sát thực địa, giấy tờ cũng góp phần "xanh" hơn cho ngành cưới.
+Lợi thế cạnh tranh không nằm ở tính năng, mà ở dữ liệu — càng nhiều cặp đôi và nhà cung cấp sử dụng, AI càng gợi ý chính xác hơn, tạo ra một vòng lặp khó sao chép. Còn rủi ro? Đã có phương án: thanh toán qua cổng chuẩn PCI-DSS kết hợp escrow, nguyên tắc "thấy sao nhận vậy" với ảnh thực tế xác thực, và ưu đãi trái mùa để tránh phụ thuộc mùa vụ.
+Lộ trình rất rõ ràng: 2026–2027 chinh phục Hà Nội, 2028–2029 mở rộng ra TP.HCM, Đà Nẵng, Hải Phòng và thêm dịch vụ mới, 2030–2031 trở thành siêu ứng dụng cho toàn bộ hành trình cưới.
+XII. INVESTOR DECISION MAKING 
+12.1. Internal Assessment Criteria
+a. Management Team (Slide 1)
+Đầu tiên là về đội ngũ quản lý. Nhóm có sự phân công các thành viên phụ trách rõ ràng giữa các lĩnh vực kinh doanh, marketing, công nghệ và an ninh mạng. Bên cạnh đó, nhóm đã xây dựng đầy đủ Business Model Canvas, kế hoạch tài chính và lộ trình phát triển từ giai đoạn MVP tại Hà Nội đến mở rộng trên toàn quốc.
+a. Management Team (Slide 2)
+Động lực của nhóm đến từ việc giải quyết hai vấn đề lớn của thị trường: 
+khách hàng thiếu thông tin minh bạch 
+Các nhà cung cấp nhỏ thiếu kênh tiếp cận khách hàng. 
+Vì vậy, Trạm Hỷ hướng tới trở thành nền tảng số minh bạch cho ngành cưới Việt Nam.
+b. Business & Deal Criteria (Slide 3)
+Về mô hình kinh doanh, nguồn doanh thu chính đến từ:
+10% hoa hồng trên mỗi giao dịch thành công 
+kết hợp với các gói quảng cáo và dịch vụ giá trị gia tăng dành cho nhà cung cấp. 
+Với tổng vốn đầu tư khoảng 102,5 triệu đồng
+dự án dự kiến đạt điểm hòa vốn sau khoảng 4 tháng và hoàn vốn trong khoảng 10 tháng.
+c. Product / Service Criteria (Slide 4)
+Về sản phẩm, Trạm Hỷ tạo sự khác biệt bằng việc kết hợp AI Budget Configuration, công nghệ 3D/VR và thanh toán ký quỹ. 
+AI sẽ đề xuất các gói dịch vụ phù hợp với ngân sách và phong cách của khách hàng, giúp tiết kiệm đến 80% thời gian lập kế hoạch, 
+Trong khi công nghệ 3D/VR cho phép khách hàng xem trước không gian cưới và giảm rủi ro giữa thiết kế và thực tế.
+d. Financial Criteria (Slide 5)
+Theo dự báo, doanh thu năm đầu của Trạm Hỷ đạt khoảng 1,28 tỷ đồng, với biên lợi nhuận EBIT khoảng 14%. 
+Dự án dự kiến đạt điểm hòa vốn từ khoảng 49 đơn đặt dịch vụ mỗi tháng, tương ứng vào tháng thứ tư đến thứ năm. 
+Đây là cơ sở cho thấy mô hình có khả năng sinh lời và mở rộng trong tương lai.
+12.2. External Assessment Criteria
+a. Market Criteria (Slide 6)
+Ở góc độ bên ngoài, thị trường cưới Việt Nam vẫn còn nhiều tiềm năng với quy mô lớn và xu hướng chuyển đổi số ngày càng mạnh. Đặc biệt, nhu cầu về AI cá nhân hóa và trải nghiệm minh bạch đang mở ra nhiều cơ hội cho Trạm Hỷ. 
+b. Investor Criteria (Slide 7 + 8)
+Về nhà đầu tư, dự án hướng đến các quỹ trong lĩnh vực Marketplace, E-commerce, EventTech và FinTech. Bên cạnh nguồn vốn, chúng tôi cũng kỳ vọng nhận được sự hỗ trợ về chiến lược, mạng lưới đối tác và kết nối với các đơn vị thanh toán như VNPay, MoMo để thúc đẩy quá trình mở rộng thị trường. 
+Kết luận phần XII
+"Tóm lại, Trạm Hỷ không chỉ có đội ngũ và chiến lược phát triển rõ ràng mà còn sở hữu sản phẩm khác biệt, mô hình tài chính khả thi và hoạt động trong một thị trường giàu tiềm năng. Đây là những yếu tố quan trọng giúp dự án tạo sức hấp dẫn đối với các nhà đầu tư."
+Script Demo
+CẤU TRÚC CHỨC NĂNG VÀ TÍNH NĂNG CHI TIẾT (SITEMAP & FEATURES)
+Dự án: Trạm Hỷ – Nền tảng bảo chứng công nghệ cưới hỏi hàng đầu Việt Nam
+Phiên bản MVP – 4 dịch vụ cốt lõi
+1. Định vị chiến lược và USP (Unique Selling Point)
+Trạm Hỷ là nền tảng kết nối các cặp đôi với những nhà cung cấp dịch vụ cưới hỏi uy tín, đồng thời giải quyết bài toán về niềm tin và rủi ro mất tiền đặt cọc trong quá trình đặt dịch vụ cưới.
+Khác với các nền tảng Wedding Directory truyền thống chỉ đóng vai trò giới thiệu thông tin, Trạm Hỷ tham gia trực tiếp vào quy trình giao dịch thông qua cơ chế bảo chứng thanh toán (Escrow), giúp bảo vệ quyền lợi của cả khách hàng và nhà cung cấp.
+Hạn chế của các nền tảng hiện nay
+Các website hiện tại chủ yếu hoạt động dưới hình thức danh bạ dịch vụ (Directory Listing). Sau khi hai bên liên hệ, toàn bộ quá trình đặt cọc và thanh toán được thực hiện bên ngoài nền tảng, dẫn đến nhiều rủi ro như:
+Khách hàng dễ bị lừa đảo hoặc mất tiền cọc.
+Nhà cung cấp có nguy cơ không nhận được khoản thanh toán cuối.
+Chất lượng dịch vụ thực tế không đúng như cam kết ban đầu.
+Không có đơn vị trung gian xử lý tranh chấp.
+Điểm khác biệt của Trạm Hỷ
+AI Budgeting
+Người dùng chỉ cần nhập:
+Tổng ngân sách
+Địa điểm tổ chức
+Phong cách cưới
+Hệ thống sẽ tự động phân bổ ngân sách hợp lý cho bốn nhóm dịch vụ chính:
+Nhà hàng
+Trang trí (Decor)
+Studio
+Makeup
+Tổng chi phí luôn khớp với ngân sách ban đầu của khách hàng.
+Milestone Payment (Escrow)
+Thanh toán được chia thành ba giai đoạn:
+Đợt 1: 30% – Đặt cọc giữ lịch
+Đợt 2: 50% – Khi nhà cung cấp bắt đầu thực hiện dịch vụ
+Đợt 3: 20% – Sau khi khách hàng nghiệm thu
+Trong suốt quá trình này, tiền được giữ tại tài khoản ký quỹ của nền tảng và chỉ giải ngân khi điều kiện thanh toán được đáp ứng.
+2. Giao diện khách hàng (B2C)
+Giao diện được thiết kế theo phong cách hiện đại, lấy cảm hứng từ Pinterest nhưng tối ưu trải nghiệm sử dụng và đảm bảo tính bảo mật tương tự các nền tảng như Airbnb hoặc Shopee.
+2.1 Trang chủ (index.html)
+Trang chủ bao gồm các chức năng chính:
+Hero Banner tích hợp AI
+Người dùng nhập:
+Tổng ngân sách
+Địa điểm
+Phong cách cưới
+Hệ thống AI sẽ:
+Phân bổ ngân sách theo từng hạng mục.
+Đề xuất các gói dịch vụ phù hợp.
+Đảm bảo tổng chi phí đúng với ngân sách.
+Danh sách Top Vendors
+Hiển thị các nhà cung cấp đã được xác minh với huy hiệu Tích Xanh, bao gồm:
+Hình ảnh đại diện
+Tên thương hiệu
+Đánh giá
+Mức giá tham khảo
+Real Wedding Stories
+Hiển thị các câu chuyện cưới thực tế cùng đánh giá từ những cặp đôi đã hoàn thành giao dịch trên nền tảng.
+2.2 Chợ dịch vụ cưới (marketplace.html)
+Hệ thống cung cấp bốn nhóm dịch vụ cốt lõi:
+Studio ảnh cưới
+Trang trí (Decor)
+Makeup & Váy cưới
+Nhà hàng tiệc cưới
+Các dịch vụ khác như MC, xe cưới hoặc ban nhạc sẽ được triển khai ở giai đoạn sau và được gắn nhãn Coming Soon.
+Bộ lọc thông minh
+Cho phép người dùng lọc theo:
+Địa điểm
+Khoảng giá
+Đánh giá sao
+Chỉ hiển thị Vendor có Tích Xanh
+Thẻ thông tin nhà cung cấp
+Mỗi Vendor Card hiển thị:
+Ảnh đại diện
+Tên thương hiệu
+Giá khởi điểm
+Đánh giá sao
+Số lượng đánh giá
+Huy hiệu bảo chứng
+2.3 Chi tiết nhà cung cấp (detail.html)
+Trang thông tin chi tiết bao gồm:
+Portfolio
+Hiển thị album ảnh thực tế nhằm phản ánh đúng năng lực của nhà cung cấp.
+Bảng thanh toán Milestone Pay
+Thông tin được trình bày minh bạch:
+Đợt 1: 30%
+Đợt 2: 50%
+Đợt 3: 20%
+Kèm theo nút Đặt lịch cọc bảo chứng.
+Đánh giá xác thực
+Chỉ những khách hàng đã hoàn thành giao dịch và sở hữu Booking ID hợp lệ mới được phép đánh giá.
+2.4 Quản lý lịch hẹn (bookings.html)
+Khách hàng có thể theo dõi toàn bộ tiến độ đơn hàng thông qua Timeline.
+Các trạng thái bao gồm:
+Đã đặt cọc
+Đang thực hiện
+Đã bàn giao
+Chờ nghiệm thu
+Hoàn thành
+Ngoài ra còn có:
+Mã QR thanh toán động cho từng đợt.
+Nút nghiệm thu.
+Nút gửi khiếu nại nếu dịch vụ không đạt yêu cầu.
+2.5 Thiệp cưới và QR (invitation.html)
+Người dùng có thể:
+Tạo thiệp cưới trực tuyến.
+Chọn nhiều mẫu giao diện khác nhau.
+Chỉnh sửa thông tin cô dâu, chú rể.
+Chia sẻ thiệp qua đường dẫn.
+Ngoài ra hệ thống hỗ trợ:
+RSVP
+Khách mời xác nhận tham dự trực tiếp trên thiệp.
+QR mừng cưới
+Tự động tạo mã VietQR để khách mời chuyển tiền mừng trực tiếp vào tài khoản ngân hàng của cô dâu và chú rể.
+3. Giao diện nhà cung cấp (Vendor Dashboard – B2B)
+Hệ thống hỗ trợ nhà cung cấp quản lý công việc và doanh thu.
+3.1 Quản lý đơn hàng
+Sử dụng bảng Kanban gồm bốn cột:
+Chờ duyệt
+Đã nhận cọc
+Đang thi công
+Chờ nghiệm thu
+Vendor có thể:
+Cập nhật tiến độ.
+Gửi thông báo hoàn thành.
+Yêu cầu khách hàng nghiệm thu.
+3.2 Ví tài chính và đối soát
+Trang tài chính hiển thị:
+Tổng doanh thu
+Tiền đang được giữ trong Escrow
+Tiền đã được giải ngân
+Ngoài ra còn có bảng đối soát chi tiết:
+Giá trị đơn hàng
+Phí nền tảng (10%)
+Số tiền thực nhận
+Thời gian giải ngân
+4. Giao diện quản trị (Admin)
+4.1 Quản lý Escrow
+Quản trị viên theo dõi:
+Tổng tiền đang được ký quỹ.
+Danh sách các giao dịch.
+Trạng thái giải ngân.
+Khi khách hàng xác nhận nghiệm thu thành công, hệ thống sẽ đưa giao dịch vào hàng đợi giải ngân để chuyển tiền cho Vendor.
+4.2 Quản lý Tích Xanh và xử lý tranh chấp
+Duyệt Tích Xanh
+Admin kiểm tra:
+Hồ sơ doanh nghiệp.
+Giấy phép kinh doanh.
+Hình ảnh thi công thực tế.
+Chất lượng dịch vụ.
+Sau khi đạt yêu cầu, Vendor sẽ được cấp huy hiệu Tích Xanh.
+Trung tâm trọng tài
+Nếu khách hàng không đồng ý nghiệm thu, Admin sẽ:
+Tiếp nhận khiếu nại.
+Kiểm tra bằng chứng của hai bên.
+Đưa ra quyết định giải quyết.
+Thực hiện hoàn tiền hoặc giải ngân theo kết quả xử lý.
+Rubik thuyết trình
+Rubric thuyết trình
+1. Nội Dung (65%)
+ Trình bày topic một cách toàn diện (35%)
+Xuất sắc (28-35 điểm): Trình bầy đầy đủ và toàn diện tất cả các khía cạnh của dự án. Nội dung phong phú, sâu sắc và có tổ chức, kết nối logic  giữa các nội dung dự án.
+Khá (22-27 điểm): Trình bầy phần lớn các khía cạnh của đề bài hoặc topic. Nội dung tương đối phong phú và có tổ chức.
+Trung bình (15-21 điểm): Trình bầy một số khía cạnh của dự án nhưng còn thiếu chi tiết. Nội dung có tổ chức nhưng chưa phong phú.
+Yếu (0-15 điểm): Trình bầy không đầy đủ hoặc lạc đề, thiếu tổ chức và thiếu chi tiết.
+Trả lời chính xác các câu hỏi do giáo viên/nhóm cùng lớp đưa ra (20%)
+Xuất sắc (17-20 điểm): Trả lời chính xác và chi tiết tất cả các câu hỏi. Thể hiện sự hiểu biết sâu sắc về kiến thức kinh doanh.
+Khá (13-16 điểm): Trả lời chính xác hầu hết các câu hỏi. Thể hiện sự hiểu biết tốt về kiến thức kinh doanh 
+Trung bình (9-12 điểm): Trả lời một số câu hỏi chính xác nhưng còn thiếu chi tiết hoặc chưa đầy đủ.
+Yếu (0-8 điểm): Trả lời không chính xác hoặc không trả lời được các câu hỏi.
+ .Thực hiện trong đúng thời gian cho phép (10%): 30ph- các thành viên đều phải trình bầy
+Xuất sắc (9-10 điểm): Trình bày hoàn thành trong khung thời gian cho phép, không vượt quá thời gian.
+Khá (7-8 điểm): Trình bày hơi vượt quá hoặc hơi thiếu so với thời gian cho phép nhưng không ảnh hưởng đáng kể.
+Trung bình (5-6 điểm): Trình bày vượt quá hoặc thiếu nhiều so với thời gian cho phép.
+Yếu (0-4 điểm): Trình bày quá ngắn hoặc quá dài so với thời gian cho phép, ảnh hưởng nghiêm trọng đến nội dung.
+2. Phong Cách Trình Bày (35%)
+Sự tự tin (10%)
+Xuất sắc (9-10 điểm): Thể hiện sự tự tin cao, duy trì sự kết nối tốt với khán giả.
+Khá (7-8 điểm): Thể hiện tự tin nhưng còn một số khoảnh khắc lúng túng.
+Trung bình (5-6 điểm): Thể hiện sự tự tin chưa vững, có nhiều khoảnh khắc lúng túng.
+Yếu (0-4 điểm): Thể hiện sự thiếu tự tin, khó kết nối với khán giả.
+Trôi chảy (10%)
+Xuất sắc (9-10 điểm): Trình bày mạch lạc, trôi chảy, dễ hiểu. Không có lỗi phát âm hay ngữ pháp đáng kể.
+Khá (7-8 điểm): Trình bày tương đối mạch lạc, ít lỗi phát âm hoặc ngữ pháp.
+Trung bình (5-6 điểm): Trình bày có một số lỗi phát âm hoặc ngữ pháp, gây khó hiểu ở một vài chỗ.
+Yếu (0-4 điểm): Trình bày rời rạc, nhiều lỗi phát âm hoặc ngữ pháp, gây khó hiểu.
+Không phụ thuộc vào script (15%)
+Xuất sắc (12-15 điểm): Trình bày hoàn toàn không phụ thuộc vào script, thể hiện sự nắm vững nội dung.
+Khá (8-12 điểm): Trình bày ít phụ thuộc vào script, thỉnh thoảng nhìn vào ghi chú nhưng không ảnh hưởng đến sự trôi chảy.
+Trung bình (4-7 điểm): Trình bày phụ thuộc nhiều vào script, thường xuyên nhìn vào ghi chú.
+Yếu (0-4 điểm): Trình bày gần như hoàn toàn dựa vào script, không thể trình bày tự nhiên.
+Tổng điểm: 100 điểm
+Điểm thuyết trình chiếm 40% điểm dự án
+Điểm Thesis (report)  chiếm 60% điểm dự án
+Yêu cầu CP 4
+Mô tả dự án "Việt Sử Ký" 
+Tóm tắt sơ lược về Mind GPT 
+Homework 3
+Homework 3
+I. Các bước thuyết trình3
+1. Chào hỏi và chúc tụng3
+2. Giới thiệu bản thân3
+3. Tương tác và dẫn dắt3
+4. Ấn định thời gian và giới thiệu chủ đề3
+5. Giới thiệu các nội dung chính3
+6. Phân tích chuyên sâu (Thân bài)4
+7. Nhắc lại nội dung trọng tâm4
+8. Chia sẻ thông điệp4
+9. Cảm ơn và kết thúc4
+II. How to Pitch Your Start-up4
+1. Startup idea là gì?4
+2. Ba câu hỏi nhà đầu tư đang tự hỏi5
+3. Nguyên tắc vàng: Rõ ràng và ngắn gọn5
+4. Ba danh từ bắt buộc phải có5
+5. Ví dụ thực tế: Tốt và Tệ6
+6. Công thức "X for Y" — dùng đúng thì hay, dùng sai thì hại6
+7. Kết luận — công thức đơn giản nhất6
+III. A Guide to YC Demo Day Presentations:7
+1. Mục tiêu thực sự của một bài Pitch gọi vốn7
+2. Cấu trúc cốt lõi của một bài Pitch xuất sắc7
+2.1. Bạn làm gì? (What do you do?)7
+2.2. Độ lớn của thị trường (Market Size)7
+2.3. Lợi thế cạnh tranh & Sự thật ngầm hiểu (Traction & Unfair Advantage)8
+2.4. Đội ngũ (Team)8
+3. Những cạm bẫy "chết người" cần tránh8
+4. Phong cách trình bày (Delivery)8
+IV. How to Design a Better Pitch Deck9
+1. Mục tiêu cốt lõi của Pitch Deck9
+1.1. Legible – Dễ đọc9
+1.2. Simple – Đơn giản10
+1.3. Obvious – Rõ ràng10
+2. Loại bỏ các yếu tố gây phân tâm11
+3. Hick's Law – Luật về quá tải thông tin12
+4. Tại sao không nên dùng Screenshot?12
+5. Khi nào được phép phá luật?13
+6. Kết luận quan trọng nhất13
+V. 31 Creative Presentation Ideas13
+Tóm tắt nội dung13
+1. Nguyên tắc thiết kế & Thẩm mỹ13
+2. Cấu trúc & Kết nối với khán giả14
+3. Cách tiếp cận theo chủ đề15
+4. Tích hợp Đa phương tiện & Tương tác15
+5. Các nguyên tắc cốt lõi để thành công16
+Các bước thuyết trình
+https://www.youtube.com/watch?v=UXT6FSW0tqw
+1. Chào hỏi và chúc tụng
+Mục tiêu: Tạo thiện cảm ban đầu.
+Hành động: Xác định rõ đối tượng người nghe để sử dụng đại từ xưng hô cho phù hợp (anh/chị, quý vị, các bạn). Gửi lời chào và một lời chúc gắn liền với mục đích của buổi gặp gỡ (Ví dụ: "Chúc quý vị có một buổi nghe Pitching tràn đầy năng lượng và hiệu quả").
+2. Giới thiệu bản thân
+Mục tiêu: Xây dựng sự uy tín (Trust) ngay lập tức.
+Hành động: Trình bày ngắn gọn tên, vai trò/chức danh trong dự án. Khéo léo lồng ghép một vài thế mạnh hoặc lý do vì sao bạn là người phù hợp nhất để chia sẻ về chủ đề này.
+3. Tương tác và dẫn dắt
+Mục tiêu: Phá băng (Ice-breaking) và kết nối với khán giả.
+Hành động: Đặt các câu hỏi trực tiếp đánh vào "nỗi đau" (Pain points) hoặc nhu cầu thiết thực của người nghe. Tránh đi thẳng vào lý thuyết khô khan, hãy dùng câu hỏi để tạo điểm neo dẫn dắt khán giả vào vấn đề chính.
+4. Ấn định thời gian và giới thiệu chủ đề
+Mục tiêu: Quản trị kỳ vọng của người nghe.
+Hành động: Đưa ra con số cụ thể về thời lượng (Ví dụ: "Tôi xin phép dành ra 5 phút để..."). Việc này giúp khán giả chuẩn bị tâm lý, chủ động lắng nghe mà không bị khó chịu vì cảm giác chờ đợi vô định.
+5. Giới thiệu các nội dung chính
+Mục tiêu: Cung cấp "bản đồ" bài nói.
+Hành động: Liệt kê nhanh các đầu mục/Agenda sẽ trình bày. Lưu ý sắp xếp nội dung theo nguyên tắc: Càng về sau càng hấp dẫn và quan trọng để giữ chân người nghe đến những phút cuối cùng.
+6. Phân tích chuyên sâu (Thân bài)
+Mục tiêu: Giải quyết vấn đề cốt lõi.
+Hành động: Đây là phần chiếm 2/3 thời lượng. Cần mổ xẻ thông tin bằng kiến thức chuyên môn, lồng ghép các ví dụ thực tế (Case study), kể chuyện (Storytelling) hoặc sử dụng hình ảnh trực quan để khán giả dễ tiếp thu nhất.
+7. Nhắc lại nội dung trọng tâm
+Mục tiêu: Khắc sâu trí nhớ.
+Hành động: Sau khi đã phân tích chi tiết, tiến hành tổng hợp và nhắc lại ngắn gọn (Summary) từ 3 đến 5 "từ khóa" đắt giá nhất để khán giả mang về.
+8. Chia sẻ thông điệp
+Mục tiêu: Truyền cảm hứng và thúc đẩy hành động (Call to action).
+Hành động: Đưa ra một câu nói, một thông điệp ý nghĩa, lời khuyên hoặc lời nhắn nhủ chân thành liên quan đến tầm nhìn của dự án.
+9. Cảm ơn và kết thúc
+Mục tiêu: Thể hiện sự chuyên nghiệp và tôn trọng.
+Hành động: Gửi lời cảm ơn khán giả, ban giám khảo/nhà đầu tư vì đã dành thời gian lắng nghe. Kết thúc bằng một lời chúc chân thành mong họ đạt được sự thành công và mời gọi phần hỏi - đáp (Q&A).
+How to Pitch Your Start-up
+https://www.ycombinator.com/library/6q-how-to-pitch-your-startup
+1. Startup idea là gì?
+Startup idea không phải chỉ là ý tưởng sản phẩm. Kevin định nghĩa nó là một hypothesis — tức là giả thuyết về lý do tại sao công ty của bạn sẽ tăng trưởng rất nhanh. Hypothesis đó phải bao gồm đủ 3 thành phần: Problem (vấn đề đủ lớn, đủ phổ biến), Solution (không bắt đầu từ công nghệ mà từ vấn đề), và Insight (lợi thế khiến công ty bạn tăng trưởng nhanh hơn đối thủ).
+Quan trọng là bạn không cần phải trình bày hết tất cả. Kevin nói rõ: nhà đầu tư giỏi sẽ tự extrapolate phần còn lại sau khi nghe bạn nói. Họ dùng sự lạc quan và kinh nghiệm của mình để tự vẽ ra bức tranh lớn hơn từ những gì bạn cung cấp.
+2. Ba câu hỏi nhà đầu tư đang tự hỏi
+Khi nghe pitch hoặc đọc application, nhà đầu tư thực chất đang cố trả lời 3 câu: Tôi có hiểu họ đang làm gì không? Tôi có bị kéo vào, cảm thấy hứng thú không? Và tôi có muốn làm việc với team này không?
+Ba câu đó cũng chính xác là những gì YC yêu cầu các startup trong batch tự hỏi nhau mỗi tuần trong group session. Kevin nhấn mạnh: mục tiêu của bạn chỉ là làm cho người nghe hiểu rõ. Phần còn lại — nhà đầu tư sẽ tự làm.
+3. Nguyên tắc vàng: Rõ ràng và ngắn gọn
+Kevin lý giải tại sao sự rõ ràng quan trọng đến vậy: các công ty lớn đều lớn lên nhờ word of mouth — người này kể cho người kia nghe. Nhưng trước khi ai đó nhớ và kể lại về bạn, họ phải hiểu bạn đang làm gì đã. Marketing và quảng cáo, theo Kevin, là "thuế mà công ty phải trả vì không tạo ra thứ gì đáng nhớ".
+Có 4 thứ hay làm ý tưởng trở nên mờ nhạt. Thứ nhất là sự mơ hồ — câu nói có thể hiểu theo nhiều nghĩa, cần hỏi thêm mới rõ. Thứ hai là sự phức tạp — nhồi nhét quá nhiều ý vào một câu. Thứ ba là bí ẩn — jargon ngành, từ viết tắt, đại từ không rõ chỉ cái gì. Thứ tư và hay bị bỏ qua nhất là những từ "dễ bỏ qua" — MBA-speak, buzzword như "end-to-end solution" hay "disruptive innovation" — nhà đầu tư nghe qua là tắt não ngay.
+Thay vào đó, Kevin khuyên nên nói chuyện như đang kể chuyện bình thường — nếu mẹ bạn nghe hiểu và tự hào, bạn đã pitch đúng. Đừng vòng vo dẫn dắt, đi thẳng vào vấn đề. Và quan trọng nhất: câu mô tả phải đủ cụ thể để người nghe hình dung được trong đầu mình sản phẩm đó trông như thế nào.
+4. Ba danh từ bắt buộc phải có
+Sau khi đọc mô tả của bạn, nhà đầu tư phải trả lời được 3 câu chỉ từ những gì bạn viết: Bạn đang làm gì (sản phẩm)? Vấn đề là gì? Và khách hàng là ai? Nếu thiếu bất kỳ danh từ nào trong 3 thứ này, mô tả của bạn chưa xong.
+Kevin lấy ví dụ một câu dài: "Our company will make low cost and low power consumption medical devices based on artificial intelligence and IoT suitable for sub-Saharan communities." Ông bóc ra: 3 danh từ cốt lõi là "our company", "medical devices", "sub-Saharan communities". AI và IoT chỉ là công nghệ — không phải insight. "Low power consumption" cũng có thể bỏ. Chỉ cần giữ "low cost" vì đó mới là điều thực sự đáng chú ý. Kết quả cuối: "We create affordable medical devices for sub-Saharan Africa." Ngắn, rõ, đủ 3 danh từ.
+5. Ví dụ thực tế: Tốt và Tệ
+Câu mô tả tệ nhất Kevin hay thấy là kiểu: "We are going to transform the relationship between individuals and information." Toàn abstract noun, không hình dung được gì, phải hỏi thêm mới hiểu. Tệ không kém là kiểu vào đề bằng cách kể lịch sử công ty — nhà đầu tư không có thời gian cho kiểu đó.
+Ngược lại, Airbnb viết: "The first online marketplace that lets travelers book rooms with locals instead of hotels." Dropbox viết: "Synchronizes files across your or your team's computers." Cả hai đều cực ngắn, không phòng thủ, không cố gắng làm mình trông lớn hơn thực tế. Chỉ mô tả đúng cái đang làm. Và đó là đủ để bắt đầu kích hoạt trí tò mò của nhà đầu tư.
+6. Công thức "X for Y" — dùng đúng thì hay, dùng sai thì hại
+Công thức này hữu ích vì nó cho phép shortcut toàn bộ business model chỉ bằng một câu — ví dụ "LinkedIn for the next billion internet users" giúp người nghe hiểu ngay đây là mạng xã hội nghề nghiệp, chỉ là cho đối tượng khác. Nhưng Kevin cảnh báo đây cũng là công thức bị lạm dụng nhiều nhất.
+Để dùng đúng, cần thỏa 3 điều kiện. X phải là tên mà ai cũng biết và đồng ý là thành công — phải là công ty tỷ đô, household name thực sự. Y phải thực sự cần model của X — phải rõ ràng tại sao thị trường đó đang thiếu hoặc chưa được phục vụ tốt. Và Y phải đủ lớn — dù là subset, nó vẫn phải có tiềm năng scale lên hàng tỷ đô.
+Ví dụ thất bại: một startup mô tả mình là "Buffer for Snapchat". Buffer nhỏ hơn Snapchat nhiều — dùng cái nhỏ hơn để mô tả cái lớn hơn không bao giờ hiệu quả.
+7. Kết luận — công thức đơn giản nhất
+Lead with WHAT. Không phải WHY, không phải HOW — hai thứ đó có chỗ khác trong application để nói. Câu đầu tiên phải cho nhà đầu tư biết ngay bạn đang xây dựng cái gì. Mọi thứ khác sẽ đến sau.
+Ngắn gọn không chỉ giúp người nghe hiểu nhanh hơn — nó còn nói lên rằng bạn đã nghĩ kỹ về ý tưởng của mình, bạn biết cái gì quan trọng nhất, và bạn đủ kỷ luật để không lãng phí thời gian của ai. Đó là những tín hiệu rất tốt với nhà đầu tư về cách bạn điều hành công ty sau này.
+Kevin kết lại bằng một câu rất thẳng: "Be clear and concise — I will do everything else."
+A Guide to YC Demo Day Presentations:
+https://www.ycombinator.com/blog/guide-to-demo-day-pitches/
+1. Mục tiêu thực sự của một bài Pitch gọi vốn 
+Nhiều startup lầm tưởng rằng mục đích của buổi thuyết trình là để nhận được tấm séc đầu tư ngay trên sân khấu.
+Sự thật: Mục tiêu duy nhất của một bài pitch trong Demo Day là khiến nhà đầu tư muốn gặp lại bạn trong một cuộc họp riêng (Get a meeting).
+Bạn không cần (và không thể) giải thích mọi chi tiết kỹ thuật phức tạp trong 2-3 phút. Việc của bạn là tạo ra sự tò mò, chứng minh dự án có tiềm năng tăng trưởng khổng lồ để nhà đầu tư phải chủ động tìm đến bạn sau buổi thuyết trình.
+2. Cấu trúc cốt lõi của một bài Pitch xuất sắc 
+Y Combinator khuyên các startup nên bám sát một cấu trúc mạch lạc, trả lời ngay lập tức những câu hỏi lớn nhất trong đầu nhà đầu tư. Đối với Trạm Hỷ, cấu trúc này có thể áp dụng như sau:
+2.1. Bạn làm gì? (What do you do?)
+Phải nói rõ ngay trong 1-2 câu đầu tiên. Không vòng vo, không dùng thuật ngữ (buzzwords).
+Áp dụng Trạm Hỷ: "Chúng tôi là Trạm Hỷ – Nền tảng công nghệ kết nối trực tiếp các cặp đôi với hệ sinh thái nhà cung cấp dịch vụ cưới hỏi địa phương, giúp quản lý ngân sách và thanh toán an toàn."
+2.2. Độ lớn của thị trường (Market Size)
+Nhà đầu tư mạo hiểm (VC) tìm kiếm những công ty có thể trở thành "kỳ lân" (tỷ đô). Hãy chứng minh thị trường của bạn đủ lớn để đáng được đầu tư.
+Áp dụng Trạm Hỷ: Nhấn mạnh vào quy mô khổng lồ của thị trường cưới hỏi tại Việt Nam, số lượng các cặp đôi Gen Z kết hôn mỗi năm và mức độ sẵn sàng chi trả của họ.
+2.3. Lợi thế cạnh tranh & Sự thật ngầm hiểu (Traction & Unfair Advantage)
+Đây là phần quan trọng nhất. Nếu bạn có số liệu tăng trưởng (Traction), hãy biến nó thành tâm điểm. Nếu chưa có, hãy nói về "Insight" – bí mật về thị trường mà chỉ bạn biết.
+Áp dụng Trạm Hỷ: Insight của dự án chính là Nỗi sợ mất cọc của khách và Nỗi sợ bùng đơn của nhà cung cấp. Lợi thế cạnh tranh (Unfair Advantage) là cơ chế Split Payment (Giải ngân theo tiến độ) và mạng lưới Vendor Tích xanh (WYSIWYG). Đây là rào cản cực lớn khiến đối thủ khó sao chép.
+2.4. Đội ngũ (Team)
+Chỉ nhấn mạnh vào những kỹ năng hoặc kinh nghiệm chứng minh nhóm của bạn là những người duy nhất/tốt nhất có thể thực thi dự án này (như kỹ năng IT, kinh nghiệm Local Sales).
+3. Những cạm bẫy "chết người" cần tránh
+Mở đầu bằng một câu hỏi tu từ dài dòng: (Ví dụ: "Đã bao giờ quý vị cảm thấy mệt mỏi khi tổ chức đám cưới chưa?"). Các nhà đầu tư nghe hàng trăm bài pitch mỗi ngày, họ ghét sự rườm rà. Hãy đi thẳng vào vấn đề.
+Slide quá nhiều chữ: (Trùng khớp với ý của Thanh Tâm). Nếu bạn nói một đằng, slide hiện một nẻo hoặc có quá nhiều chữ, nhà đầu tư sẽ đọc slide và ngừng nghe bạn nói. Slide chỉ nên có những con số lớn, biểu đồ tăng trưởng đi lên (Up and to the right) hoặc hình ảnh sản phẩm.
+Sử dụng biệt ngữ (Jargon): Tránh các từ ngữ đao to búa lớn khiến người nghe bối rối. Hãy giải thích dự án sao cho một người ngoài ngành cũng hiểu ngay lập tức.
+4. Phong cách trình bày (Delivery)
+Đừng cố bắt chước Steve Jobs: YC khuyên bạn đừng cố gắng trở thành một diễn giả truyền cảm hứng nếu đó không phải là bạn. Sự chân thành, rõ ràng và tự tin về các con số của mình mới là thứ ăn điểm.
+Luyện tập (Practice): Một bài pitch 2-3 phút cần được luyện tập hàng chục, thậm chí hàng trăm lần. Bạn phải nói trôi chảy đến mức âm điệu tự nhiên như đang kể chuyện, chứ không phải đang đọc thuộc lòng như một con robot. Biết chính xác mình sẽ nhấn nhá ở từ nào (ví dụ nhấn mạnh vào "0đ phí duy trì", "Bảo chứng dòng tiền").
+How to Design a Better Pitch Deck
+https://www.ycombinator.com/library/4T-how-to-design-a-better-pitch-deck/
+1. Mục tiêu cốt lõi của Pitch Deck
+Kevin Hale cho rằng hầu hết startup đều mắc sai lầm khi cố gắng nói quá nhiều điều về công ty của mình.
+Thực tế:
+Startup có thể có 100 lý do để đầu tư.
+Những nhà đầu tư chỉ nhớ được 5–7 ý quan trọng nhất.
+Sau một buổi Demo Day có hơn 100 startup trình bày, họ thậm chí chỉ nhớ được 1–2 ý.
+Nguyên tắc quan trọng nhất
+Muốn người khác hiểu, slide phải đáp ứng 3 tiêu chí:
+Legible (Dễ đọc)
+Simple (Đơn giản)
+Obvious (Rõ ràng, dễ hiểu ngay lập tức)
+1.1. Legible – Dễ đọc
+Vấn đề
+Trong khán phòng có:
+Hơn 500 người
+Nhiều người ngồi xa
+Nhiều nhà đầu tư lớn tuổi
+Nếu họ không đọc được slide thì họ sẽ không hiểu.
+Cách làm slide dễ đọc
+Sử dụng cỡ chữ lớn.
+Dùng chữ đậm.
+Chọn font đơn giản.
+Tạo độ tương phản cao giữa chữ và nền.
+Đặt thông tin quan trọng ở vị trí dễ nhìn, đặc biệt là phía trên slide.
+Một lỗi phổ biến là startup đặt thông tin quan trọng nhất bằng chữ nhỏ hoặc màu nhạt, khiến người xem không nhận ra giá trị thực sự của sản phẩm.
+1.2. Simple – Đơn giản
+Một slide chỉ nên truyền tải một ý tưởng duy nhất.
+Sai lầm phổ biến
+Nhiều startup cố gắng đưa quá nhiều thông tin lên cùng một slide như:
+Sản phẩm là gì.
+Khách hàng là ai.
+Thị trường lớn như thế nào.
+ Công nghệ hoạt động ra sao.
+Khi nhiều ý tưởng xuất hiện cùng lúc, người xem khó xác định đâu là thông điệp quan trọng nhất và cuối cùng không nhớ được gì.
+Vì vậy:
+Một slide nên tập trung vào một ý.
+Nếu cần truyền tải nhiều ý tưởng thì hãy chia thành nhiều slide.
+Loại bỏ những chi tiết phụ không thực sự cần thiết.
+Theo Kevin Hale, nếu startup chỉ có khoảng 5–7 thông điệp quan trọng cần truyền tải thì Pitch Deck lý tưởng cũng chỉ nên xoay quanh 5–7 slide chính.
+1.3. Obvious – Rõ ràng
+Một slide tốt phải được hiểu chỉ bằng một cái nhìn.
+Tác giả đề xuất một bài kiểm tra đơn giản:
+Đưa slide cho người lạ xem. Hỏi: "Slide này nói gì?"
+Nếu họ không trả lời đúng ngay lập tức:
+=>   Slide chưa đủ rõ.
+Điều này đặc biệt quan trọng vì trong các buổi Demo Day:
+Demo Day chỉ có: 2 phút 30 giây
+Trong khi đó:
+Nhà đầu tư mất tập trung
+Kiểm tra email
+Nhìn điện thoại
+Nếu họ bỏ lỡ vài giây đầu: Bạn mất cơ hội truyền tải thông điệp
+Làm slide rõ ràng bằng cách nào?
+Khi trình bày biểu đồ tăng trưởng, nhiều startup chỉ hiển thị biểu đồ và mong người xem tự hiểu.
+Tác giả cho rằng nên viết trực tiếp kết luận lên slide, chẳng hạn:
+“Doanh thu tăng 500% trong 12 tháng.”
+“Tăng trưởng trung bình 20% mỗi tháng.”
+Khi đó người xem không cần suy luận mà hiểu ngay điều startup muốn nhấn mạnh.
+2. Loại bỏ các yếu tố gây phân tâm
+Tác giả cho rằng mọi thứ làm người xem mất thời gian suy nghĩ đều là yếu tố gây phân tâm.
+Các yếu tố này bao gồm:
+Quá nhiều chữ.
+Các đoạn giải thích dài.
+Quá nhiều logo và yếu tố thương hiệu.
+Hình ảnh không có chú thích.
+Animation.
+Transition.
+Meme.
+Các trò đùa tinh tế.
+Những yếu tố này khiến người xem tập trung vào slide thay vì tập trung vào startup.
+Theo tác giả:
+Nhà đầu tư đầu tư vào đội ngũ, không phải slide.
+Slide chỉ là công cụ hỗ trợ.
+3. Hick's Law – Luật về quá tải thông tin
+Kevin nhắc đến:
+Hick's Law: “Càng nhiều lựa chọn và thông tin thì con người càng mất nhiều thời gian để hiểu và quyết định.”
+Ví dụ: Một sơ đồ đầy:
+Mũi tên
+Hộp
+Biểu tượng
+Chú thích
+=> Người xem phải "giải mã".
+Trong pitch deck: Điều này rất nguy hiểm.
+4. Tại sao không nên dùng Screenshot?
+Đây là phần Kevin nhấn mạnh mạnh nhất. Ông gọi screenshot là:
+"Kẻ phá hỏng slide."
+Screenshot thường vi phạm cả 3 nguyên tắc
+Không dễ đọc: Text trong UI rất nhỏ.
+Không đơn giản: Ứng dụng thường có:
+Menu
+Nút
+Tab
+Sidebar
+=> Quá nhiều thứ xuất hiện.
+Không rõ ràng: Người xem phải mất thời gian tìm:
+"Tôi nên nhìn vào đâu?"
+Thay thế Screenshot bằng:
+Dùng danh sách các bước
+Dùng mô tả đơn giản
+5. Khi nào được phép phá luật?
+Thông thường tác giả khuyên nên tránh sự phức tạp. Tuy nhiên có một ngoại lệ:
+Ví dụ: startup Magic.
+Họ đưa lên slide hàng trăm logo dịch vụ khác nhau.
+Mục đích:
+Cho thấy thị trường cực kỳ phân mảnh
+Người dùng phải quản lý vô số dịch vụ
+Lúc này: Sự phức tạp chính là thông điệp nên được chấp nhận.
+6. Kết luận quan trọng nhất
+Kevin Hale tóm tắt toàn bộ triết lý thiết kế Pitch Deck bằng một câu:
+“Make it legible. Make it simple. Make it obvious.”
+“Hãy làm cho slide dễ đọc, đơn giản và rõ ràng.”
+Nếu người xem hiểu được startup của bạn ngay lập tức, khả năng họ nhớ và muốn trao đổi thêm với bạn sẽ tăng lên rất nhiều. Đây là nền tảng của một pitch deck thành công.
+31 Creative Presentation Ideas
+https://youtu.be/BuB7IhWZnJs
+Tóm tắt nội dung
+Thuyết trình là một nhiệm vụ quan trọng đòi hỏi sự cân bằng giữa truyền tải thông tin và duy trì sự chú ý của người nghe. Báo cáo này tổng hợp 31 chiến lược sáng tạo để biến một bài thuyết trình tiêu chuẩn trở thành một trải nghiệm lôi cuốn, tập trung vào thẩm mỹ thiết kế, cấu trúc trình bày và sự kết nối với khán giả.
+1. Nguyên tắc thiết kế & Thẩm mỹ
+Tính nhất quán về hình ảnh và các lựa chọn thiết kế có chủ đích là nền tảng để giữ chân khán giả.
+- Chủ nghĩa tối giản: Áp dụng triết lý "ít hơn là nhiều hơn" (less is more). Chỉ sử dụng hình ảnh và văn bản thiết yếu để đảm bảo sự rõ ràng, tránh quá tải thông tin.
+- Typography: Sử dụng chữ in hoa (ALL CAPS) cho tiêu đề để tạo điểm nhấn và thu hút sự chú ý ngay lập tức.
+- Chiến lược màu sắc:
+Điểm nhấn: Sử dụng nền đen trắng hoặc đơn sắc với một màu nổi bật duy nhất để làm nổi bật các chi tiết quan trọng.
+Bảng màu đơn sắc (Monochromatic): Sử dụng các sắc thái khác nhau của cùng một màu (màu nhạt cho nền, màu đậm cho biểu tượng/văn bản) để tạo vẻ tinh tế, chuyên nghiệp.
+Đen trắng cổ điển: Loại bỏ hoàn toàn màu sắc để tạo nên sự sang trọng và vượt thời gian.
+- Yếu tố hình ảnh:
+Cắt hình sáng tạo: Thay vì khung chữ nhật truyền thống, hãy thử cắt ảnh thành hình tròn để gợi cảm giác trọn vẹn và gần gũi.
+Minh họa 3D (Isometric): Sử dụng các mô hình 3D để phân tích các vật thể phức tạp hoặc tạo ra các "thế giới nhỏ" trực quan.
+Hiệu ứng mực loang: Thêm nét nghệ thuật bằng cách sử dụng các vệt mực loang với kích thước khác nhau.
+Khối màu (Color Blocks): Sắp xếp nội dung bên trong các hình khối hình học để phân tách thông tin khỏi các yếu tố thiết kế trang trí.
+2. Cấu trúc & Kết nối với khán giả
+Một cấu trúc tốt sẽ dẫn dắt người xem đi theo một hành trình, thay vì chỉ là các slide rời rạc.
+- Chuyển cảnh nhất quán: Sử dụng kiểu chuyển cảnh ngang (horizontal transition) đồng nhất cho toàn bộ bài thuyết trình để tạo dòng chảy liền mạch và chuyên nghiệp.
+- Slide "nghỉ": Sử dụng các câu trích dẫn hoặc slide tối giản để tạo khoảng nghỉ cho khán giả giữa các phần nặng về thông tin.
+- Trực quan hóa dữ liệu: Thay thế bảng tính đầy số liệu bằng các biểu đồ sinh động, đẹp mắt để dữ liệu dễ hiểu và hấp dẫn hơn.
+- Dòng thời gian (Timeline): Sử dụng dòng thời gian ngang để trình bày các bước dự án hoặc tiến trình lịch sử, giúp khán giả nắm bắt quy trình dễ dàng.
+- Sử dụng mũi tên: Dùng mũi tên để điều hướng mắt người xem và chỉ ra luồng thông tin cần theo dõi.
+3. Cách tiếp cận theo chủ đề
+Việc chọn phong cách thiết kế phù hợp với chủ đề có thể giúp khán giả ghi nhớ thông tin tốt hơn.
+- Cổ điển (Vintage): Sử dụng màu nâu đỏ (sepia), khung viền tinh xảo và các phông chữ kiểu poster cũ để tạo cảm giác về sự tin tưởng và trí tuệ.
+- Không gian (Space): Sử dụng hình ảnh vũ trụ, thiên hà để gợi lên sự đổi mới và "những khả năng vô tận".
+- Trường học/Bảng đen: Tạo không khí lớp học với nền bảng đen và phông chữ viết tay, phấn trắng để tăng tính gần gũi.
+- Nhật ký: Thiết kế slide như một cuốn nhật ký với các ghi chú viết tay và các vật dụng bàn làm việc để thông tin trông tự nhiên hơn.
+- Trò chơi: Sử dụng thẩm mỹ của các trò chơi nổi tiếng (ví dụ: game 8-bit) để tăng tính giải trí và tương tác.
+4. Tích hợp Đa phương tiện & Tương tác
+Sử dụng các định dạng hiện đại để biến bài thuyết trình từ một chiều thành trải nghiệm hai chiều.
+- Audio kể chuyện: Lồng tiếng hoặc âm thanh vào từng slide để người thuyết trình có thể tạm dừng và giải thích sâu hơn một cách tự nhiên.
+- Âm nhạc: Sử dụng nhạc nền không lời hoặc nhạc acoustic để thiết lập tâm trạng và duy trì sự hứng thú.
+- Hài hước: Sử dụng meme hoặc câu chuyện hài hước phù hợp để xây dựng sự kết nối. Lưu ý: Chỉ dùng khi cảm thấy tự nhiên để tránh sự gượng ép.
+- Đạo cụ thực tế: Nếu có thể, hãy mang đạo cụ thật vào buổi thuyết trình để tạo sự tương tác trực tiếp và đáng nhớ.
+5. Các nguyên tắc cốt lõi để thành công
+- Mở đầu mạnh mẽ: Slide đầu tiên phải có một thông điệp kích thích tư duy để giữ chân khán giả từ giây đầu tiên.
+- Tập trung vào khán giả: Hãy luôn tự hỏi thông tin này giúp ích gì cho người nghe thay vì chỉ nói về bản thân hoặc thương hiệu của bạn.
+- Giữ vững bản sắc thương hiệu: Sử dụng nhất quán font chữ, màu sắc và phong cách thiết kế đặc trưng của thương hiệu.
+- Sự cân bằng: Luôn giữ sự hài hòa – từ lượng thông tin, độ đậm nhạt của màu sắc đến tần suất sử dụng các yếu tố giải trí.
+Mô tả dự án
+                           FINAL REPORT 
+               GENERAL INFORMATION 
+Subject: EXE101 
+Topic: Trạm Hỷ
+Class: SE1936-NET
+Lecture: Đoàn Thị Thanh Hương
+Tên nhóm: Group 5
+Mentor: Bùi Mai Phương
+                   MEMBER INFORMATION
+1. Trần Huyền Trang - HS194065
+2. Lê Minh Châu - HS186348
+3. Nguyễn Thị Thanh Tâm - HE180879
+4. Nguyễn Duy Quang - HE181202
+5. Phùng Đức Anh - HE182553
+6. Tô Văn Tiến Dũng - HE182025
+I. ABOUT US
+1.1. Introduction
+Trạm Hỷ là dự án startup công nghệ thuộc lĩnh vực Wedding Tech, hoạt động theo mô hình nền tảng trung gian hai chiều (two-sided marketplace), kết nối trực tiếp:
+Cô dâu chú rể (B2C) — người có nhu cầu tổ chức đám cưới
+Nhà cung cấp dịch vụ cưới (B2B) — nhà rạp, decor gia tiên, cổng hoa, âm thanh ánh sáng, mâm quả, studio ảnh cưới, makeup...
+Dự án ra đời từ việc quan sát một nghịch lý của thị trường cưới Việt Nam : Mỗi năm Việt Nam có khoảng 688.000 cặp đôi kết hôn, với chi phí đám cưới trung bình 120 triệu VNĐ/đám cưới — một thị trường quy mô ~82.560 tỷ VNĐ (PAM). Tuy nhiên, ngành này lại vận hành rất phân mảnh: khách hàng phải khảo giá thủ công qua hội nhóm/truyền miệng, không có thước đo giá chuẩn, dễ bị "chặt chém" hoặc gặp tình trạng "treo đầu dê bán thịt chó" (ảnh quảng cáo khác xa thực tế thi công). Ngược lại, nhiều cơ sở decor, nhà rạp nhỏ lẻ tại địa phương có tay nghề tốt, giá hợp lý nhưng lại "đói khách" vì thiếu năng lực marketing số.
+Từ nghịch lý "cung thiếu tiếp cận – cầu thiếu minh bạch" đó, Trạm Hỷ ra đời với vai trò một nền tảng số hóa toàn bộ hành trình chuẩn bị cưới: Tìm kiếm – Xem mẫu – So sánh giá – Đặt combo dịch vụ – Quản lý lịch trình – Thanh toán, tất cả trên một hệ thống duy nhất.
+Lộ trình phát triển: Theo mô hình Lean Startup — MVP tại Hà Nội → mở rộng ra các thành phố lớn → phủ sóng toàn quốc.
+1.2. Vision
+Trạm Hỷ hướng tới trở thành nền tảng công nghệ trung gian kết nối dịch vụ cưới hỏi uy tín, minh bạch hàng đầu tại Việt Nam, và trong dài hạn, phát triển thành một hệ sinh thái cưới hỏi toàn diện bao gồm:
+Trụ cột hệ sinh thái
+Nội dung
+Tìm kiếm & đặt dịch vụ
+Kết nối khách hàng với hàng nghìn nhà cung cấp
+Quản lý ngân sách
+Công cụ AI Budget Allocator
+Thiệp điện tử & khách mời
+Số hóa khâu mời cưới, RSVP tự động
+Thanh toán & giữ cọc
+Milestone Payment an toàn
+Quản lý tiến độ tổ chức
+Dashboard theo dõi thi công real-time
+Hậu cưới
+Dịch vụ trăng mật liên kết
+1.3. Meaning of the name
+"Trạm Hỷ"
+"Trạm": hình ảnh một điểm trung chuyển, dừng chân — thể hiện đúng bản chất nền tảng trung gian (platform), nơi tập hợp mọi dịch vụ cưới hỏi để khách hàng chỉ cần ghé qua một lần là có đủ mọi lựa chọn.
+"Hỷ": biểu tượng văn hóa truyền thống Việt Nam (chữ Song Hỷ - 囍) gắn liền với hôn lễ, tượng trưng cho niềm vui, hạnh phúc lứa đôi.
+=> Cái tên gói gọn trọn vẹn định vị thương hiệu: một "trạm dừng" công nghệ, nơi khởi đầu cho một hành trình cưới hỏi thảnh thơi và trọn vẹn niềm vui.
+1.4. Mission
+"Đập tan sự bất đối xứng thông tin, kiến tạo không gian kết nối minh bạch cho ngành cưới hỏi Việt Nam."
+Cụ thể, sứ mệnh của Trạm Hỷ song hành trên 2 mặt trận:
+Đối với khách hàng (B2C): Giúp các cặp đôi thảnh thơi thiết kế đám cưới trong mơ đúng ngân sách, loại bỏ nỗi lo phát sinh chi phí, bị "hét giá" hay nhận dịch vụ không đúng như quảng cáo.
+Đối với nhà cung cấp (B2B): Trao cơ hội chuyển đổi số và tiếp cận khách hàng trẻ một cách bình đẳng cho các cơ sở decor, nhà rạp địa phương — vốn có tay nghề tốt nhưng thiếu năng lực marketing.
+=> Kết quả là một lời cam kết về trải nghiệm cưới văn minh, tiện lợi và tiết kiệm trong thời đại số, đồng thời góp phần thúc đẩy chuyển đổi số cho một ngành dịch vụ truyền thống còn rời rạc.
+1.5. Core values
+Giá trị
+Cam kết cụ thể
+Minh bạch 
+Báo giá công khai, chuẩn hóa; hệ thống Review hai chiều định danh; nguyên lý WYSIWYG – "nhìn sao nhận vậy" 
+An toàn
+Cơ chế thanh toán theo tiến độ (Milestone Payment), giữ cọc bên thứ ba, bảo mật chuẩn PCI-DSS/SSL 
+Cá nhân hóa
+AI gợi ý combo dịch vụ theo Ngân sách & Phong cách; trải nghiệm xem mẫu trực quan 
+Bình đẳng và đồng hành
+Chiến lược "Cầm tay chỉ việc" onboard nhà cung cấp nhỏ lẻ; chính sách 0% hoa hồng 3-6 tháng đầu để xây dựng niềm tin; thiết kế "Zero-learning curve" cho đối tác lớn tuổi 
+Văn minh trong giao dịch
+Đánh giá hai chiều (khách hàng ↔ nhà cung cấp), xây dựng môi trường hợp tác công bằng, giảm tranh chấp 
+II. IDEA PERFECTION PROCESS
+2.1. Idea Formation Process
+Ý tưởng Trạm Hỷ – Kết duyên cát hỷ được hình thành từ việc quan sát những bất cập kéo dài trong thị trường dịch vụ cưới hỏi tại Việt Nam. Mặc dù mỗi năm Việt Nam có hàng trăm nghìn cặp đôi tổ chức đám cưới và quy mô thị trường rất lớn, ngành dịch vụ cưới vẫn vận hành theo mô hình truyền thống, phân mảnh và thiếu tính minh bạch.
+Về phía khách hàng, các cặp đôi phải tự tìm kiếm và làm việc với nhiều nhà cung cấp khác nhau như nhà rạp, decor gia tiên, cổng hoa, âm thanh ánh sáng, quay phim chụp ảnh, xe cưới,... Việc khảo giá thường dựa trên giới thiệu hoặc các hội nhóm mạng xã hội khiến khách hàng mất nhiều thời gian, khó so sánh chất lượng và dễ gặp rủi ro về giá cả cũng như chất lượng thực tế của dịch vụ.
+Kết quả phỏng vấn sâu cho thấy những nỗi lo lớn nhất của khách hàng bao gồm:
+Nhà cung cấp nhận tiền cọc nhưng không thực hiện đúng cam kết.
+Hình ảnh quảng cáo khác xa thực tế thi công.
+Phát sinh chi phí ngoài dự kiến trong quá trình chuẩn bị đám cưới.
+Bị làm phiền bởi các cuộc gọi tư vấn liên tục sau khi để lại thông tin liên hệ.
+Ở chiều ngược lại, phần lớn các nhà cung cấp dịch vụ cưới là các doanh nghiệp nhỏ hoặc hộ kinh doanh cá thể có tay nghề tốt nhưng thiếu năng lực marketing và công nghệ. Họ phụ thuộc nhiều vào Facebook, Zalo hoặc khách hàng giới thiệu, dẫn đến khả năng tiếp cận khách hàng mới còn hạn chế và khó cạnh tranh với các thương hiệu lớn.
+Từ những vấn đề trên, nhóm dự án xây dựng ý tưởng về Trạm Hỷ như một nền tảng công nghệ trung gian kết nối khách hàng và nhà cung cấp, giúp chuẩn hóa thị trường cưới hỏi, minh bạch hóa giá cả, bảo vệ quyền lợi của cả hai bên và thúc đẩy chuyển đổi số trong ngành dịch vụ cưới tại Việt Nam.
+2.2. Trend Research 
+Quá trình hoàn thiện ý tưởng được thực hiện dựa trên việc nghiên cứu các xu hướng nổi bật của thị trường cưới và hành vi tiêu dùng của thế hệ trẻ.
+2.2.1 Xu hướng chuyển đổi số trong ngành cưới
+Khách hàng ngày càng có xu hướng tìm kiếm, so sánh và đặt dịch vụ trực tuyến thay vì thông qua các mối quan hệ truyền thống hoặc môi giới trung gian. Việc số hóa toàn bộ hành trình chuẩn bị cưới trở thành nhu cầu thực tế của thị trường.
+2.2.2 Xu hướng cá nhân hóa trải nghiệm
+Các cặp đôi hiện đại không còn muốn sử dụng các mẫu cưới đại trà mà mong muốn được thiết kế đám cưới theo phong cách, sở thích và ngân sách riêng của mình. Điều này tạo cơ hội cho các nền tảng ứng dụng công nghệ AI trong việc gợi ý và cá nhân hóa dịch vụ.
+2.2.3. Xu hướng tiêu dùng dựa trên đánh giá thực tế
+Khách hàng ngày càng tin tưởng vào review xác thực từ người dùng thực tế hơn là quảng cáo từ doanh nghiệp. Điều này làm gia tăng vai trò của các hệ thống đánh giá định danh và cơ chế xác thực người dùng.
+2.2.4. Xu hướng trải nghiệm trực quan
+Người dùng mong muốn được xem trước không gian cưới thông qua hình ảnh thực tế, video, mô hình 3D hoặc công nghệ thực tế ảo trước khi đưa ra quyết định đặt dịch vụ.
+2.2.5. Xu hướng Mobile-first của Gen Z và Millennials
+Nhóm khách hàng mục tiêu chủ yếu là Gen Z và Millennials với hành vi tiêu dùng tập trung trên các nền tảng số như TikTok, Instagram, Pinterest và Facebook. Họ ưu tiên trải nghiệm nhanh, đơn giản, minh bạch và có khả năng thực hiện toàn bộ giao dịch ngay trên điện thoại.
+2.3. Market Research (Nghiên cứu thị trường)
+2.3.1. Nghiên cứu khách hàng B2C
+Khảo sát và phỏng vấn khách hàng cho thấy:
+Khoảng 65% khách hàng bắt đầu tìm kiếm dịch vụ cưới từ 3 đến 12 tháng trước ngày cưới.
+39,2% gặp khó khăn trong việc so sánh giá cả và chất lượng giữa các nhà cung cấp.
+32,5% lo ngại dịch vụ thực tế không giống với quảng cáo.
+Phần lớn khách hàng đều so sánh ít nhất 3 nhà cung cấp trước khi đưa ra quyết định cuối cùng.
+Khách hàng mong muốn:
+Giá cả minh bạch và hiển thị công khai.
+Có thể so sánh nhiều nhà cung cấp trên cùng một nền tảng.
+Có cơ chế giữ cọc và bảo vệ giao dịch.
+Được gợi ý phương án tối ưu theo ngân sách.
+Có thể quản lý toàn bộ quá trình chuẩn bị cưới trên một hệ thống duy nhất.
+2.3.2. Nghiên cứu khách hàng B2B
+Đối tượng nhà cung cấp chủ yếu là các doanh nghiệp vừa và nhỏ hoặc hộ kinh doanh cá thể hoạt động trong lĩnh vực: Decor cưới, rạp cưới, makeup, studio ảnh cưới, quay phim chụp ảnh, xe cưới, âm thanh ánh sáng.
+Những khó khăn chính của nhóm khách hàng này bao gồm:
+Thiếu nguồn khách hàng ổn định.
+Không có hệ thống quản lý khách hàng chuyên nghiệp.
+Chi phí marketing cao.
+Phụ thuộc vào giới thiệu truyền miệng hoặc mạng xã hội.
+2.3.3. Nghiên cứu đối thủ cạnh tranh
+Nhóm dự án tiến hành phân tích các đối thủ trong nước và quốc tế như: Marry.vn, VDES, Weddingbook, Zola, WeddingWire.
+Kết quả nghiên cứu cho thấy thị trường hiện vẫn còn thiếu một nền tảng có khả năng:
+Hiển thị giá minh bạch.
+Hỗ trợ đặt dịch vụ và thanh toán trực tuyến.
+Giữ tiền cọc và giải ngân theo tiến độ thực hiện.
+Ứng dụng AI trong việc gợi ý dịch vụ.
+Xác thực chất lượng nhà cung cấp bằng hình ảnh thực tế và đánh giá định danh.
+2.4. Project Objectives
+Mục tiêu ngắn hạn: 
+Xây dựng và triển khai phiên bản MVP tại Hà Nội.
+Hợp tác với các nhà cung cấp dịch vụ cưới địa phương.
+Kiểm chứng nhu cầu thị trường và tối ưu trải nghiệm người dùng.
+Mục tiêu trung hạn:
+Mở rộng thị trường sang TP.HCM, Đà Nẵng, Hải Phòng và các thành phố lớn khác.
+Tích hợp thêm nhiều dịch vụ vệ tinh như studio ảnh cưới, thuê xe cưới, makeup và wedding planner.
+Mục tiêu dài hạn: 
+Trở thành nền tảng công nghệ cưới hỏi hàng đầu Việt Nam với hệ sinh thái toàn diện bao gồm:
+Tìm kiếm và đặt dịch vụ cưới.
+Quản lý ngân sách cưới.
+Thiệp điện tử và quản lý khách mời.
+Thanh toán và giữ cọc an toàn.
+Quản lý tiến độ tổ chức cưới.
+Dịch vụ trăng mật và hậu cưới.
+Trong dài hạn, Trạm Hỷ hướng tới việc trở thành một Wedding Super App, thúc đẩy chuyển đổi số cho toàn bộ ngành dịch vụ cưới truyền thống tại Việt Nam và tạo ra một thị trường minh bạch, an toàn và hiệu quả hơn cho tất cả các bên tham gia.
+       III. MODEL CANVAS
+3. Customer Segments 
+3.1. Customer Segments
+Khách hàng mục tiêu của Trạm Hỷ là mô hình two-sided gồm cô dâu/chú rể (B2C) và nhà cung cấp dịch vụ cưới (B2B), với các đặc điểm cụ thể:
+Đối với nhóm B2C (Cô dâu, chú rể và bố mẹ có con chuẩn bị cưới )
+Độ tuổi và Tình trạng: Tập trung chủ yếu ở nhóm 18–30 tuổi, thuộc thế hệ Gen Z (chiếm 77,6%), trong đó nhóm chủ lực là 25-30 tuổi (44%). Nhóm Độc thân (36,4%) và Chuẩn bị kết hôn (38,2%). Ngoài ra, nhóm phụ huynh có con chuẩn bị cưới (45–60 tuổi) cũng là đối tượng quan trọng — thường là người nắm ngân sách chính và ra quyết định cuối cùng trong nhiều đám cưới tại Việt Nam.
+Nghề nghiệp và Hành vi chi tiêu: Đa phần là nhân viên văn phòng (36,8%) và kinh doanh tự do (33,8%), có thu nhập khá nhưng cực kỳ bận rộn. Họ sẵn sàng đầu tư cho đám cưới nhưng mong muốn chi tiêu hợp lý, minh bạch và nhận được giá trị tương xứng. Nhóm phụ huynh thường có ngân sách cao hơn nhưng ít quen với nền tảng số, ưu tiên tin tưởng vào lời giới thiệu từ người quen hơn là tự tìm kiếm online.
+Nhu cầu và Nỗi sợ: Khoảng 65% khách hàng bắt đầu tìm kiếm và đặt dịch vụ từ 3–12 tháng trước ngày cưới. Khó khăn nổi bật là khó so sánh chất lượng và giá cả (39,2%) và lo ngại dịch vụ thực tế không giống quảng cáo (32,5%). Riêng nhóm phụ huynh đặc biệt lo sợ bị "chặt chém" hoặc gặp nhà cung cấp không uy tín — đây chính là lý do cơ chế Tích xanh và review xác thực của Trạm Hỷ phát huy tác dụng với nhóm này.
+Đối với nhóm B2B (Nhà cung cấp dịch vụ cưới)
+Đối tượng: Bao gồm studio ảnh cưới, đơn vị trang trí (decor), makeup artist, váy cưới, nhà hàng tiệc cưới, xe cưới, quay phim – chụp ảnh và các nhà cung cấp địa phương.
+Nhu cầu và Hành vi: Phần lớn là các doanh nghiệp nhỏ và hộ kinh doanh cá thể, phụ thuộc nhiều vào giới thiệu truyền miệng và các mối quan hệ cá nhân để tìm kiếm khách hàng. Họ mong muốn có một nền tảng giúp tiếp cận nguồn khách hàng ổn định, tăng độ uy tín và giảm chi phí marketing, đồng thời hạn chế các vấn đề như khách hàng ép giá hoặc phát sinh yêu cầu ngoài thỏa thuận. 
+3.2.Value Proposition - Đức AnhGiá trị cốt lõi (USP) của Trạm Hỷ là kiến tạo một "Hệ sinh thái cưới: Tiết kiệm thời gian - Cá nhân hóa - Minh bạch - An toàn". Giá trị này được cung cấp song song, tạo ra mô hình Win-Win cho cả hai phía:
+Đối với Khách hàng (B2C - Cặp đôi Dâu Rể):
+Tiết kiệm thời gian tối đa (Time-saving & All-in-one): Cung cấp công cụ quản trị giúp dâu rể đi từ bước tìm cảm hứng, lập kế hoạch, so sánh báo giá đến chốt đơn chỉ trên một ứng dụng duy nhất. Đây là giải pháp hoàn hảo cho những cặp đôi bận rộn, giúp họ không phải tốn hàng tuần lễ để tự tìm kiếm và ghép nối các dịch vụ rời rạc.
+Bảo vệ tài chính linh hoạt (Milestone Payment): Thay vì giữ toàn bộ tiền, nền tảng áp dụng cơ chế thanh toán theo tiến độ. Khách hàng thanh toán thành nhiều đợt gắn với từng mốc thực hiện dịch vụ. Trạm Hỷ sẽ giữ lại một tỷ lệ nhỏ của khoản thanh toán cuối cùng như một khoản "bảo chứng chất lượng" cho đến khi dâu rể nghiệm thu xong, giúp bảo vệ an toàn cho dòng tiền mà vẫn đảm bảo tính khả thi.
+Cá nhân hóa bằng AI (AI-powered Matching): Không bán các gói cố định, hệ thống tự động phân rã ngân sách và gợi ý các combo dịch vụ "may đo" chuẩn xác theo số tiền khách hàng có, giúp họ không bị "vung tay quá trán".
+Minh bạch chất lượng (WYSIWYG - Nhìn sao nhận vậy): Yêu cầu nhà cung cấp tải ảnh cam thường thực tế tại hiện trường và chỉ mở cổng đánh giá (Review) cho những người đã có Booking ID thật, xóa bỏ hoàn toàn rào cản "treo đầu dê bán thịt chó".
+Đối với Đối tác cung cấp dịch vụ (B2B - SMEs, Nhà rạp địa phương):
+Giải phóng dòng tiền & Xóa rủi ro công nợ (Milestone Payment): Cơ chế thanh toán theo tiến độ cho phép đối tác được giải ngân một phần tiền cọc ngay khi xác nhận Booking để có nguồn lực chuẩn bị vật tư (đặt hoa, thuê nhân sự...). Cách tiếp cận này đáp ứng đúng nhu cầu dòng tiền thực tế của ngành cưới, đồng thời giúp nhà cung cấp không lo bị khách bùng cọc sát ngày hay bị các bên trung gian lớn "găm" công nợ.
+Tối ưu chi phí & Tăng trưởng doanh thu: Hạ rào cản gia nhập bằng việc không thu phí duy trì (chỉ thu hoa hồng 10-15% khi giao dịch thành công) và miễn phí 0% hoa hồng giai đoạn đầu. Giúp các hộ kinh doanh nhỏ lẻ dễ dàng tiếp cận tệp khách hàng trẻ mà không cần tự xây dựng website hay đội ngũ Marketing.
+3.3.Channels - Đức Anh
+Kênh tiếp cận (Channels)
+Đối tượng mục tiêu
+Vai trò chiến lược
+Nội dung triển khai thực tế
+Hệ sinh thái Nền tảng số
+(Website)
+B2C (Dâu rể) & B2B (Nhà cung cấp)
+Kênh giao dịch lõi, nơi cung cấp trải nghiệm dịch vụ "All-in-one" và quản lý dòng tiền.
+- Với B2C: Hoạt động như "trợ lý cưới ảo", cung cấp công cụ Digital Planning, tư vấn AI, tìm kiếm dịch vụ và thanh toán an toàn.
+- Với B2B: Cung cấp Website để nhà rạp quản lý lịch trình, chốt đơn, đăng tải ảnh thực tế và đối soát doanh thu sòng phẳng.
+Mạng xã hội & Cộng đồng
+(Facebook, TikTok, Pinterest, Instagram, Threads )
+B2C (Gen Z & Millennials trẻ)
+Kênh truyền thông tạo phễu (Funnel), truyền cảm hứng và gia tăng nhận diện thương hiệu.
+- Sử dụng thế mạnh Visual (hình ảnh/video) trên TikTok, Pinterest, Instagram, Threads  để thu hút khách hàng trẻ.
+- Xây dựng cộng đồng (Groups) trên Facebook để chia sẻ kinh nghiệm cưới, hiển thị Verified Reviews và tung các đợt AI Flash Sale.
+Mạng lưới Sales thực địa
+(Local Direct Sales)
+B2B (SMEs, Studio, Nhà rạp địa phương)
+Kênh tiếp cận trực tiếp giúp mở rộng mạng lưới đối tác và kiểm soát rủi ro chất lượng.
+Đội ngũ Sales địa phương trực tiếp đi thẩm định, hướng dẫn (onboard) các nhà cung cấp lên sàn, đồng thời bám sát hiện trường thi công để đảm bảo nhà rạp thực hiện đúng cam kết trên app.
+Marketing truyền miệng
+(Word-of-Mouth & Referral)
+B2C (Khách hàng chuẩn bị cưới)
+Kênh tăng trưởng tự nhiên dựa trên niềm tin (High-trust), giúp tối ưu chi phí chuyển đổi (CAC).
+Tận dụng cơ chế an toàn từ "Milestone Payment" để tạo ra trải nghiệm vượt kỳ vọng. Biến chính những dâu rể đã cưới thành công thành "đại sứ thương hiệu" đi giới thiệu ứng dụng cho bạn bè, người thân của họ.
+3.4.Customer Relationship - Duy Quang
+Trạm Hỷ xây dựng mối quan hệ dựa trên vai trò "Trọng tài thẩm định" — bảo vệ niềm tin cho cả hai phía:
+Cá nhân hóa trải nghiệm: Tính năng AI Budget Allocator cho phép khách nhập ngân sách, hệ thống tự động chia nhỏ và gợi ý combo dịch vụ phù hợp — không cần tự mò từng nhà cung cấp. Tư vấn qua Zalo giúp lưu lại toàn bộ lịch sử trao đổi, tránh bị làm phiền bởi sale gọi điện liên tục.
+Xây dựng niềm tin: Milestone Payment chia nhỏ thanh toán thành nhiều đợt gắn với từng mốc thực hiện dịch vụ — trả từng phần khi nhà cung cấp hoàn thành đúng cam kết — hết lo bị bùng hoặc mất trắng tiền cọc. "Tích xanh" yêu cầu nhà cung cấp đăng ảnh thực tế (không photoshop), chỉ cho phép khách đã đặt dịch vụ thật mới được để lại đánh giá — hết lo "ảnh mạng một kiểu, thực tế một kiểu".
+Gắn kết qua cộng đồng: Xây dựng thương hiệu dựa trên review thật từ người dùng thật, đúng kiểu "tiếng lành đồn xa" của ngành cưới — chứ không chỉ là một web tìm kiếm dịch vụ thuần túy.
+Chăm sóc sau dịch vụ: Thanh toán cho nhà cung cấp đúng hạn ngay khi hoàn thành, thu thập đánh giá hai chiều sau mỗi đơn để cải thiện liên tục — cả khách lẫn vendor đều được bảo vệ.
+Chương trình Early Bird & Referral: Ưu đãi cho khách đặt sớm trước 3-6 tháng — hiệu quả gấp đôi giảm giá thông thường (54,2% so với 27,5%) vì khách cảm thấy mình chi tiêu thông minh chứ không phải vì hàng rẻ. Nhà cung cấp mới được onboard qua giới thiệu trong nghề, tận dụng uy tín sẵn có thay vì tốn chi phí tìm kiếm.
+3.5.Key Resource - Dũng
+Nguồn lực của Trạm Hỷ được xây dựng theo mô hình khởi nghiệp công nghệ tinh gọn. Thay vì phải đầu tư nguồn vốn lớn vào tài sản cố định như xây dựng phim trường, mở cửa hàng lớn hay mua sắm số lượng lớn váy cưới và đạo cụ, dự án tập trung phần lớn nguồn lực vào hạ tầng công nghệ, dữ liệu đối tác và đội ngũ nhân sự vận hành linh hoạt để tối ưu hóa chi phí đầu tư ban đầu.
+Nhóm nguồn lực
+Thành phần cụ thể
+Tính chất
+Vai trò đối với dự án
+Công nghệ và Dữ liệu
+Website, ứng dụng cho nhà cung cấp, công cụ gợi ý ngân sách cưới (AI), hệ thống giữ tiền cọc và kho dữ liệu thông tin khách hàng.
+Vô hình (Hạ tầng số)
+Là nền tảng cốt lõi giúp kết nối hai bên dâu rể và nhà cung cấp, giúp khách hàng tự tra cứu và chọn dịch vụ dễ dàng.
+Con người
+Thành viên phụ trách kỹ thuật (IT), đội ngũ tiếp thị trực địa (Local Sales) và nhân sự chăm sóc khách hàng.
+Vô hình (Kỹ năng, chuyên môn)
+Đội ngũ trực địa giúp kiểm tra, xác thực năng lực thực tế của nhà rạp/studio để đảm bảo uy tín của website.
+Thương hiệu và Quy trình
+Danh sách đối tác đã kiểm duyệt (gắn Tích xanh), quy trình đối soát tiền hoa hồng và niềm tin từ cộng đồng cặp đôi.
+Vô hình
+Tạo độ tin cậy cho nền tảng; khi hệ thống có càng nhiều đối tác tốt sẽ càng thu hút thêm nhiều cặp đôi đăng ký.
+Tài sản và Thiết bị làm việc
+Máy tính, máy in, thiết bị chụp ảnh cơ bản, bộ ấn phẩm mẫu (thiệp mẫu, bảng QR mẫu) và văn phòng phẩm.
+Hữu hình (Tài sản vật lý)
+Là công cụ làm việc hàng ngày của nhóm và là vật phẩm trực tiếp gửi đến các cửa hàng để chào hàng, tiếp cận khách.
+Tài chính
+Vốn đầu tư ban đầu, dòng tiền duy trì hệ thống quảng cáo, server và quỹ dự phòng xử lý sự cố.
+Hữu hình
+Đảm bảo hệ thống duy trì hoạt động ổn định và chạy quảng cáo liên tục trong những tháng đầu chưa có lãi.
+Việc phân bổ nguồn lực này cho thấy Trạm Hỷ thế hiện rõ ưu điểm của một mô hình kinh doanh dịch vụ trung gian. Bằng cách không tự sở hữu kho bãi hay nguyên vật liệu phông bạt nặng nề, nhóm có thể giữ cho bộ máy nhân sự nhỏ gọn và giảm thiểu áp lực gánh nặng chi phí cố định hàng tháng. Toàn bộ nguồn vốn sẽ được tập trung vào việc tối ưu hóa trải nghiệm tiện lợi trên website và xây dựng mạng lưới cửa hàng liên kết rộng rãi, giúp dự án nhanh chóng tiếp cận thị trường và đạt điểm hòa vốn an toàn.
+3.6.Key Activity - Dũng
+Nhóm hoạt động
+Nội dung công việc cụ thể
+Vai trò đối với dự án
+Tác động đến việc cạnh tranh
+Xây dựng, phát triển và vận hành nền tảng công nghệ
+Xây dựng và duy trì hệ thống Website hoạt động ổn định, tải nhanh.
+Phát triển bộ công cụ tính toán và gợi ý gói dịch vụ theo ngân sách của khách (AI Budget Allocator).
+Vận hành các tính năng: tạo mã QR chuyển khoản, thiệp điện tử, sổ ký tên online và nhắn tin tự động nhắc lịch cưới (RSVP).
+Giúp khách hàng tự chọn dịch vụ, tính toán chi phí nhanh chóng và thao tác mọi lúc mọi nơi trên một nền tảng duy nhất.
+Tạo sự tiện lợi vượt trội cho các cặp đôi trẻ thích công nghệ, điều mà các bên làm cưới truyền thống chưa tập trung làm bài bản.
+Quản lý dòng tiền đặt cọc
+Tiếp nhận tiền đặt cọc từ cô dâu/chú rể qua cổng thanh toán online.
+Thanh toán theo từng mốc tiến độ — Trạm Hỷ chỉ giải ngân từng phần cho nhà rạp/studio khi khách xác nhận hoàn thành đúng cam kết tại mỗi giai đoạn (Cơ chế Milestone Payment).
+Khấu trừ phần trăm hoa hồng thương mại (10-15%) trước khi thanh toán cho bên đối tác.
+Đảm bảo an toàn tiền bạc cho khách hàng, giúp họ không lo bị lừa đảo hoặc mất tiền cọc trước ngày cưới.
+Xây dựng niềm tin lớn cho người dùng, giải quyết trực tiếp nỗi sợ lớn nhất của khách khi đi đặt dịch vụ cưới hỏi.
+Tìm kiếm và kiểm duyệt đối tác (Vendors)
+Tìm kiếm, đàm phán và ký hợp đồng hợp tác với các bên cung cấp dịch vụ: Studio chụp ảnh, váy cưới, trang trí, makeup, nhà rạp...
+Kiểm tra năng lực thực tế và đưa bảng giá, hình ảnh sản phẩm của họ lên website.
+Gắn "Tích xanh" xác thực cho những đối tác cam kết làm đúng như ảnh chụp thực tế (WYSIWYG).
+Xây dựng danh mục dịch vụ đa dạng, nhiều mức giá để khách hàng dễ dàng so sánh và lựa chọn.
+Loại bỏ tình trạng quảng cáo sai sự thật, giúp khách hàng yên tâm chọn được bên làm dịch vụ đúng với nhu cầu.
+Tiếp thị trực tiếp tại cửa hàng đối tác (Offline)
+In ấn và đặt các bảng mã QR cứng, chân đế gỗ hoặc standee giới thiệu tại bàn lễ tân của các studio, tiệm váy đối tác.
+Đưa ra mức thưởng và hướng dẫn nhân viên tại cửa hàng đối tác cách giới thiệu khách hàng trải nghiệm Trạm Hỷ.
+Tiếp cận trực tiếp những cặp đôi đang đi xem váy, chụp ảnh cưới để mời họ dùng thử dịch vụ của mình.
+Tận dụng được uy tín sẵn có của các cửa hàng lớn để khách hàng tin tưởng Trạm Hỷ nhanh hơn mà không tốn tiền thuê mặt bằng.
+Quảng cáo trên mạng xã hội (Online)
+Chạy quảng cáo trên Facebook, TikTok nhắm vào những người đang chuẩn bị kết hôn tại khu vực mục tiêu.
+Đăng tải các bài viết chia sẻ kinh nghiệm cưới, các đánh giá (review) thực tế từ những cặp đôi đã dùng dịch vụ.
+Thu hút người dùng trên mạng biết đến website Trạm Hỷ, tạo ra lượng khách hàng đều đặn.
+Càng nhiều khách hàng truy cập sử dụng thì càng có nhiều nhà cung cấp muốn tham gia vào hệ thống để bán dịch vụ.
+Chuẩn bị vật phẩm và chăm sóc khách hàng
+Đặt hàng xưởng in làm các bảng QR để bàn, phôi thiệp cứng bàn giao cho khách (nếu khách chọn gói có vật phẩm đi kèm).
+Hỗ trợ kỹ thuật, hướng dẫn khách dùng thiệp/QR và đứng ra xử lý các khiếu nại, tranh chấp giữa khách với nhà cung cấp (nếu có).
+Đảm bảo các sản phẩm vật lý đạt chất lượng tốt, giao đúng hạn; đồng hành xử lý các vấn đề phát sinh của khách.
+Làm tăng mức độ hài lòng của khách, khiến họ chủ động giới thiệu, truyền miệng dịch vụ cho bạn bè và người thân dùng theo.
+Trạm Hỷ hoạt động theo mô hình sàn kết nối trung gian. Dự án sẽ không tự sắm sửa bàn ghế phông bạt, không mở phim trường hay tự may váy cưới để tránh tốn kém chi phí đầu tư lớn. Thay vào đó, toàn bộ công việc hàng ngày của nhóm sẽ tập trung vào: vận hành website ổn định, đi tìm kiếm và kiểm tra chất lượng các nhà cung cấp dịch vụ, và làm marketing (cả trên mạng lẫn tại cửa hàng) để mang khách về. Cách làm này giúp bộ máy nhân sự của nhóm cực kỳ gọn nhẹ, ít rủi ro về vốn và dễ dàng tăng quy mô số lượng đơn hàng lên khi dự án phát triển.
+3.7.Key Partners - Tâm
+Trạm Hỷ tập trung xây dựng mạng lưới đối tác nhằm kết nối các nhà cung cấp dịch vụ cưới với khách hàng trên cùng một hệ thống. Các đối tác không chỉ tham gia cung cấp dịch vụ mà còn hỗ trợ nền tảng về công nghệ, thanh toán, sản xuất và mở rộng kênh tiếp cận khách hàng. Sự phối hợp giữa các nhóm đối tác giúp Trạm Hỷ hoàn thiện hệ sinh thái dịch vụ cưới, nâng cao trải nghiệm người dùng và tạo nền tảng cho sự phát triển lâu dài. 
+Nhóm đối tác
+Thành phần cụ thể
+Vai trò
+Gía trị chiến lược
+Nhà cung cấp dịch vụ cưới (Wedding Vendors) 
+Studio ảnh cưới, nhà rạp, đơn vị trang trí (decor), makeup artist, váy cưới, quay phim – chụp ảnh, MC, ban nhạc, dịch vụ xe cưới, thiệp cưới,... 
+Cung cấp dịch vụ cưới trực tiếp cho khách hàng trên nền tảng; cập nhật báo giá, lịch trống và portfolio thực tế.
+Tạo nguồn cung dịch vụ đa dạng, giúp Trạm Hỷ xây dựng hệ sinh thái cưới All-in-one và tạo hiệu ứng mạng lưới (Network Effect).
+Đối tác thanh toán & tài chính 
+Ngân hàng, ví điện tử, cổng thanh toán trực tuyến (VNPay, MoMo, ZaloPay,...). 
+Hỗ trợ xử lý giao dịch, đối soát dòng tiền giữa khách hàng và nhà cung cấp.
+Gia tăng tính minh bạch, bảo vệ tiền cọc của khách hàng và tạo niềm tin cho cả hai bên tham gia nền tảng.
+Đối tác công nghệ 
+Nhà cung cấp Hosting/ Cloud, SMS, Email, AI và hệ thống bảo mật
+Cung cấp hạ tầng kỹ thuật, hỗ trợ vận hành website, ứng dụng, lưu trữ dữ liệu và triển khai các tính năng AI.
+Đảm bảo hệ thống hoạt động ổn định, có khả năng mở rộng nhanh với chi phí thấp theo mô hình Lean Startup.
+Đối tác sản xuất & in ấn 
+Xưởng in thiệp cưới, đơn vị sản xuất bảng QR, standee, vật phẩm nhận diện thương hiệu. 
+Gia công và cung cấp các sản phẩm vật lý đi kèm dịch vụ số của Trạm Hỷ. 
+Hoàn thiện trải nghiệm khách hàng, kết hợp hiệu quả giữa nền tảng số và các sản phẩm thực tế trong đám cưới. 
+ Đối tác địa phương & điểm bán 
+Studio cưới, tiệm váy cưới, cửa hàng vàng bạc, nhà hàng tiệc cưới, trung tâm hội nghị
+Đặt standee QR, giới thiệu khách hàng và hỗ trợ triển khai các chương trình hợp tác Offline.
+Giúp Trạm Hỷ tiếp cận trực tiếp khách hàng có nhu cầu thực tế, gia tăng độ tin cậy và tỷ lệ chuyển đổi.
+Bảng 7.1. Các nhóm đối tác chính của Trạm Hỷ 
+Mỗi nhóm đối tác đều đảm nhận một vai trò khác nhau nhưng có mối liên kết chặt chẽ trong việc tạo ra giá trị cho Trạm Hỷ. Trong đó, các nhà cung cấp dịch vụ cưới là nguồn lực cốt lõi để hình thành hệ sinh thái All-in-one; đối tác công nghệ và thanh toán đảm bảo nền tảng vận hành ổn định, an toàn và minh bạch; còn các đối tác sản xuất, in ấn và điểm bán địa phương giúp mở rộng khả năng tiếp cận khách hàng cũng như nâng cao trải nghiệm dịch vụ. Việc xây dựng mạng lưới đối tác đa dạng không chỉ giúp Trạm Hỷ tối ưu nguồn lực và giảm chi phí đầu tư ban đầu mà còn tạo lợi thế cạnh tranh thông qua khả năng kết nối và cung cấp giải pháp cưới toàn diện.
+IV. PRODUCT COST - Huyền Trang
+4.1.Revenue Streams 
+Nguồn doanh thu
+Đối tượng trả phí
+Cách thu
+Vai trò chiến lược
+Hoa hồng theo booking thành công
+Nhà cung cấp dịch vụ cưới: nhà rạp, decor, studio, makeup, váy cưới, mâm quả …
+Trạm Hỷ thu 10–15% giá trị hợp đồng sau khi khách xác nhận nghiệm thu; khoản hoa hồng được tách rõ trong cơ chế Milestone Payment.
+Là dòng doanh thu lõi, gắn trực tiếp với giá trị nền tảng tạo ra: mang khách hàng thật, giảm rủi ro bùng cọc và hỗ trợ đối soát minh bạch.
+Gói hiển thị nâng cao cho vendor
+Vendor muốn tăng nhận diện hoặc nhận nhiều lead hơn
+Gói trả phí theo tháng/quý để được ưu tiên vị trí tìm kiếm, gắn nhãn “Vendor nổi bật”, xuất hiện trong các combo AI hoặc chiến dịch theo mùa cưới.
+Tạo doanh thu định kỳ; không thay thế chất lượng dịch vụ mà chỉ tăng khả năng tiếp cận khách hàng phù hợp.
+Dịch vụ số gia tăng cho B2C
+Cặp đôi có nhu cầu cá nhân hóa cao
+Thu phí tùy chọn đối với các tiện ích như thiết kế thiệp cưới điện tử nâng cao, website cưới cá nhân, checklist premium, quản lý khách mời hoặc tư vấn wedding planner đối tác.
+Là nguồn thu bổ trợ ở giai đoạn mở rộng; không làm ảnh hưởng định vị “dễ tiếp cận” của nền tảng ở giai đoạn MVP.
+Trong giai đoạn MVP tại Hà Nội, Trạm Hỷ sẽ ưu tiên hoa hồng booking thành công làm nguồn thu chính. Điều này phù hợp hơn với các nhà cung cấp nhỏ lẻ vốn e ngại chi phí marketing cố định, đồng thời giúp nền tảng chứng minh hiệu quả trước khi mở rộng sang gói hiển thị. Cơ chế hoa hồng sẽ gắn với nghiệm thu và đối soát rõ ràng để giải quyết rủi ro công nợ
+4.2.Cost Revenue: 
+Trạm Hỷ vận hành theo mô hình nền tảng công nghệ kết nối (Two-sided Marketplace) giữa cặp đôi dâu rể (B2C) và hệ sinh thái các nhà cung cấp dịch vụ cưới hỏi (B2B). Triết lý quản trị tài chính của dự án tuân thủ nghiêm ngặt mô hình tinh gọn (Lean Startup). Theo đó, Trạm Hỷ tập trung tối ưu hóa để giữ chi phí cố định (Fixed Costs) ở mức tối thiểu, đồng thời phân bổ nguồn lực vào chi phí biến đổi (Variable Costs) gắn liền với hiệu quả tạo doanh thu. Điều này giúp doanh nghiệp giảm thiểu rủi ro vận hành trong giai đoạn đầu và đạt được hiệu quả kinh tế theo quy mô (Economies of Scale).
+4.2.1.Chi phí đầu tư ban đầu (Initial Investment)
+Đây là các khoản chi phí một lần phát sinh trước khi nền tảng chính thức đi vào hoạt động nhằm xây dựng cơ sở hạ tầng công nghệ và thiết lập sự hiện diện thương hiệu trên thị trường:
+STT
+Hạng mục chi phí
+Ngân sách ước tính (VNĐ)
+Ghi chú bài toán tài chính
+1
+Hạ tầng Công nghệ & Số hóa
+12.000.000 - 18.000.000
+Xây dựng Website/Landing Page; Tích hợp công cụ AI Budget Calculator & bộ lọc thông minh; Phí Domain, Hosting và Email doanh nghiệp.
+2
+Sales Kit & Ấn phẩm điểm bán
+15.000.000 - 25.000.000
+Thiết kế bộ nhận diện (Logo, profile); Sản xuất công cụ thực địa cho Direct Sales (bảng mã QR mica mẫu, phôi thiệp, catalogue mẫu).
+3
+Thiết bị & Pháp lý ban đầu
+38.000.000 - 45.000.000
+Chi phí đăng ký doanh nghiệp, bản quyền thương hiệu; Trang bị phần cứng vận hành cơ bản (Laptop, máy in, máy ảnh kiểm định).
+4
+Vốn dự phòng ban đầu
+20.000.000 - 32.000.000
+Quỹ dự phòng dòng tiền mặt để xử lý các chi phí phát sinh ngoài kế hoạch trước ngày ra mắt.
+Tổng
+Tổng chi phí đầu tư ban đầu
+~ 85.000.000 - 120.000.000
+Chi trả 1 lần duy nhất trước khi sản phẩm ra mắt thị trường.
+4.4.2.Chi phí Marketing & Truyền thông (Marketing Costs)
+Thay vì liệt kê ngân sách Marketing độc lập, Trạm Hỷ gắn liền chi phí này với logic phễu chuyển đổi tài chính (Chi phí bỏ ra phải mang lại bao nhiêu đơn hàng và doanh thu tương ứng để đảm bảo điểm hòa vốn):
+STT
+Hạng mục chi phí
+Ngân sách/Tháng (VNĐ)
+Định hướng mục tiêu KPI & Logic chuyển đổi
+1
+Quảng cáo trực tuyến (Paid Ads)
+6.000.000 - 8.000.000
+Tập trung chạy Ads (FB/TikTok) tối ưu chuyển đổi. Đẩy mạnh "Hook Feature" (Tạo thiệp điện tử/QR mừng cưới miễn phí) để thu hút hàng ngàn khách hàng tiềm năng bận rộn với chi phí tối thiểu.
+2
+Sản xuất Nội dung & POSM
+3.500.000 - 8.000.000
+Xây dựng kho nội dung video/hình ảnh thực tế thi công đám cưới (WYSIWYG); In ấn bổ sung standee, bảng QR mica phân phối đến các điểm bán của Vendor chiến lược.
+3
+Kích hoạt mạng lưới đối tác
+3.000.000 - 5.000.000
+Tổ chức các buổi Workshop nhỏ, chương trình kết nối offline với các chủ Studio, nhà rạp tại địa phương nhằm xây dựng niềm tin hệ thống.
+Tổng
+Tổng chi phí Marketing/Tháng
+~ 12.500.000 - 21.000.000
+Mục tiêu chuyển đổi tài chính:
+• Mùa thấp điểm: Đạt 15 - 20 bookings/tháng.
+• Mùa cao điểm: Đạt 35 - 50 bookings/tháng.
+→ Chiết khấu hoa hồng 10% - 15% thu về từ Vendor trên mỗi combo chốt thành công sẽ hoàn toàn bù đắp khoản chi này và tạo dòng tiền dương.
+4.2.3.Chi phí Vận hành cố định & Dự phòng (Operations & Contingency)
+Nhóm chi phí bắt buộc để duy trì bộ máy vận hành ổn định, được tối ưu theo mô hình Asset-light (không sở hữu tài sản vật lý) để giảm áp lực dòng tiền:
+STT
+Hạng mục chi phí
+Ngân sách/Tháng (VNĐ)
+Ghi chú chức năng vận hành
+1
+Phần mềm & Nền tảng quản lý
+2.000.000 - 3.000.000
+Chi phí bản quyền định kỳ cho hệ thống CRM chăm sóc khách hàng, các công cụ thiết kế và quản lý tác vụ.
+2
+Hành chính & CSKH trực tuyến
+2.500.000 - 3.000.000
+Chi phí duy trì hệ thống hotline, internet, văn phòng phẩm và các công cụ liên lạc hỗ trợ tư vấn 24/7.
+3
+Thực địa & Phát triển đối tác
+2.000.000 - 3.000.000
+Chi phí di chuyển, networking của đội ngũ Direct Sales khi đi khảo sát thực tế và dán "Tích xanh xác thực" tại nhà rạp, studio.
+4
+Quỹ dự phòng vận hành
+1.000.000 - 2.000.000
+Khoản ngân sách trích lập hàng tháng để xử lý các sự cố kỹ thuật phát sinh hoặc bồi thường rủi ro hệ thống (nếu có).
+Tổng
+Tổng định phí vận hành/Tháng
+~ 7.500.000 - 11.000.000
+Duy trì ở mức tối thiểu để đảm bảo ngay cả khi số lượng bookings biến động theo mùa cưới, nền tảng vẫn an toàn tài chính.
+4.2.4. Chi phí Biến đổi trên 1 đơn hàng (Variable Cost per Booking)
+Nhóm chi phí này gắn liền 100% với doanh thu; không có đơn hàng sẽ không phát sinh chi phí, giúp loại bỏ hoàn toàn rủi ro găm vốn:
+STT
+Hạng mục chi phí
+Mức chi dự kiến
+Ghi chú bản chất kinh tế
+1
+Hoa hồng đối tác giới thiệu
+3% - 6% doanh thu đơn hàng
+Chi trả cho các đơn vị trong hệ sinh thái (ví dụ: Studio giới thiệu khách đặt tráp cưới/nhà rạp qua sàn và ngược lại).
+2
+Sản xuất sản phẩm vật lý
+200.000 VNĐ / đơn hàng
+Chi phí in ấn phôi thiệp cưới vật lý thiết kế riêng, làm bảng QR động mica cá nhân hóa cho từng cặp đôi.
+3
+Phí xử lý giao dịch tài chính
+1% - 2% giá trị giao dịch
+Phí cổng thanh toán trực tuyến phát sinh 
+4
+Quà tặng & Trải nghiệm khách hàng
+50.000 - 100.000 VNĐ / đơn hàng
+Chi phí thiệp cảm ơn, quà lưu niệm nhỏ gửi kèm khi nghiệm thu dịch vụ đám cưới thành công.
+Tổng
+Tổng biến phí trên mỗi đơn hàng
+4% - 8% Doanh thu +
+250.000 - 300.000 VNĐ / đơn
+Gắn chặt với doanh thu thực tế. Khi quy mô booking tăng, tổng biến phí tăng nhưng biên lợi nhuận gộp trên mỗi đơn luôn được bảo toàn.
+4.2.5. Bảng Tổng hợp Chi phí (Summary Table)
+Bảng tổng hợp giúp ban quản trị có cái nhìn toàn diện về bức tranh dòng tiền của dự án Trạm Hỷ theo tần suất phát sinh:
+Loại chi phí
+Ngân sách ước tính (VNĐ)
+Tần suất phát sinhquan Doanh
+Logic vận hành & Tương  thu
+Chi phí đầu tư ban đầu
+85.000.000 - 120.000.000
+Một lần duy nhất
+Xây dựng nền tảng cốt lõi và Sales Kit để tiếp cận thị trường.
+Chi phí Marketing & Truyền thông
+12.500.000 - 21.000.000
+Hàng tháng
+Chi phí biến đổi linh hoạt nhằm chuyển đổi ra KPI tối thiểu từ 15 đến 50 đơn hàng/tháng tùy theo mùa cưới.
+Chi phí Vận hành cố định & Dự phòng
+7.500.000 - 11.000.000
+Hàng tháng
+Định phí tối thiểu để duy trì hệ thống trực tuyến và đội ngũ Direct Sales thực địa.
+Chi phí biến đổi (Variable Cost)
+4% - 8% Doanh thu +
+250.000 - 300.000 VNĐ / đơn
+Theo từng đơn hàng
+Phát sinh trực tiếp dựa trên hợp đồng thành công, bảo vệ dòng tiền không bị gián đoạn hoặc đọng vốn.
+Bằng cách thiết lập cấu trúc chi phí này, trong giai đoạn đầu (MVP), dòng tiền của Trạm Hỷ sẽ tập trung tối đa cho hoạt động tiếp thị để thu hút người dùng. Khi số lượng bookings vượt qua điểm hòa vốn (dự kiến chỉ cần đạt từ 10 - 12 đơn hàng/tháng để bù đắp toàn bộ định phí vận hành và Marketing), mô hình sẽ bắt đầu tạo ra lợi nhuận ròng thặng dư cao nhờ đòn bẩy công nghệ, chứng minh tính khả thi của một Wedding Tech Platform tại thị trường Việt Nam.
+V. MVP - Minh Châu
+5.1. Định nghĩa & Mục tiêu MVP
+Trạm Hỷ được phát triển theo mô hình Lean Startup (tinh gọn), với chiến lược triển khai MVP tập trung vào một thị trường trọng điểm trước khi nhân rộng quy mô. Mục tiêu của giai đoạn MVP là:
+Kiểm chứng nhu cầu thực tế của cả hai phía khách hàng (B2C) và nhà cung cấp (B2B)
+Thu thập phản hồi để tối ưu hóa hệ thống booking và thanh toán (Milestone Payment)
+Xây dựng tệp khách hàng và mạng lưới đối tác đầu tiên với chi phí và rủi ro tối thiểu
+Chứng minh tính khả thi tài chính của mô hình (điểm hòa vốn, thời gian hoàn vốn) trước khi mở rộng toàn quốc
+5.2. Phạm vi triển khai MVP
+Thị trường thí điểm: Hà Nội
+Lý do chọn Hà Nội
+Diễn giải
+Nhu cầu cưới hỏi lớn và ổn định
+Một trong hai thành phố lớn nhất VN, số lượng đám cưới tổ chức hàng năm rất cao, ổn định quanh năm
+Tập trung nhiều nhà cung cấp
+Hệ sinh thái phát triển mạnh: studio ảnh cưới, đơn vị decor, makeup artist, váy cưới, nhà hàng tiệc cưới, xe cưới, quay phim – chụp ảnh
+Dễ kiểm thử và tối ưu
+Kiểm tra nhu cầu thực tế, thu thập phản hồi, đánh giá hiệu quả hệ thống booking/thanh toán trước khi mở rộng
+Khả năng mở rộng trong tương lai
+Bàn đạp để nhân rộng sang TP.HCM, Hải Phòng, Đà Nẵng, Cần Thơ
+Đối tượng ưu tiên trong MVP:
+B2C: Cặp đôi Gen Z & Millennials trẻ (18–30 tuổi), tập trung nhóm 25–30 tuổi, sống tại đô thị, độc thân hoặc chuẩn bị kết hôn; kèm theo nhóm phụ huynh (45–60 tuổi) giữ vai trò quyết định ngân sách.
+B2B: Studio ảnh cưới, đơn vị trang trí (decor), makeup artist, cửa hàng váy cưới, nhà hàng tiệc cưới — ưu tiên các hộ kinh doanh nhỏ lẻ tại Hà Nội, onboard 15–20 vendor đạt chuẩn "Tích xanh" trong giai đoạn đầu.
+Dịch vụ ưu tiên đưa lên nền tảng ở giai đoạn đầu:
+Studio ảnh cưới
+Trang trí (decor) tiệc cưới
+Makeup & váy cưới
+Nhà hàng tiệc cưới
+(Các dịch vụ mở rộng như xe cưới, quay phim, wedding planner sẽ được tích hợp ở Giai đoạn 2 — sau khi MVP ổn định)
+5.3. Tính năng cốt lõi trong MVP
+Tính năng
+Mô tả
+Website Marketplace
+Danh sách vendor, công cụ so sánh giá và báo giá minh bạch
+AI Budget Allocator
+Khách nhập ngân sách → hệ thống tự động phân bổ và gợi ý combo dịch vụ phù hợp
+Milestone Payment
+Thanh toán theo tiến độ, giải ngân từng phần khi vendor hoàn thành đúng cam kết — bảo vệ dòng tiền cho cả hai phía
+Tích xanh (WYSIWYG)
+Vendor bắt buộc đăng ảnh thực tế (không photoshop); chỉ khách đã có Booking ID thật mới được đánh giá
+Tư vấn qua Zalo OA
+Lưu lịch sử trao đổi, tránh bị sale gọi điện làm phiền
+Cổng thanh toán online
+Tích hợp ví điện tử (MoMo, ZaloPay, VNPay) để nhận cọc và đối soát minh bạch
+Portal cho Vendor
+Quản lý lịch trình, chốt đơn, đăng ảnh thực tế và đối soát doanh thu
+5.4. Chiến lược triển khai MVP
+Vì rào cản lớn nhất ở phía cung là các chủ cơ sở lớn tuổi quen giao dịch tiền mặt, e ngại công nghệ phức tạp, Trạm Hỷ áp dụng 3 chiến lược tháo gỡ:
+Zero-learning curve: Portal cho vendor thiết kế "nhìn là biết dùng", thao tác tương tự Zalo — công cụ mà hầu hết chủ cơ sở đã quen dùng hàng ngày.
+Cầm tay chỉ việc (Direct Onboarding): Đội ngũ Sales địa phương trực tiếp xuống thẩm định, hỗ trợ vendor số hóa hồ sơ: chụp ảnh sản phẩm thực tế, chuẩn hóa bảng giá, hướng dẫn nhận đơn và quản lý tiền cọc.
+Đòn bẩy kinh tế (0% Commission): Miễn phí hoa hồng nền tảng trong giai đoạn đầu ra mắt — chiến thuật "chứng minh giá trị trước, thu phí sau" để xây dựng lòng tin và thói quen sử dụng, trước khi áp dụng mức hoa hồng chuẩn 10–15%.
+Song song đó, đội ngũ Direct Sales sẽ kiểm định chất lượng thi công thực tế tại Hà Nội trong suốt giai đoạn MVP, đảm bảo cam kết WYSIWYG được thực thi nghiêm túc — đây là yếu tố sống còn để giữ niềm tin ngay từ những khách hàng đầu tiên.
+5. Chỉ tiêu thành công của MVP (Success Metrics)
+Dựa trên mô hình tài chính đã xây dựng cho giai đoạn MVP tại Hà Nội:
+Chỉ tiêu
+Mục tiêu MVP
+Điểm hòa vốn (Break-even)
+~55 đơn hàng/tháng để bù đắp định phí vận hành + marketing (32.416.666 VNĐ/tháng ÷ 590.000 VNĐ lợi nhuận gộp/đơn)
+Booking mùa thấp điểm
+15–20 đơn/tháng
+Booking mùa cao điểm
+35–50 đơn/tháng
+Sản lượng mục tiêu khi vận hành ổn định
+80 đơn/tháng
+Doanh thu hàng tháng (ở mức ổn định)
+~120.000.000 VNĐ/tháng
+Lợi nhuận ròng hàng tháng
+~14.783.334 VNĐ/tháng
+Vốn đầu tư ban đầu
+~102.500.000 VNĐ (trung bình khoảng 85–120 triệu)
+Thời gian hoàn vốn dự kiến
+~7 tháng
+Mô tả dự án ngắn gọn
+                      MÔ TẢ DỰ ÁN 
+          THÔNG TIN TỔNG QUAN
+Subject: EXE101 
+Topic: Trạm Hỷ
+Class: SE1936-NET
+Lecture: Đoàn Thị Thanh Hương
+Tên nhóm: Group 5
+Mentor: Bùi Mai Phương
+THÔNG TIN THÀNH VIÊN
+1. Trần Huyền Trang - HS194065
+2. Lê Minh Châu - HS186348
+3. Nguyễn Thị Thanh Tâm - HE180879
+4. Nguyễn Duy Quang - HE181202
+5. Phùng Đức Anh - HE182553
+6. Tô Văn Tiến Dũng - HE182025
+MỤC LỤC
+I. VỀ TRẠM HỶ4
+1.1. Giới thiệu4
+1.2. Tầm nhìn4
+1.3. Ý nghĩa của Trạm Hỷ5
+1.4. Sứ mệnh5
+1.5. Giá trị cốt lõi6
+II. QUY TRÌNH HOÀN THIỆN Ý TƯỞNG7
+2.1. Quy trình hình thành ý tưởng7
+2.2. Nghiên cứu xu hướng7
+2.2.1 Xu hướng chuyển đổi số trong ngành cưới8
+2.2.2 Xu hướng cá nhân hóa trải nghiệm8
+2.2.3. Xu hướng tiêu dùng dựa trên đánh giá thực tế8
+2.2.4. Xu hướng trải nghiệm trực quan8
+2.2.5. Xu hướng Mobile-first của Gen Z và Millennials8
+2.3. Nghiên cứu thị trường8
+2.3.1. Nghiên cứu khách hàng B2C8
+2.3.2. Nghiên cứu khách hàng B2B9
+2.4. Mục tiêu dự án9
+III. LỘ TRÌNH PHÁT TRIỂN10
+IV. TÍNH NĂNG NỔI BẬT11
+4.1. Công nghệ cốt lõi11
+4.2. Giao dịch & thanh toán an toàn11
+4.3. Niềm tin & cộng đồng12
+4.4. Tiện ích số12
+4.5. Hỗ trợ nhà cung cấp (B2B)12
+I. VỀ TRẠM HỶ
+1.1. Giới thiệu
+Trạm Hỷ là dự án startup công nghệ thuộc lĩnh vực Wedding Tech, hoạt động theo mô hình nền tảng trung gian hai chiều (two-sided marketplace), kết nối trực tiếp:
+Cô dâu chú rể (B2C) — người có nhu cầu tổ chức đám cưới
+Nhà cung cấp dịch vụ cưới (B2B) — nhà rạp, decor gia tiên, cổng hoa, âm thanh ánh sáng, mâm quả, studio ảnh cưới, makeup...
+Dự án ra đời từ việc quan sát một nghịch lý của thị trường cưới Việt Nam : Mỗi năm Việt Nam có khoảng 688.000 cặp đôi kết hôn, với chi phí đám cưới trung bình 120 triệu VNĐ/đám cưới — một thị trường quy mô ~82.560 tỷ VNĐ (PAM). Tuy nhiên, ngành này lại vận hành rất phân mảnh: khách hàng phải khảo giá thủ công qua hội nhóm/truyền miệng, không có thước đo giá chuẩn, dễ bị "chặt chém" hoặc gặp tình trạng "treo đầu dê bán thịt chó" (ảnh quảng cáo khác xa thực tế thi công). Ngược lại, nhiều cơ sở decor, nhà rạp nhỏ lẻ tại địa phương có tay nghề tốt, giá hợp lý nhưng lại "đói khách" vì thiếu năng lực marketing số.
+Từ nghịch lý "cung thiếu tiếp cận – cầu thiếu minh bạch" đó, Trạm Hỷ ra đời với vai trò một nền tảng số hóa toàn bộ hành trình chuẩn bị cưới: Tìm kiếm – Xem mẫu – So sánh giá – Đặt combo dịch vụ – Quản lý lịch trình – Thanh toán, tất cả trên một hệ thống duy nhất.
+Lộ trình phát triển: Theo mô hình Lean Startup — MVP tại Hà Nội → mở rộng ra các thành phố lớn → phủ sóng toàn quốc.
+1.2. Tầm nhìn
+Trạm Hỷ hướng tới trở thành nền tảng công nghệ trung gian kết nối dịch vụ cưới hỏi uy tín, minh bạch hàng đầu tại Việt Nam, và trong dài hạn, phát triển thành một hệ sinh thái cưới hỏi toàn diện bao gồm:
+Trụ cột hệ sinh thái
+Nội dung
+Tìm kiếm & đặt dịch vụ
+Kết nối khách hàng với hàng nghìn nhà cung cấp
+Quản lý ngân sách
+Công cụ AI Budget Allocator
+Thiệp điện tử & khách mời
+Số hóa khâu mời cưới, RSVP tự động
+Thanh toán & giữ cọc
+Milestone Payment an toàn
+Quản lý tiến độ tổ chức
+Dashboard theo dõi thi công real-time
+Hậu cưới
+Dịch vụ trăng mật liên kết
+1.3. Ý nghĩa của Trạm Hỷ
+"Trạm Hỷ"
+"Trạm": hình ảnh một điểm trung chuyển, dừng chân — thể hiện đúng bản chất nền tảng trung gian (platform), nơi tập hợp mọi dịch vụ cưới hỏi để khách hàng chỉ cần ghé qua một lần là có đủ mọi lựa chọn.
+"Hỷ": biểu tượng văn hóa truyền thống Việt Nam (chữ Song Hỷ - 囍) gắn liền với hôn lễ, tượng trưng cho niềm vui, hạnh phúc lứa đôi.
+=> Cái tên gói gọn trọn vẹn định vị thương hiệu: một "trạm dừng" công nghệ, nơi khởi đầu cho một hành trình cưới hỏi thảnh thơi và trọn vẹn niềm vui.
+1.4. Sứ mệnh
+"Đập tan sự bất đối xứng thông tin, kiến tạo không gian kết nối minh bạch cho ngành cưới hỏi Việt Nam."
+Cụ thể, sứ mệnh của Trạm Hỷ song hành trên 2 mặt trận:
+Đối với khách hàng (B2C): Giúp các cặp đôi thảnh thơi thiết kế đám cưới trong mơ đúng ngân sách, loại bỏ nỗi lo phát sinh chi phí, bị "hét giá" hay nhận dịch vụ không đúng như quảng cáo.
+Đối với nhà cung cấp (B2B): Trao cơ hội chuyển đổi số và tiếp cận khách hàng trẻ một cách bình đẳng cho các cơ sở decor, nhà rạp địa phương — vốn có tay nghề tốt nhưng thiếu năng lực marketing.
+Kết quả là một lời cam kết về trải nghiệm cưới văn minh, tiện lợi và tiết kiệm trong thời đại số, đồng thời góp phần thúc đẩy chuyển đổi số cho một ngành dịch vụ truyền thống còn rời rạc.
+1.5. Giá trị cốt lõi
+Giá trị
+Cam kết cụ thể
+Minh bạch 
+Báo giá công khai, chuẩn hóa; hệ thống Review hai chiều định danh; nguyên lý WYSIWYG – "nhìn sao nhận vậy" 
+An toàn
+Cơ chế thanh toán theo tiến độ (Milestone Payment), giữ cọc bên thứ ba, bảo mật chuẩn PCI-DSS/SSL 
+Cá nhân hóa
+AI gợi ý combo dịch vụ theo Ngân sách & Phong cách; trải nghiệm xem mẫu trực quan 
+Bình đẳng và đồng hành
+Chiến lược "Cầm tay chỉ việc" onboard nhà cung cấp nhỏ lẻ; chính sách 0% hoa hồng 3-6 tháng đầu để xây dựng niềm tin; thiết kế "Zero-learning curve" cho đối tác lớn tuổi 
+Văn minh trong giao dịch
+Đánh giá hai chiều (khách hàng ↔ nhà cung cấp), xây dựng môi trường hợp tác công bằng, giảm tranh chấp 
+II. QUY TRÌNH HOÀN THIỆN Ý TƯỞNG
+2.1. Quy trình hình thành ý tưởng
+Ý tưởng Trạm Hỷ – Kết duyên cát hỷ được hình thành từ việc quan sát những bất cập kéo dài trong thị trường dịch vụ cưới hỏi tại Việt Nam. Mặc dù mỗi năm Việt Nam có hàng trăm nghìn cặp đôi tổ chức đám cưới và quy mô thị trường rất lớn, ngành dịch vụ cưới vẫn vận hành theo mô hình truyền thống, phân mảnh và thiếu tính minh bạch.
+Về phía khách hàng, các cặp đôi phải tự tìm kiếm và làm việc với nhiều nhà cung cấp khác nhau như nhà rạp, decor gia tiên, cổng hoa, âm thanh ánh sáng, quay phim chụp ảnh, xe cưới,... Việc khảo giá thường dựa trên giới thiệu hoặc các hội nhóm mạng xã hội khiến khách hàng mất nhiều thời gian, khó so sánh chất lượng và dễ gặp rủi ro về giá cả cũng như chất lượng thực tế của dịch vụ.
+Kết quả phỏng vấn sâu cho thấy những nỗi lo lớn nhất của khách hàng bao gồm:
+Nhà cung cấp nhận tiền cọc nhưng không thực hiện đúng cam kết.
+Hình ảnh quảng cáo khác xa thực tế thi công.
+Phát sinh chi phí ngoài dự kiến trong quá trình chuẩn bị đám cưới.
+Bị làm phiền bởi các cuộc gọi tư vấn liên tục sau khi để lại thông tin liên hệ.
+Ở chiều ngược lại, phần lớn các nhà cung cấp dịch vụ cưới là các doanh nghiệp nhỏ hoặc hộ kinh doanh cá thể có tay nghề tốt nhưng thiếu năng lực marketing và công nghệ. Họ phụ thuộc nhiều vào Facebook, Zalo hoặc khách hàng giới thiệu, dẫn đến khả năng tiếp cận khách hàng mới còn hạn chế và khó cạnh tranh với các thương hiệu lớn.
+Từ những vấn đề trên, nhóm dự án xây dựng ý tưởng về Trạm Hỷ như một nền tảng công nghệ trung gian kết nối khách hàng và nhà cung cấp, giúp chuẩn hóa thị trường cưới hỏi, minh bạch hóa giá cả, bảo vệ quyền lợi của cả hai bên và thúc đẩy chuyển đổi số trong ngành dịch vụ cưới tại Việt Nam.
+2.2. Nghiên cứu xu hướng 
+Quá trình hoàn thiện ý tưởng được thực hiện dựa trên việc nghiên cứu các xu hướng nổi bật của thị trường cưới và hành vi tiêu dùng của thế hệ trẻ.
+2.2.1 Xu hướng chuyển đổi số trong ngành cưới
+Khách hàng ngày càng có xu hướng tìm kiếm, so sánh và đặt dịch vụ trực tuyến thay vì thông qua các mối quan hệ truyền thống hoặc môi giới trung gian. Việc số hóa toàn bộ hành trình chuẩn bị cưới trở thành nhu cầu thực tế của thị trường.
+2.2.2 Xu hướng cá nhân hóa trải nghiệm
+Các cặp đôi hiện đại không còn muốn sử dụng các mẫu cưới đại trà mà mong muốn được thiết kế đám cưới theo phong cách, sở thích và ngân sách riêng của mình. Điều này tạo cơ hội cho các nền tảng ứng dụng công nghệ AI trong việc gợi ý và cá nhân hóa dịch vụ.
+2.2.3. Xu hướng tiêu dùng dựa trên đánh giá thực tế
+Khách hàng ngày càng tin tưởng vào review xác thực từ người dùng thực tế hơn là quảng cáo từ doanh nghiệp. Điều này làm gia tăng vai trò của các hệ thống đánh giá định danh và cơ chế xác thực người dùng.
+2.2.4. Xu hướng trải nghiệm trực quan
+Người dùng mong muốn được xem trước không gian cưới thông qua hình ảnh thực tế, video, mô hình 3D hoặc công nghệ thực tế ảo trước khi đưa ra quyết định đặt dịch vụ.
+2.2.5. Xu hướng Mobile-first của Gen Z và Millennials
+Nhóm khách hàng mục tiêu chủ yếu là Gen Z và Millennials với hành vi tiêu dùng tập trung trên các nền tảng số như TikTok, Instagram, Pinterest và Facebook. Họ ưu tiên trải nghiệm nhanh, đơn giản, minh bạch và có khả năng thực hiện toàn bộ giao dịch ngay trên điện thoại.
+2.3. Nghiên cứu thị trường
+2.3.1. Nghiên cứu khách hàng B2C
+Khảo sát và phỏng vấn khách hàng cho thấy:
+Khách hàng bắt đầu tìm kiếm dịch vụ cưới từ 3 đến 12 tháng trước ngày cưới.
+Họ gặp khó khăn trong việc so sánh giá cả và chất lượng giữa các nhà cung cấp.
+Lo ngại dịch vụ thực tế không giống với quảng cáo.
+Phần lớn khách hàng đều so sánh ít nhất 3 nhà cung cấp trước khi đưa ra quyết định cuối cùng.
+Khách hàng mong muốn:
+Giá cả minh bạch và hiển thị công khai.
+Có thể so sánh nhiều nhà cung cấp trên cùng một nền tảng.
+Có cơ chế giữ cọc và bảo vệ giao dịch.
+Được gợi ý phương án tối ưu theo ngân sách.
+Có thể quản lý toàn bộ quá trình chuẩn bị cưới trên một hệ thống duy nhất.
+2.3.2. Nghiên cứu khách hàng B2B
+Đối tượng nhà cung cấp chủ yếu là các doanh nghiệp vừa và nhỏ hoặc hộ kinh doanh cá thể hoạt động trong lĩnh vực: Decor cưới, rạp cưới, makeup, studio ảnh cưới, quay phim chụp ảnh, xe cưới, âm thanh ánh sáng.
+Những khó khăn chính của nhóm khách hàng này bao gồm:
+Thiếu nguồn khách hàng ổn định.
+Không có hệ thống quản lý khách hàng chuyên nghiệp.
+Chi phí marketing cao.
+Phụ thuộc vào giới thiệu truyền miệng hoặc mạng xã hội.
+2.4. Mục tiêu dự án
+Mục tiêu ngắn hạn: 
+Xây dựng và triển khai phiên bản MVP tại Hà Nội.
+Hợp tác với các nhà cung cấp dịch vụ cưới địa phương.
+Kiểm chứng nhu cầu thị trường và tối ưu trải nghiệm người dùng.
+Mục tiêu trung hạn:
+Mở rộng thị trường sang TP.HCM, Đà Nẵng, Hải Phòng và các thành phố lớn khác.
+Tích hợp thêm nhiều dịch vụ vệ tinh như studio ảnh cưới, thuê xe cưới, makeup và wedding planner.
+Mục tiêu dài hạn: 
+Trở thành nền tảng công nghệ cưới hỏi hàng đầu Việt Nam với hệ sinh thái toàn diện bao gồm:
+Tìm kiếm và đặt dịch vụ cưới.
+Quản lý ngân sách cưới.
+Thiệp điện tử và quản lý khách mời.
+Thanh toán và giữ cọc an toàn.
+Quản lý tiến độ tổ chức cưới.
+Dịch vụ trăng mật và hậu cưới.
+Trong dài hạn, Trạm Hỷ hướng tới việc trở thành một Wedding Super Website, thúc đẩy chuyển đổi số cho toàn bộ ngành dịch vụ cưới truyền thống tại Việt Nam và tạo ra một thị trường minh bạch, an toàn và hiệu quả hơn cho tất cả các bên tham gia.
+III. LỘ TRÌNH PHÁT TRIỂN
+Trạm Hỷ triển khai chiến lược mở rộng theo 3 giai đoạn, đi từ MVP tại thị trường ngách (Hà Nội) đến hệ sinh thái "Super-App" toàn diện cho ngành cưới tại Việt Nam:
+Giai đoạn
+Trọng tâm
+Nội dung triển khai
+Giai đoạn 1 
+Cuối 2026 – 2027
+MVP & Thâm nhập thị trường Hà Nội
+Hoàn thiện nền tảng MVP; onboard vendor địa phương (rạp cưới, trang trí bàn thờ gia tiên, cổng hoa) qua Direct Sales "cầm tay chỉ việc" + 0% hoa hồng ban đầu. 
+Ra mắt chính thức tại Hà Nội, mục tiêu SOM 2.500 đám cưới thành công; thu thập feedback, thử nghiệm escrow, tinh chỉnh AI gợi ý.
+Giai đoạn 2 
+2028 – 2029
+Mở rộng địa lý & chiều dọc
+Nhân rộng mô hình sang TP.HCM, Đà Nẵng, Hải Phòng — các đô thị có mức độ tiếp nhận công nghệ cao.
+Tích hợp thêm dịch vụ liên quan (studio ảnh cưới, trang điểm, xe cưới, âm thanh ánh sáng) nhằm tăng giá trị đơn hàng trung bình và đa dạng hóa doanh thu.
+Giai đoạn 3 
+2030 – 2031
+Hệ sinh thái cưới hoàn chỉnh 
+Ra mắt thiệp cưới điện tử, quản lý khách mời số, AI lập lịch trình đám cưới, liên kết gói du lịch trăng mật. 
+Chính thức định vị Trạm Hỷ là chuẩn mực số cho ngành cưới tại Việt Nam.
+IV. TÍNH NĂNG NỔI BẬT
+4.1. Công nghệ cốt lõi
+AI Budget Configuration: Tự động gợi ý combo dịch vụ phù hợp ngân sách và phong cách, giúp tiết kiệm tới 80% thời gian lên kế hoạch.
+4.2. Giao dịch & thanh toán an toàn
+Instant Booking: Đặt dịch vụ tức thì, không cần chờ xác nhận thủ công.
+Escrow theo mốc (Milestone-based Payment): Nền tảng giữ tiền cọc và chỉ giải ngân cho vendor sau khi khách hàng xác nhận từng giai đoạn hoàn thành — bảo vệ khách khỏi rủi ro mất cọc.
+Nguyên tắc WYSIWYG: Vendor phải đăng ảnh thực tế tại sự kiện để được gắn "Verified Badge", đảm bảo dịch vụ thực tế khớp với quảng cáo.
+4.3. Niềm tin & cộng đồng
+Hệ thống đánh giá xác thực danh tính: Hạn chế đánh giá ảo, đảm bảo tính minh bạch của phản hồi khách hàng.
+Cộng đồng chia sẻ trải nghiệm: Nơi các cặp đôi chia sẻ trải nghiệm thật, hỗ trợ quyết định của người dùng mới (UGC storytelling).
+4.4. Tiện ích số
+Thiệp cưới QR-code: Miễn phí, tích hợp sẵn trên nền tảng.
+Dashboard quản lý: Theo dõi tiến độ, quản lý dịch vụ và thanh toán tập trung tại một nơi duy nhất.
+4.5. Hỗ trợ nhà cung cấp (B2B)
+Đăng ký & vận hành miễn phí: Không phí duy trì cố định, chỉ thu 10 - 15%  hoa hồng khi đặt dịch vụ thành công.
+Công cụ vận hành chuyên nghiệp: Công cụ quản lý booking, hồ sơ chuyên nghiệp, thanh toán đúng hạn theo milestone.
+Note buổi học
+Chủ yếu nói sâu về demo
+Các phần trên của mọi người chỉ nói kết luận thôi
+Chuẩn bị 1 phần các câu có thể bị hỏi
+scrip demo web
+KỊCH BẢN THUYẾT TRÌNH – TRẠM HỶ
+Đây là Trạm Hỷ – nền tảng công nghệ cưới hỏi bảo chứng tại Việt Nam.
+Khác với các website cưới truyền thống chỉ đóng vai trò là nơi đăng thông tin nhà cung cấp, Trạm Hỷ tập trung giải quyết hai vấn đề lớn nhất của thị trường hiện nay: rủi ro mất tiền cọc và chất lượng dịch vụ không đúng như cam kết.
+Cảnh 1 – AI lập kế hoạch ngân sách
+Khi chuẩn bị cho đám cưới, điều đầu tiên khiến nhiều cặp đôi băn khoăn là không biết nên phân chia ngân sách như thế nào cho hợp lý.
+TạiTrạm Hỷ, người dùng chỉ cần nhập tổng ngân sách dự kiếnví dụ 150 triệu đồng, và chọn địa điểm tổ chức, chẳng hạn Hà Nội.
+Ngay lập tức, AI Budget Assistant sẽ tự động phân tích và đề xuất cách chia ngân sách tối ưu dựa trên dữ liệu thị trường.
+Sau khi có kết quả, người dùng có thể nhấn trực tiếp vào từng danh mục để tìm những nhà cung cấp phù hợp với mức ngân sách mà AI vừa gợi ý.
+Cảnh 2 – Chợ dịch vụ và đặt cọc bảo chứng
+Đây là Chợ dịch vụ cưới hỏi.
+Hệ thống tập hợp bốn nhóm dịch vụ chính, đi kèm các bộ lọc theo khoảng giá, khu vực và nhiều tiêu chí khác.
+Một điểm nổi bật là người dùng có thể bật bộ lọc "Chỉ hiện nhà cung cấp có Tích Xanh Bảo Chứng".
+Đây là huy hiệu dành cho các nhà cung cấp đã được Trạm Hỷ kiểm định về chất lượng và độ uy tín.
+Ví dụ, khi chọn TuArt Wedding, hệ thống sẽ hiển thị đầy đủ album thực tế, bảng giá và các gói dịch vụ.
+Thay vì thanh toán toàn bộ ngay từ đầu như cách truyền thống, Trạm Hỷ áp dụng mô hình Milestone Payment, chia quá trình thanh toán thành ba giai đoạn:
+Đợt một: Đặt cọc 30% để giữ lịch.
+Đợt hai: Thanh toán 50% khi hoàn thành giai đoạn thi công.
+Đợt ba: Thanh toán 20% sau khi nghiệm thu.
+Trong ví dụ này, khách hàng quét VietQR để thanh toán tiền cọc Điểm quan trọng là khoản tiền này không chuyển ngay cho studio, mà được giữ trong ví ký quỹ Escrow của Trạm Hỷ.
+Nhờ vậy, khách hàng vừa giữ được lịch, vừa không lo mất tiền cọc nếu xảy ra tranh chấp.
+Cảnh 3 – Kênh nhà cung cấp
+Bây giờ chúng ta chuyển sang góc nhìn của nhà cung cấp.
+nhà cung cấp có một bảng quản lý công việc theo dạng Kanban, giúp theo dõi toàn bộ tiến độ thực hiện.
+Sau khi thấy tiền cọc đã được hệ thống bảo chứng an toàn, nhà cung cấp bắt đầu chuẩn bị ekip và tiến hành buổi chụp.
+Khi hoàn thành, studio nhấn "Báo cáo đã chụp xong", đồng thời gửi ảnh thô lên hệ thống để yêu cầu giải ngân đợt hai.
+Ở phía khách hàng, cặp đôi đăng nhập vào trang Lịch hẹn, xem ảnh thô và nếu đồng ý thì thanh toán tiếp 50%.
+Khoản tiền này vẫn tiếp tục được giữ trong Ví Bảo Chứng, cho đến khi sản phẩm hoàn thiện.
+Sau khi studio bàn giao album cuối cùng, hệ thống chuyển sang bước quan trọng nhất là nghiệm thu.
+Khách hàng kiểm tra toàn bộ sản phẩm.
+Nếu hài lòng, họ nhấn "Nghiệm thu và giải ngân đợt cuối".
+Lúc này, hệ thống mới chính thức giải phóng toàn bộ số tiền cho nhà cung cấp, đồng thời mở tính năng đánh giá để khách hàng chấm 5 sao, giúp xây dựng uy tín cho studio.
+Cảnh 4 – Admin Escrow và mô hình doanh thu
+Cuối cùng là Trang quản trị Admin.
+Đây là nơi theo dõi toàn bộ dòng tiền ký quỹ và các giao dịch trên hệ thống.
+Mô hình doanh thu của Trạm Hỷ là thu phí nền tảng 10% trên mỗi đơn hàng hoàn tất.
+Ví dụ, sau khi khách hàng nghiệm thu thành công, hệ thống sẽ tự động trích 10% phí dịch vụ, 
+90% còn lại sẽ được chuyển về tài khoản của nhà cung cấp.
+Ngoài ra, Admin cũng là nơi kiểm tra chất lượng hình ảnh thi công thực tế để cấp Tích Xanh Bảo Chứng cho các đơn vị đạt tiêu chuẩn.
+Kết luận
+Tóm lại, Trạm Hỷ không chỉ giúp các cặp đôi giảm thiểu rủi ro tài chính thông qua cơ chế Escrow, mà còn giúp các nhà cung cấp chuẩn hóa quy trình làm việc, nâng cao uy tín và tiếp cận khách hàng hiệu quả hơn.
