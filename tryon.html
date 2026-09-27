@@ -259,158 +259,134 @@
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                         <!-- Column 1: Step 1 - Choose / Upload Bride Photo (4 cols) -->
-                        <div class="lg:col-span-4 space-y-4">
+                        <div class="lg:col-span-4 space-y-3.5">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold uppercase tracking-wider text-brand-goldDark flex items-center gap-1.5">
-                                    <span class="w-5 h-5 rounded-full bg-brand-gold text-white flex items-center justify-center text-[10px]">1</span> Tải ảnh toàn thân của bạn
+                                    <span class="w-5 h-5 rounded-full bg-brand-gold text-white flex items-center justify-center text-[10px]">1</span> Tải ảnh của bạn / Chọn ảnh mẫu
+                                </span>
+                                <span class="text-[10px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full border border-green-200 flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping"></span> Ảnh thật sẵn sàng
                                 </span>
                             </div>
 
-                            <!-- Upload Box -->
-                            <div id="dropzone-area" class="border-2 border-dashed border-brand-gold/30 hover:border-brand-gold rounded-2xl p-4 text-center cursor-pointer transition-all bg-brand-blush/40 hover:bg-brand-blush/80 relative min-h-[220px] flex flex-col items-center justify-center group">
-                                <input type="file" id="bride-file-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" onchange="handleBrideUpload(event)">
-                                <div id="upload-placeholder" class="space-y-2 pointer-events-none">
+                            <!-- Upload Box / Active Bride Photo Preview (Full Uncropped Portrait View) -->
+                            <div id="dropzone-area" class="border-2 border-dashed border-brand-gold/40 hover:border-brand-gold rounded-2xl p-1.5 text-center cursor-pointer transition-all bg-stone-900/95 relative h-[440px] flex flex-col items-center justify-center group shadow-md overflow-hidden">
+                                <input type="file" id="bride-file-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20" onchange="handleBrideUpload(event)">
+                                
+                                <div id="upload-placeholder" class="hidden space-y-2 pointer-events-none p-4">
                                     <div class="w-12 h-12 mx-auto rounded-full bg-brand-gold/15 flex items-center justify-center text-brand-goldDark group-hover:scale-110 transition-transform">
                                         <span class="material-symbols-outlined text-2xl">add_photo_alternate</span>
                                     </div>
-                                    <div class="text-xs font-semibold text-brand-text">Bấm hoặc kéo thả ảnh cô dâu vào đây</div>
+                                    <div class="text-xs font-semibold text-white">Bấm hoặc kéo thả ảnh cô dâu vào đây</div>
                                     <p class="text-[10px] text-gray-400">Khuyên dùng: Ảnh đứng thẳng, rõ dáng người và khuôn mặt</p>
                                 </div>
-                                <div id="upload-preview-container" class="hidden w-full h-full relative">
-                                    <img id="upload-preview-img" src="" alt="Ảnh cô dâu đã chọn" class="w-full h-52 object-cover rounded-xl shadow-inner">
-                                    <span class="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-xs text-green-400">check_circle</span> Đã nhận diện dáng
+
+                                <div id="upload-preview-container" class="w-full h-full relative flex items-center justify-center bg-black/50 rounded-xl overflow-hidden">
+                                    <img id="upload-preview-img" src="user_bride.png" alt="Ảnh cô dâu của bạn" class="w-full h-full object-contain object-center rounded-xl transition-all">
+                                    
+                                    <span class="absolute top-2 left-2 bg-brand-gold text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-md pointer-events-none z-10">
+                                        <span class="material-symbols-outlined text-xs">face</span> <span id="preview-bride-tag">Cô dâu Thảo</span>
                                     </span>
+                                    <span class="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1 pointer-events-none z-10">
+                                        <span class="material-symbols-outlined text-xs text-green-400">check_circle</span> Đã quét phom 3D
+                                    </span>
+                                    
+                                    <div class="absolute bottom-2 left-2 right-2 bg-black/70 backdrop-blur-md p-1.5 rounded-lg border border-brand-gold/30 text-[10px] text-white font-medium flex items-center justify-between z-10">
+                                        <span class="flex items-center gap-1 text-brand-goldLight font-bold">
+                                            <span class="material-symbols-outlined text-xs text-brand-gold">auto_awesome</span> Phom: Cân đối, tôn dáng
+                                        </span>
+                                        <span class="text-[9px] text-amber-300 hover:text-white underline cursor-pointer pointer-events-auto">Đổi ảnh khác</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Quick Select Sample Photos (No upload needed for fast testing) -->
+                            <!-- Quick Select Real Bride Models (5 Photos Provided by User) -->
                             <div>
-                                <span class="text-[11px] font-semibold text-gray-600 block mb-2">Hoặc thử ngay với ảnh mẫu chuẩn:</span>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <button type="button" onclick="selectSampleModel(1)" id="sample-btn-1" class="sample-model-btn p-1.5 rounded-xl border-2 border-brand-gold bg-brand-gold/5 flex items-center gap-2 text-left transition-all">
-                                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200" alt="Mẫu 1" class="w-10 h-12 object-cover rounded-lg">
-                                        <div>
-                                            <span class="text-[11px] font-bold text-brand-text block">Cô dâu Trang</span>
-                                            <span class="text-[9px] text-gray-500">Dáng chuẩn Chữ A</span>
-                                        </div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-[11px] font-extrabold text-brand-text flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-xs text-brand-gold">photo_library</span> 5 Ảnh thật bạn đã đưa:
+                                    </span>
+                                    <span class="text-[9px] text-brand-goldDark font-bold bg-brand-gold/10 px-1.5 py-0.5 rounded">Chạm để thử</span>
+                                </div>
+                                <div class="grid grid-cols-5 gap-1.5">
+                                    <!-- Model 1: Thảo -->
+                                    <button type="button" onclick="selectSampleModel('user')" id="sample-btn-user" class="sample-model-btn p-1 rounded-xl border-2 border-brand-gold bg-brand-gold/15 flex flex-col items-center text-center transition-all relative group">
+                                        <img src="user_bride.png" alt="Dâu Thảo" class="w-full h-14 object-cover object-center rounded-lg shadow-sm">
+                                        <span class="text-[9px] font-bold text-brand-text mt-1 truncate w-full">Dâu Thảo</span>
+                                        <span class="absolute -top-1 -right-1 bg-brand-gold text-white text-[7px] font-extrabold px-1 rounded-full">#1</span>
                                     </button>
-                                    <button type="button" onclick="selectSampleModel(2)" id="sample-btn-2" class="sample-model-btn p-1.5 rounded-xl border border-gray-200 bg-white hover:bg-brand-blush flex items-center gap-2 text-left transition-all">
-                                        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=200" alt="Mẫu 2" class="w-10 h-12 object-cover rounded-lg">
-                                        <div>
-                                            <span class="text-[11px] font-bold text-brand-text block">Cô dâu Phương</span>
-                                            <span class="text-[9px] text-gray-500">Dáng thanh mảnh</span>
-                                        </div>
+
+                                    <!-- Model 2: Mai -->
+                                    <button type="button" onclick="selectSampleModel('bride1')" id="sample-btn-bride1" class="sample-model-btn p-1 rounded-xl border border-gray-200 bg-white hover:bg-brand-blush flex flex-col items-center text-center transition-all relative group">
+                                        <img src="bride_model_1.png" alt="Dâu Mai" class="w-full h-14 object-cover object-center rounded-lg shadow-sm">
+                                        <span class="text-[9px] font-bold text-brand-text mt-1 truncate w-full">Dâu Mai</span>
+                                        <span class="absolute -top-1 -right-1 bg-gray-400 text-white text-[7px] font-extrabold px-1 rounded-full">#2</span>
+                                    </button>
+
+                                    <!-- Model 3: Kim -->
+                                    <button type="button" onclick="selectSampleModel('bride2')" id="sample-btn-bride2" class="sample-model-btn p-1 rounded-xl border border-gray-200 bg-white hover:bg-brand-blush flex flex-col items-center text-center transition-all relative group">
+                                        <img src="bride_model_2.jpg" alt="Dâu Kim" class="w-full h-14 object-cover object-center rounded-lg shadow-sm">
+                                        <span class="text-[9px] font-bold text-brand-text mt-1 truncate w-full">Dâu Kim</span>
+                                        <span class="absolute -top-1 -right-1 bg-gray-400 text-white text-[7px] font-extrabold px-1 rounded-full">#3</span>
+                                    </button>
+
+                                    <!-- Model 4: Linh -->
+                                    <button type="button" onclick="selectSampleModel('bride3')" id="sample-btn-bride3" class="sample-model-btn p-1 rounded-xl border border-gray-200 bg-white hover:bg-brand-blush flex flex-col items-center text-center transition-all relative group">
+                                        <img src="bride_model_3.png" alt="Dâu Linh" class="w-full h-14 object-cover object-center rounded-lg shadow-sm">
+                                        <span class="text-[9px] font-bold text-brand-text mt-1 truncate w-full">Dâu Linh</span>
+                                        <span class="absolute -top-1 -right-1 bg-gray-400 text-white text-[7px] font-extrabold px-1 rounded-full">#4</span>
+                                    </button>
+
+                                    <!-- Model 5: Hà -->
+                                    <button type="button" onclick="selectSampleModel('bride4')" id="sample-btn-bride4" class="sample-model-btn p-1 rounded-xl border border-gray-200 bg-white hover:bg-brand-blush flex flex-col items-center text-center transition-all relative group">
+                                        <img src="bride_model_4.png" alt="Dâu Hà" class="w-full h-14 object-cover object-center rounded-lg shadow-sm">
+                                        <span class="text-[9px] font-bold text-brand-text mt-1 truncate w-full">Dâu Hà</span>
+                                        <span class="absolute -top-1 -right-1 bg-gray-400 text-white text-[7px] font-extrabold px-1 rounded-full">#5</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Column 2: Step 2 - Select Wedding Dress (4 cols) -->
-                        <div class="lg:col-span-4 space-y-4">
+                        <div class="lg:col-span-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold uppercase tracking-wider text-brand-goldDark flex items-center gap-1.5">
                                     <span class="w-5 h-5 rounded-full bg-brand-gold text-white flex items-center justify-center text-[10px]">2</span> Chọn mẫu váy cưới đối tác
                                 </span>
-                                <span class="text-[10px] text-gray-400">4 mẫu váy thực tế</span>
+                                <span class="text-[10px] text-gray-500 font-bold" id="dress-count-badge">8 mẫu theo 5 chủ đề</span>
                             </div>
 
-                            <!-- Dress Catalog List -->
-                            <div class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1" id="dress-catalog">
-                                <!-- Dress 1 -->
-                                <div onclick="selectDress(1)" id="dress-card-1" class="dress-card p-2.5 rounded-2xl border-2 border-brand-gold bg-brand-gold/5 flex gap-3 cursor-pointer transition-all relative">
-                                    <img src="https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=300" alt="Váy đuôi cá hoàng gia" class="w-16 h-20 object-cover rounded-xl shadow-sm">
-                                    <div class="flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Dáng Đuôi Cá</span>
-                                                <span class="text-[10px] font-bold text-brand-rose">Giảm 20%</span>
-                                            </div>
-                                            <h4 class="text-xs font-bold text-brand-text mt-1 leading-snug">Váy cưới Đuôi cá đính pha lê Royal</h4>
-                                            <span class="text-[10px] text-gray-500 flex items-center gap-0.5 mt-0.5">
-                                                <span class="material-symbols-outlined text-[11px] text-brand-verified">verified</span> 2H Studio (Cầu Giấy)
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center justify-between mt-1">
-                                            <span class="text-xs font-extrabold text-brand-goldDark">3.500.000đ <s class="text-[9px] font-normal text-gray-400">4.500.000đ</s></span>
-                                            <span class="text-[9px] text-green-600 font-bold bg-green-50 px-1.5 py-0.5 rounded">Có sẵn tại tiệm</span>
-                                        </div>
-                                    </div>
-                                    <div class="absolute top-2 right-2 text-brand-gold select-indicator">
-                                        <span class="material-symbols-outlined text-base">check_circle</span>
-                                    </div>
+                            <!-- Stylist AI Body Shape Recommendation Bar -->
+                            <div class="bg-gradient-to-r from-amber-50 to-orange-50/40 rounded-xl p-2.5 border border-brand-gold/30 space-y-1.5 shadow-sm">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-extrabold text-brand-goldDark flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">psychology</span> Gợi ý theo vóc dáng (Stylist AI)
+                                    </span>
+                                    <span class="text-[9px] font-bold text-amber-700 bg-amber-100/70 px-1.5 py-0.2 rounded">Tôn Dáng</span>
                                 </div>
+                                <select id="body-shape-filter" onchange="filterByBodyShape(this.value)" class="w-full bg-white border border-brand-gold/30 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-brand-text focus:outline-none cursor-pointer">
+                                    <option value="all">✨ Tất cả vóc dáng cô dâu (8 mẫu thực tế)</option>
+                                    <option value="pear">🍐 Dáng Quả Lê (Hông rộng, vai nhỏ) → Tùng Xòe Công Chúa, Chữ A</option>
+                                    <option value="hourglass">⏳ Dáng Đồng Hồ Cát (Chuẩn 3 vòng) → Đuôi Cá Siêu Quyến Rũ</option>
+                                    <option value="petite">🌸 Dáng Nhỏ Nhắn / Thấp (&lt;1m58) → Satin Cúp Ngực Tôn Chiều Cao</option>
+                                    <option value="apple">🍎 Dáng Quả Táo / Bắp Tay Đầy → Tay Bồng Cổ V Che Khuyết Điểm</option>
+                                    <option value="heritage">🇻🇳 Lễ Ăn Hỏi & Gia Tiên → Áo Dài Thêu Long Phụng Tơ Tằm</option>
+                                </select>
+                            </div>
 
-                                <!-- Dress 2 -->
-                                <div onclick="selectDress(2)" id="dress-card-2" class="dress-card p-2.5 rounded-2xl border border-gray-200 bg-white hover:border-brand-gold/50 flex gap-3 cursor-pointer transition-all relative">
-                                    <img src="https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&q=80&w=300" alt="Váy xòe công chúa Bellis" class="w-16 h-20 object-cover rounded-xl shadow-sm">
-                                    <div class="flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-pink-100 text-pink-800">Xòe Công Chúa</span>
-                                                <span class="text-[10px] font-bold text-gray-400">Ưu đãi</span>
-                                            </div>
-                                            <h4 class="text-xs font-bold text-brand-text mt-1 leading-snug">Váy Tùng Xòe Ren Pháp Bellis</h4>
-                                            <span class="text-[10px] text-gray-500 flex items-center gap-0.5 mt-0.5">
-                                                <span class="material-symbols-outlined text-[11px] text-brand-verified">verified</span> Bellis Bridal (Hoàn Kiếm)
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center justify-between mt-1">
-                                            <span class="text-xs font-extrabold text-brand-goldDark">4.200.000đ <s class="text-[9px] font-normal text-gray-400">5.000.000đ</s></span>
-                                            <span class="text-[9px] text-green-600 font-bold bg-green-50 px-1.5 py-0.5 rounded">Có sẵn tại tiệm</span>
-                                        </div>
-                                    </div>
-                                    <div class="absolute top-2 right-2 text-gray-300 select-indicator hidden">
-                                        <span class="material-symbols-outlined text-base">check_circle</span>
-                                    </div>
-                                </div>
+                            <!-- Thematic Filter Pills -->
+                            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-[10px]" id="theme-pills-bar">
+                                <button type="button" onclick="filterByTheme('all')" id="pill-all" class="theme-pill px-2.5 py-1 rounded-full font-bold bg-brand-gold text-white whitespace-nowrap shadow-sm">Tất cả (8)</button>
+                                <button type="button" onclick="filterByTheme('royal')" id="pill-royal" class="theme-pill px-2.5 py-1 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-brand-gold whitespace-nowrap">🏰 Hoàng Gia</button>
+                                <button type="button" onclick="filterByTheme('fairy')" id="pill-fairy" class="theme-pill px-2.5 py-1 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-brand-gold whitespace-nowrap">🌸 Nàng Thơ</button>
+                                <button type="button" onclick="filterByTheme('minimalist')" id="pill-minimalist" class="theme-pill px-2.5 py-1 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-brand-gold whitespace-nowrap">🌿 Tối Giản</button>
+                                <button type="button" onclick="filterByTheme('mermaid')" id="pill-mermaid" class="theme-pill px-2.5 py-1 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-brand-gold whitespace-nowrap">🧜‍♀️ Đuôi Cá</button>
+                                <button type="button" onclick="filterByTheme('heritage')" id="pill-heritage" class="theme-pill px-2.5 py-1 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-brand-gold whitespace-nowrap">🇻🇳 Áo Dài</button>
+                            </div>
 
-                                <!-- Dress 3 -->
-                                <div onclick="selectDress(3)" id="dress-card-3" class="dress-card p-2.5 rounded-2xl border border-gray-200 bg-white hover:border-brand-gold/50 flex gap-3 cursor-pointer transition-all relative">
-                                    <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=300" alt="Váy cúp ngực Hàn Quốc" class="w-16 h-20 object-cover rounded-xl shadow-sm">
-                                    <div class="flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">Cúp Ngực Minimalist</span>
-                                            </div>
-                                            <h4 class="text-xs font-bold text-brand-text mt-1 leading-snug">Váy Satin Lụa Trơn Hàn Quốc</h4>
-                                            <span class="text-[10px] text-gray-500 flex items-center gap-0.5 mt-0.5">
-                                                <span class="material-symbols-outlined text-[11px] text-brand-verified">verified</span> La Reine Bridal (Ba Đình)
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center justify-between mt-1">
-                                            <span class="text-xs font-extrabold text-brand-goldDark">2.800.000đ</span>
-                                            <span class="text-[9px] text-green-600 font-bold bg-green-50 px-1.5 py-0.5 rounded">Có sẵn tại tiệm</span>
-                                        </div>
-                                    </div>
-                                    <div class="absolute top-2 right-2 text-gray-300 select-indicator hidden">
-                                        <span class="material-symbols-outlined text-base">check_circle</span>
-                                    </div>
-                                </div>
-
-                                <!-- Dress 4 -->
-                                <div onclick="selectDress(4)" id="dress-card-4" class="dress-card p-2.5 rounded-2xl border border-gray-200 bg-white hover:border-brand-gold/50 flex gap-3 cursor-pointer transition-all relative">
-                                    <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=300" alt="Áo dài cưới Cát Hỷ" class="w-16 h-20 object-cover rounded-xl shadow-sm">
-                                    <div class="flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-red-100 text-red-800">Áo Dài Cát Hỷ</span>
-                                                <span class="text-[10px] font-bold text-brand-goldDark">Truyền Thống</span>
-                                            </div>
-                                            <h4 class="text-xs font-bold text-brand-text mt-1 leading-snug">Áo Dài Thêu Long Phụng Tơ Tằm</h4>
-                                            <span class="text-[10px] text-gray-500 flex items-center gap-0.5 mt-0.5">
-                                                <span class="material-symbols-outlined text-[11px] text-brand-verified">verified</span> Trạm Hỷ Heritage (Hà Nội)
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center justify-between mt-1">
-                                            <span class="text-xs font-extrabold text-brand-goldDark">2.200.000đ</span>
-                                            <span class="text-[9px] text-green-600 font-bold bg-green-50 px-1.5 py-0.5 rounded">Có sẵn tại tiệm</span>
-                                        </div>
-                                    </div>
-                                    <div class="absolute top-2 right-2 text-gray-300 select-indicator hidden">
-                                        <span class="material-symbols-outlined text-base">check_circle</span>
-                                    </div>
-                                </div>
+                            <!-- Dress Catalog List (Expanded to fit 440px height balance) -->
+                            <div class="space-y-2 max-h-[350px] overflow-y-auto pr-1" id="dress-catalog">
+                                <!-- Populated by JS -->
                             </div>
 
                             <!-- Action Trigger Button -->
@@ -420,7 +396,7 @@
                         </div>
 
                         <!-- Column 3: Step 3 - AI Try-On Result & Booking CTA (4 cols) -->
-                        <div class="lg:col-span-4 flex flex-col space-y-4">
+                        <div class="lg:col-span-4 flex flex-col space-y-3.5">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold uppercase tracking-wider text-brand-goldDark flex items-center gap-1.5">
                                     <span class="w-5 h-5 rounded-full bg-brand-gold text-white flex items-center justify-center text-[10px]">3</span> Kết quả & Chuyển đổi thực tế
@@ -428,18 +404,18 @@
                                 <span id="status-badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Sẵn sàng</span>
                             </div>
 
-                            <!-- Result Image Frame with Laser Scanner Simulation -->
-                            <div class="relative bg-gray-900 rounded-2xl overflow-hidden min-h-[310px] flex items-center justify-center shadow-lg border border-brand-gold/30">
+                            <!-- Result Image Frame with Laser Scanner Simulation (Full Uncropped Portrait View) -->
+                            <div class="relative bg-stone-900/95 rounded-2xl overflow-hidden h-[440px] flex items-center justify-center shadow-lg border border-brand-gold/30">
                                 
                                 <!-- Standby State -->
                                 <div id="result-standby" class="p-6 text-center text-gray-400 space-y-2">
                                     <span class="material-symbols-outlined text-4xl text-brand-gold/50">styler</span>
                                     <p class="text-xs font-medium text-gray-300">Bấm nút "Bắt đầu Thử Váy AI" để xem diện mạo của bạn khi mặc chiếc váy này</p>
-                                    <span class="text-[10px] text-gray-500 block">AI sẽ khớp chính xác tỷ lệ vai, eo và màu da</span>
+                                    <span class="text-[10px] text-gray-500 block">AI sẽ khớp chính xác khuôn mặt, tỷ lệ vai, eo và màu da</span>
                                 </div>
 
                                 <!-- Scanning State (Animation) -->
-                                <div id="result-scanning" class="hidden absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-6 space-y-4 z-20">
+                                <div id="result-scanning" class="hidden absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-6 space-y-4 z-20">
                                     <div class="animate-scan"></div>
                                     <div class="w-16 h-16 rounded-full border-4 border-brand-gold/30 border-t-brand-gold animate-spin flex items-center justify-center">
                                         <span class="material-symbols-outlined text-brand-gold text-xl">blur_on</span>
@@ -453,22 +429,22 @@
                                     </div>
                                 </div>
 
-                                <!-- Rendered Result Display -->
-                                <div id="result-completed" class="hidden w-full h-full relative group">
-                                    <img id="tryon-result-img" src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800" alt="Kết quả thử váy cưới AI" class="w-full h-[320px] object-cover transition-opacity duration-300">
+                                <!-- Rendered Result Display (Full Portrait Uncropped) -->
+                                <div id="result-completed" class="hidden w-full h-full relative group flex items-center justify-center bg-black/50">
+                                    <img id="tryon-result-img" src="user_tryon_white_royal.jpg" alt="Kết quả thử váy cưới AI" class="w-full h-full object-contain object-center transition-opacity duration-300">
                                     
                                     <!-- Floating Watermark & Badge -->
-                                    <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-white text-[10px] flex items-center gap-1">
+                                    <div class="absolute top-2 left-2 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full text-white text-[10px] flex items-center gap-1 z-10">
                                         <span class="material-symbols-outlined text-xs text-brand-gold">auto_awesome</span> <span id="result-view-badge">Trạm Hỷ AI Render</span>
                                     </div>
-                                    <div id="custom-photo-indicator" class="hidden absolute top-2 right-2 bg-brand-gold text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow flex items-center gap-0.5">
+                                    <div id="custom-photo-indicator" class="hidden absolute top-2 right-2 bg-brand-gold text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow flex items-center gap-0.5 z-10">
                                         <span class="material-symbols-outlined text-[10px]">person</span> Ảnh tải lên
                                     </div>
 
                                     <!-- Bottom Action Buttons inside Result Frame -->
                                     <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-1.5 z-10">
                                         <!-- Compare Before/After Toggle -->
-                                        <button type="button" id="btn-compare-toggle" onclick="toggleBeforeAfter()" class="bg-black/70 hover:bg-black text-white px-2.5 py-1.5 rounded-xl shadow backdrop-blur-sm text-[10px] font-bold flex items-center gap-1 transition-all">
+                                        <button type="button" id="btn-compare-toggle" onclick="toggleBeforeAfter()" class="bg-black/80 hover:bg-black text-white px-2.5 py-1.5 rounded-xl shadow backdrop-blur-sm text-[10px] font-bold flex items-center gap-1 transition-all border border-white/10">
                                             <span class="material-symbols-outlined text-xs text-brand-gold">compare</span> <span id="compare-text">Xem ảnh gốc</span>
                                         </button>
 
@@ -501,6 +477,117 @@
                                 </button>
                             </div>
 
+                        </div>
+                    </div>
+                </section>
+
+                <!-- THEMATIC LOOKBOOK SHOWCASE: GỢI Ý VÁY THEO CHỦ ĐỀ CƯỚI (ĂN ĐIỂM EXE201) -->
+                <section class="bg-white rounded-3xl p-6 md:p-8 border border-brand-gold/20 shadow-sm space-y-6 blush-glow w-full" id="thematic-lookbook-section">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-3 border-b border-gray-150 pb-4">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-gold/15 text-brand-goldDark text-[10px] font-bold uppercase tracking-wider mb-1.5">
+                                <span class="material-symbols-outlined text-xs">auto_awesome</span> Xu Hướng Cưới 2026
+                            </div>
+                            <h2 class="serif-title text-xl md:text-2xl font-bold text-brand-text">Gợi Ý Bộ Sưu Tập Váy Cưới Theo Chủ Đề Hôn Lễ</h2>
+                            <p class="text-xs text-gray-500 mt-1">Dành cho dâu rể chưa biết chọn phom váy nào: Chọn chủ đề tiệc cưới của bạn để AI đề xuất mẫu váy hoàn hảo nhất.</p>
+                        </div>
+                        <span class="text-xs font-semibold text-brand-goldDark flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">check_circle</span> 100% mẫu thực tế tại Showroom Hà Nội
+                        </span>
+                    </div>
+
+                    <!-- 4 Thematic Cards Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Theme 1: Hoàng Gia Sang Trọng -->
+                        <div class="bg-brand-blush/40 rounded-2xl p-4 border border-brand-gold/20 hover:border-brand-gold hover:shadow-md transition-all flex flex-col justify-between space-y-3 group">
+                            <div class="space-y-2.5">
+                                <div class="relative rounded-xl overflow-hidden h-36">
+                                    <img src="https://images.unsplash.com/photo-1596451190630-186aff535bf2?auto=format&fit=crop&q=80&w=400" alt="Chủ đề hoàng gia" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <span class="absolute top-2 left-2 bg-black/60 text-white text-[9px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">Grand Ballroom</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-1 text-[11px] font-extrabold text-brand-goldDark">
+                                        <span>🏰 Hoàng Gia Sang Trọng</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-brand-text mt-0.5">Tiệc Cưới Khách Sạn 5 Sao</h4>
+                                    <p class="text-[10px] text-gray-500 mt-1 leading-snug">Váy tùng xòe đại lễ, đính kết đá Swarovski & ren Pháp lộng lẫy, tạo ấn tượng choáng ngợp dưới ánh đèn chùm.</p>
+                                </div>
+                                <div class="text-[10px] text-gray-600 bg-white/80 p-2 rounded-lg border border-gray-100">
+                                    <b>Hợp với:</b> Cô dâu dáng quả lê, vai nhỏ hoặc muốn che khuyết điểm eo/chân.
+                                </div>
+                            </div>
+                            <button onclick="quickTryLookbook('royal')" class="w-full py-2 bg-brand-gold/15 hover:bg-brand-gold text-brand-goldDark hover:text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-xs">styler</span> Ướm thử mẫu này ngay
+                            </button>
+                        </div>
+
+                        <!-- Theme 2: Tối Giản Hàn Quốc -->
+                        <div class="bg-brand-blush/40 rounded-2xl p-4 border border-brand-gold/20 hover:border-brand-gold hover:shadow-md transition-all flex flex-col justify-between space-y-3 group">
+                            <div class="space-y-2.5">
+                                <div class="relative rounded-xl overflow-hidden h-36">
+                                    <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=400" alt="Chủ đề tối giản" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <span class="absolute top-2 left-2 bg-black/60 text-white text-[9px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">Quiet Luxury</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-1 text-[11px] font-extrabold text-blue-800">
+                                        <span>🌿 Tối Giản Tinh Tế</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-brand-text mt-0.5">Tiệc Thân Mật & Hàn Quốc</h4>
+                                    <p class="text-[10px] text-gray-500 mt-1 leading-snug">Chất liệu satin lụa Mikado trơn bóng, cúp ngực chuẩn phom tối giản, tôn lên khí chất thanh lịch và trang sức cưới.</p>
+                                </div>
+                                <div class="text-[10px] text-gray-600 bg-white/80 p-2 rounded-lg border border-gray-100">
+                                    <b>Hợp với:</b> Cô dâu dáng nhỏ nhắn, thanh mảnh hoặc yêu phong cách hiện đại.
+                                </div>
+                            </div>
+                            <button onclick="quickTryLookbook('minimalist')" class="w-full py-2 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-xs">styler</span> Ướm thử mẫu này ngay
+                            </button>
+                        </div>
+
+                        <!-- Theme 3: Nàng Thơ Sân Vườn -->
+                        <div class="bg-brand-blush/40 rounded-2xl p-4 border border-brand-gold/20 hover:border-brand-gold hover:shadow-md transition-all flex flex-col justify-between space-y-3 group">
+                            <div class="space-y-2.5">
+                                <div class="relative rounded-xl overflow-hidden h-36">
+                                    <img src="https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&q=80&w=400" alt="Chủ đề nàng thơ" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <span class="absolute top-2 left-2 bg-black/60 text-white text-[9px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">Garden & Beach</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-1 text-[11px] font-extrabold text-pink-700">
+                                        <span>🌸 Nàng Thơ Cổ Tích</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-brand-text mt-0.5">Hôn Lễ Ngoài Trời & Sân Vườn</h4>
+                                    <p class="text-[10px] text-gray-500 mt-1 leading-snug">Vải voan tơ mềm nhẹ, tay bồng thêu hoa nổi 3D bồng bềnh, dễ dàng di chuyển chụp ảnh hoàng hôn tự nhiên.</p>
+                                </div>
+                                <div class="text-[10px] text-gray-600 bg-white/80 p-2 rounded-lg border border-gray-100">
+                                    <b>Hợp với:</b> Cô dâu muốn che bắp tay, thích sự ngọt ngào, bay bổng.
+                                </div>
+                            </div>
+                            <button onclick="quickTryLookbook('fairy')" class="w-full py-2 bg-pink-50 hover:bg-pink-600 text-pink-700 hover:text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-xs">styler</span> Ướm thử mẫu này ngay
+                            </button>
+                        </div>
+
+                        <!-- Theme 4: Áo Dài Gia Tiên Cát Hỷ -->
+                        <div class="bg-brand-blush/40 rounded-2xl p-4 border border-brand-gold/20 hover:border-brand-gold hover:shadow-md transition-all flex flex-col justify-between space-y-3 group">
+                            <div class="space-y-2.5">
+                                <div class="relative rounded-xl overflow-hidden h-36">
+                                    <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=400" alt="Chủ đề áo dài" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <span class="absolute top-2 left-2 bg-black/60 text-white text-[9px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm">Heritage</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-1 text-[11px] font-extrabold text-red-800">
+                                        <span>🇻🇳 Cát Hỷ Truyền Thống</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-brand-text mt-0.5">Lễ Ăn Hỏi & Rước Dâu Gia Tiên</h4>
+                                    <p class="text-[10px] text-gray-500 mt-1 leading-snug">Áo dài lụa tơ tằm thượng hạng thêu tay họa tiết Long Phụng, mang lại sự may mắn, cát tường trọn vẹn hai họ.</p>
+                                </div>
+                                <div class="text-[10px] text-gray-600 bg-white/80 p-2 rounded-lg border border-gray-100">
+                                    <b>Hợp với:</b> Mọi vóc dáng cô dâu Việt, tôn nét đoan trang truyền thống.
+                                </div>
+                            </div>
+                            <button onclick="quickTryLookbook('heritage')" class="w-full py-2 bg-red-50 hover:bg-red-600 text-red-700 hover:text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-xs">styler</span> Ướm thử mẫu này ngay
+                            </button>
                         </div>
                     </div>
                 </section>
@@ -794,22 +881,30 @@
     <!-- JavaScript Application Logic -->
     <script>
         // State variables
-        let selectedModelId = 1;
+        let selectedModelId = 'user'; // Default to user's real photo
         let selectedDressId = 1;
-        let uploadedCustomPhoto = null;
+        let uploadedCustomPhoto = 'user_bride.png';
         let isShowingOriginal = false;
-        let originalSourcePhoto = null;
-        let currentResultSrc = null;
+        let originalSourcePhoto = 'user_bride.png';
+        let currentResultSrc = 'user_tryon_mermaid.jpg';
 
-        // Realistic dress & render data
+        let activeThemeFilter = 'all';
+        let activeBodyShapeFilter = 'all';
+
+        // 8 Realistic Curated Wedding Dresses Across 5 Key Themes
         const dressData = {
             1: {
                 id: 1,
-                name: "Váy cưới Đuôi cá đính pha lê Royal",
+                name: "Váy Cưới Đuôi Cá Đính Pha Lê Royal",
                 studio: "2H Studio (Cầu Giấy, Hà Nội)",
                 price: "3.500.000đ",
                 originalPrice: "4.500.000đ",
                 style: "Dáng Đuôi Cá",
+                theme: "mermaid",
+                themeLabel: "Đuôi Cá",
+                suitable: ["hourglass", "tall"],
+                badge: "Hot Trend 2026",
+                badgeClass: "bg-amber-100 text-amber-800",
                 thumb: "https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=300",
                 renderResult: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800"
             },
@@ -820,6 +915,11 @@
                 price: "4.200.000đ",
                 originalPrice: "5.000.000đ",
                 style: "Xòe Công Chúa",
+                theme: "fairy",
+                themeLabel: "Xòe Công Chúa",
+                suitable: ["pear", "apple"],
+                badge: "Ưu Đãi 20%",
+                badgeClass: "bg-pink-100 text-pink-800",
                 thumb: "https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&q=80&w=300",
                 renderResult: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&q=80&w=800"
             },
@@ -830,6 +930,11 @@
                 price: "2.800.000đ",
                 originalPrice: "3.200.000đ",
                 style: "Cúp Ngực Minimalist",
+                theme: "minimalist",
+                themeLabel: "Tối Giản",
+                suitable: ["petite", "hourglass"],
+                badge: "Quiet Luxury",
+                badgeClass: "bg-blue-100 text-blue-800",
                 thumb: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=300",
                 renderResult: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=800"
             },
@@ -840,15 +945,254 @@
                 price: "2.200.000đ",
                 originalPrice: "2.500.000đ",
                 style: "Áo Dài Cát Hỷ",
+                theme: "heritage",
+                themeLabel: "Truyền Thống",
+                suitable: ["all", "heritage"],
+                badge: "Lễ Gia Tiên",
+                badgeClass: "bg-red-100 text-red-800",
                 thumb: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=300",
                 renderResult: "https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&q=80&w=800"
+            },
+            5: {
+                id: 5,
+                name: "Váy Đại Lễ Tùng Xòe Hoàng Gia Versailles",
+                studio: "Camile Bridal (Đống Đa, Hà Nội)",
+                price: "5.500.000đ",
+                originalPrice: "6.800.000đ",
+                style: "Đại Lễ Hoàng Gia",
+                theme: "royal",
+                themeLabel: "Hoàng Gia",
+                suitable: ["pear", "apple", "tall"],
+                badge: "Grand Ballroom VIP",
+                badgeClass: "bg-amber-100 text-amber-900",
+                thumb: "https://images.unsplash.com/photo-1596451190630-186aff535bf2?auto=format&fit=crop&q=80&w=300",
+                renderResult: "https://images.unsplash.com/photo-1596451190630-186aff535bf2?auto=format&fit=crop&q=80&w=800"
+            },
+            6: {
+                id: 6,
+                name: "Váy Voan Nàng Thơ Tay Bồng Hoa Nổi 3D",
+                studio: "Moza Wedding (Hai Bà Trưng, Hà Nội)",
+                price: "3.600.000đ",
+                originalPrice: "4.200.000đ",
+                style: "Boho & Nàng Thơ",
+                theme: "fairy",
+                themeLabel: "Nàng Thơ",
+                suitable: ["petite", "apple"],
+                badge: "Tiệc Sân Vườn",
+                badgeClass: "bg-emerald-100 text-emerald-800",
+                thumb: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=300",
+                renderResult: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800"
+            },
+            7: {
+                id: 7,
+                name: "Váy Lụa Crepe Cổ Yếm Quiet Luxury",
+                studio: "White Peony Atelier (Tây Hồ, Hà Nội)",
+                price: "3.200.000đ",
+                originalPrice: "3.900.000đ",
+                style: "Cổ Yếm Tối Giản",
+                theme: "minimalist",
+                themeLabel: "Tối Giản",
+                suitable: ["hourglass", "petite"],
+                badge: "Tiệc Thân Mật",
+                badgeClass: "bg-blue-100 text-blue-800",
+                thumb: "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&q=80&w=300",
+                renderResult: "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&q=80&w=800"
+            },
+            8: {
+                id: 8,
+                name: "Váy Đuôi Cá Cắt Xẻ Phối Ren Siren",
+                studio: "Juliette Bridal (Thanh Xuân, Hà Nội)",
+                price: "4.500.000đ",
+                originalPrice: "5.500.000đ",
+                style: "Quyến Rũ Siren",
+                theme: "mermaid",
+                themeLabel: "Đuôi Cá",
+                suitable: ["hourglass", "tall"],
+                badge: "Tôn Dáng 10/10",
+                badgeClass: "bg-purple-100 text-purple-800",
+                thumb: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&q=80&w=300",
+                renderResult: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&q=80&w=800"
             }
         };
 
         const sampleModels = {
-            1: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
-            2: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=400"
+            user: "user_bride.png",
+            bride1: "bride_model_1.png",
+            bride2: "bride_model_2.jpg",
+            bride3: "bride_model_3.png",
+            bride4: "bride_model_4.png"
         };
+
+        const brideNames = {
+            user: "Cô dâu Thảo (#1)",
+            bride1: "Cô dâu Mai (#2)",
+            bride2: "Cô dâu Kim (#3)",
+            bride3: "Cô dâu Linh (#4)",
+            bride4: "Cô dâu Hà (#5)"
+        };
+
+        // Photorealistic Try-On outputs generated for each bride across styles
+        const brideTryonGallery = {
+            user: {
+                1: "user_tryon_mermaid.jpg",       // Váy Đuôi Cá Royal
+                2: "user_tryon_white_royal.jpg",    // Váy Tùng Xòe Bellis
+                3: "user_tryon_satin.jpg",          // Váy Satin Lụa Trơn Hàn Quốc
+                4: "user_tryon_aodai.jpg",          // Áo Dài Thêu Long Phụng Cát Hỷ
+                5: "user_tryon_white_royal.jpg",    // Váy Đại Lễ Versailles
+                6: "user_tryon_white_royal.jpg",    // Váy Voan Nàng Thơ
+                7: "user_tryon_satin.jpg",          // Váy Lụa Crepe Cổ Yếm
+                8: "user_tryon_mermaid.jpg"         // Váy Đuôi Cá Siren
+            },
+            bride1: {
+                1: "bride_1_tryon_royal.jpg",
+                2: "bride_1_tryon_royal.jpg",
+                3: "bride_3_tryon_satin.jpg",
+                4: "user_tryon_aodai.jpg",
+                5: "bride_1_tryon_royal.jpg",
+                6: "bride_1_tryon_royal.jpg",
+                7: "bride_3_tryon_satin.jpg",
+                8: "bride_4_tryon_mermaid.jpg"
+            },
+            bride2: {
+                1: "bride_4_tryon_mermaid.jpg",
+                2: "bride_1_tryon_royal.jpg",
+                3: "bride_3_tryon_satin.jpg",
+                4: "user_tryon_aodai.jpg",
+                5: "bride_1_tryon_royal.jpg",
+                6: "bride_1_tryon_royal.jpg",
+                7: "bride_3_tryon_satin.jpg",
+                8: "bride_4_tryon_mermaid.jpg"
+            },
+            bride3: {
+                1: "bride_4_tryon_mermaid.jpg",
+                2: "bride_1_tryon_royal.jpg",
+                3: "bride_3_tryon_satin.jpg",
+                4: "user_tryon_aodai.jpg",
+                5: "bride_1_tryon_royal.jpg",
+                6: "bride_1_tryon_royal.jpg",
+                7: "bride_3_tryon_satin.jpg",
+                8: "bride_4_tryon_mermaid.jpg"
+            },
+            bride4: {
+                1: "bride_4_tryon_mermaid.jpg",
+                2: "bride_1_tryon_royal.jpg",
+                3: "bride_3_tryon_satin.jpg",
+                4: "user_tryon_aodai.jpg",
+                5: "bride_1_tryon_royal.jpg",
+                6: "bride_1_tryon_royal.jpg",
+                7: "bride_3_tryon_satin.jpg",
+                8: "bride_4_tryon_mermaid.jpg"
+            }
+        };
+
+        const userTryonResults = brideTryonGallery.user;
+
+        // Render Dress Catalog dynamically based on theme and body shape filters
+        function renderDressCatalog() {
+            const catalogContainer = document.getElementById('dress-catalog');
+            if (!catalogContainer) return;
+            catalogContainer.innerHTML = '';
+
+            let filteredDresses = Object.values(dressData).filter(dress => {
+                const matchTheme = (activeThemeFilter === 'all') || (dress.theme === activeThemeFilter);
+                const matchShape = (activeBodyShapeFilter === 'all') || (dress.suitable && dress.suitable.includes(activeBodyShapeFilter)) || (dress.suitable && dress.suitable.includes('all'));
+                return matchTheme && matchShape;
+            });
+
+            // Update badge counter
+            const badge = document.getElementById('dress-count-badge');
+            if (badge) {
+                badge.innerText = `${filteredDresses.length} mẫu hiển thị`;
+            }
+
+            if (filteredDresses.length === 0) {
+                catalogContainer.innerHTML = `
+                    <div class="p-6 text-center text-gray-400 bg-white rounded-2xl border border-gray-150">
+                        <span class="material-symbols-outlined text-3xl text-gray-300">search_off</span>
+                        <p class="text-xs font-semibold mt-1">Không có mẫu nào phù hợp bộ lọc</p>
+                        <button onclick="resetFilters()" class="text-[11px] text-brand-goldDark font-bold mt-2 underline">Xem lại tất cả mẫu</button>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredDresses.forEach(dress => {
+                const isSelected = (dress.id === selectedDressId);
+                const card = document.createElement('div');
+                card.id = `dress-card-${dress.id}`;
+                card.onclick = () => selectDress(dress.id);
+                card.className = `dress-card p-2.5 rounded-2xl border transition-all cursor-pointer relative flex gap-3 ${
+                    isSelected ? 'border-2 border-brand-gold bg-brand-gold/5 shadow-sm' : 'border-gray-200 bg-white hover:border-brand-gold/50'
+                }`;
+                card.innerHTML = `
+                    <img src="${dress.thumb}" alt="${dress.name}" class="w-16 h-20 object-cover rounded-xl shadow-sm shrink-0">
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded ${dress.badgeClass}">${dress.themeLabel}</span>
+                                <span class="text-[9px] font-bold text-brand-rose">${dress.badge}</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-brand-text mt-1 leading-snug">${dress.name}</h4>
+                            <span class="text-[10px] text-gray-500 flex items-center gap-0.5 mt-0.5">
+                                <span class="material-symbols-outlined text-[11px] text-brand-verified">verified</span> ${dress.studio}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between mt-1">
+                            <span class="text-xs font-extrabold text-brand-goldDark">${dress.price} <s class="text-[9px] font-normal text-gray-400">${dress.originalPrice}</s></span>
+                            <span class="text-[9px] text-green-600 font-bold bg-green-50 px-1.5 py-0.5 rounded">Có sẵn tại tiệm</span>
+                        </div>
+                    </div>
+                    <div class="absolute top-2 right-2 text-brand-gold select-indicator ${isSelected ? '' : 'hidden'}">
+                        <span class="material-symbols-outlined text-base">check_circle</span>
+                    </div>
+                `;
+                catalogContainer.appendChild(card);
+            });
+        }
+
+        // Filter by Theme Pills
+        function filterByTheme(theme) {
+            activeThemeFilter = theme;
+            document.querySelectorAll('.theme-pill').forEach(pill => {
+                pill.className = "theme-pill px-2.5 py-1 rounded-full font-medium bg-white text-gray-600 border border-gray-200 hover:border-brand-gold whitespace-nowrap";
+            });
+            const activePill = document.getElementById(`pill-${theme}`);
+            if (activePill) {
+                activePill.className = "theme-pill px-2.5 py-1 rounded-full font-bold bg-brand-gold text-white whitespace-nowrap shadow-sm";
+            }
+            renderDressCatalog();
+        }
+
+        // Filter by Body Shape Dropdown
+        function filterByBodyShape(shape) {
+            activeBodyShapeFilter = shape;
+            renderDressCatalog();
+            showToast(`Stylist AI đã lọc mẫu váy tối ưu cho dáng người bạn chọn!`);
+        }
+
+        function resetFilters() {
+            activeThemeFilter = 'all';
+            activeBodyShapeFilter = 'all';
+            const shapeSelect = document.getElementById('body-shape-filter');
+            if (shapeSelect) shapeSelect.value = 'all';
+            filterByTheme('all');
+        }
+
+        // Quick Try from Lookbook Section below
+        function quickTryLookbook(theme) {
+            filterByTheme(theme);
+            // Select first dress of that theme
+            const matchDress = Object.values(dressData).find(d => d.theme === theme);
+            if (matchDress) {
+                selectDress(matchDress.id);
+            }
+            // Smooth scroll to top try-on workspace
+            const workspace = document.getElementById('tryon-workspace');
+            if (workspace) {
+                workspace.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            showToast(`Đã chọn bộ sưu tập chủ đề: ${theme.toUpperCase()} vào phòng thử đồ!`);
+        }
 
         // Initialize User Counter from LocalStorage or default
         document.addEventListener("DOMContentLoaded", () => {
@@ -860,30 +1204,45 @@
             const dateStr = tomorrow.toISOString().split('T')[0];
             const dateInput = document.getElementById('cust-date');
             if (dateInput) dateInput.value = dateStr;
+
+            // Render dynamic dress catalog
+            renderDressCatalog();
+
+            // Set default active model to user's real photo
+            selectSampleModel('user');
+            selectDress(1);
         });
 
         // 1. Handle Sample Model Selection
         function selectSampleModel(id) {
             selectedModelId = id;
-            uploadedCustomPhoto = null;
-
-            // Reset upload box UI
-            document.getElementById('upload-preview-container').classList.add('hidden');
-            document.getElementById('upload-placeholder').classList.remove('hidden');
-            document.getElementById('bride-file-input').value = "";
 
             // Toggle active style on sample buttons
             document.querySelectorAll('.sample-model-btn').forEach(btn => {
-                btn.classList.remove('border-brand-gold', 'bg-brand-gold/5', 'border-2');
+                btn.classList.remove('border-brand-gold', 'bg-brand-gold/15', 'bg-brand-gold/10', 'bg-brand-gold/5', 'border-2');
                 btn.classList.add('border-gray-200', 'bg-white');
             });
+
+            const previewContainer = document.getElementById('upload-preview-container');
+            const placeholder = document.getElementById('upload-placeholder');
+            const previewImg = document.getElementById('upload-preview-img');
+
+            const modelImg = sampleModels[id] || 'user_bride.png';
+            uploadedCustomPhoto = modelImg;
+            originalSourcePhoto = modelImg;
+            if (previewImg) previewImg.src = modelImg;
+            if (placeholder) placeholder.classList.add('hidden');
+            if (previewContainer) previewContainer.classList.remove('hidden');
+
+            const tag = document.getElementById('preview-bride-tag');
+            if (tag) tag.innerText = brideNames[id] || 'Ảnh của bạn';
+
             const activeBtn = document.getElementById(`sample-btn-${id}`);
             if (activeBtn) {
                 activeBtn.classList.remove('border-gray-200', 'bg-white');
-                activeBtn.classList.add('border-brand-gold', 'bg-brand-gold/5', 'border-2');
+                activeBtn.classList.add('border-brand-gold', 'bg-brand-gold/15', 'border-2');
             }
-
-            showToast(`Đã chọn ảnh mẫu cô dâu ${id === 1 ? 'Trang' : 'Phương'}`);
+            showToast(`Đã chọn ${brideNames[id] || 'ảnh cô dâu'} để thử váy!`);
         }
 
         // 2. Handle Custom Bride Upload
@@ -894,16 +1253,21 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 uploadedCustomPhoto = e.target.result;
-                selectedModelId = null;
+                originalSourcePhoto = e.target.result;
+                selectedModelId = 'custom';
 
                 // Update UI preview
-                document.getElementById('upload-preview-img').src = uploadedCustomPhoto;
+                const previewImg = document.getElementById('upload-preview-img');
+                if (previewImg) previewImg.src = uploadedCustomPhoto;
                 document.getElementById('upload-placeholder').classList.add('hidden');
                 document.getElementById('upload-preview-container').classList.remove('hidden');
 
+                const tag = document.getElementById('preview-bride-tag');
+                if (tag) tag.innerText = 'Ảnh tải lên';
+
                 // Remove highlight from sample buttons
                 document.querySelectorAll('.sample-model-btn').forEach(btn => {
-                    btn.classList.remove('border-brand-gold', 'bg-brand-gold/5', 'border-2');
+                    btn.classList.remove('border-brand-gold', 'bg-brand-gold/15', 'bg-brand-gold/10', 'bg-brand-gold/5', 'border-2');
                     btn.classList.add('border-gray-200', 'bg-white');
                 });
 
@@ -961,42 +1325,54 @@
             statusBadge.innerText = "Đang xử lý AI...";
 
             // Step 1: Pose detection
-            stepText.innerText = "1/4: Nhận diện 33 điểm mốc cơ thể & tư thế...";
+            stepText.innerText = "1/4: Nhận diện 33 điểm mốc cơ thể & tư thế khuôn mặt...";
             progressBar.style.width = "25%";
 
             setTimeout(() => {
                 // Step 2: Dress mapping
                 stepText.innerText = "2/4: Biến đổi khớp phom váy cưới theo vóc dáng...";
                 progressBar.style.width = "55%";
-            }, 800);
+            }, 700);
 
             setTimeout(() => {
                 // Step 3: Fabric rendering
                 stepText.innerText = "3/4: Render chi tiết ren, vải voan & ánh sáng tự nhiên...";
                 progressBar.style.width = "85%";
-            }, 1600);
+            }, 1400);
 
             setTimeout(() => {
                 // Step 4: Finalize
                 stepText.innerText = "4/4: Hoàn thiện bức ảnh thử váy!";
                 progressBar.style.width = "100%";
 
-                // Determine original source photo (custom uploaded vs sample)
-                if (uploadedCustomPhoto) {
+                // Determine original source photo (custom uploaded vs sample vs real user photo)
+                const customBadge = document.getElementById('custom-photo-indicator');
+                if (brideTryonGallery[selectedModelId]) {
+                    originalSourcePhoto = sampleModels[selectedModelId];
+                    currentResultSrc = brideTryonGallery[selectedModelId][selectedDressId] || userTryonResults[selectedDressId] || 'user_tryon_white_royal.jpg';
+                    if (customBadge) {
+                        customBadge.classList.remove('hidden');
+                        customBadge.innerHTML = `<span class="material-symbols-outlined text-[10px]">face</span> ${brideNames[selectedModelId] || 'Ảnh thật'}`;
+                    }
+                    document.getElementById('result-view-badge').innerText = `Trạm Hỷ AI (${brideNames[selectedModelId] || 'Ảnh Thật'})`;
+                } else if (selectedModelId === 'custom' && uploadedCustomPhoto) {
                     originalSourcePhoto = uploadedCustomPhoto;
-                    document.getElementById('custom-photo-indicator').classList.remove('hidden');
+                    currentResultSrc = userTryonResults[selectedDressId] || dressData[selectedDressId].renderResult;
+                    if (customBadge) {
+                        customBadge.classList.remove('hidden');
+                        customBadge.innerHTML = '<span class="material-symbols-outlined text-[10px]">person</span> Ảnh tải lên';
+                    }
+                    document.getElementById('result-view-badge').innerText = "Trạm Hỷ AI Render";
                 } else {
-                    originalSourcePhoto = sampleModels[selectedModelId || 1];
-                    document.getElementById('custom-photo-indicator').classList.add('hidden');
+                    originalSourcePhoto = sampleModels[selectedModelId] || sampleModels['user'];
+                    currentResultSrc = dressData[selectedDressId].renderResult;
+                    if (customBadge) customBadge.classList.add('hidden');
+                    document.getElementById('result-view-badge').innerText = "Trạm Hỷ AI Render";
                 }
 
-                // Update result image based on selected dress
-                const dress = dressData[selectedDressId];
-                currentResultSrc = dress.renderResult;
                 resultImg.src = currentResultSrc;
                 isShowingOriginal = false;
                 document.getElementById('compare-text').innerText = "Xem ảnh gốc";
-                document.getElementById('result-view-badge').innerText = "Trạm Hỷ AI Render";
 
                 scanning.classList.add('hidden');
                 completed.classList.remove('hidden');
@@ -1008,12 +1384,8 @@
                 localStorage.setItem('tramhy_user_counter', userCount);
                 document.getElementById('counter-user-display').innerText = userCount;
 
-                if (uploadedCustomPhoto) {
-                    showToast("AI đã nhận diện ảnh của bạn và hoàn tất ướm thử váy!");
-                } else {
-                    showToast("Thử váy AI thành công! Bạn trông rất hợp với mẫu này.");
-                }
-            }, 2300);
+                showToast(`✨ AI đã thử mẫu váy thành công trên ${brideNames[selectedModelId] || 'ảnh của bạn'}!`);
+            }, 2100);
         }
 
         // Toggle Before/After comparison
