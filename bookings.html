@@ -36,13 +36,13 @@
             font-family: 'Playfair Display', serif;
         }
         .glass {
-            background: rgba(255, 255, 255, 0.82);
+            background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
         .blush-glow {
-            box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.12);
+            box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.15);
         }
         .step-line {
             position: absolute;
@@ -67,13 +67,11 @@
         </div>
         <div class="flex flex-col gap-1.5" id="demo-buttons">
             <a href="index.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1. Trang chủ</a>
-            <a href="tryon.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-goldDark font-bold hover:bg-brand-blush shadow-sm transition-all border border-brand-gold/40 text-left flex items-center justify-between"><span>2. Thử váy AR (EXE201)</span> <span class="bg-red-500 text-white text-[9px] px-1.5 py-0.2 rounded-full">Hot</span></a>
-            <a href="marketplace.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">3. Dịch vụ cưới hỏi</a>
-            <a href="detail.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">4. Chi tiết & Đặt cọc</a>
-            <a href="bookings.html" class="px-3 py-1.5 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 5. Lịch hẹn nhà cung cấp</a>
-            <a href="dashboard.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">6. Kênh Nhà cung cấp</a>
-            <a href="invitation.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">7. Tạo thiệp & QR</a>
-            <a href="admin.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">8. Quản trị Admin</a>
+            <a href="tryon.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-goldDark font-bold hover:bg-brand-blush shadow-sm transition-all border border-brand-gold/40 text-left flex items-center justify-between"><span>2. Thử Váy AR (Mới)</span> <span class="bg-red-500 text-white text-[9px] px-1.5 py-0.2 rounded-full">Hot</span></a>
+            <a href="marketplace.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">3. Thuê & May Đo Váy</a>
+            <a href="bookings.html" class="px-3 py-1.5 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 4. Lịch Hẹn & Escrow 2 Chiều</a>
+            <a href="invitation.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">5. Tạo thiệp & QR</a>
+            <a href="admin.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">6. Quản trị Admin</a>
         </div>
     </div>
 
@@ -202,17 +200,17 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div class="bg-stone-800/80 p-3.5 rounded-2xl border border-stone-700 space-y-1">
                             <span class="text-[10px] text-stone-400 uppercase tracking-wider block">Cọc sàn đang giữ an toàn cho Studio</span>
-                            <span class="serif-title text-lg font-extrabold text-brand-goldLight">14.500.000đ</span>
+                            <span class="serif-title text-lg font-extrabold text-brand-goldLight" id="b2b-stat-locked">14.500.000đ</span>
                             <span class="text-[9px] text-emerald-400 block">✓ Khách đã cọc tiền thật, không sợ bùng lịch</span>
                         </div>
                         <div class="bg-stone-800/80 p-3.5 rounded-2xl border border-stone-700 space-y-1">
                             <span class="text-[10px] text-stone-400 uppercase tracking-wider block">Đã giải ngân Mốc 1 (Sau ngày 1)</span>
-                            <span class="serif-title text-lg font-extrabold text-white">7.250.000đ</span>
+                            <span class="serif-title text-lg font-extrabold text-white" id="b2b-stat-disbursed">7.250.000đ</span>
                             <span class="text-[9px] text-stone-400 block">Chuyển khoản trong 24h sau buổi chụp</span>
                         </div>
                         <div class="bg-stone-800/80 p-3.5 rounded-2xl border border-stone-700 space-y-1">
                             <span class="text-[10px] text-stone-400 uppercase tracking-wider block">Bảo vệ rủi ro No-show / Hủy lịch</span>
-                            <span class="serif-title text-lg font-extrabold text-emerald-400">100% Cọc</span>
+                            <span class="serif-title text-lg font-extrabold text-emerald-400" id="b2b-stat-noshow">100% Cọc</span>
                             <span class="text-[9px] text-stone-400 block">Bồi thường cho studio nếu khách hủy &lt; 48h</span>
                         </div>
                     </div>
@@ -234,8 +232,218 @@
         </footer>
     </div>
 
-    <!-- PAYMENT QR CODE MODAL -->
-    <div id="payment-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center hidden">
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-notification" class="fixed top-5 right-5 z-[99999] max-w-sm w-full transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div id="toast-box" class="glass rounded-2xl p-4 shadow-2xl border flex items-center gap-3 text-xs font-bold border-brand-gold/40 blush-glow">
+            <span id="toast-icon" class="material-symbols-outlined text-2xl text-emerald-600">check_circle</span>
+            <div class="flex-1 text-brand-text" id="toast-text">Thông báo thành công</div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: GIẢI NGÂN MỐC 1 CHO STUDIO (B2B) -->
+    <div id="disburse-modal" class="fixed inset-0 bg-black/65 backdrop-blur-sm z-[9999] flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-brand-gold/30 space-y-4 relative blush-glow">
+            <button onclick="closeModal('disburse-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-brand-text"><span class="material-symbols-outlined">close</span></button>
+            
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-3">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200 shrink-0">
+                    <span class="material-symbols-outlined text-2xl">account_balance</span>
+                </div>
+                <div>
+                    <h3 class="serif-title text-base font-bold text-brand-text">Xác Nhận Giải Ngân Mốc 1 (Ngày 1)</h3>
+                    <p class="text-[11px] text-gray-500">Chuyển tiền cọc sang tài khoản Studio đối tác</p>
+                </div>
+            </div>
+
+            <div class="bg-brand-blush/70 rounded-2xl p-3.5 border border-brand-gold/20 space-y-2 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Mã đơn đặt lịch:</span>
+                    <span class="font-extrabold text-brand-text" id="disburse-modal-id">BK-829104</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Khách hàng:</span>
+                    <span class="font-bold text-brand-text" id="disburse-modal-client">Nguyễn Minh Ngọc</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Mẫu váy thử:</span>
+                    <span class="font-bold text-blue-900" id="disburse-modal-dress">Váy cưới Đuôi cá đính pha lê Royal</span>
+                </div>
+                <div class="border-t border-gray-200 pt-2 flex justify-between items-center">
+                    <span class="font-bold text-gray-700">Số tiền rút đợt 1 (50% cọc):</span>
+                    <span class="serif-title text-base font-extrabold text-emerald-700" id="disburse-modal-amount">525.000đ</span>
+                </div>
+                <div class="flex justify-between text-[11px] text-gray-500">
+                    <span>Tài khoản nhận:</span>
+                    <span class="font-bold text-stone-800">Vietcombank • STK: **** 8829 (2H Studio)</span>
+                </div>
+            </div>
+
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-[11px] text-emerald-800 space-y-1">
+                <div class="font-bold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">verified_user</span> Cơ chế bảo chứng Escrow Trạm Hỷ
+                </div>
+                <p>Số tiền 50% còn lại (525.000đ) tiếp tục được giữ an toàn trên sàn cho đến khi cô dâu cưới xong và nghiệm thu váy.</p>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button onclick="closeModal('disburse-modal')" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition-all">
+                    Hủy bỏ
+                </button>
+                <button onclick="executeDisburse()" class="flex-1 py-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 active:scale-95">
+                    <span class="material-symbols-outlined text-sm">check_circle</span> Rút 525.000đ Về STK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: BÁO CÁO NO-SHOW (B2B) -->
+    <div id="noshow-modal" class="fixed inset-0 bg-black/65 backdrop-blur-sm z-[9999] flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-brand-gold/30 space-y-4 relative blush-glow">
+            <button onclick="closeModal('noshow-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-brand-text"><span class="material-symbols-outlined">close</span></button>
+            
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-3">
+                <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-700 flex items-center justify-center border border-rose-200 shrink-0">
+                    <span class="material-symbols-outlined text-2xl">event_busy</span>
+                </div>
+                <div>
+                    <h3 class="serif-title text-base font-bold text-rose-900">Báo Cáo Khách Hàng No-Show</h3>
+                    <p class="text-[11px] text-gray-500">Kích hoạt bồi thường 100% tiền cọc cho Studio</p>
+                </div>
+            </div>
+
+            <div class="bg-rose-50/60 rounded-2xl p-3.5 border border-rose-200 space-y-2 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Mã đơn:</span>
+                    <span class="font-extrabold text-brand-text" id="noshow-modal-id">BK-829104</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Khách hàng:</span>
+                    <span class="font-bold text-brand-text" id="noshow-modal-client">Nguyễn Minh Ngọc</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Thời gian hẹn:</span>
+                    <span class="font-bold text-rose-700">14:00 - 15:30 (Đã quá giờ hẹn &gt; 45p)</span>
+                </div>
+                <div class="border-t border-rose-200 pt-2 flex justify-between items-center">
+                    <span class="font-bold text-gray-700">Khoản bồi thường Studio nhận:</span>
+                    <span class="serif-title text-base font-extrabold text-rose-700" id="noshow-modal-amount">1.050.000đ (100% Cọc)</span>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-900 space-y-1">
+                <div class="font-bold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">shield</span> Điều khoản Bảo Vệ Đối Tác B2B
+                </div>
+                <p>Khách không có mặt mà không thông báo trước 48h. Toàn bộ tiền cọc giữ chỗ sẽ được Trạm Hỷ bồi thường ngay lập tức vào ví của Studio để bù đắp chi phí giữ ekip.</p>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button onclick="closeModal('noshow-modal')" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition-all">
+                    Đóng
+                </button>
+                <button onclick="executeNoShow()" class="flex-1 py-3 bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 active:scale-95">
+                    <span class="material-symbols-outlined text-sm">security</span> Nhận Bồi Thường 1.050.000đ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: HOÀN CỌC 100% CHO CÔ DÂU (B2C) -->
+    <div id="refund-modal" class="fixed inset-0 bg-black/65 backdrop-blur-sm z-[9999] flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-brand-gold/30 space-y-4 relative blush-glow">
+            <button onclick="closeModal('refund-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-brand-text"><span class="material-symbols-outlined">close</span></button>
+            
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-3">
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-brand-goldDark flex items-center justify-center border border-brand-gold/30 shrink-0">
+                    <span class="material-symbols-outlined text-2xl">shield_with_heart</span>
+                </div>
+                <div>
+                    <h3 class="serif-title text-base font-bold text-brand-text">Trạm Hỷ Care: Hoàn Cọc 100%</h3>
+                    <p class="text-[11px] text-gray-500">Bảo vệ quyền lợi cô dâu theo cam kết vàng</p>
+                </div>
+            </div>
+
+            <div class="bg-brand-blush/70 rounded-2xl p-3.5 border border-brand-gold/20 space-y-2 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Mã lịch hẹn:</span>
+                    <span class="font-extrabold text-brand-text" id="refund-modal-id">BK-829104</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Studio:</span>
+                    <span class="font-bold text-brand-text">2H Studio (Cầu Giấy, Hà Nội)</span>
+                </div>
+                <div class="border-t border-gray-200 pt-2 flex justify-between items-center">
+                    <span class="font-bold text-gray-700">Số tiền được hoàn trả:</span>
+                    <span class="serif-title text-base font-extrabold text-emerald-700" id="refund-modal-amount">1.050.000đ (100% Cọc)</span>
+                </div>
+            </div>
+
+            <!-- Reason selection -->
+            <div class="space-y-1.5 text-xs">
+                <span class="font-bold text-gray-700 block">Chọn lý do hoàn cọc bảo chứng:</span>
+                <label class="flex items-center gap-2 p-2 bg-gray-50 hover:bg-gray-100 rounded-xl cursor-pointer border border-gray-200">
+                    <input type="radio" name="refund-reason" checked class="text-brand-gold">
+                    <span class="text-[11px] text-gray-700 font-medium">Váy tại showroom khác phom dáng hoặc chất liệu so với ảnh AI</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-gray-50 hover:bg-gray-100 rounded-xl cursor-pointer border border-gray-200">
+                    <input type="radio" name="refund-reason" class="text-brand-gold">
+                    <span class="text-[11px] text-gray-700 font-medium">Showroom không giữ đúng mẫu váy hoặc hủy lịch hẹn</span>
+                </label>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button onclick="closeModal('refund-modal')" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition-all">
+                    Giữ Lại Lịch Hẹn
+                </button>
+                <button onclick="executeRefund()" class="flex-1 py-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 active:scale-95">
+                    <span class="material-symbols-outlined text-sm">undo</span> Xác Nhận Hoàn 100% Cọc
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: THẺ CHECK-IN SHOWROOM QR (B2C) -->
+    <div id="checkin-modal" class="fixed inset-0 bg-black/65 backdrop-blur-sm z-[9999] flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-brand-gold/30 space-y-4 relative blush-glow text-center">
+            <button onclick="closeModal('checkin-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-brand-text"><span class="material-symbols-outlined">close</span></button>
+            
+            <div>
+                <span class="text-[9px] uppercase tracking-wider font-extrabold text-brand-goldDark bg-brand-gold/15 px-2.5 py-0.5 rounded-full">THẺ THỬ VÁY VIP</span>
+                <h3 class="serif-title text-base font-bold text-brand-text mt-1">Mã Check-in Showroom</h3>
+                <p class="text-[10px] text-gray-400">Đưa mã này cho nhân viên lễ tân khi bạn đến tiệm</p>
+            </div>
+
+            <div class="bg-stone-50 p-3 rounded-2xl border border-brand-gold/30 inline-block shadow-inner mx-auto">
+                <img id="checkin-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TRAMHY_CHECKIN_BK829104" class="w-40 h-40 object-cover mx-auto rounded-lg" alt="Checkin QR">
+            </div>
+
+            <div class="bg-brand-blush/80 rounded-2xl p-3 text-left space-y-1.5 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-gray-400">Mã lịch hẹn:</span>
+                    <span class="font-extrabold text-brand-text" id="checkin-id">BK-829104</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">Cô dâu:</span>
+                    <span class="font-bold text-brand-text" id="checkin-name">Nguyễn Minh Ngọc</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">Số đo nhân trắc:</span>
+                    <span class="font-bold text-brand-goldDark" id="checkin-metrics">162cm • 49kg • Dáng Đồng hồ cát</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">Showroom:</span>
+                    <span class="font-semibold text-gray-700">2H Studio (Cầu Giấy, HN)</span>
+                </div>
+            </div>
+
+            <button onclick="closeModal('checkin-modal')" class="w-full py-2.5 bg-brand-text text-white text-xs font-bold rounded-xl shadow hover:bg-black transition-all">
+                Đóng Thẻ
+            </button>
+        </div>
+    </div>
+
+    <!-- PAYMENT QR CODE MODAL (ESCROW STAGE PAYMENT) -->
+    <div id="payment-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-brand-gold/20 text-center space-y-4 relative">
             <button onclick="closePaymentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-brand-text"><span class="material-symbols-outlined">close</span></button>
             
@@ -245,7 +453,7 @@
             
             <div>
                 <h3 class="serif-title text-sm font-bold text-brand-text" id="modal-title">Thanh toán bảo chứng Đợt 2</h3>
-                <p class="text-[10px] text-gray-400 mt-1">Sử dụng ứng dụng Ngân hàng hoặc Ví điện tử của bạn để quét mã.</p>
+                <p class="text-[10px] text-gray-400 mt-1">Sử dụng ứng dụng Ngân hàng hoặc Ví điện tử để quét mã.</p>
             </div>
 
             <!-- Simulated QR Image (VietQR dynamic format) -->
@@ -268,7 +476,7 @@
                 </div>
             </div>
 
-            <button onclick="confirmStagePayment()" class="w-full py-2.5 bg-green-600 hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-md transition-all">
+            <button onclick="confirmStagePayment()" class="w-full py-2.5 bg-green-600 hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
                 Tôi Đã Quét & Thanh Toán Thành Công
             </button>
         </div>
@@ -282,6 +490,40 @@
 
         let currentActiveStageToPay = null;
         let currentPerspective = 'b2c'; // 'b2c' or 'b2b'
+        let targetBookingId = null;
+
+        // Custom Toast System (No ugly browser alerts)
+        let toastTimeout = null;
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast-notification');
+            const toastText = document.getElementById('toast-text');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastText.innerHTML = message;
+            if (type === 'success') {
+                toastIcon.innerText = 'check_circle';
+                toastIcon.className = 'material-symbols-outlined text-2xl text-emerald-600';
+            } else if (type === 'warning') {
+                toastIcon.innerText = 'warning';
+                toastIcon.className = 'material-symbols-outlined text-2xl text-amber-500';
+            } else if (type === 'shield') {
+                toastIcon.innerText = 'verified_user';
+                toastIcon.className = 'material-symbols-outlined text-2xl text-brand-goldDark';
+            }
+
+            toast.classList.remove('pointer-events-none', '-translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-24', 'opacity-0', 'pointer-events-none');
+            }, 3500);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
 
         function switchEscrowPerspective(persp) {
             currentPerspective = persp;
@@ -295,12 +537,14 @@
                 btnB2B.classList.remove('bg-white', 'text-brand-text', 'shadow-sm');
                 btnB2B.classList.add('text-gray-500');
                 b2bSummary.classList.add('hidden');
+                showToast("Đã chuyển sang: <b>Góc nhìn Cô Dâu (B2C)</b> - Theo dõi bảo chứng cọc Trạm Hỷ Shield", "shield");
             } else {
                 btnB2B.classList.add('bg-white', 'text-brand-text', 'shadow-sm');
                 btnB2B.classList.remove('text-gray-500');
                 btnB2C.classList.remove('bg-white', 'text-brand-text', 'shadow-sm');
                 btnB2C.classList.add('text-gray-500');
                 b2bSummary.classList.remove('hidden');
+                showToast("Đã chuyển sang: <b>Góc nhìn Studio Đối tác (B2B)</b> - Quản lý rút cọc & chống bùng lịch", "success");
             }
             loadBookings();
         }
@@ -320,23 +564,86 @@
                         dressName: "Váy cưới Đuôi cá đính pha lê Royal",
                         studio: "2H Studio (Cầu Giấy, Hà Nội)",
                         price: "3.500.000đ",
+                        numericPrice: 3500000,
+                        depositPaid: 1050000,
                         date: "28/09/2026",
                         time: "14:00 - 15:30",
                         height: 162,
                         weight: 49,
                         shape: "hourglass",
-                        includePhoto: true,
-                        includeMakeup: true,
-                        depositStatus: "Đã giữ cọc an toàn (Milestone Pay)",
+                        status: "deposit_locked", // deposit_locked, day1_disbursed, no_show_claimed, b2c_refunded, completed
                         createdAt: "2026-09-26T14:30:00.000Z"
+                    },
+                    {
+                        id: "BK-716492",
+                        customerName: "Trần Mai Phương",
+                        phone: "0912 345 678",
+                        dressName: "Váy Tùng Xòe Ren Pháp Bellis",
+                        studio: "2H Studio (Cầu Giấy, Hà Nội)",
+                        price: "3.500.000đ",
+                        numericPrice: 3500000,
+                        depositPaid: 1050000,
+                        date: "29/09/2026",
+                        time: "09:30 - 11:00",
+                        height: 162,
+                        weight: 49,
+                        shape: "hourglass",
+                        status: "deposit_locked",
+                        createdAt: "2026-09-27T08:00:00.000Z"
+                    },
+                    {
+                        id: "BK-552109",
+                        customerName: "Lê Hoàng Yến",
+                        phone: "0905 888 999",
+                        dressName: "Váy Satin Lụa Trơn Hàn Quốc",
+                        studio: "2H Studio (Cầu Giấy, Hà Nội)",
+                        price: "3.500.000đ",
+                        numericPrice: 3500000,
+                        depositPaid: 1050000,
+                        date: "30/09/2026",
+                        time: "16:00 - 17:30",
+                        height: 162,
+                        weight: 49,
+                        shape: "hourglass",
+                        status: "deposit_locked",
+                        createdAt: "2026-09-27T10:00:00.000Z"
                     }
                 ];
                 localStorage.setItem('tramhy_bookings', JSON.stringify(tryOnBookings));
             }
 
+            // Calculate dynamic totals for B2B summary banner
+            let baseLocked = 14500000;
+            let baseDisbursed = 7250000;
+            let noShowCount = 0;
+
+            tryOnBookings.forEach(item => {
+                if (item.status === 'day1_disbursed') {
+                    baseDisbursed += 525000;
+                    baseLocked -= 525000;
+                } else if (item.status === 'no_show_claimed') {
+                    baseDisbursed += 1050000;
+                    baseLocked -= 1050000;
+                    noShowCount++;
+                } else if (item.status === 'b2c_refunded') {
+                    baseLocked -= 1050000;
+                } else if (item.status === 'completed') {
+                    baseDisbursed += 1050000;
+                    baseLocked -= 1050000;
+                }
+            });
+
+            const statLockedEl = document.getElementById('b2b-stat-locked');
+            const statDisbursedEl = document.getElementById('b2b-stat-disbursed');
+            const statNoShowEl = document.getElementById('b2b-stat-noshow');
+            if (statLockedEl) statLockedEl.innerText = formatMoney(baseLocked);
+            if (statDisbursedEl) statDisbursedEl.innerText = formatMoney(baseDisbursed);
+            if (statNoShowEl) statNoShowEl.innerText = noShowCount > 0 ? `Đã bảo vệ ${noShowCount} ca` : `100% Cọc`;
+
+            // Render each AR Try-on card
             tryOnBookings.forEach(item => {
                 const tryonCard = document.createElement('div');
-                tryonCard.className = "bg-white rounded-3xl border-2 border-brand-gold/40 p-5 shadow-sm space-y-4 blush-glow relative overflow-hidden";
+                tryonCard.className = "bg-white rounded-3xl border-2 border-brand-gold/40 p-5 shadow-sm space-y-4 blush-glow relative overflow-hidden transition-all";
                 
                 const shapeNames = {
                     hourglass: 'Đồng hồ cát',
@@ -347,7 +654,69 @@
                 const shapeLabel = shapeNames[item.shape] || 'Cân đối';
 
                 if (currentPerspective === 'b2c') {
-                    // =================== B2C BRIDE VIEW ===================
+                    // =================== B2C BRIDE PERSPECTIVE ===================
+                    let statusBadgeB2C = '';
+                    let actionAreaB2C = '';
+
+                    if (item.status === 'day1_disbursed') {
+                        statusBadgeB2C = '<span class="px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 font-bold text-[9px]">TIẾN ĐỘ: ĐÃ XONG NGÀY 1 (GIẢI NGÂN 50%)</span>';
+                        actionAreaB2C = `
+                            <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-3 text-xs space-y-1">
+                                <span class="text-[11px] font-bold text-blue-900 flex items-center gap-1"><span class="material-symbols-outlined text-sm text-blue-600">verified</span> Studio đã hoàn thành buổi thử/chụp Ngày 1</span>
+                                <p class="text-[10px] text-blue-700">Trạm Hỷ đã tạm ứng 50% cọc cho Studio và tiếp tục giữ 50% cọc còn lại (525.000đ) bảo chứng đến ngày nhận váy cưới.</p>
+                            </div>
+                        `;
+                    } else if (item.status === 'no_show_claimed') {
+                        statusBadgeB2C = '<span class="px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 font-bold text-[9px]">LỊCH HẸN ĐÃ HỦY DO NO-SHOW</span>';
+                        actionAreaB2C = `
+                            <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs text-rose-800">
+                                <p class="font-bold text-[11px]">Đơn đặt lịch đã quá giờ hẹn</p>
+                                <p class="text-[10px] text-rose-700 mt-0.5">Tiền cọc đợt 1 đã được chuyển bồi thường cho Studio theo chính sách bảo vệ đối tác khi khách hủy lịch &lt;48h.</p>
+                            </div>
+                        `;
+                    } else if (item.status === 'b2c_refunded') {
+                        statusBadgeB2C = '<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[9px]">✓ ĐÃ HOÀN 100% CỌC VỀ VÍ (1.050.000đ)</span>';
+                        actionAreaB2C = `
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800 space-y-1">
+                                <span class="font-bold text-[11px] flex items-center gap-1"><span class="material-symbols-outlined text-sm">check_circle</span> Trạm Hỷ Care Shield đã hoàn cọc thành công</span>
+                                <p class="text-[10px] text-emerald-700">1.050.000đ đã được hoàn trả về tài khoản ngân hàng của bạn do vi phạm cam kết phom dáng váy tại Showroom.</p>
+                            </div>
+                        `;
+                    } else if (item.status === 'completed') {
+                        statusBadgeB2C = '<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[9px]">✓ HỢP ĐỒNG ĐÃ HOÀN TẤT VIÊN MÃN</span>';
+                        actionAreaB2C = `
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center space-y-1 text-xs">
+                                <span class="material-symbols-outlined text-emerald-600 text-2xl">favorite</span>
+                                <p class="font-bold text-emerald-800">Chúc hai bạn trăm năm hạnh phúc!</p>
+                                <p class="text-[10px] text-emerald-600">Đã tất toán 100% và bàn giao váy cưới hoàn chỉnh.</p>
+                            </div>
+                        `;
+                    } else {
+                        // default: deposit_locked
+                        statusBadgeB2C = '<span class="text-[9px] font-bold text-green-700 bg-green-200/60 px-2 py-0.5 rounded-full">Đã Khóa Giữ Lịch</span>';
+                        actionAreaB2C = `
+                            <div class="p-3 bg-green-50 border border-green-200 rounded-xl text-xs space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-bold text-green-800 flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm text-green-600">shield</span>
+                                        Cọc Bảo Chứng Trạm Hỷ Escrow (Đợt 1: 30%)
+                                    </span>
+                                    ${statusBadgeB2C}
+                                </div>
+                                <p class="text-[9px] text-green-700 leading-tight">Số tiền cọc (1.050.000đ) được giữ an toàn trên sàn. Nếu đến tiệm mà váy lệch phom hoặc tiệm hủy hẹn, dâu rể được hoàn 100% cọc trong 2 giờ + đền bù voucher 500k.</p>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-1 border-t border-gray-100">
+                                <button onclick="openCheckInModal('${item.id}')" class="flex-1 py-2 bg-brand-text text-white text-[11px] font-bold rounded-xl shadow-sm hover:bg-black transition-all flex items-center justify-center gap-1 active:scale-95">
+                                    <span class="material-symbols-outlined text-xs text-brand-gold">qr_code_2</span> Thẻ Check-in Showroom
+                                </button>
+                                <button onclick="openRefundModal('${item.id}')" class="px-3 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 text-[10px] font-bold rounded-xl border border-rose-200 transition-all flex items-center gap-1 active:scale-95">
+                                    <span class="material-symbols-outlined text-xs">undo</span> Hoàn Cọc 100%
+                                </button>
+                            </div>
+                        `;
+                    }
+
                     tryonCard.innerHTML = `
                         <div class="absolute top-0 right-0 bg-brand-gold text-white text-[9px] font-extrabold uppercase px-3 py-1 rounded-bl-xl tracking-wider flex items-center gap-1 shadow-sm">
                             <span class="material-symbols-outlined text-[11px]">styler</span> Thử Váy AR (Bảo Chứng Cọc B2C)
@@ -389,30 +758,87 @@
                             <span class="text-gray-700">Cao: <b>${item.height || 162}cm</b> • Nặng: <b>${item.weight || 49}kg</b> • Dáng: <b>${shapeLabel}</b></span>
                         </div>
 
-                        <!-- Escrow Protection Badge -->
-                        <div class="p-3 bg-green-50 border border-green-200 rounded-xl text-xs space-y-1">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-bold text-green-800 flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-sm text-green-600">shield</span>
-                                    Cọc Bảo Chứng Trạm Hỷ Escrow (Đợt 1: 30%)
-                                </span>
-                                <span class="text-[9px] font-bold text-green-700 bg-green-200/60 px-2 py-0.5 rounded-full">Đã Khóa Giữ Lịch</span>
-                            </div>
-                            <p class="text-[9px] text-green-700 leading-tight">Số tiền cọc được giữ an toàn trên sàn. Nếu đến tiệm mà váy lệch phom hoặc tiệm hủy hẹn, dâu rể được hoàn 100% cọc trong 2 giờ + đền bù voucher 500k.</p>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="flex items-center gap-2 pt-1 border-t border-gray-100">
-                            <a href="tel:${item.phone}" class="flex-1 text-center py-2 bg-slate-900 text-white text-[11px] font-bold rounded-xl shadow-sm hover:bg-black transition-all flex items-center justify-center gap-1">
-                                <span class="material-symbols-outlined text-xs text-brand-gold">call</span> Gọi Hotline Studio
-                            </a>
-                            <a href="tryon.html" class="px-3 py-2 bg-brand-gold/15 text-brand-goldDark text-[11px] font-bold rounded-xl hover:bg-brand-gold/25 transition-all flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">refresh</span> Thử lại
-                            </a>
-                        </div>
+                        <!-- Dynamic Action and Status Area -->
+                        ${actionAreaB2C}
                     `;
                 } else {
-                    // =================== B2B STUDIO VIEW ===================
+                    // =================== B2B STUDIO PERSPECTIVE ===================
+                    let statusBadgeB2B = '';
+                    let actionAreaB2B = '';
+
+                    if (item.status === 'day1_disbursed') {
+                        statusBadgeB2B = '<span class="px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 font-bold text-[9px]">✓ ĐÃ GIẢI NGÂN MỐC 1 (525.000đ)</span>';
+                        actionAreaB2B = `
+                            <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-3 text-xs space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-blue-900 flex items-center gap-1"><span class="material-symbols-outlined text-sm text-blue-600">account_balance</span> Tiền đã chuyển về STK Vietcombank ****8829</span>
+                                    <span class="text-[9px] text-blue-700 font-bold">525.000đ (50% Cọc)</span>
+                                </div>
+                                <p class="text-[10px] text-blue-700 leading-tight">Đã giải ngân Mốc 1 sau ngày chụp đầu tiên. Khoản 525.000đ còn lại sẽ được kích hoạt rút khi khách nhận váy hoàn tất.</p>
+                            </div>
+
+                            <div class="pt-1 border-t border-gray-100">
+                                <button onclick="completeOrderB2B('${item.id}')" class="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold rounded-xl shadow transition-all flex items-center justify-center gap-1 active:scale-95">
+                                    <span class="material-symbols-outlined text-xs">verified</span> Khách Đã Nhận Váy & Tất Toán (Rút 525.000đ Còn Lại)
+                                </button>
+                            </div>
+                        `;
+                    } else if (item.status === 'no_show_claimed') {
+                        statusBadgeB2B = '<span class="px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 font-bold text-[9px]">🛡️ ĐÃ BỒI THƯỜNG 100% DO NO-SHOW</span>';
+                        actionAreaB2B = `
+                            <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs text-rose-900 space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-[11px] flex items-center gap-1"><span class="material-symbols-outlined text-sm text-rose-600">check_circle</span> Đã bồi thường 1.050.000đ vào ví đối tác</span>
+                                    <span class="text-[9px] font-extrabold text-rose-700">100% Cọc</span>
+                                </div>
+                                <p class="text-[10px] text-rose-700">Khoản đền bù do khách hủy &lt;48h đã được cộng vào tài khoản đối tác 2H Studio để bù đắp chi phí ekip.</p>
+                            </div>
+                        `;
+                    } else if (item.status === 'b2c_refunded') {
+                        statusBadgeB2B = '<span class="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 font-bold text-[9px]">ĐƠN ĐÃ HOÀN TRẢ CỌC B2C</span>';
+                        actionAreaB2B = `
+                            <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-600">
+                                <p class="font-bold text-[11px]">Đơn này đã được sàn hoàn cọc cho cô dâu</p>
+                                <p class="text-[10px] text-gray-500 mt-0.5">Lý do: Váy tại Showroom lệch phom so với ảnh AI theo khiếu nại Trạm Hỷ Care.</p>
+                            </div>
+                        `;
+                    } else if (item.status === 'completed') {
+                        statusBadgeB2B = '<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[9px]">✓ ĐÃ QUYẾT TOÁN 100% (1.050.000đ)</span>';
+                        actionAreaB2B = `
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900 space-y-1">
+                                <p class="font-bold text-[11px] flex items-center gap-1"><span class="material-symbols-outlined text-sm text-emerald-600">verified</span> Đơn hàng hoàn tất viên mãn</p>
+                                <p class="text-[10px] text-emerald-700">Đã giải ngân toàn bộ 100% tiền cọc về STK Vietcombank của 2H Studio.</p>
+                            </div>
+                        `;
+                    } else {
+                        // default: deposit_locked
+                        statusBadgeB2B = '<span class="text-[9px] font-bold text-emerald-700 bg-emerald-200/70 px-2 py-0.5 rounded-full">Khách Đã Trả Thật</span>';
+                        actionAreaB2B = `
+                            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-bold text-emerald-900 flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-xs text-emerald-600">verified</span>
+                                        Cọc sàn đang giữ an toàn: 1.050.000đ (30%)
+                                    </span>
+                                    ${statusBadgeB2B}
+                                </div>
+                                <p class="text-[9px] text-emerald-800 leading-tight">
+                                    ✓ <b>Chống bùng kèo:</b> Nếu khách hủy lịch &lt;48h, studio được bồi thường 100% số tiền cọc này.<br>
+                                    ✓ <b>Dòng tiền:</b> Bấm xác nhận chụp xong Ngày 1 dưới đây để nhận giải ngân ngay 50% cọc (525.000đ).
+                                </p>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-1 border-t border-gray-100">
+                                <button onclick="openDisburseModal('${item.id}')" class="flex-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold rounded-xl shadow transition-all flex items-center justify-center gap-1 active:scale-95">
+                                    <span class="material-symbols-outlined text-xs">check_circle</span> Xác Nhận Chụp Xong Ngày 1 (Rút 50% Cọc)
+                                </button>
+                                <button onclick="openNoShowModal('${item.id}')" class="px-3 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 text-[10px] font-bold rounded-xl border border-rose-200 transition-all active:scale-95">
+                                    Báo No-Show
+                                </button>
+                            </div>
+                        `;
+                    }
+
                     tryonCard.innerHTML = `
                         <div class="absolute top-0 right-0 bg-blue-600 text-white text-[9px] font-extrabold uppercase px-3 py-1 rounded-bl-xl tracking-wider flex items-center gap-1 shadow-sm">
                             <span class="material-symbols-outlined text-[11px]">storefront</span> Kênh Studio (B2B Protected)
@@ -431,7 +857,7 @@
                             </div>
                         </div>
 
-                        <!-- Dress & Measurement Info (Pre-received so Studio can alter dress in advance) -->
+                        <!-- Dress & Measurement Info -->
                         <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100 space-y-1.5 text-xs">
                             <div class="flex justify-between items-center">
                                 <span class="text-[10px] text-gray-500 uppercase font-bold">Mẫu Váy Đặt Thử:</span>
@@ -443,30 +869,8 @@
                             </div>
                         </div>
 
-                        <!-- Studio Protection & Payout Action -->
-                        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-bold text-emerald-900 flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-xs text-emerald-600">verified</span>
-                                    Cọc sàn đang giữ an toàn: 1.050.000đ (30%)
-                                </span>
-                                <span class="text-[9px] font-bold text-emerald-700 bg-emerald-200/70 px-2 py-0.5 rounded-full">Khách Đã Trả Thật</span>
-                            </div>
-                            <p class="text-[9px] text-emerald-800 leading-tight">
-                                ✓ <b>Chống bùng kèo:</b> Nếu khách hủy lịch &lt;48h, studio được bồi thường 100% số tiền cọc này.<br>
-                                ✓ <b>Dòng tiền:</b> Bấm xác nhận chụp xong Ngày 1 dưới đây để nhận giải ngân ngay 50% cọc.
-                            </p>
-                        </div>
-
-                        <!-- Studio Actions -->
-                        <div class="flex items-center gap-2 pt-1 border-t border-gray-100">
-                            <button onclick="disburseToStudio('${item.id}')" class="flex-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold rounded-xl shadow transition-all flex items-center justify-center gap-1">
-                                <span class="material-symbols-outlined text-xs">check_circle</span> Xác Nhận Chụp Xong Ngày 1 (Rút 50% Cọc)
-                            </button>
-                            <button onclick="reportNoShow('${item.id}')" class="px-3 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 text-[10px] font-bold rounded-xl border border-rose-200 transition-all">
-                                Báo No-Show
-                            </button>
-                        </div>
+                        <!-- Action Area for Studio -->
+                        ${actionAreaB2B}
                     `;
                 }
 
@@ -506,9 +910,9 @@
                 actionBtn = `
                     <div class="bg-slate-50 rounded-xl p-3 border border-gray-100 space-y-2">
                         <p class="text-[9px] font-bold text-brand-goldDark flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-brand-gold animate-ping"></span> Chờ Vendor thực hiện chụp ảnh & gửi yêu cầu đợt 2</p>
-                        <p class="text-[8px] text-gray-400">Bạn có thể sang trang Kênh Nhà cung cấp hoặc bấm nút giả lập nhanh dưới đây để bỏ qua bước chuyển đổi vai trò:</p>
-                        <button onclick="simulateVendorAction('executing')" class="w-full py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-600 font-extrabold text-[9px] rounded-lg transition-all flex items-center justify-center gap-1">
-                            <span class="material-symbols-outlined text-[11px]">bolt</span> Giả lập nhanh: TuArt Wedding gửi yêu cầu giải ngân Đợt 2
+                        <p class="text-[8px] text-gray-400">Bấm nút giả lập nhanh dưới đây để đóng vai TuArt Wedding yêu cầu giải ngân Mốc 2:</p>
+                        <button onclick="simulateVendorAction('executing')" class="w-full py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-extrabold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1 active:scale-95">
+                            <span class="material-symbols-outlined text-sm">bolt</span> Giả lập nhanh: TuArt Wedding gửi yêu cầu giải ngân Đợt 2
                         </button>
                     </div>
                 `;
@@ -516,7 +920,7 @@
                 statusBadge = '<span class="px-2.5 py-1 rounded bg-blue-100 text-blue-600 font-bold text-[9px]">CHỜ GIẢI NGÂN ĐỢT 2 (50%)</span>';
                 step2State = 'to_pay'; // ready for couple to disburse
                 actionBtn = `
-                    <button onclick="openPaymentModal(2)" class="w-full py-2.5 bg-brand-gold text-white text-xs font-bold rounded-xl shadow-md hover:opacity-95 flex items-center justify-center gap-1">
+                    <button onclick="openPaymentModal(2)" class="w-full py-2.5 bg-brand-gold hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1 active:scale-95">
                         <span class="material-symbols-outlined text-sm">payments</span> Giải ngân Đợt 2 (50% - ${formatMoney(booking.price * 0.5)})
                     </button>
                 `;
@@ -527,9 +931,9 @@
                 actionBtn = `
                     <div class="bg-slate-50 rounded-xl p-3 border border-gray-100 space-y-2">
                         <p class="text-[9px] font-bold text-blue-600 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span> Chờ đối tác bàn giao sản phẩm & gửi yêu cầu nghiệm thu</p>
-                        <p class="text-[8px] text-gray-400">Bạn có thể sang trang Kênh Nhà cung cấp hoặc bấm nút giả lập nhanh dưới đây để bỏ qua bước chuyển đổi vai trò:</p>
-                        <button onclick="simulateVendorAction('to_approve')" class="w-full py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-600 font-extrabold text-[9px] rounded-lg transition-all flex items-center justify-center gap-1">
-                            <span class="material-symbols-outlined text-[11px]">bolt</span> Giả lập nhanh: TuArt Wedding yêu cầu Nghiệm thu (Đợt 3)
+                        <p class="text-[8px] text-gray-400">Bấm nút giả lập nhanh dưới đây để đóng vai TuArt Wedding yêu cầu nghiệm thu cuối:</p>
+                        <button onclick="simulateVendorAction('to_approve')" class="w-full py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 font-extrabold text-[10px] rounded-lg transition-all flex items-center justify-center gap-1 active:scale-95">
+                            <span class="material-symbols-outlined text-sm">bolt</span> Giả lập nhanh: TuArt Wedding yêu cầu Nghiệm thu (Đợt 3)
                         </button>
                     </div>
                 `;
@@ -538,7 +942,7 @@
                 step2State = 'completed';
                 step3State = 'to_pay'; // ready for couple to sign off
                 actionBtn = `
-                    <button onclick="openPaymentModal(3)" class="w-full py-2.5 bg-green-600 text-white text-xs font-bold rounded-xl shadow-md hover:opacity-95 flex items-center justify-center gap-1">
+                    <button onclick="openPaymentModal(3)" class="w-full py-2.5 bg-green-600 hover:opacity-95 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1 active:scale-95">
                         <span class="material-symbols-outlined text-sm">thumb_up</span> Nghiệm thu & Giải ngân Đợt 3 (20% - ${formatMoney(booking.price * 0.2)})
                     </button>
                 `;
@@ -560,7 +964,6 @@
                                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
                                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
                             </div>
-                            <p class="text-[8px] text-gray-400 italic">Đánh giá 5 sao sẽ cập nhật trực tiếp lên hệ thống tín nhiệm của đối tác.</p>
                         </div>
                     </div>
                 `;
@@ -615,7 +1018,7 @@
             else if (step3State === 'upcoming') s3Desc = '🔒 Đang khóa (Chờ hoàn thành bước trước).';
 
             const card = document.createElement('div');
-            card.className = "bg-white rounded-2xl border border-gray-150 p-5 shadow-sm space-y-4 blush-glow";
+            card.className = "bg-white rounded-3xl border border-gray-150 p-5 shadow-sm space-y-4 blush-glow";
             card.innerHTML = `
                 <!-- Partner Info Header -->
                 <div class="flex justify-between items-start border-b border-gray-50 pb-3">
@@ -697,194 +1100,116 @@
                 </div>
             `;
             container.appendChild(card);
-
-            // Mock Booking 1: 7799 Storyteller (Completed)
-            const mockCard1 = document.createElement('div');
-            mockCard1.className = "bg-white rounded-2xl border border-gray-150 p-5 shadow-sm space-y-4 opacity-95 blush-glow";
-            mockCard1.innerHTML = `
-                <!-- Partner Info Header -->
-                <div class="flex justify-between items-start border-b border-gray-50 pb-3">
-                    <div class="flex items-center gap-3">
-                        <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&q=80&w=80" class="w-10 h-10 object-cover rounded-xl border border-brand-gold/20" alt="7799 Photo">
-                        <div>
-                            <h3 class="serif-title text-sm font-bold text-brand-text flex items-center gap-1">
-                                7799 Storyteller
-                                <span class="material-symbols-outlined text-blue-500 text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
-                            </h3>
-                            <p class="text-[9px] text-gray-400">Mã giao dịch: #1082</p>
-                        </div>
-                    </div>
-                    <span class="px-2.5 py-1 rounded bg-green-100 text-green-700 font-bold text-[9px]">ĐÃ HOÀN THÀNH & QUYẾT TOÁN</span>
-                </div>
-
-                <!-- Price Detail Info -->
-                <div class="grid grid-cols-2 gap-4 bg-brand-blush/60 p-3 rounded-xl border border-brand-gold/10 text-xs font-semibold">
-                    <div>
-                        <span class="text-gray-400 text-[9px] uppercase tracking-wider block">Gói Dịch Vụ</span>
-                        <span class="text-brand-text text-[11px] font-bold">Trang Trí Gia Tiên Cao Cấp</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-gray-400 text-[9px] uppercase tracking-wider block">Tổng Giá Trị Hợp Đồng</span>
-                        <span class="text-brand-goldDark text-[11px] font-bold">25.000.000đ</span>
-                    </div>
-                </div>
-
-                <!-- Escrow Milestone Timeline -->
-                <div class="space-y-4 relative">
-                    <div class="step-line"></div>
-                    
-                    <!-- Milestone 1 -->
-                    <div class="flex gap-3 relative z-10">
-                        <div class="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow">
-                            <span class="material-symbols-outlined text-base">check</span>
-                        </div>
-                        <div class="flex-1 space-y-0.5">
-                            <div class="flex justify-between items-center">
-                                <h4 class="text-xs font-bold text-green-700">Đợt 1: Cọc giữ chỗ (30%)</h4>
-                                <span class="text-[10px] font-extrabold text-slate-700">7.500.000đ</span>
-                            </div>
-                            <p class="text-[9px] text-gray-400 font-medium">Đã thanh toán & giải ngân bảo chứng ✓</p>
-                        </div>
-                    </div>
-
-                    <!-- Milestone 2 -->
-                    <div class="flex gap-3 relative z-10">
-                        <div class="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow">
-                            <span class="material-symbols-outlined text-base">check</span>
-                        </div>
-                        <div class="flex-1 space-y-0.5">
-                            <div class="flex justify-between items-center">
-                                <h4 class="text-xs font-bold text-green-700">Đợt 2: Giải ngân thi công (50%)</h4>
-                                <span class="text-[10px] font-extrabold text-slate-700">12.500.000đ</span>
-                            </div>
-                            <p class="text-[9px] text-gray-400 font-medium">Đã thanh toán & giải ngân bảo chứng ✓</p>
-                        </div>
-                    </div>
-
-                    <!-- Milestone 3 -->
-                    <div class="flex gap-3 relative z-10">
-                        <div class="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow">
-                            <span class="material-symbols-outlined text-base">check</span>
-                        </div>
-                        <div class="flex-1 space-y-0.5">
-                            <div class="flex justify-between items-center">
-                                <h4 class="text-xs font-bold text-green-700">Đợt 3: Nghiệm thu bàn giao (20%)</h4>
-                                <span class="text-[10px] font-extrabold text-slate-700">5.000.000đ</span>
-                            </div>
-                            <p class="text-[9px] text-gray-400 font-medium">Đã thanh toán & giải ngân bảo chứng ✓</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Actions Container (Reviews) -->
-                <div class="pt-2 border-t border-gray-50">
-                    <div class="bg-green-50 border border-green-200 rounded-2xl p-4 text-center space-y-2">
-                        <h4 class="text-xs font-bold text-green-700">Đơn hàng hoàn tất viên mãn!</h4>
-                        <div class="pt-1 space-y-1">
-                            <p class="text-[10px] font-bold text-brand-text">Đánh giá của bạn về 7799 Storyteller:</p>
-                            <div class="flex justify-center gap-1 text-brand-gold">
-                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            container.appendChild(mockCard1);
-
-            // Mock Booking 2: Mai Đỗ Makeup (In Progress)
-            const mockCard2 = document.createElement('div');
-            mockCard2.className = "bg-white rounded-2xl border border-gray-150 p-5 shadow-sm space-y-4 opacity-95 blush-glow";
-            mockCard2.innerHTML = `
-                <!-- Partner Info Header -->
-                <div class="flex justify-between items-start border-b border-gray-50 pb-3">
-                    <div class="flex items-center gap-3">
-                        <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=80" class="w-10 h-10 object-cover rounded-xl border border-brand-gold/20" alt="Mai Do Photo">
-                        <div>
-                            <h3 class="serif-title text-sm font-bold text-brand-text flex items-center gap-1">
-                                Mai Đỗ Makeup
-                                <span class="material-symbols-outlined text-blue-500 text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
-                            </h3>
-                            <p class="text-[9px] text-gray-400">Mã giao dịch: #1084</p>
-                        </div>
-                    </div>
-                    <span class="px-2.5 py-1 rounded bg-blue-100 text-blue-600 font-bold text-[9px]">ĐÃ CỌC ĐỢT 2 (80% GIỮ)</span>
-                </div>
-
-                <!-- Price Detail Info -->
-                <div class="grid grid-cols-2 gap-4 bg-brand-blush/60 p-3 rounded-xl border border-brand-gold/10 text-xs font-semibold">
-                    <div>
-                        <span class="text-gray-400 text-[9px] uppercase tracking-wider block">Gói Dịch Vụ</span>
-                        <span class="text-brand-text text-[11px] font-bold">Gói Trang Điểm Cô Dâu Vip</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-gray-400 text-[9px] uppercase tracking-wider block">Tổng Giá Trị Hợp Đồng</span>
-                        <span class="text-brand-goldDark text-[11px] font-bold">4.500.000đ</span>
-                    </div>
-                </div>
-
-                <!-- Escrow Milestone Timeline -->
-                <div class="space-y-4 relative">
-                    <div class="step-line"></div>
-                    
-                    <!-- Milestone 1 -->
-                    <div class="flex gap-3 relative z-10">
-                        <div class="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow">
-                            <span class="material-symbols-outlined text-base">check</span>
-                        </div>
-                        <div class="flex-1 space-y-0.5">
-                            <div class="flex justify-between items-center">
-                                <h4 class="text-xs font-bold text-green-700">Đợt 1: Cọc giữ chỗ (30%)</h4>
-                                <span class="text-[10px] font-extrabold text-slate-700">1.350.000đ</span>
-                            </div>
-                            <p class="text-[9px] text-gray-400 font-medium">Đã thanh toán cọc ✓</p>
-                        </div>
-                    </div>
-
-                    <!-- Milestone 2 -->
-                    <div class="flex gap-3 relative z-10">
-                        <div class="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm shadow">
-                            <span class="material-symbols-outlined text-base">check</span>
-                        </div>
-                        <div class="flex-1 space-y-0.5">
-                            <div class="flex justify-between items-center">
-                                <h4 class="text-xs font-bold text-green-700">Đợt 2: Giải ngân thi công (50%)</h4>
-                                <span class="text-[10px] font-extrabold text-slate-700">2.250.000đ</span>
-                            </div>
-                            <p class="text-[9px] text-gray-400 font-medium">Đã thanh toán cọc đợt 2 ✓</p>
-                        </div>
-                    </div>
-
-                    <!-- Milestone 3 -->
-                    <div class="flex gap-3 relative z-10">
-                        <div class="w-8 h-8 rounded-full bg-blue-500 text-white animate-pulse flex items-center justify-center text-sm shadow">
-                            <span class="material-symbols-outlined text-base">hourglass_empty</span>
-                        </div>
-                        <div class="flex-1 space-y-0.5">
-                            <div class="flex justify-between items-center">
-                                <h4 class="text-xs font-bold text-blue-600">Đợt 3: Nghiệm thu bàn giao (20%)</h4>
-                                <span class="text-[10px] font-extrabold text-slate-700">900.000đ</span>
-                            </div>
-                            <p class="text-[9px] text-slate-500 font-semibold">Chờ hoàn tất ngày cưới để nghiệm thu & giải ngân.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Actions Container -->
-                <div class="pt-2 border-t border-gray-50">
-                    <div class="bg-slate-50 rounded-xl p-3 border border-gray-150 space-y-1">
-                        <p class="text-[9px] font-bold text-blue-600 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span> Đang thi hành hợp đồng</p>
-                        <p class="text-[8px] text-gray-400">Đã giải ngân 80% ngân sách giữ chỗ, 20% còn lại đang khóa an toàn trong ví bảo chứng.</p>
-                    </div>
-                </div>
-            `;
-            container.appendChild(mockCard2);
         }
 
-        // Open payments modal
+        // =========================================================================
+        // REAL ACTION HANDLERS (MODAL LOGIC & LOCALSTORAGE STATE TRANSITIONS)
+        // =========================================================================
+
+        // 1. Open Disburse Modal (Studio rút 50% cọc)
+        function openDisburseModal(bookingId) {
+            targetBookingId = bookingId;
+            let tryOnBookings = JSON.parse(localStorage.getItem('tramhy_bookings')) || [];
+            const booking = tryOnBookings.find(b => b.id === bookingId);
+            if (!booking) return;
+
+            document.getElementById('disburse-modal-id').innerText = booking.id;
+            document.getElementById('disburse-modal-client').innerText = booking.customerName;
+            document.getElementById('disburse-modal-dress').innerText = booking.dressName;
+            document.getElementById('disburse-modal').classList.remove('hidden');
+        }
+
+        function executeDisburse() {
+            if (!targetBookingId) return;
+            let tryOnBookings = JSON.parse(localStorage.getItem('tramhy_bookings')) || [];
+            const idx = tryOnBookings.findIndex(b => b.id === targetBookingId);
+            if (idx !== -1) {
+                tryOnBookings[idx].status = 'day1_disbursed';
+                tryOnBookings[idx].disbursedAt = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                localStorage.setItem('tramhy_bookings', JSON.stringify(tryOnBookings));
+            }
+            closeModal('disburse-modal');
+            loadBookings();
+            showToast(`✓ Đã giải ngân thành công <b>525.000đ</b> về STK Vietcombank của 2H Studio!`, 'success');
+        }
+
+        // 2. Open No-Show Modal (Studio báo khách bùng lịch)
+        function openNoShowModal(bookingId) {
+            targetBookingId = bookingId;
+            let tryOnBookings = JSON.parse(localStorage.getItem('tramhy_bookings')) || [];
+            const booking = tryOnBookings.find(b => b.id === bookingId);
+            if (!booking) return;
+
+            document.getElementById('noshow-modal-id').innerText = booking.id;
+            document.getElementById('noshow-modal-client').innerText = booking.customerName;
+            document.getElementById('noshow-modal').classList.remove('hidden');
+        }
+
+        function executeNoShow() {
+            if (!targetBookingId) return;
+            let tryOnBookings = JSON.parse(localStorage.getItem('tramhy_bookings')) || [];
+            const idx = tryOnBookings.findIndex(b => b.id === targetBookingId);
+            if (idx !== -1) {
+                tryOnBookings[idx].status = 'no_show_claimed';
+                tryOnBookings[idx].claimedAt = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                localStorage.setItem('tramhy_bookings', JSON.stringify(tryOnBookings));
+            }
+            closeModal('noshow-modal');
+            loadBookings();
+            showToast(`🛡️ Sàn Trạm Hỷ đã bồi thường <b>1.050.000đ (100% Cọc)</b> vào ví Studio do khách bùng hẹn!`, 'warning');
+        }
+
+        // 3. Open Refund Modal (Cô dâu yêu cầu hoàn cọc 100%)
+        function openRefundModal(bookingId) {
+            targetBookingId = bookingId;
+            let tryOnBookings = JSON.parse(localStorage.getItem('tramhy_bookings')) || [];
+            const booking = tryOnBookings.find(b => b.id === bookingId);
+            if (!booking) return;
+
+            document.getElementById('refund-modal-id').innerText = booking.id;
+            document.getElementById('refund-modal').classList.remove('hidden');
+        }
+
+        function executeRefund() {
+            if (!targetBookingId) return;
+            let tryOnBookings = JSON.parse(localStorage.getItem('tramhy_bookings')) || [];
+            const idx = tryOnBookings.findIndex(b => b.id === targetBookingId);
+            if (idx !== -1) {
+                tryOnBookings[idx].status = 'b2c_refunded';
+                tryOnBookings[idx].refundedAt = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                localStorage.setItem('tramhy_bookings', JSON.stringify(tryOnBookings));
+            }
+            closeModal('refund-modal');
+            loadBookings();
+            showToast(`✓ Trạm Hỷ Shield đã phê duyệt! <b>1.050.000đ</b> đã được hoàn về tài khoản cô dâu trong vòng 2 giờ.`, 'shield');
+        }
+
+        // 4. Open Check-in Modal (Cô dâu xem thẻ QR đến Showroom)
+        function openCheckInModal(bookingId) {
+            let tryOnBookings = JSON.parse(localStorage.getItem('tramhy_bookings')) || [];
+            const booking = tryOnBookings.find(b => b.id === bookingId);
+            if (!booking) return;
+
+            document.getElementById('checkin-id').innerText = booking.id;
+            document.getElementById('checkin-name').innerText = booking.customerName;
+            document.getElementById('checkin-metrics').innerText = `${booking.height || 162}cm • ${booking.weight || 49}kg • ${booking.shape || 'Cân đối'}`;
+            document.getElementById('checkin-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TRAMHY_${booking.id}_${encodeURIComponent(booking.customerName)}`;
+            document.getElementById('checkin-modal').classList.remove('hidden');
+        }
+
+        // 5. Complete Order B2B (Studio rút 50% cọc còn lại sau đám cưới)
+        function completeOrderB2B(bookingId) {
+            let tryOnBookings = JSON.parse(localStorage.getItem('tramhy_bookings')) || [];
+            const idx = tryOnBookings.findIndex(b => b.id === bookingId);
+            if (idx !== -1) {
+                tryOnBookings[idx].status = 'completed';
+                localStorage.setItem('tramhy_bookings', JSON.stringify(tryOnBookings));
+            }
+            loadBookings();
+            showToast(`🎉 Đơn hàng ${bookingId} đã tất toán 100%! Đã giải ngân nốt <b>525.000đ</b> còn lại về STK Studio.`, 'success');
+        }
+
+        // 6. Open payments modal for TuArt Wedding
         function openPaymentModal(stage) {
             const booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
             if (!booking) return;
@@ -897,7 +1222,7 @@
             document.getElementById('modal-amount').innerText = formatMoney(amount);
             document.getElementById('modal-info').innerText = info;
 
-            // Generate simulated VietQR code image URL using QRserver API
+            // Generate simulated VietQR code image URL
             const bankAcc = "19036789999";
             const bankId = "Techcombank";
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=2a2421&data=https://vietqr.me/api/qr/${bankId}/${bankAcc}?amount=${amount}%26addInfo=${encodeURIComponent(info)}`;
@@ -910,7 +1235,7 @@
             document.getElementById('payment-modal').classList.add('hidden');
         }
 
-        // Confirm milestone stage payment
+        // Confirm milestone stage payment for TuArt Wedding
         function confirmStagePayment() {
             const booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
             if (!booking) return;
@@ -918,27 +1243,14 @@
             let newStatus = '';
             if (currentActiveStageToPay === 2) {
                 newStatus = 'executing_paid';
+                showToast(`💸 Đã giải ngân thành công Đợt 2: <b>${formatMoney(booking.price * 0.5)}</b> cho TuArt Wedding!`, 'success');
             } else if (currentActiveStageToPay === 3) {
                 newStatus = 'completed';
+                showToast(`🎉 Hợp đồng TuArt Wedding đã hoàn thành viên mãn! Đã giải ngân 100% ngân sách.`, 'shield');
             }
 
             if (newStatus) {
                 localStorage.setItem('tramhy_active_booking_status', newStatus);
-                
-                // Sync to system bookings
-                let sysBookings = JSON.parse(localStorage.getItem('tramhy_system_bookings'));
-                if (sysBookings) {
-                    const idx = sysBookings.findIndex(b => b.id === booking.id);
-                    if (idx !== -1) {
-                        sysBookings[idx].status = newStatus;
-                        if (newStatus === 'executing_paid') {
-                            sysBookings[idx].stages.s2 = 'paid';
-                        } else if (newStatus === 'completed') {
-                            sysBookings[idx].stages.s3 = 'paid';
-                        }
-                        localStorage.setItem('tramhy_system_bookings', JSON.stringify(sysBookings));
-                    }
-                }
             }
 
             closePaymentModal();
@@ -948,30 +1260,19 @@
         // Simulate Vendor Action in-page
         function simulateVendorAction(newStatus) {
             localStorage.setItem('tramhy_active_booking_status', newStatus);
-            
-            // Sync to system bookings database
-            const booking = JSON.parse(localStorage.getItem('tramhy_active_booking'));
-            if (booking) {
-                let sysBookings = JSON.parse(localStorage.getItem('tramhy_system_bookings'));
-                if (sysBookings) {
-                    const idx = sysBookings.findIndex(b => b.id === booking.id);
-                    if (idx !== -1) {
-                        sysBookings[idx].status = newStatus;
-                        if (newStatus === 'executing') {
-                            sysBookings[idx].stages.s2 = 'executing';
-                        } else if (newStatus === 'to_approve') {
-                            sysBookings[idx].stages.s3 = 'executing';
-                        }
-                        localStorage.setItem('tramhy_system_bookings', JSON.stringify(sysBookings));
-                    }
-                }
+            if (newStatus === 'executing') {
+                showToast(`📸 TuArt Wedding đã gửi yêu cầu giải ngân Đợt 2 sau khi chụp xong ảnh thô!`, 'warning');
+            } else if (newStatus === 'to_approve') {
+                showToast(`🎀 TuArt Wedding yêu cầu Nghiệm thu & Bàn giao toàn bộ Album ảnh cưới!`, 'warning');
             }
             loadBookings();
         }
+
+        // 7. Reset all demo status to clean initial state
         function resetDemoStatus() {
+            localStorage.removeItem('tramhy_bookings');
             localStorage.setItem('tramhy_active_booking_status', 'deposit_paid');
             
-            // Force reset the active booking in localStorage to the full initial mock data
             let booking = {
                 id: '#1085',
                 customerName: 'Nguyễn Minh Quân',
@@ -984,33 +1285,8 @@
             };
             localStorage.setItem('tramhy_active_booking', JSON.stringify(booking));
             
-            // Also reset the system bookings database status for #1085
-            let sysBookings = JSON.parse(localStorage.getItem('tramhy_system_bookings'));
-            if (sysBookings) {
-                const idx = sysBookings.findIndex(b => b.id === '#1085');
-                if (idx !== -1) {
-                    sysBookings[idx].status = 'deposit_paid';
-                    sysBookings[idx].stages = { s1: 'paid', s2: 'locked', s3: 'locked' };
-                    localStorage.setItem('tramhy_system_bookings', JSON.stringify(sysBookings));
-                }
-            }
-            
-            // Reload page to refresh UI
-            location.reload();
-        }
-
-        // Studio B2B Actions
-        function disburseToStudio(bookingId) {
-            alert(`✓ Đã xác nhận hoàn thành Ngày 1 cho đơn ${bookingId}!\n\nSố tiền 50% cọc (525.000đ - 1.750.000đ) đã được kích hoạt giải ngân tự động về STK Studio đối tác trong 24h.`);
             loadBookings();
-        }
-
-        function reportNoShow(bookingId) {
-            const confirmed = confirm(`Xác nhận khách hàng không đến (No-show) cho đơn ${bookingId} mà không báo trước 48h?\n\nTheo chính sách Bảo vệ Studio, sàn Trạm Hỷ sẽ giải ngân 100% tiền cọc đợt 1 để bồi thường chi phí giữ ekip cho bạn.`);
-            if (confirmed) {
-                alert(`✓ Đã ghi nhận báo cáo No-show! 100% tiền cọc đợt 1 đã được chuyển về ví bồi thường của Studio.`);
-                loadBookings();
-            }
+            showToast(`⚡ Đã reset toàn bộ trạng thái Demo về mốc ban đầu (Đợt 1)!`, 'shield');
         }
 
         // Initialize Onload
