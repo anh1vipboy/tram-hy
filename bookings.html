@@ -1097,14 +1097,21 @@
                         `;
                     }
 
-                    const isFromImage = (item.type === 'image_to_dress');
-                    const badgeText = isFromImage 
-                        ? 'May Đo Theo Ảnh Mẫu (AI Image-to-Dress)' 
-                        : 'May Đo Bespoke Haute Couture (Escrow 3 Chặng)';
-                    const badgeGradient = isFromImage
-                        ? 'bg-gradient-to-r from-pink-600 via-rose-600 to-purple-800'
-                        : 'bg-gradient-to-r from-purple-800 to-indigo-900';
-                    const badgeIcon = isFromImage ? 'auto_fix_high' : 'design_services';
+                    const isFromPrompt = (item.type === 'bespoke_prompt' || (item.bespokeDetails && item.bespokeDetails.submode === 'prompt'));
+                    const isFromImage = (item.type === 'image_to_dress' || item.type === 'bespoke_image' || (item.bespokeDetails && item.bespokeDetails.submode === 'image'));
+                    let badgeText = 'May Đo Bespoke Thủ Công (Escrow 3 Chặng)';
+                    let badgeGradient = 'bg-gradient-to-r from-purple-800 to-indigo-900';
+                    let badgeIcon = 'design_services';
+
+                    if (isFromPrompt) {
+                        badgeText = 'Thiết Kế May Đo AI Bằng Prompt (GenAI)';
+                        badgeGradient = 'bg-gradient-to-r from-violet-600 via-purple-700 to-fuchsia-800';
+                        badgeIcon = 'psychology';
+                    } else if (isFromImage) {
+                        badgeText = 'May Đo Theo Ảnh Mẫu (AI Image-to-Dress)';
+                        badgeGradient = 'bg-gradient-to-r from-pink-600 via-rose-600 to-purple-800';
+                        badgeIcon = 'auto_fix_high';
+                    }
 
                     tryonCard.innerHTML = `
                         <div class="absolute top-0 right-0 ${badgeGradient} text-white text-[9px] font-extrabold uppercase px-3 py-1 rounded-bl-xl tracking-wider flex items-center gap-1 shadow-sm">
