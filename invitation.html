@@ -99,48 +99,92 @@
         
         <div>
             <!-- Sticky Top Header & Navigation -->
-            <header class="sticky top-0 z-50 glass border-b border-brand-blush/40 shadow-sm bg-white/95">
-                <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                    <!-- Top Branding Line / Left on Desktop -->
-                    <div class="flex items-center justify-between md:justify-start gap-4">
-                        <div class="flex items-center gap-2">
-                            <a href="index.html" class="material-symbols-outlined text-brand-text text-lg hover:opacity-85">arrow_back</a>
-                            <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-8 h-8 rounded-full object-cover border border-brand-gold/30">
-                            <h1 class="serif-title text-base font-extrabold text-brand-text tracking-wide italic">Tạo Thiệp Cưới & QR</h1>
-                        </div>
-                        <span class="text-[9px] font-bold text-brand-goldDark bg-brand-gold/10 px-2 py-0.5 rounded-full hidden md:inline-block">Thiệp Cưới Tự Phục Vụ</span>
-                    </div>
+            <header class="sticky top-0 z-50 glass border-b border-brand-gold/20 shadow-xs bg-white/95 backdrop-blur-md">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4">
                     
-                    <!-- Navigation Tabs -->
-                    <nav class="flex justify-between md:justify-center items-center gap-1 md:gap-3 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent overflow-x-auto pb-1 md:pb-0">
-                        <a href="index.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
+                    <!-- Left: Brand Logo & Escrow Tag -->
+                    <div class="flex items-center gap-3 shrink-0">
+                        <a href="index.html" class="flex items-center gap-2.5 group">
+                            <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-9 h-9 rounded-full object-cover border-2 border-brand-gold shadow-xs group-hover:scale-105 transition-transform duration-300">
+                            <div class="flex flex-col">
+                                <span class="serif-title text-base sm:text-lg font-black text-brand-text tracking-tight italic leading-tight group-hover:text-brand-goldDark transition-colors">Trạm Hỷ</span>
+                                <span class="text-[9px] font-extrabold text-brand-goldDark tracking-widest uppercase leading-none">Wedding Tech Platform</span>
+                            </div>
+                        </a>
+                        <span class="hidden xl:inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                            <span class="material-symbols-outlined text-xs text-emerald-600">verified_user</span> Bảo Chứng Escrow 2 Chiều
+                        </span>
+                    </div>
+
+                    <!-- Center: Standardized Navigation Links (Single Line, Luxury Pills) -->
+                    <nav class="hidden lg:flex items-center gap-1.5 xl:gap-2">
+                        <!-- 1. Trang Chủ -->
+                        <a href="index.html" class="px-3.5 py-1.5 rounded-full font-semibold text-xs text-stone-600 hover:text-brand-text hover:bg-stone-100 flex items-center gap-1.5 whitespace-nowrap transition-all">
                             <span class="material-symbols-outlined text-base">home</span>
-                            <span class="text-[10px] font-medium">Trang chủ</span>
+                            <span>Trang Chủ</span>
                         </a>
-                        <a href="tryon.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-goldDark whitespace-nowrap">
+
+                        <!-- 2. Thử Váy AR -->
+                        <a href="tryon.html" class="px-3.5 py-1.5 rounded-full font-semibold text-xs text-stone-600 hover:text-brand-text hover:bg-stone-100 flex items-center gap-1.5 whitespace-nowrap transition-all">
                             <span class="material-symbols-outlined text-base">styler</span>
-                            <span class="text-[10px] font-medium">Thử váy AR</span>
+                            <span>Thử Váy AR</span>
+                            <span class="text-[9px] font-black px-1.5 py-0.2 rounded-full bg-brand-gold text-white uppercase tracking-wider">AI</span>
                         </a>
-                        <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
-                            <span class="material-symbols-outlined text-base">search</span>
-                            <span class="text-[10px] font-medium">Dịch vụ cưới hỏi</span>
+
+                        <!-- 3. Thuê & May Đo Váy -->
+                        <a href="marketplace.html" class="px-3.5 py-1.5 rounded-full font-semibold text-xs text-stone-600 hover:text-brand-text hover:bg-stone-100 flex items-center gap-1.5 whitespace-nowrap transition-all">
+                            <span class="material-symbols-outlined text-base">storefront</span>
+                            <span>Thuê & May Đo Váy</span>
                         </a>
-                        <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
-                            <span class="material-symbols-outlined text-base">calendar_month</span>
-                            <span class="text-[10px] font-medium">Lịch hẹn</span>
+
+                        <!-- 4. Lịch Hẹn & Escrow -->
+                        <a href="bookings.html" class="px-3.5 py-1.5 rounded-full font-semibold text-xs text-stone-600 hover:text-brand-text hover:bg-stone-100 flex items-center gap-1.5 whitespace-nowrap transition-all">
+                            <span class="material-symbols-outlined text-base">shield</span>
+                            <span>Lịch Hẹn & Escrow</span>
                         </a>
-                        <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark whitespace-nowrap">
-                            <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 1;">mail</span>
-                            <span class="text-[10px] font-bold">Tạo thiệp & QR</span>
+
+                        <!-- 5. Tạo Thiệp & QR (Active) -->
+                        <a href="invitation.html" class="px-3.5 py-1.5 rounded-full font-bold text-xs flex items-center gap-1.5 whitespace-nowrap bg-brand-gold/15 text-brand-goldDark border border-brand-gold/40 shadow-xs transition-all">
+                            <span class="material-symbols-outlined text-base">mail</span>
+                            <span>Tạo Thiệp & QR</span>
                         </a>
                     </nav>
 
-                    <!-- Right Controls -->
-                    <div class="flex items-center justify-between md:justify-end gap-3 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent">
-                        <button onclick="showToast()" class="text-xs font-bold text-brand-goldDark hover:underline flex items-center gap-1">
-                            <span class="material-symbols-outlined text-sm">share</span> Chia sẻ nhanh
+                    <!-- Right: Location Picker & CTA Action -->
+                    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <div class="hidden sm:flex items-center gap-1 text-xs bg-stone-50 border border-stone-200 px-3 py-1.5 rounded-full text-stone-700 shadow-xs">
+                            <span class="material-symbols-outlined text-brand-gold text-sm">location_on</span>
+                            <select class="bg-transparent text-xs font-semibold text-brand-text focus:outline-none cursor-pointer">
+                                <option value="Hà Nội">Hà Nội (45 Studio)</option>
+                                <option value="TP. Hồ Chí Minh">TP. HCM (60 Studio)</option>
+                                <option value="Đà Nẵng">Đà Nẵng (20 Studio)</option>
+                            </select>
+                        </div>
+
+                        <button onclick="showToast()" class="gold-gradient text-white text-xs font-bold py-1.5 px-4 rounded-full shadow-sm hover:opacity-95 active:scale-95 transition-all flex items-center gap-1.5 whitespace-nowrap">
+                            <span class="material-symbols-outlined text-sm">share</span>
+                            <span>Chia Sẻ Thiệp</span>
                         </button>
                     </div>
+                </div>
+
+                <!-- Responsive Sub-Nav Bar for Mobile Screens -->
+                <div class="lg:hidden border-t border-gray-100 px-3 py-1.5 flex items-center justify-between overflow-x-auto gap-1 bg-white/80">
+                    <a href="index.html" class="px-2.5 py-1 text-xs font-bold rounded-full text-stone-600 hover:text-brand-text whitespace-nowrap flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">home</span> Trang Chủ
+                    </a>
+                    <a href="tryon.html" class="px-2.5 py-1 text-xs font-bold rounded-full text-stone-600 hover:text-brand-text whitespace-nowrap flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">styler</span> Thử Váy AR
+                    </a>
+                    <a href="marketplace.html" class="px-2.5 py-1 text-xs font-bold rounded-full text-stone-600 hover:text-brand-text whitespace-nowrap flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">storefront</span> Thuê Váy
+                    </a>
+                    <a href="bookings.html" class="px-2.5 py-1 text-xs font-bold rounded-full text-stone-600 hover:text-brand-text whitespace-nowrap flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">shield</span> Lịch Hẹn
+                    </a>
+                    <a href="invitation.html" class="px-2.5 py-1 text-xs font-bold rounded-full text-brand-goldDark bg-brand-gold/15 border border-brand-gold/30 whitespace-nowrap flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">mail</span> Thiệp Cưới
+                    </a>
                 </div>
             </header>
 
