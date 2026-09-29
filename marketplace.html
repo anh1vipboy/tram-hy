@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trạm Hỷ - Chợ Dịch Vụ Cưới Minh Bạch</title>
-    
+
     <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
     <script>
         tailwind.config = {
             theme: {
@@ -33,50 +37,75 @@
             }
         }
     </script>
-    
+
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #FDF8F7;
             color: #2A2421;
         }
+
         .serif-title {
             font-family: 'Playfair Display', serif;
         }
+
         .glass {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
+
         .gold-gradient {
             background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
         }
+
         .blush-glow {
             box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.15);
         }
     </style>
 </head>
+
 <body class="min-h-screen pb-24 relative">
 
     <!-- Global Demo Controller Bar -->
     <!-- Global Demo Controller Bar -->
-    <div class="fixed bottom-4 right-4 z-[9999] glass rounded-2xl p-4 shadow-xl flex flex-col gap-2 text-xs font-semibold border border-brand-gold/30 max-w-[260px] blush-glow">
+    <div
+        class="fixed bottom-4 right-4 z-[9999] glass rounded-2xl p-4 shadow-xl flex flex-col gap-2 text-xs font-semibold border border-brand-gold/30 max-w-[260px] blush-glow">
         <div class="flex items-center justify-between border-b border-gray-200/50 pb-1.5">
             <span class="text-brand-goldDark flex items-center gap-1 serif-title italic text-xs">
                 <span class="material-symbols-outlined text-sm">construction</span> Demo Controller
             </span>
-            <button onclick="toggleDemoController()" class="text-gray-400 hover:text-brand-text focus:outline-none"><span class="material-symbols-outlined text-sm" id="demo-toggle-icon">keyboard_arrow_down</span></button>
+            <button onclick="toggleDemoController()"
+                class="text-gray-400 hover:text-brand-text focus:outline-none"><span
+                    class="material-symbols-outlined text-sm" id="demo-toggle-icon">keyboard_arrow_down</span></button>
         </div>
         <div class="flex flex-col gap-1.5" id="demo-buttons">
-            <a href="index.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1. Trang chủ</a>
-            <a href="tryon.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-goldDark font-bold hover:bg-brand-blush shadow-sm transition-all border border-brand-gold/40 text-left flex items-center justify-between"><span>2. Thử váy AR (EXE201)</span> <span class="bg-red-500 text-white text-[9px] px-1.5 py-0.2 rounded-full">Hot</span></a>
-            <a href="marketplace.html" class="px-3 py-1.5 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white"></span> 3. Dịch vụ cưới hỏi</a>
-            <a href="detail.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">4. Chi tiết & Đặt cọc</a>
-            <a href="bookings.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">5. Lịch hẹn nhà cung cấp</a>
-            <a href="dashboard.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">6. Kênh Nhà cung cấp</a>
-            <a href="invitation.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">7. Tạo thiệp & QR</a>
-            <a href="admin.html" class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">8. Quản trị Admin</a>
+            <a href="index.html"
+                class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">1.
+                Trang chủ</a>
+            <a href="tryon.html"
+                class="px-3 py-1.5 rounded-lg bg-white text-brand-goldDark font-bold hover:bg-brand-blush shadow-sm transition-all border border-brand-gold/40 text-left flex items-center justify-between"><span>2.
+                    Thử váy AR (EXE201)</span> <span
+                    class="bg-red-500 text-white text-[9px] px-1.5 py-0.2 rounded-full">Hot</span></a>
+            <a href="marketplace.html"
+                class="px-3 py-1.5 rounded-lg bg-brand-gold text-white shadow-sm transition-all text-left flex items-center gap-1.5"><span
+                    class="w-1.5 h-1.5 rounded-full bg-white"></span> 3. Dịch vụ cưới hỏi</a>
+            <a href="detail.html"
+                class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">4.
+                Chi tiết & Đặt cọc</a>
+            <a href="bookings.html"
+                class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">5.
+                Lịch hẹn nhà cung cấp</a>
+            <a href="dashboard.html"
+                class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">6.
+                Kênh Nhà cung cấp</a>
+            <a href="invitation.html"
+                class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">7.
+                Tạo thiệp & QR</a>
+            <a href="admin.html"
+                class="px-3 py-1.5 rounded-lg bg-white text-brand-text hover:bg-brand-blush shadow-sm transition-all border border-gray-200 text-left">8.
+                Quản trị Admin</a>
         </div>
     </div>
 
@@ -96,49 +125,64 @@
 
     <!-- Main Responsive Web Container -->
     <div class="w-full bg-brand-blush min-h-screen flex flex-col justify-between">
-        
+
         <div>
             <!-- Sticky Top Header & Navigation -->
             <header class="sticky top-0 z-50 glass border-b border-brand-blush/40 shadow-sm bg-white/95">
-                <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div
+                    class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <!-- Top Branding Line / Left on Desktop -->
                     <div class="flex items-center justify-between md:justify-start gap-4">
                         <div class="flex items-center gap-2">
-                            <a href="index.html" class="material-symbols-outlined text-brand-text text-lg hover:opacity-85">arrow_back</a>
-                            <img src="logo.jpg" alt="Logo Trạm Hỷ" class="w-8 h-8 rounded-full object-cover border border-brand-gold/30">
-                            <h1 class="serif-title text-base font-extrabold text-brand-text tracking-wide italic">Dịch vụ cưới hỏi</h1>
+                            <a href="index.html"
+                                class="material-symbols-outlined text-brand-text text-lg hover:opacity-85">arrow_back</a>
+                            <img src="logo.jpg" alt="Logo Trạm Hỷ"
+                                class="w-8 h-8 rounded-full object-cover border border-brand-gold/30">
+                            <h1 class="serif-title text-base font-extrabold text-brand-text tracking-wide italic">Dịch
+                                vụ cưới hỏi</h1>
                         </div>
-                        <span class="text-[9px] font-bold text-brand-goldDark bg-brand-gold/10 px-2 py-0.5 rounded-full hidden md:inline-block">Trạm Hỷ Marketplace</span>
+                        <span
+                            class="text-[9px] font-bold text-brand-goldDark bg-brand-gold/10 px-2 py-0.5 rounded-full hidden md:inline-block">Trạm
+                            Hỷ Marketplace</span>
                     </div>
-                    
+
                     <!-- Navigation Tabs (Tìm kiếm Active) -->
-                    <nav class="flex justify-between md:justify-center items-center gap-1 md:gap-3 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent overflow-x-auto pb-1 md:pb-0">
-                        <a href="index.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
+                    <nav
+                        class="flex justify-between md:justify-center items-center gap-1 md:gap-3 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent overflow-x-auto pb-1 md:pb-0">
+                        <a href="index.html"
+                            class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
                             <span class="material-symbols-outlined text-base">home</span>
                             <span class="text-[10px] font-medium">Trang chủ</span>
                         </a>
-                        <a href="tryon.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-goldDark whitespace-nowrap">
+                        <a href="tryon.html"
+                            class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-goldDark whitespace-nowrap">
                             <span class="material-symbols-outlined text-base">styler</span>
                             <span class="text-[10px] font-medium">Thử váy AR</span>
                         </a>
-                        <a href="marketplace.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark whitespace-nowrap">
-                            <span class="material-symbols-outlined text-base" style="font-variation-settings: 'FILL' 1;">search</span>
+                        <a href="marketplace.html"
+                            class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all bg-brand-gold/15 text-brand-goldDark whitespace-nowrap">
+                            <span class="material-symbols-outlined text-base"
+                                style="font-variation-settings: 'FILL' 1;">search</span>
                             <span class="text-[10px] font-bold">Dịch vụ cưới hỏi</span>
                         </a>
-                        <a href="bookings.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
+                        <a href="bookings.html"
+                            class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
                             <span class="material-symbols-outlined text-base">calendar_month</span>
                             <span class="text-[10px] font-medium">Lịch hẹn</span>
                         </a>
-                        <a href="invitation.html" class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
+                        <a href="invitation.html"
+                            class="flex items-center gap-1 px-2.5 py-1 rounded-xl transition-all text-gray-500 hover:text-brand-text whitespace-nowrap">
                             <span class="material-symbols-outlined text-base">mail</span>
                             <span class="text-[10px] font-medium">Tạo thiệp & QR</span>
                         </a>
                     </nav>
 
                     <!-- Right Controls (Location, Notification) -->
-                    <div class="flex items-center justify-between md:justify-end gap-3 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent">
+                    <div
+                        class="flex items-center justify-between md:justify-end gap-3 border-t md:border-t-0 pt-2 md:pt-0 border-gray-100 md:border-transparent">
                         <div class="flex items-center gap-1">
-                            <span class="material-symbols-outlined text-brand-gold text-base" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                            <span class="material-symbols-outlined text-brand-gold text-base"
+                                style="font-variation-settings: 'FILL' 1;">location_on</span>
                             <span class="text-[11px] font-bold text-brand-text">Việt Nam</span>
                         </div>
                     </div>
@@ -147,41 +191,65 @@
 
             <!-- Main Content Area: Sidebar + Grid layout -->
             <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 flex-1">
-                
+
                 <!-- Search bar & AI Active Budget Bar -->
                 <div class="space-y-3">
-                    <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-brand-gold/15 flex items-center gap-3">
+                    <div
+                        class="bg-white rounded-2xl p-3.5 shadow-sm border border-brand-gold/15 flex items-center gap-3">
                         <span class="material-symbols-outlined text-brand-gold text-xl">search</span>
-                        <input type="text" id="search-input" oninput="filterVendors()" class="flex-1 bg-transparent text-xs font-semibold focus:outline-none text-brand-text" placeholder="Tìm tên studio, decor, nhà cung cấp hoặc địa chỉ...">
-                        <span class="material-symbols-outlined text-gray-400 text-base cursor-pointer hover:text-brand-text" onclick="clearSearch()">close</span>
+                        <input type="text" id="search-input" oninput="filterVendors()"
+                            class="flex-1 bg-transparent text-xs font-semibold focus:outline-none text-brand-text"
+                            placeholder="Tìm tên studio, decor, nhà cung cấp hoặc địa chỉ...">
+                        <span
+                            class="material-symbols-outlined text-gray-400 text-base cursor-pointer hover:text-brand-text"
+                            onclick="clearSearch()">close</span>
                     </div>
 
                     <!-- Active Budget Indicator (From AI Planner) -->
-                    <div id="budget-badge" class="bg-brand-gold/10 border border-brand-gold/20 rounded-2xl px-4 py-3 hidden flex justify-between items-center">
+                    <div id="budget-badge"
+                        class="bg-brand-gold/10 border border-brand-gold/20 rounded-2xl px-4 py-3 hidden flex justify-between items-center">
                         <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-brand-gold text-sm animate-pulse" style="font-variation-settings: 'FILL' 1;">neurology</span>
-                            <span class="text-xs font-bold text-brand-goldDark">Bộ lọc AI: Ngân sách phù hợp khoảng <span id="budget-badge-val" class="underline">150.000.000đ</span></span>
+                            <span class="material-symbols-outlined text-brand-gold text-sm animate-pulse"
+                                style="font-variation-settings: 'FILL' 1;">neurology</span>
+                            <span class="text-xs font-bold text-brand-goldDark">Bộ lọc AI: Ngân sách phù hợp khoảng
+                                <span id="budget-badge-val" class="underline">150.000.000đ</span></span>
                         </div>
-                        <button onclick="resetBudgetFilter()" class="text-xs uppercase font-extrabold text-red-500 hover:underline">Xóa lọc</button>
+                        <button onclick="resetBudgetFilter()"
+                            class="text-xs uppercase font-extrabold text-red-500 hover:underline">Xóa lọc</button>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-                    
+
                     <!-- Left Sidebar Filters -->
                     <aside class="bg-white rounded-2xl p-5 border border-brand-gold/15 space-y-5 lg:sticky lg:top-24">
-                        
+
                         <!-- Categories -->
                         <div>
-                            <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider mb-3">Danh mục dịch vụ</h3>
+                            <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider mb-3">Danh mục dịch vụ
+                            </h3>
                             <div class="flex flex-row overflow-x-auto lg:flex-col gap-2 pb-2 lg:pb-0 no-scrollbar">
-                                <button onclick="selectCategory('All')" id="cat-All" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-left whitespace-nowrap">✨ Tất cả dịch vụ</button>
-                                <button onclick="selectCategory('VayThue')" id="cat-VayThue" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap text-brand-goldDark">👗 Váy Cho Thuê (Ready)</button>
-                                <button onclick="selectCategory('MayDo')" id="cat-MayDo" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap text-purple-700">✂️ May Đo Thiết Kế (Bespoke)</button>
-                                <button onclick="selectCategory('Studio')" id="cat-Studio" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">📸 Studio ảnh cưới</button>
-                                <button onclick="selectCategory('Decor')" id="cat-Decor" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">🎀 Trang trí gia tiên</button>
-                                <button onclick="selectCategory('Makeup')" id="cat-Makeup" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">💄 Makeup cô dâu</button>
-                                <button onclick="selectCategory('Nhà hàng')" id="cat-Nhà hàng" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">🍽️ Nhà hàng tiệc cưới</button>
+                                <button onclick="selectCategory('All')" id="cat-All"
+                                    class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-left whitespace-nowrap">✨
+                                    Tất cả dịch vụ</button>
+                                <button onclick="selectCategory('VayThue')" id="cat-VayThue"
+                                    class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap text-brand-goldDark">👗
+                                    Váy Cho Thuê (Ready)</button>
+                                <button onclick="selectCategory('MayDo')" id="cat-MayDo"
+                                    class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap text-purple-700">✂️
+                                    May Đo Thiết Kế (Bespoke)</button>
+                                <button onclick="selectCategory('Studio')" id="cat-Studio"
+                                    class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">📸
+                                    Studio ảnh cưới</button>
+                                <button onclick="selectCategory('Decor')" id="cat-Decor"
+                                    class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">🎀
+                                    Trang trí gia tiên</button>
+                                <button onclick="selectCategory('Makeup')" id="cat-Makeup"
+                                    class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">💄
+                                    Makeup cô dâu</button>
+                                <button onclick="selectCategory('Nhà hàng')" id="cat-Nhà hàng"
+                                    class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">🍽️
+                                    Nhà hàng tiệc cưới</button>
                             </div>
                         </div>
 
@@ -190,10 +258,14 @@
                         <!-- Verification Toggle -->
                         <div class="space-y-2">
                             <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider">Mức độ bảo chứng</h3>
-                            <div class="flex items-center gap-2 bg-brand-blush/60 p-2.5 rounded-xl border border-brand-gold/10">
-                                <input type="checkbox" id="verified-only" onchange="filterVendors()" class="rounded border-gray-300 text-brand-gold focus:ring-brand-gold h-4 w-4 cursor-pointer">
-                                <label for="verified-only" class="text-xs font-bold text-brand-text cursor-pointer flex items-center gap-1 select-none">
-                                    <span class="material-symbols-outlined text-base text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>
+                            <div
+                                class="flex items-center gap-2 bg-brand-blush/60 p-2.5 rounded-xl border border-brand-gold/10">
+                                <input type="checkbox" id="verified-only" onchange="filterVendors()"
+                                    class="rounded border-gray-300 text-brand-gold focus:ring-brand-gold h-4 w-4 cursor-pointer">
+                                <label for="verified-only"
+                                    class="text-xs font-bold text-brand-text cursor-pointer flex items-center gap-1 select-none">
+                                    <span class="material-symbols-outlined text-base text-blue-500"
+                                        style="font-variation-settings: 'FILL' 1;">verified</span>
                                     Chỉ đối tác Tích xanh
                                 </label>
                             </div>
@@ -204,11 +276,16 @@
                         <!-- Price Range Slider -->
                         <div class="space-y-3">
                             <div class="flex justify-between items-center">
-                                <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider">Khoảng giá lọc</h3>
-                                <span id="price-range-val" class="text-[11px] font-extrabold text-brand-goldDark bg-brand-gold/10 px-2 py-0.5 rounded-full border border-brand-gold/20">Tất cả mức giá</span>
+                                <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider">Khoảng giá lọc
+                                </h3>
+                                <span id="price-range-val"
+                                    class="text-[11px] font-extrabold text-brand-goldDark bg-brand-gold/10 px-2 py-0.5 rounded-full border border-brand-gold/20">Tất
+                                    cả mức giá</span>
                             </div>
                             <div class="space-y-1.5 pt-1">
-                                <input type="range" id="price-range" min="2000000" max="600000000" step="1000000" value="600000000" oninput="updatePriceRangeDisplay(); filterVendors();" class="w-full accent-brand-gold cursor-pointer h-2 bg-gray-200 rounded-lg appearance-none">
+                                <input type="range" id="price-range" min="2000000" max="600000000" step="1000000"
+                                    value="600000000" oninput="updatePriceRangeDisplay(); filterVendors();"
+                                    class="w-full accent-brand-gold cursor-pointer h-2 bg-gray-200 rounded-lg appearance-none">
                                 <div class="flex justify-between text-[9px] font-bold text-gray-400 px-0.5">
                                     <span>2tr</span>
                                     <span>20tr</span>
@@ -218,10 +295,18 @@
                             </div>
                             <!-- Quick Price Filter Pills -->
                             <div class="flex flex-wrap gap-1.5 pt-1">
-                                <button type="button" onclick="setQuickPrice(600000000)" class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">Tất cả</button>
-                                <button type="button" onclick="setQuickPrice(5000000)" class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt; 5tr (Thuê váy)</button>
-                                <button type="button" onclick="setQuickPrice(20000000)" class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt; 20tr (May đo/Studio)</button>
-                                <button type="button" onclick="setQuickPrice(100000000)" class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt; 100tr</button>
+                                <button type="button" onclick="setQuickPrice(600000000)"
+                                    class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">Tất
+                                    cả</button>
+                                <button type="button" onclick="setQuickPrice(5000000)"
+                                    class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt;
+                                    5tr (Thuê váy)</button>
+                                <button type="button" onclick="setQuickPrice(20000000)"
+                                    class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt;
+                                    20tr (May đo/Studio)</button>
+                                <button type="button" onclick="setQuickPrice(100000000)"
+                                    class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt;
+                                    100tr</button>
                             </div>
                         </div>
 
@@ -230,7 +315,8 @@
                         <!-- Price Sorting -->
                         <div class="space-y-2">
                             <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider">Sắp xếp giá</h3>
-                            <select id="price-sort" onchange="filterVendors()" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-brand-text focus:outline-none focus:border-brand-gold">
+                            <select id="price-sort" onchange="filterVendors()"
+                                class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-brand-text focus:outline-none focus:border-brand-gold">
                                 <option value="default">Mặc định</option>
                                 <option value="low-high">Giá: Thấp -> Cao</option>
                                 <option value="high-low">Giá: Cao -> Thấp</option>
@@ -240,15 +326,18 @@
 
                     <!-- Right Vendor Grid Area -->
                     <div class="lg:col-span-3 space-y-4">
-                        
+
                         <!-- ANTI-DISINTERMEDIATION GUARANTEE BANNER (CHỐNG CẮT CẦU) -->
-                        <div class="bg-gradient-to-r from-amber-50 via-white to-amber-50 rounded-2xl p-4 border border-brand-gold/30 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div
+                            class="bg-gradient-to-r from-amber-50 via-white to-amber-50 rounded-2xl p-4 border border-brand-gold/30 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-brand-gold text-white flex items-center justify-center shrink-0 shadow-md">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-brand-gold text-white flex items-center justify-center shrink-0 shadow-md">
                                     <span class="material-symbols-outlined text-2xl">verified_user</span>
                                 </div>
                                 <div>
-                                    <h3 class="serif-title text-xs sm:text-sm font-bold text-brand-text">Đặc Quyền Đặt Dịch Vụ Qua Sàn Trạm Hỷ</h3>
+                                    <h3 class="serif-title text-xs sm:text-sm font-bold text-brand-text">Đặc Quyền Đặt
+                                        Dịch Vụ Qua Sàn Trạm Hỷ</h3>
                                     <div class="flex flex-wrap items-center gap-2 text-[10px] text-gray-600 mt-0.5">
                                         <span class="font-bold text-brand-rose">✓ Giảm 15% độc quyền</span>
                                         <span>•</span>
@@ -258,7 +347,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <a href="tryon.html" class="shrink-0 px-3.5 py-2 bg-brand-text text-white hover:bg-black text-[11px] font-bold rounded-xl shadow transition-all flex items-center gap-1">
+                            <a href="tryon.html"
+                                class="shrink-0 px-3.5 py-2 bg-brand-text text-white hover:bg-black text-[11px] font-bold rounded-xl shadow transition-all flex items-center gap-1">
                                 <span class="material-symbols-outlined text-xs text-brand-gold">styler</span>
                                 <span>Thử Váy AR Trước Khi Thuê</span>
                             </a>
@@ -269,7 +359,8 @@
                         </div>
 
                         <!-- Empty State -->
-                        <div id="empty-state" class="hidden text-center py-16 space-y-3 bg-white rounded-2xl border border-gray-150 p-6">
+                        <div id="empty-state"
+                            class="hidden text-center py-16 space-y-3 bg-white rounded-2xl border border-gray-150 p-6">
                             <span class="material-symbols-outlined text-4xl text-gray-300">search_off</span>
                             <h4 class="text-sm font-bold text-brand-text">Không tìm thấy đối tác phù hợp</h4>
                             <p class="text-xs text-gray-400">Vui lòng thử điều chỉnh lại bộ lọc hoặc khoảng giá.</p>
@@ -618,7 +709,7 @@
         }
 
         // Initialize parameters from URL or localStorage
-        window.onload = function() {
+        window.onload = function () {
             const urlParams = new URLSearchParams(window.location.search);
             const catParam = urlParams.get('category');
             const budgetParam = urlParams.get('budget') || localStorage.getItem('tramhy_selected_budget');
@@ -767,7 +858,7 @@
             vendors.forEach(v => {
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all border border-gray-150 flex flex-col justify-between group";
-                
+
                 const linkHref = v.isDress ? 'tryon.html' : 'detail.html';
                 const actionLabel = v.isDress ? 'Ướm Thử AR Ngay' : 'Xem Chi Tiết';
                 const actionIcon = v.isDress ? 'styler' : 'arrow_forward';
@@ -820,4 +911,5 @@
         }
     </script>
 </body>
+
 </html>
