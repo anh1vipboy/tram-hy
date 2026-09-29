@@ -173,13 +173,15 @@
                         
                         <!-- Categories -->
                         <div>
-                            <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider mb-3">Danh mục</h3>
+                            <h3 class="text-xs font-bold text-brand-text uppercase tracking-wider mb-3">Danh mục dịch vụ</h3>
                             <div class="flex flex-row overflow-x-auto lg:flex-col gap-2 pb-2 lg:pb-0 no-scrollbar">
-                                <button onclick="selectCategory('All')" id="cat-All" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-left whitespace-nowrap">Tất cả</button>
-                                <button onclick="selectCategory('Studio')" id="cat-Studio" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">📸 Studio ảnh</button>
-                                <button onclick="selectCategory('Decor')" id="cat-Decor" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">🎀 Trang trí</button>
-                                <button onclick="selectCategory('Makeup')" id="cat-Makeup" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">👗 Makeup</button>
-                                <button onclick="selectCategory('Nhà hàng')" id="cat-Nhà hàng" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">🍽️ Nhà hàng</button>
+                                <button onclick="selectCategory('All')" id="cat-All" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-left whitespace-nowrap">✨ Tất cả dịch vụ</button>
+                                <button onclick="selectCategory('VayThue')" id="cat-VayThue" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap text-brand-goldDark">👗 Váy Cho Thuê (Ready)</button>
+                                <button onclick="selectCategory('MayDo')" id="cat-MayDo" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap text-purple-700">✂️ May Đo Thiết Kế (Bespoke)</button>
+                                <button onclick="selectCategory('Studio')" id="cat-Studio" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">📸 Studio ảnh cưới</button>
+                                <button onclick="selectCategory('Decor')" id="cat-Decor" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">🎀 Trang trí gia tiên</button>
+                                <button onclick="selectCategory('Makeup')" id="cat-Makeup" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">💄 Makeup cô dâu</button>
+                                <button onclick="selectCategory('Nhà hàng')" id="cat-Nhà hàng" class="px-4 py-2 rounded-xl text-xs font-medium transition-all text-left whitespace-nowrap">🍽️ Nhà hàng tiệc cưới</button>
                             </div>
                         </div>
 
@@ -206,20 +208,20 @@
                                 <span id="price-range-val" class="text-[11px] font-extrabold text-brand-goldDark bg-brand-gold/10 px-2 py-0.5 rounded-full border border-brand-gold/20">Tất cả mức giá</span>
                             </div>
                             <div class="space-y-1.5 pt-1">
-                                <input type="range" id="price-range" min="5000000" max="600000000" step="5000000" value="600000000" oninput="updatePriceRangeDisplay(); filterVendors();" class="w-full accent-brand-gold cursor-pointer h-2 bg-gray-200 rounded-lg appearance-none">
+                                <input type="range" id="price-range" min="2000000" max="600000000" step="1000000" value="600000000" oninput="updatePriceRangeDisplay(); filterVendors();" class="w-full accent-brand-gold cursor-pointer h-2 bg-gray-200 rounded-lg appearance-none">
                                 <div class="flex justify-between text-[9px] font-bold text-gray-400 px-0.5">
-                                    <span>5tr</span>
+                                    <span>2tr</span>
+                                    <span>20tr</span>
                                     <span>100tr</span>
-                                    <span>300tr</span>
                                     <span>600tr+</span>
                                 </div>
                             </div>
                             <!-- Quick Price Filter Pills -->
                             <div class="flex flex-wrap gap-1.5 pt-1">
                                 <button type="button" onclick="setQuickPrice(600000000)" class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">Tất cả</button>
-                                <button type="button" onclick="setQuickPrice(20000000)" class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt; 20tr</button>
+                                <button type="button" onclick="setQuickPrice(5000000)" class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt; 5tr (Thuê váy)</button>
+                                <button type="button" onclick="setQuickPrice(20000000)" class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt; 20tr (May đo/Studio)</button>
                                 <button type="button" onclick="setQuickPrice(100000000)" class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt; 100tr</button>
-                                <button type="button" onclick="setQuickPrice(300000000)" class="text-[10px] font-semibold px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 hover:bg-brand-blush hover:border-brand-gold/30 text-brand-text transition-all">&lt; 300tr</button>
                             </div>
                         </div>
 
@@ -236,8 +238,32 @@
                         </div>
                     </aside>
 
-                    <!-- Right Vendor Grid -->
-                    <div class="lg:col-span-3">
+                    <!-- Right Vendor Grid Area -->
+                    <div class="lg:col-span-3 space-y-4">
+                        
+                        <!-- ANTI-DISINTERMEDIATION GUARANTEE BANNER (CHỐNG CẮT CẦU) -->
+                        <div class="bg-gradient-to-r from-amber-50 via-white to-amber-50 rounded-2xl p-4 border border-brand-gold/30 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-brand-gold text-white flex items-center justify-center shrink-0 shadow-md">
+                                    <span class="material-symbols-outlined text-2xl">verified_user</span>
+                                </div>
+                                <div>
+                                    <h3 class="serif-title text-xs sm:text-sm font-bold text-brand-text">Đặc Quyền Đặt Dịch Vụ Qua Sàn Trạm Hỷ</h3>
+                                    <div class="flex flex-wrap items-center gap-2 text-[10px] text-gray-600 mt-0.5">
+                                        <span class="font-bold text-brand-rose">✓ Giảm 15% độc quyền</span>
+                                        <span>•</span>
+                                        <span class="font-bold text-emerald-700">✓ Giữ cọc Escrow 3 mốc</span>
+                                        <span>•</span>
+                                        <span class="font-bold text-blue-700">✓ Tặng Thiệp QR 500k</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="tryon.html" class="shrink-0 px-3.5 py-2 bg-brand-text text-white hover:bg-black text-[11px] font-bold rounded-xl shadow transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs text-brand-gold">styler</span>
+                                <span>Thử Váy AR Trước Khi Thuê</span>
+                            </a>
+                        </div>
+
                         <div id="vendor-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             <!-- Populated Dynamically -->
                         </div>
@@ -246,7 +272,7 @@
                         <div id="empty-state" class="hidden text-center py-16 space-y-3 bg-white rounded-2xl border border-gray-150 p-6">
                             <span class="material-symbols-outlined text-4xl text-gray-300">search_off</span>
                             <h4 class="text-sm font-bold text-brand-text">Không tìm thấy đối tác phù hợp</h4>
-                            <p class="text-xs text-gray-400">Vui lòng thử điều chỉnh lại bộ lọc hoặc ngân sách hoạch định AI.</p>
+                            <p class="text-xs text-gray-400">Vui lòng thử điều chỉnh lại bộ lọc hoặc khoảng giá.</p>
                         </div>
                     </div>
                 </div>
@@ -264,6 +290,71 @@
     <!-- JS Logic -->
     <script>
         const allVendors = [
+            {
+                id: 'vay-duoica-royal',
+                name: 'Váy Cưới Đuôi Cá Royal (Thuê)',
+                category: 'VayThue',
+                price: 3500000,
+                rating: 5.0,
+                reviews: 142,
+                verified: true,
+                location: '2H Studio (Cầu Giấy, Hà Nội)',
+                image: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=300',
+                isDress: true,
+                badge: 'Có sẵn tại Showroom'
+            },
+            {
+                id: 'vay-tungxoe-bellis',
+                name: 'Váy Tùng Xòe Ren Pháp Bellis (Thuê)',
+                category: 'VayThue',
+                price: 4200000,
+                rating: 4.9,
+                reviews: 88,
+                verified: true,
+                location: 'Bellis Bridal (Hoàn Kiếm, Hà Nội)',
+                image: 'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&q=80&w=300',
+                isDress: true,
+                badge: 'Ưu Đãi 20%'
+            },
+            {
+                id: 'vay-satin-korea',
+                name: 'Váy Satin Lụa Cúp Ngực Hàn Quốc (Thuê)',
+                category: 'VayThue',
+                price: 2800000,
+                rating: 4.8,
+                reviews: 65,
+                verified: true,
+                location: 'La Reine Bridal (Ba Đình, Hà Nội)',
+                image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=300',
+                isDress: true,
+                badge: 'Quiet Luxury'
+            },
+            {
+                id: 'vay-maydo-mikado',
+                name: 'Váy May Đo Mikado Haute Couture',
+                category: 'MayDo',
+                price: 12500000,
+                rating: 5.0,
+                reviews: 47,
+                verified: true,
+                location: 'Trạm Hỷ Atelier (Tây Hồ, Hà Nội)',
+                image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&q=80&w=300',
+                isDress: true,
+                badge: 'May Đo Riêng 100%'
+            },
+            {
+                id: 'vay-maydo-chantilly',
+                name: 'Váy May Đo Ren Chantilly Hoàng Gia',
+                category: 'MayDo',
+                price: 18000000,
+                rating: 5.0,
+                reviews: 32,
+                verified: true,
+                location: 'Trạm Hỷ Atelier & NTK Lê Lan',
+                image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=300',
+                isDress: true,
+                badge: 'Độc Bản Haute Couture'
+            },
             {
                 id: 'tuart',
                 name: 'TuArt Wedding',
@@ -552,14 +643,14 @@
         }
 
         function updateCategoryPills() {
-            const cats = ['All', 'Studio', 'Decor', 'Makeup', 'Nhà hàng'];
+            const cats = ['All', 'VayThue', 'MayDo', 'Studio', 'Decor', 'Makeup', 'Nhà hàng'];
             cats.forEach(c => {
                 const el = document.getElementById(`cat-${c}`);
                 if (!el) return;
                 if (c === selectedCategory) {
-                    el.className = "px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm bg-brand-gold text-white border border-brand-gold";
+                    el.className = "px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm bg-brand-gold text-white border border-brand-gold whitespace-nowrap text-left";
                 } else {
-                    el.className = "px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white";
+                    el.className = "px-4 py-2 rounded-xl text-xs font-medium transition-all hover:bg-brand-blush text-brand-text border border-gray-200 bg-white whitespace-nowrap text-left";
                 }
             });
         }
@@ -674,33 +765,54 @@
             empty.classList.add('hidden');
 
             vendors.forEach(v => {
-                // Direct link to detail.html for TuArt, other cards can just mock-link to detail.html as well
-                const card = document.createElement('a');
-                card.href = 'detail.html';
-                card.className = "bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition-all border border-gray-100 flex flex-col justify-between";
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all border border-gray-150 flex flex-col justify-between group";
                 
+                const linkHref = v.isDress ? 'tryon.html' : 'detail.html';
+                const actionLabel = v.isDress ? 'Ướm Thử AR Ngay' : 'Xem Chi Tiết';
+                const actionIcon = v.isDress ? 'styler' : 'arrow_forward';
+
                 card.innerHTML = `
-                    <div class="h-44 overflow-hidden relative">
-                        <img src="${v.image}" alt="${v.name}" class="w-full h-full object-cover">
-                        <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[9px] font-bold text-brand-goldDark">
-                            <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span> ${v.rating}
+                    <div>
+                        <div class="h-44 overflow-hidden relative">
+                            <img src="${v.image}" alt="${v.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute top-3 right-3 bg-white/95 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[9px] font-bold text-brand-goldDark">
+                                <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">star</span> ${v.rating}
+                            </div>
+                            ${v.badge ? `
+                            <div class="absolute top-3 left-3 bg-brand-gold text-white px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[8px] font-extrabold uppercase tracking-wider">
+                                <span class="material-symbols-outlined text-[9px]">auto_awesome</span> ${v.badge}
+                            </div>
+                            ` : (v.verified ? `
+                            <div class="absolute top-3 left-3 bg-gradient-to-r from-brand-gold to-brand-goldDark text-white px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[8px] font-extrabold uppercase tracking-wider">
+                                <span class="material-symbols-outlined text-[8px]">military_tech</span> Choice 2026
+                            </div>
+                            ` : '')}
                         </div>
-                        ${v.verified ? `
-                        <div class="absolute top-3 left-3 bg-gradient-to-r from-brand-gold to-brand-goldDark text-white px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm text-[8px] font-extrabold uppercase tracking-wider">
-                            <span class="material-symbols-outlined text-[8px]">military_tech</span> Choice 2026
+                        <div class="p-4 space-y-2">
+                            <div class="flex items-center gap-1">
+                                <h4 class="text-xs sm:text-sm font-bold text-brand-text truncate flex-1">${v.name}</h4>
+                                ${v.verified ? `<span class="material-symbols-outlined text-sm text-blue-500 shrink-0" style="font-variation-settings: 'FILL' 1;">verified</span>` : ''}
+                            </div>
+                            <p class="text-[11px] text-gray-500 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs text-brand-gold">location_on</span> ${v.location}
+                            </p>
+                            <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+                                <div>
+                                    <span class="text-[10px] text-gray-400 block">${v.isDress ? 'Giá niêm yết' : 'Trọn gói từ'}</span>
+                                    <span class="text-xs sm:text-sm font-extrabold text-brand-goldDark">${formatMoney(v.price)}</span>
+                                </div>
+                                <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                    Escrow 2 Chiều
+                                </span>
+                            </div>
                         </div>
-                        ` : ''}
                     </div>
-                    <div class="p-4">
-                        <div class="flex items-center gap-1">
-                            <h4 class="text-sm font-bold text-brand-text truncate flex-1">${v.name}</h4>
-                            ${v.verified ? `<span class="material-symbols-outlined text-sm text-blue-500" style="font-variation-settings: 'FILL' 1;">verified</span>` : ''}
-                        </div>
-                        <p class="text-xs text-gray-400 mt-1">${v.location}</p>
-                        <div class="flex justify-between items-center mt-3 border-t border-gray-50 pt-2">
-                            <span class="text-xs text-gray-400">Trọn gói từ</span>
-                            <span class="text-sm font-bold text-brand-goldDark">${formatMoney(v.price)}</span>
-                        </div>
+                    <div class="px-4 pb-4 pt-1">
+                        <a href="${linkHref}" class="w-full py-2.5 ${v.isDress ? 'gold-gradient text-white' : 'bg-brand-text text-white hover:bg-black'} text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5 active:scale-95">
+                            <span class="material-symbols-outlined text-sm">${actionIcon}</span>
+                            <span>${actionLabel}</span>
+                        </a>
                     </div>
                 `;
                 grid.appendChild(card);
