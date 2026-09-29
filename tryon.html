@@ -562,15 +562,20 @@
                                 </span>
                             </div>
 
-                            <!-- 2 MAJOR TABS: CHO THUÊ vs MAY ĐO THIẾT KẾ (Mentor Solution) -->
-                            <div class="grid grid-cols-2 gap-1.5 bg-gray-100 p-1 rounded-2xl">
-                                <button type="button" onclick="switchCollectionType('rental')" id="tab-type-rental" class="py-2 px-3 rounded-xl font-bold text-xs bg-white text-brand-text shadow-sm transition-all flex items-center justify-center gap-1">
-                                    <span class="material-symbols-outlined text-sm text-brand-gold">checkroom</span>
-                                    <span>Váy Cho Thuê (Ready)</span>
+                            <!-- 3 MAJOR TABS: CHO THUÊ vs MAY ĐO ATELIER vs MAY THEO ẢNH MẪU (AI SCAN) -->
+                            <div class="grid grid-cols-3 gap-1 bg-gray-100 p-1 rounded-2xl text-[10px]">
+                                <button type="button" onclick="switchCollectionType('rental')" id="tab-type-rental" class="py-2 px-1.5 rounded-xl font-bold bg-white text-brand-text shadow-sm transition-all flex items-center justify-center gap-1">
+                                    <span class="material-symbols-outlined text-xs text-brand-gold">checkroom</span>
+                                    <span>Váy Thuê Sẵn</span>
                                 </button>
-                                <button type="button" onclick="switchCollectionType('bespoke')" id="tab-type-bespoke" class="py-2 px-3 rounded-xl font-bold text-xs text-gray-500 hover:text-brand-text transition-all flex items-center justify-center gap-1">
-                                    <span class="material-symbols-outlined text-sm text-purple-600">design_services</span>
-                                    <span>May Đo Thiết Kế (Bespoke)</span>
+                                <button type="button" onclick="switchCollectionType('bespoke')" id="tab-type-bespoke" class="py-2 px-1.5 rounded-xl font-bold text-gray-500 hover:text-brand-text transition-all flex items-center justify-center gap-1">
+                                    <span class="material-symbols-outlined text-xs text-purple-600">design_services</span>
+                                    <span>May Tùy Chọn</span>
+                                </button>
+                                <button type="button" onclick="switchCollectionType('image_to_dress')" id="tab-type-image" class="py-2 px-1.5 rounded-xl font-bold text-gray-500 hover:text-brand-text transition-all flex items-center justify-center gap-1 relative">
+                                    <span class="material-symbols-outlined text-xs text-pink-600">auto_fix_high</span>
+                                    <span>May Theo Ảnh</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></span>
                                 </button>
                             </div>
 
@@ -714,16 +719,165 @@
                                     </div>
                                 </div>
 
-                                <!-- Action Buttons: View Spec Sheet & Confirm Bespoke -->
-                                <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
-                                    <button type="button" onclick="openSpecSheetModal()" class="w-full sm:w-auto flex-1 py-2.5 px-3 bg-white hover:bg-purple-50 text-purple-900 border border-purple-300 font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 active:scale-95 text-[11px]">
-                                        <span class="material-symbols-outlined text-sm text-purple-600">description</span>
-                                        <span>Xem & Xuất Hồ Sơ May Đo (Spec Sheet)</span>
-                                    </button>
-                                    <div class="text-[10px] text-gray-500 flex items-center gap-1 shrink-0">
-                                        <span class="material-symbols-outlined text-xs text-emerald-600">verified</span>
-                                        <span>Bảo chứng Escrow 3 chặng</span>
+                            </div>
+
+                            <!-- ================= MAY ĐO THEO ẢNH MẪU (AI VISION SCAN & AR TRY-ON) ================= -->
+                            <div id="image-to-dress-box" class="hidden bg-gradient-to-b from-pink-50/90 via-rose-50/40 to-white rounded-3xl p-4 sm:p-5 border-2 border-pink-300 shadow-md space-y-4 text-xs">
+                                
+                                <!-- Studio Header -->
+                                <div class="flex items-center justify-between border-b border-pink-200 pb-2.5">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 text-white flex items-center justify-center shadow-xs">
+                                            <span class="material-symbols-outlined text-base">auto_fix_high</span>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-black text-rose-950 text-xs sm:text-sm flex items-center gap-1.5">
+                                                May Đo Theo Ảnh Mẫu (AI Image-to-Dress)
+                                                <span class="text-[9px] font-extrabold text-pink-700 bg-pink-100 px-2 py-0.5 rounded-full border border-pink-300">Độc Quyền Trạm Hỷ</span>
+                                            </h4>
+                                            <p class="text-[10px] text-pink-800">Bóc tách thiết kế từ Pinterest/Instagram & Thử trực tiếp trên dáng người bằng AR</p>
+                                        </div>
                                     </div>
+                                    <span class="text-[9px] font-extrabold text-pink-800 bg-pink-100 px-2 py-0.5 rounded-full border border-pink-300 uppercase tracking-wider">
+                                        AI Scanner
+                                    </span>
+                                </div>
+
+                                <!-- Upload & Reference Selector -->
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] font-bold text-gray-800 flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm text-pink-600">add_photo_alternate</span> 1. Chọn hoặc Tải ảnh váy bạn muốn may:
+                                        </span>
+                                        <span class="text-[9px] text-gray-500">Hỗ trợ JPG, PNG, WEBP</span>
+                                    </div>
+
+                                    <!-- Dotted Upload Dropzone -->
+                                    <label for="custom-dress-upload-input" class="cursor-pointer block border-2 border-dashed border-pink-300 hover:border-pink-500 bg-white/90 hover:bg-pink-50/50 rounded-2xl p-3 text-center transition-all group shadow-2xs">
+                                        <input type="file" id="custom-dress-upload-input" accept="image/*" onchange="handleCustomDressUpload(event)" class="hidden">
+                                        <div class="flex flex-col items-center justify-center gap-1">
+                                            <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                <span class="material-symbols-outlined text-lg">cloud_upload</span>
+                                            </div>
+                                            <div class="text-[11px] font-bold text-gray-800">
+                                                Bấm để tải ảnh mẫu váy từ máy (Pinterest / Instagram / Bản vẽ)
+                                            </div>
+                                            <p class="text-[9px] text-gray-500">AI tự động nhận diện phom dáng, đường may và tính toán độ khả thi</p>
+                                        </div>
+                                    </label>
+
+                                    <!-- 3 International Haute Couture Presets (Clickable) -->
+                                    <div class="space-y-1.5 pt-1">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-[10px] font-bold text-gray-600">Hoặc chọn 1 trong 3 mẫu Haute Couture quốc tế đã bóc tách:</span>
+                                            <span class="text-[9px] text-pink-600 font-semibold">Chọn thử ngay ⚡</span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-2">
+                                            <!-- Preset 1: Elie Saab -->
+                                            <button type="button" onclick="selectCustomPreset('eliesaab')" id="preset-btn-eliesaab" class="custom-preset-btn p-2 rounded-xl border-2 border-pink-500 bg-pink-100/70 text-left transition-all relative flex flex-col justify-between">
+                                                <div class="aspect-[3/4] w-full rounded-lg overflow-hidden mb-1.5 relative shadow-xs">
+                                                    <img src="https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=300" alt="Elie Saab Ballgown" class="w-full h-full object-cover">
+                                                    <span class="absolute top-1 left-1 bg-black/60 backdrop-blur-xs text-white text-[8px] font-bold px-1.5 py-0.5 rounded">Elie Saab</span>
+                                                </div>
+                                                <span class="text-[10px] font-bold text-gray-900 block truncate leading-tight">Công Chúa Sparkle</span>
+                                                <span class="text-[8px] text-pink-700 font-semibold block mt-0.5">Xòe phồng lấp lánh</span>
+                                            </button>
+
+                                            <!-- Preset 2: Vera Wang -->
+                                            <button type="button" onclick="selectCustomPreset('verawang')" id="preset-btn-verawang" class="custom-preset-btn p-2 rounded-xl border border-gray-200 bg-white hover:border-pink-300 text-left transition-all relative flex flex-col justify-between">
+                                                <div class="aspect-[3/4] w-full rounded-lg overflow-hidden mb-1.5 relative shadow-xs">
+                                                    <img src="https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&q=80&w=300" alt="Vera Wang Satin" class="w-full h-full object-cover">
+                                                    <span class="absolute top-1 left-1 bg-black/60 backdrop-blur-xs text-white text-[8px] font-bold px-1.5 py-0.5 rounded">Vera Wang</span>
+                                                </div>
+                                                <span class="text-[10px] font-bold text-gray-900 block truncate leading-tight">Lụa Satin Mikado</span>
+                                                <span class="text-[8px] text-gray-500 font-semibold block mt-0.5">Tối giản quý phái</span>
+                                            </button>
+
+                                            <!-- Preset 3: Berta -->
+                                            <button type="button" onclick="selectCustomPreset('berta')" id="preset-btn-berta" class="custom-preset-btn p-2 rounded-xl border border-gray-200 bg-white hover:border-pink-300 text-left transition-all relative flex flex-col justify-between">
+                                                <div class="aspect-[3/4] w-full rounded-lg overflow-hidden mb-1.5 relative shadow-xs">
+                                                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=300" alt="Berta Mermaid" class="w-full h-full object-cover">
+                                                    <span class="absolute top-1 left-1 bg-black/60 backdrop-blur-xs text-white text-[8px] font-bold px-1.5 py-0.5 rounded">Berta Bridal</span>
+                                                </div>
+                                                <span class="text-[10px] font-bold text-gray-900 block truncate leading-tight">Ren Pháp Đuôi Cá</span>
+                                                <span class="text-[8px] text-gray-500 font-semibold block mt-0.5">Gợi cảm tôn eo hông</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- AI Vision Deconstruction Card (Bóc tách thông số kỹ thuật đa tầng) -->
+                                <div class="p-3.5 rounded-2xl bg-white border border-pink-200 shadow-xs space-y-2.5">
+                                    <div class="flex items-center justify-between border-b border-pink-100 pb-2">
+                                        <span class="text-[11px] font-bold text-rose-950 flex items-center gap-1.5">
+                                            <span class="material-symbols-outlined text-sm text-pink-600">troubleshoot</span>
+                                            2. Kết Quả Bóc Tách Thiết Kế (AI Vision Analysis)
+                                        </span>
+                                        <span class="text-[9px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                            Độ khả thi xưởng: <span id="custom-feasibility-score">98%</span>
+                                        </span>
+                                    </div>
+
+                                    <!-- Vision Scanning Indicator (Active when scanning) -->
+                                    <div id="custom-vision-loading" class="hidden p-3 bg-pink-50/70 rounded-xl border border-pink-200 text-center space-y-1.5">
+                                        <div class="flex items-center justify-center gap-2 text-pink-700 font-bold text-xs">
+                                            <span class="material-symbols-outlined animate-spin text-sm">sync</span>
+                                            <span id="custom-scan-text">AI đang phân tích kết cấu vải & phom dáng...</span>
+                                        </div>
+                                        <div class="w-full bg-pink-200 h-1.5 rounded-full overflow-hidden">
+                                            <div id="custom-scan-bar" class="bg-gradient-to-r from-pink-500 to-rose-600 h-full transition-all duration-300" style="width: 25%"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Specs Grid Breakdown -->
+                                    <div id="custom-vision-results" class="space-y-2">
+                                        <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                            <div class="p-2 rounded-xl bg-pink-50/50 border border-pink-100">
+                                                <span class="text-gray-500 block text-[9px] font-medium">Phom Dáng Nhận Diện:</span>
+                                                <b class="text-gray-900 block mt-0.5" id="custom-spec-silhouette">Ballgown Hoàng Gia Xòe Bồng</b>
+                                            </div>
+                                            <div class="p-2 rounded-xl bg-pink-50/50 border border-pink-100">
+                                                <span class="text-gray-500 block text-[9px] font-medium">Cổ Áo & Cúp Ngực:</span>
+                                                <b class="text-gray-900 block mt-0.5" id="custom-spec-neckline">Cổ Tim Sweetheart + Corset Siết Eo</b>
+                                            </div>
+                                            <div class="p-2 rounded-xl bg-pink-50/50 border border-pink-100">
+                                                <span class="text-gray-500 block text-[9px] font-medium">Chất Liệu Đề Xuất:</span>
+                                                <b class="text-gray-900 block mt-0.5" id="custom-spec-fabric">Tulle 7 lớp ánh kim + Satin lót</b>
+                                            </div>
+                                            <div class="p-2 rounded-xl bg-pink-50/50 border border-pink-100">
+                                                <span class="text-gray-500 block text-[9px] font-medium">Kỹ Thuật Đính Kết:</span>
+                                                <b class="text-gray-900 block mt-0.5" id="custom-spec-embellish">Pha lê Swarovski + Cườm ngũ sắc</b>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tailoring Quotation & Escrow Protection -->
+                                        <div class="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-[10px] space-y-1">
+                                            <div class="flex items-center justify-between">
+                                                <span class="font-bold text-amber-900">Ước tính định giá may đo xưởng VN:</span>
+                                                <span class="font-extrabold text-amber-900 text-xs" id="custom-spec-price">18.500.000đ</span>
+                                            </div>
+                                            <div class="flex items-center justify-between text-gray-500 text-[9px]">
+                                                <span>Bản gốc quốc tế: <del id="custom-spec-original">120.000.000đ</del></span>
+                                                <span class="text-emerald-700 font-bold">Tiết kiệm ~84%</span>
+                                            </div>
+                                            <p class="text-[9px] text-amber-800 leading-tight pt-0.5">
+                                                🛡️ <b>Bảo chứng Escrow 3 chặng</b>: Chỉ giải ngân khi duyệt phác thảo 3D (30%) → Thử rập mộc vừa vặn (40%) → Nghiệm thu váy đạt 100% (30%).
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons for Image-to-Dress -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                                    <button type="button" onclick="executeCustomDressVisionScan()" class="py-2.5 px-3 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95 text-[11px]">
+                                        <span class="material-symbols-outlined text-sm">visibility</span>
+                                        <span>Ướm Thử Ngay Lên Gương AR</span>
+                                    </button>
+                                    <button type="button" onclick="transferCustomDressToBooking()" class="py-2.5 px-3 bg-white hover:bg-rose-50 text-rose-900 border border-rose-300 font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 active:scale-95 text-[11px]">
+                                        <span class="material-symbols-outlined text-sm text-rose-600">assignment</span>
+                                        <span>Ký Hợp Đồng May & Giữ Cọc</span>
+                                    </button>
                                 </div>
 
                             </div>
@@ -1922,35 +2076,418 @@
             document.getElementById('fit-score-explanation').innerText = note;
         }
 
-        // Switch between RENTAL and BESPOKE Collections
+        // =========================================================================
+        // AI VISION IMAGE-TO-DRESS (MAY ĐO THEO ẢNH MẪU & AR TRY-ON) SUITE
+        // =========================================================================
+        const customDressPresets = {
+            eliesaab: {
+                id: 'custom_eliesaab',
+                name: 'Váy Cưới Elie Saab Sparkle Ballgown (May Theo Ảnh Mẫu)',
+                studio: 'Bellis Atelier Haute Couture (Cầu Giấy, Hà Nội)',
+                silhouette: 'Ballgown Hoàng Gia Xòe Bồng 7 Lớp',
+                neckline: 'Cổ Tim Sweetheart + Corset Siết Eo',
+                fabric: 'Tulle 7 lớp ánh kim + Satin dệt mật độ cao',
+                embellish: '1.500 viên pha lê Swarovski + Cườm Nhật Bản',
+                price: '18.500.000đ',
+                numericPrice: 18500000,
+                originalPrice: '120.000.000đ',
+                feasibility: '98%',
+                thumb: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=300',
+                tryonMap: {
+                    user: 'user_tryon_white_royal.jpg',
+                    bride1: 'bride_1_tryon_royal.jpg',
+                    bride2: 'bride_1_tryon_royal.jpg',
+                    bride3: 'bride_1_tryon_royal.jpg',
+                    bride4: 'bride_1_tryon_royal.jpg'
+                }
+            },
+            verawang: {
+                id: 'custom_verawang',
+                name: 'Váy Cưới Vera Wang Luxe Mikado (May Theo Ảnh Mẫu)',
+                studio: 'White Peony Bridal Workshop (Ba Đình, Hà Nội)',
+                silhouette: 'A-Line Tối Giản Tôn Dáng & Quý Phái',
+                neckline: 'Cúp Ngực Đứng Dáng Điêu Khắc (Sculpted Bodice)',
+                fabric: 'Lụa Satin Mikado Ý Cao Cấp (Đứng Phom 100%)',
+                embellish: 'Đường xếp ly nghệ thuật origami + Cúc ngọc trai bọc lụa',
+                price: '14.800.000đ',
+                numericPrice: 14800000,
+                originalPrice: '75.000.000đ',
+                feasibility: '99%',
+                thumb: 'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&q=80&w=300',
+                tryonMap: {
+                    user: 'user_tryon_satin.jpg',
+                    bride1: 'bride_3_tryon_satin.jpg',
+                    bride2: 'bride_3_tryon_satin.jpg',
+                    bride3: 'bride_3_tryon_satin.jpg',
+                    bride4: 'bride_3_tryon_satin.jpg'
+                }
+            },
+            berta: {
+                id: 'custom_berta',
+                name: 'Váy Cưới Berta Bridal Mermaid French Lace (May Theo Ảnh Mẫu)',
+                studio: 'Lian Couture Studio (Hoàn Kiếm, Hà Nội)',
+                silhouette: 'Đuôi Cá Ôm Sát Tôn Trọn Đường Cong 3 Vòng',
+                neckline: 'Cổ Chữ V Xẻ Sâu Kèm Lưới Ảo Illusion Tulle',
+                fabric: 'Ren Pháp Chantilly Thêu Hoa Nổi + Voan Siêu Mịn',
+                embellish: 'Đính đá lấp lánh dọc sống lưng & gấu đuôi dài 2m',
+                price: '16.500.000đ',
+                numericPrice: 16500000,
+                originalPrice: '90.000.000đ',
+                feasibility: '96%',
+                thumb: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=300',
+                tryonMap: {
+                    user: 'user_tryon_mermaid.jpg',
+                    bride1: 'bride_4_tryon_mermaid.jpg',
+                    bride2: 'bride_4_tryon_mermaid.jpg',
+                    bride3: 'bride_4_tryon_mermaid.jpg',
+                    bride4: 'bride_4_tryon_mermaid.jpg'
+                }
+            }
+        };
+
+        let selectedCustomPreset = 'eliesaab';
+        let customUploadedDress = null;
+
+        // Switch between RENTAL, BESPOKE, and IMAGE_TO_DRESS
         function switchCollectionType(type) {
             activeCollectionType = type;
             const tabRental = document.getElementById('tab-type-rental');
             const tabBespoke = document.getElementById('tab-type-bespoke');
+            const tabImage = document.getElementById('tab-type-image');
             const modeBadge = document.getElementById('collection-mode-badge');
             const bespokeBox = document.getElementById('bespoke-customizer-box');
+            const imageBox = document.getElementById('image-to-dress-box');
+            const catalogList = document.getElementById('dress-catalog-list');
+            const filterPills = document.getElementById('filter-pills-container');
             const bookingBtn = document.getElementById('btn-booking-main-label');
+            const btnRunTryon = document.getElementById('btn-run-tryon');
+
+            // Reset tab highlights
+            [tabRental, tabBespoke, tabImage].forEach(tab => {
+                if (tab) {
+                    tab.classList.remove('bg-white', 'text-brand-text', 'shadow-sm');
+                    tab.classList.add('text-gray-500');
+                }
+            });
 
             if (type === 'rental') {
-                tabRental.classList.add('bg-white', 'text-brand-text', 'shadow-sm');
-                tabRental.classList.remove('text-gray-500');
-                tabBespoke.classList.remove('bg-white', 'text-brand-text', 'shadow-sm');
-                tabBespoke.classList.add('text-gray-500');
-                modeBadge.innerText = 'Váy Cho Thuê Sẵn';
-                modeBadge.className = 'text-[10px] font-bold text-brand-rose bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200';
-                bespokeBox.classList.add('hidden');
-                bookingBtn.innerText = 'Đặt Lịch Thử Thật Tại Studio (Bảo Chứng Escrow)';
-            } else {
-                tabBespoke.classList.add('bg-white', 'text-brand-text', 'shadow-sm');
-                tabBespoke.classList.remove('text-gray-500');
-                tabRental.classList.remove('bg-white', 'text-brand-text', 'shadow-sm');
-                tabRental.classList.add('text-gray-500');
-                modeBadge.innerText = 'May Đo Thiết Kế (Bespoke)';
-                modeBadge.className = 'text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full border border-purple-300';
-                bespokeBox.classList.remove('hidden');
-                bookingBtn.innerText = 'Gửi Số Đo & Đặt Lịch May Đo Cùng NTK';
+                if (tabRental) {
+                    tabRental.classList.add('bg-white', 'text-brand-text', 'shadow-sm');
+                    tabRental.classList.remove('text-gray-500');
+                }
+                if (modeBadge) {
+                    modeBadge.innerText = 'Váy Cho Thuê Sẵn';
+                    modeBadge.className = 'text-[10px] font-bold text-brand-rose bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200';
+                }
+                if (bespokeBox) bespokeBox.classList.add('hidden');
+                if (imageBox) imageBox.classList.add('hidden');
+                if (catalogList) catalogList.classList.remove('hidden');
+                if (filterPills) filterPills.classList.remove('hidden');
+                if (btnRunTryon) btnRunTryon.classList.remove('hidden');
+                if (bookingBtn) bookingBtn.innerText = 'Đặt Lịch Thử Thật Tại Studio (Bảo Chứng Escrow)';
+                renderDressCatalog();
+                updateStep3Summary();
+                updateFitScore();
+            } else if (type === 'bespoke') {
+                if (tabBespoke) {
+                    tabBespoke.classList.add('bg-white', 'text-brand-text', 'shadow-sm');
+                    tabBespoke.classList.remove('text-gray-500');
+                }
+                if (modeBadge) {
+                    modeBadge.innerText = 'May Đo Thiết Kế (Bespoke)';
+                    modeBadge.className = 'text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full border border-purple-300';
+                }
+                if (bespokeBox) bespokeBox.classList.remove('hidden');
+                if (imageBox) imageBox.classList.add('hidden');
+                if (catalogList) catalogList.classList.remove('hidden');
+                if (filterPills) filterPills.classList.remove('hidden');
+                if (btnRunTryon) btnRunTryon.classList.remove('hidden');
+                if (bookingBtn) bookingBtn.innerText = 'Gửi Số Đo & Đặt Lịch May Đo Cùng NTK';
+                renderDressCatalog();
+                calculateBespokeCustomPrice();
+                updateFitScore();
+            } else if (type === 'image_to_dress') {
+                if (tabImage) {
+                    tabImage.classList.add('bg-white', 'text-brand-text', 'shadow-sm');
+                    tabImage.classList.remove('text-gray-500');
+                }
+                if (modeBadge) {
+                    modeBadge.innerText = 'May Theo Ảnh Mẫu (AI Vision)';
+                    modeBadge.className = 'text-[10px] font-bold text-pink-700 bg-pink-100 px-2 py-0.5 rounded-full border border-pink-300';
+                }
+                if (bespokeBox) bespokeBox.classList.add('hidden');
+                if (imageBox) imageBox.classList.remove('hidden');
+                if (catalogList) catalogList.classList.add('hidden');
+                if (filterPills) filterPills.classList.add('hidden');
+                if (btnRunTryon) btnRunTryon.classList.add('hidden');
+                if (bookingBtn) bookingBtn.innerText = 'Gửi Ảnh Mẫu & Ký Hợp Đồng May Đo Escrow';
+                selectCustomPreset(selectedCustomPreset);
             }
-            renderDressCatalog();
+        }
+
+        // Select Custom Preset Dress
+        function selectCustomPreset(key) {
+            selectedCustomPreset = key;
+            const data = customDressPresets[key];
+            if (!data) return;
+
+            document.querySelectorAll('.custom-preset-btn').forEach(btn => {
+                btn.classList.remove('border-2', 'border-pink-500', 'bg-pink-100/70');
+                btn.classList.add('border-gray-200', 'bg-white');
+            });
+            const activeBtn = document.getElementById(`preset-btn-${key}`);
+            if (activeBtn) {
+                activeBtn.classList.add('border-2', 'border-pink-500', 'bg-pink-100/70');
+                activeBtn.classList.remove('border-gray-200', 'bg-white');
+            }
+
+            // Update Specs in AI Vision Card
+            const feasEl = document.getElementById('custom-feasibility-score');
+            if (feasEl) feasEl.innerText = data.feasibility;
+            const silhEl = document.getElementById('custom-spec-silhouette');
+            if (silhEl) silhEl.innerText = data.silhouette;
+            const neckEl = document.getElementById('custom-spec-neckline');
+            if (neckEl) neckEl.innerText = data.neckline;
+            const fabEl = document.getElementById('custom-spec-fabric');
+            if (fabEl) fabEl.innerText = data.fabric;
+            const embEl = document.getElementById('custom-spec-embellish');
+            if (embEl) embEl.innerText = data.embellish;
+            const prcEl = document.getElementById('custom-spec-price');
+            if (prcEl) prcEl.innerText = data.price;
+            const origEl = document.getElementById('custom-spec-original');
+            if (origEl) origEl.innerText = data.originalPrice;
+
+            // Sync with Step 3 Summary
+            const ctaName = document.getElementById('cta-dress-name');
+            if (ctaName) ctaName.innerText = data.name;
+            const ctaStudio = document.getElementById('cta-studio-name');
+            if (ctaStudio) ctaStudio.innerText = data.studio;
+            const ctaPrice = document.getElementById('cta-final-price');
+            if (ctaPrice) ctaPrice.innerText = data.price;
+
+            // Sync Step 3 Escrow Milestones
+            const mContainer = document.getElementById('escrow-milestone-container');
+            const mTitle = document.getElementById('escrow-milestone-title');
+            if (mTitle) mTitle.innerText = 'Lộ trình giải ngân 3 chặng May đo Theo Ảnh Mẫu (Escrow):';
+            if (mContainer) {
+                const c1 = Math.round(data.numericPrice * 0.3);
+                const c2 = Math.round(data.numericPrice * 0.4);
+                const c3 = Math.round(data.numericPrice * 0.3);
+                mContainer.innerHTML = `
+                    <div class="bg-amber-50 p-1.5 rounded-lg border border-brand-gold/30 text-brand-goldDark">
+                        <b>Chặng 1: 30%</b>
+                        <span class="block text-[8px] text-gray-500">${c1.toLocaleString('vi-VN')}đ (Duyệt phác thảo 3D)</span>
+                    </div>
+                    <div class="bg-purple-50 p-1.5 rounded-lg border border-purple-200 text-purple-900">
+                        <b>Chặng 2: 40%</b>
+                        <span class="block text-[8px] text-gray-500">${c2.toLocaleString('vi-VN')}đ (Thử rập Toile mộc)</span>
+                    </div>
+                    <div class="bg-emerald-50 p-1.5 rounded-lg border border-emerald-200 text-emerald-800">
+                        <b>Chặng 3: 30%</b>
+                        <span class="block text-[8px] text-gray-500">${c3.toLocaleString('vi-VN')}đ (Nghiệm thu đạt 100%)</span>
+                    </div>
+                `;
+            }
+
+            // Stylist fit score update
+            const scoreEl = document.getElementById('fit-score-number');
+            if (scoreEl) scoreEl.innerText = '97%';
+            const verdEl = document.getElementById('fit-score-verdict');
+            if (verdEl) verdEl.innerText = 'Phom dáng tương thích xuất sắc';
+            const expEl = document.getElementById('fit-score-explanation');
+            if (expEl) expEl.innerText = `Mẫu thiết kế "${data.name}" cực kỳ tôn đường cong với vóc dáng cao ${bodyMetrics.height}cm của bạn.`;
+        }
+
+        // Handle Custom Dress Photo Upload from Bride
+        function handleCustomDressUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const customImgSrc = e.target.result;
+                
+                // Show scanning indicator
+                const loadingBox = document.getElementById('custom-vision-loading');
+                const scanText = document.getElementById('custom-scan-text');
+                const scanBar = document.getElementById('custom-scan-bar');
+                const resultsBox = document.getElementById('custom-vision-results');
+
+                if (loadingBox) loadingBox.classList.remove('hidden');
+                if (resultsBox) resultsBox.classList.add('opacity-50');
+
+                if (scanBar) scanBar.style.width = '30%';
+                if (scanText) scanText.innerText = '1. Đang bóc tách đường nét, phom váy từ ảnh Pinterest/Instagram...';
+
+                setTimeout(() => {
+                    if (scanBar) scanBar.style.width = '70%';
+                    if (scanText) scanText.innerText = '2. Nhận diện chất liệu ren thêu, lưới voan & độ xòe đuôi váy...';
+                }, 700);
+
+                setTimeout(() => {
+                    if (scanBar) scanBar.style.width = '100%';
+                    if (scanText) scanText.innerText = '3. Đã dựng phom 3D & kết nối 3 xưởng may chuyên dòng váy này!';
+                }, 1400);
+
+                setTimeout(() => {
+                    if (loadingBox) loadingBox.classList.add('hidden');
+                    if (resultsBox) resultsBox.classList.remove('opacity-50');
+
+                    // Register custom uploaded dress into state
+                    customUploadedDress = {
+                        id: 'custom_uploaded_' + Date.now(),
+                        name: 'Váy Cưới May Theo Ảnh Riêng Của Bạn (Pinterest / Sketch)',
+                        studio: 'Bellis Atelier Haute Couture (Cầu Giấy, Hà Nội)',
+                        silhouette: 'Đuôi Cá Xòe Nhẹ (Trumpet) Tôn Dáng',
+                        neckline: 'Cổ Trễ Vai Quý Tộc Kèm Corset Siết Eo',
+                        fabric: 'Lụa Mikado Ý Phủ Ren Thêu Tay',
+                        embellish: 'Đính hạt ngọc trai & pha lê tán sắc',
+                        price: '16.800.000đ',
+                        numericPrice: 16800000,
+                        originalPrice: '85.000.000đ',
+                        feasibility: '98.5%',
+                        thumb: customImgSrc,
+                        tryonMap: {
+                            user: 'user_tryon_mermaid.jpg',
+                            bride1: 'bride_4_tryon_mermaid.jpg',
+                            bride2: 'bride_4_tryon_mermaid.jpg',
+                            bride3: 'bride_4_tryon_mermaid.jpg',
+                            bride4: 'bride_4_tryon_mermaid.jpg'
+                        }
+                    };
+
+                    // Deselect presets
+                    document.querySelectorAll('.custom-preset-btn').forEach(btn => {
+                        btn.classList.remove('border-2', 'border-pink-500', 'bg-pink-100/70');
+                        btn.classList.add('border-gray-200', 'bg-white');
+                    });
+
+                    // Update specs display
+                    document.getElementById('custom-feasibility-score').innerText = customUploadedDress.feasibility;
+                    document.getElementById('custom-spec-silhouette').innerText = customUploadedDress.silhouette;
+                    document.getElementById('custom-spec-neckline').innerText = customUploadedDress.neckline;
+                    document.getElementById('custom-spec-fabric').innerText = customUploadedDress.fabric;
+                    document.getElementById('custom-spec-embellish').innerText = customUploadedDress.embellish;
+                    document.getElementById('custom-spec-price').innerText = customUploadedDress.price;
+                    document.getElementById('custom-spec-original').innerText = customUploadedDress.originalPrice;
+
+                    // Sync with Step 3
+                    document.getElementById('cta-dress-name').innerText = customUploadedDress.name;
+                    document.getElementById('cta-studio-name').innerText = customUploadedDress.studio;
+                    document.getElementById('cta-final-price').innerText = customUploadedDress.price;
+
+                    showToast('✓ AI Vision đã bóc tách ảnh thành công! Bấm "Ướm Thử Ngay Lên Gương AR" để xem.');
+                }, 1800);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Execute AR Try-on scan on Mirror for Custom Dress
+        function executeCustomDressVisionScan() {
+            const scanOverlay = document.getElementById('result-scanning');
+            const scanStepText = document.getElementById('scan-step-text');
+            const scanBar = document.getElementById('scan-progress-bar');
+
+            scanOverlay.classList.remove('hidden');
+            scanBar.style.width = '25%';
+            scanStepText.innerText = '1. Đang bóc tách vector phom váy từ ảnh mẫu tham chiếu...';
+
+            setTimeout(() => {
+                scanBar.style.width = '65%';
+                scanStepText.innerText = '2. Engine AR Diffusion đang khớp nẹp eo, cổ áo và độ dài đuôi vào vóc dáng của bạn...';
+            }, 700);
+
+            setTimeout(() => {
+                scanBar.style.width = '100%';
+                scanStepText.innerText = '3. Hoàn tất dựng mẫu váy may đo độc bản!';
+            }, 1400);
+
+            setTimeout(() => {
+                scanOverlay.classList.add('hidden');
+                
+                // Swap main mirror image based on active preset or uploaded dress
+                const targetData = customUploadedDress || customDressPresets[selectedCustomPreset] || customDressPresets.eliesaab;
+                const tryonImgPath = (targetData.tryonMap && targetData.tryonMap[selectedModelId]) 
+                    ? targetData.tryonMap[selectedModelId] 
+                    : (targetData.tryonMap ? targetData.tryonMap.user : 'user_tryon_mermaid.jpg');
+
+                const img = document.getElementById('main-mirror-img');
+                const viewPillText = document.getElementById('view-mode-text');
+                const compareBtnLabel = document.getElementById('compare-btn-label');
+
+                if (img) img.src = tryonImgPath;
+                if (viewPillText) viewPillText.innerText = 'Ảnh Đã Lên Váy (AI Render Từ Ảnh Mẫu)';
+                if (compareBtnLabel) compareBtnLabel.innerText = 'Giữ để xem ảnh gốc cô dâu';
+
+                // Update fit score card
+                document.getElementById('fit-score-number').innerText = '98%';
+                document.getElementById('fit-score-verdict').innerText = 'Độ tương thích vóc dáng hoàn hảo';
+                document.getElementById('fit-score-explanation').innerText = `Váy cưới từ ảnh mẫu ôm chuẩn phom ${bodyMetrics.height}cm / ${bodyMetrics.weight}kg. Xưởng may cam kết chuẩn tỷ lệ 100%.`;
+
+                showToast(`✓ Đã ướm thử váy "${targetData.name}" lên người bạn bằng công nghệ AR!`);
+            }, 1800);
+        }
+
+        // Transfer Custom Dress Data to Booking Modal
+        function transferCustomDressToBooking() {
+            const targetData = customUploadedDress || customDressPresets[selectedCustomPreset] || customDressPresets.eliesaab;
+            const priceNum = targetData.numericPrice || 16500000;
+            const depositNum = Math.round(priceNum * 0.3);
+
+            document.getElementById('modal-dress-title').innerText = `${targetData.name}`;
+            document.getElementById('modal-studio-tag').innerText = targetData.studio;
+            document.getElementById('modal-dress-price').innerText = `Tổng định giá xưởng may: ${priceNum.toLocaleString('vi-VN')}đ`;
+            document.getElementById('modal-dress-img').src = targetData.thumb;
+
+            // Auto-fill body metrics
+            document.getElementById('modal-metric-height').innerText = `${bodyMetrics.height} cm`;
+            document.getElementById('modal-metric-weight').innerText = `${bodyMetrics.weight} kg`;
+            
+            const shapeNames = {
+                hourglass: 'Đồng hồ cát',
+                pear: 'Dáng quả lê',
+                apple: 'Dáng quả táo',
+                petite: 'Dáng nhỏ nhắn'
+            };
+            document.getElementById('modal-metric-shape').innerText = shapeNames[bodyMetrics.shape] || 'Cân đối';
+
+            const bespokeBadge = document.getElementById('modal-bespoke-spec-badge');
+            const modalTitle = document.getElementById('booking-modal-title');
+            const modalSub = document.getElementById('booking-modal-subtitle');
+            const modalLabelDate = document.getElementById('modal-label-date');
+            const depositTitle = document.getElementById('modal-deposit-title');
+            const depositAmount = document.getElementById('modal-deposit-amount');
+            const depositDesc = document.getElementById('modal-deposit-desc');
+            const submitBtn = document.getElementById('modal-btn-submit');
+
+            if (bespokeBadge) bespokeBadge.classList.remove('hidden');
+            if (modalTitle) modalTitle.innerText = 'Ký Hợp Đồng May Theo Ảnh & Giữ Cọc Chặng 1 (Escrow)';
+            if (modalSub) modalSub.innerText = 'Trạm Hỷ bảo chứng: Duyệt 3D (30%) → Thử rập Toile mộc (40%) → Nghiệm thu đạt 100% (30%)';
+            if (modalLabelDate) modalLabelDate.innerText = 'Ngày hẹn gặp NTK xưởng lấy số đo trực tiếp & duyệt vải *';
+            if (depositTitle) depositTitle.innerText = 'Cọc Chặng 1 (Duyệt bản vẽ 3D & chất liệu vải):';
+            if (depositAmount) depositAmount.innerText = `${depositNum.toLocaleString('vi-VN')}đ (30%)`;
+            if (depositDesc) {
+                depositDesc.innerHTML = `
+                    ✓ Tiền cọc 30% được giữ an toàn tại <b>Trạm Hỷ Escrow</b> trong lúc xưởng may dựng rập 3D theo ảnh mẫu.<br>
+                    ✓ Chặng 2 (40%) chỉ giải ngân khi bạn đã mặc thử khung váy mộc (Toile) ưng ý.<br>
+                    ✓ Nếu sản phẩm thực tế sai lệch quá 10% so với ảnh mẫu cam kết, <b>hoàn tiền 100%</b>!
+                `;
+            }
+            if (submitBtn) submitBtn.innerText = 'Ký Hợp Đồng May Đo Theo Ảnh & Cọc Chặng 1';
+
+            const bStats = document.getElementById('modal-bespoke-stats');
+            if (bStats) bStats.innerText = `${bespokeConfig.bust} - ${bespokeConfig.waist} - ${bespokeConfig.hip} cm`;
+            const bHeel = document.getElementById('modal-bespoke-heel');
+            if (bHeel) bHeel.innerText = `${bespokeConfig.heel} cm`;
+            const bSumm = document.getElementById('modal-bespoke-summary');
+            if (bSumm) bSumm.innerText = `Theo ảnh mẫu: ${targetData.silhouette} • ${targetData.fabric} • Độ khả thi ${targetData.feasibility}`;
+
+            // Default date tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('cust-date').value = tomorrow.toISOString().split('T')[0];
+
+            document.getElementById('booking-modal').classList.remove('hidden');
         }
 
         // Filter theme pills
@@ -2229,9 +2766,20 @@
             const time = document.getElementById('cust-time').value;
             const dress = dressData[selectedDressId];
 
-            const isBespoke = (dress.type === 'bespoke' || activeCollectionType === 'bespoke');
-            let priceNum = parseInt(dress.price.replace(/\D/g, '')) || 3500000;
-            if (isBespoke && bespokeConfig.totalPrice) {
+            const isImageToDress = (activeCollectionType === 'image_to_dress');
+            const isBespoke = (dress.type === 'bespoke' || activeCollectionType === 'bespoke' || isImageToDress);
+            const targetCustom = customUploadedDress || customDressPresets[selectedCustomPreset] || customDressPresets.eliesaab;
+
+            let dressTitle = dress ? dress.name : 'Váy Cưới Cao Cấp';
+            let studioName = dress ? dress.studio : '2H Studio';
+            let priceNum = dress ? (parseInt(dress.price.replace(/\D/g, '')) || 3500000) : 3500000;
+
+            if (isImageToDress) {
+                dressTitle = targetCustom.name;
+                studioName = targetCustom.studio;
+                priceNum = targetCustom.numericPrice;
+            } else if (isBespoke && bespokeConfig.totalPrice) {
+                dressTitle = `${dress.name} (May Đo Riêng)`;
                 priceNum = bespokeConfig.totalPrice;
             }
             const depositNum = Math.round(priceNum * 0.3);
@@ -2240,8 +2788,8 @@
                 id: `BK-${Math.floor(100000 + Math.random() * 900000)}`,
                 customerName: name,
                 phone: phone,
-                dressName: isBespoke ? `${dress.name} (May Đo Riêng)` : dress.name,
-                studio: dress.studio,
+                dressName: dressTitle,
+                studio: studioName,
                 price: `${priceNum.toLocaleString('vi-VN')}đ`,
                 numericPrice: priceNum,
                 depositPaid: depositNum,
@@ -2250,23 +2798,26 @@
                 height: bodyMetrics.height,
                 weight: bodyMetrics.weight,
                 shape: bodyMetrics.shape,
-                type: isBespoke ? 'bespoke' : 'rental',
+                type: isImageToDress ? 'image_to_dress' : (isBespoke ? 'bespoke' : 'rental'),
                 bespokeDetails: isBespoke ? {
                     bust: bespokeConfig.bust,
                     waist: bespokeConfig.waist,
                     hip: bespokeConfig.hip,
                     heel: bespokeConfig.heel,
-                    neckline: bespokeConfig.necklineLabel,
-                    sleeve: bespokeConfig.sleeveLabel,
-                    fabric: bespokeConfig.fabricLabel,
-                    train: bespokeConfig.trainLabel,
-                    swarovski: bespokeConfig.swarovski,
-                    flower3d: bespokeConfig.flower3d,
+                    neckline: isImageToDress ? targetCustom.neckline : bespokeConfig.necklineLabel,
+                    sleeve: isImageToDress ? 'Chuẩn hóa theo ảnh mẫu' : bespokeConfig.sleeveLabel,
+                    fabric: isImageToDress ? targetCustom.fabric : bespokeConfig.fabricLabel,
+                    train: isImageToDress ? targetCustom.silhouette : bespokeConfig.trainLabel,
+                    swarovski: isImageToDress ? true : bespokeConfig.swarovski,
+                    flower3d: isImageToDress ? false : bespokeConfig.flower3d,
+                    feasibility: isImageToDress ? targetCustom.feasibility : '100%',
                     totalPrice: priceNum,
                     milestone: 1
                 } : null,
                 status: isBespoke ? "bespoke_milestone_1" : "deposit_locked",
-                depositStatus: isBespoke ? "Đang cọc Chặng 1 (30% - Duyệt phác thảo 3D & Vải)" : "Đã giữ cọc an toàn (Milestone Pay Escrow)",
+                depositStatus: isImageToDress 
+                    ? "Đang cọc Chặng 1 (30% - Duyệt phác thảo 3D từ ảnh mẫu & Vải)" 
+                    : (isBespoke ? "Đang cọc Chặng 1 (30% - Duyệt phác thảo 3D & Vải)" : "Đã giữ cọc an toàn (Milestone Pay Escrow)"),
                 createdAt: new Date().toISOString()
             };
 
@@ -2275,9 +2826,11 @@
             localStorage.setItem('tramhy_bookings', JSON.stringify(existing));
 
             closeBookingModal();
-            const toastMsg = isBespoke 
-                ? `Hợp đồng may đo kích hoạt thành công! Cọc Chặng 1 (${depositNum.toLocaleString('vi-VN')}đ) đã vào Trạm Hỷ Escrow.` 
-                : `Tuyệt vời! Đã giữ lịch và kích hoạt Bảo Chứng Cọc cho ${name}.`;
+            const toastMsg = isImageToDress
+                ? `Hợp đồng may theo ảnh mẫu thành công! Cọc Chặng 1 (${depositNum.toLocaleString('vi-VN')}đ) đã được bảo chứng an toàn.`
+                : (isBespoke 
+                    ? `Hợp đồng may đo kích hoạt thành công! Cọc Chặng 1 (${depositNum.toLocaleString('vi-VN')}đ) đã vào Trạm Hỷ Escrow.` 
+                    : `Tuyệt vời! Đã giữ lịch và kích hoạt Bảo Chứng Cọc cho ${name}.`);
             showToast(toastMsg);
 
             setTimeout(() => {
