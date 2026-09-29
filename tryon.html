@@ -309,12 +309,12 @@
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" id="master-tryon-container">
 
                     <!-- ========================================================================= -->
-                    <!-- LEFT COLUMN (60% ON DESKTOP - 7 COLS): THE HERO VIRTUAL MIRROR CANVAS     -->
+                    <!-- LEFT COLUMN (60% ON DESKTOP - 7 COLS): THE HERO VIRTUAL MIRROR CANVAS (STICKY SCROLL) -->
                     <!-- ========================================================================= -->
-                    <div class="lg:col-span-7 space-y-4">
+                    <div class="lg:col-span-7 space-y-3 lg:sticky lg:top-[108px] self-start transition-all" id="mirror-sticky-container">
                         
                         <!-- The Master Mirror Card -->
-                        <div class="bg-stone-900 rounded-3xl p-3 sm:p-4 shadow-2xl border-2 border-brand-gold/40 relative mirror-glow flex flex-col justify-between overflow-hidden" style="min-height: 600px;">
+                        <div class="bg-stone-900 rounded-3xl p-3 sm:p-4 shadow-2xl border-2 border-brand-gold/40 relative mirror-glow flex flex-col justify-between overflow-hidden" style="min-height: 520px; max-height: calc(100vh - 170px);">
                             
                             <!-- Top Mirror Status Bar -->
                             <div class="flex items-center justify-between z-20 pb-2 border-b border-stone-800">
@@ -335,7 +335,7 @@
                             </div>
 
                             <!-- Interactive Mirror Display Frame (Full 3:4 Aspect Ratio Canvas) -->
-                            <div class="relative w-full flex-1 flex items-center justify-center rounded-2xl overflow-hidden my-2 bg-stone-950 min-h-[460px] group">
+                            <div class="relative w-full flex-1 flex items-center justify-center rounded-2xl overflow-hidden my-2 bg-stone-950 min-h-[380px] lg:min-h-[420px] group">
 
                                 <!-- Scanning Laser Overlay (Active during try-on simulation) -->
                                 <div id="result-scanning" class="hidden absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-6 space-y-4 z-30">
@@ -354,7 +354,7 @@
 
                                 <!-- The Real Main Try-On Image (Uncropped, Full Portrait) -->
                                 <div id="mirror-image-container" class="w-full h-full relative flex items-center justify-center overflow-hidden">
-                                    <img id="main-mirror-img" src="user_tryon_mermaid.jpg" alt="Kết quả thử váy cưới của cô dâu" class="w-full h-full object-contain object-center max-h-[560px] transition-all duration-300 select-none">
+                                    <img id="main-mirror-img" src="user_tryon_mermaid.jpg" alt="Kết quả thử váy cưới của cô dâu" class="w-full h-full object-contain object-center max-h-[460px] xl:max-h-[520px] 2xl:max-h-[580px] transition-all duration-300 select-none">
                                     
                                     <!-- Before / After Toggle Indicator Pill -->
                                     <div id="view-mode-pill" class="absolute top-3 left-3 bg-black/75 backdrop-blur-md px-3 py-1 rounded-full text-white text-[11px] font-bold border border-brand-gold/30 flex items-center gap-1.5 shadow-lg z-20">
@@ -411,7 +411,7 @@
                         </div>
 
                         <!-- 2-Way Escrow Trust Shield Banner (Prominently displayed right under mirror) -->
-                        <div class="bg-gradient-to-r from-amber-50 via-white to-amber-50/60 rounded-2xl p-4 border border-brand-gold/30 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="bg-gradient-to-r from-amber-50 via-white to-amber-50/60 rounded-2xl p-3 sm:p-3.5 border border-brand-gold/30 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-brand-gold text-white flex items-center justify-center shrink-0 shadow-md">
                                     <span class="material-symbols-outlined text-2xl">shield</span>
