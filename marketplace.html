@@ -468,6 +468,7 @@
                 location: '2H Studio (Cầu Giấy, Hà Nội)',
                 image: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=300',
                 isDress: true,
+                tryonSlug: 'mermaid',
                 badge: 'Có sẵn tại Showroom'
             },
             {
@@ -481,6 +482,7 @@
                 location: 'Bellis Bridal (Hoàn Kiếm, Hà Nội)',
                 image: 'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&q=80&w=300',
                 isDress: true,
+                tryonSlug: 'fairy',
                 badge: 'Ưu Đãi 20%'
             },
             {
@@ -494,6 +496,7 @@
                 location: 'La Reine Bridal (Ba Đình, Hà Nội)',
                 image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=300',
                 isDress: true,
+                tryonSlug: 'minimalist',
                 badge: 'Quiet Luxury'
             },
             {
@@ -507,6 +510,7 @@
                 location: 'Trạm Hỷ Atelier (Tây Hồ, Hà Nội)',
                 image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&q=80&w=300',
                 isDress: true,
+                tryonSlug: 'bespoke_mikado',
                 badge: 'May Đo Riêng 100%'
             },
             {
@@ -520,7 +524,36 @@
                 location: 'Trạm Hỷ Atelier & NTK Lê Lan',
                 image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=300',
                 isDress: true,
+                tryonSlug: 'bespoke_chantilly',
                 badge: 'Độc Bản Haute Couture'
+            },
+            {
+                id: 'vay-maydo-tiara',
+                name: 'Váy May Đo Công Chúa Sparkling Tiara',
+                category: 'MayDo',
+                price: 15500000,
+                rating: 5.0,
+                reviews: 26,
+                verified: true,
+                location: 'Bella Bridal Atelier (Tây Hồ, Hà Nội)',
+                image: 'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&q=80&w=300',
+                isDress: true,
+                tryonSlug: 'bespoke_fairy',
+                badge: 'Đính Swarovski & Voan 7 Lớp'
+            },
+            {
+                id: 'vay-maydo-aodai',
+                name: 'Áo Dài Cưới Gấm Hoàng Tộc Thêu Phượng Triều Nguyễn',
+                category: 'MayDo',
+                price: 9800000,
+                rating: 4.9,
+                reviews: 38,
+                verified: true,
+                location: 'Trạm Hỷ Heritage Silk (Hoàn Kiếm, Hà Nội)',
+                image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=300',
+                isDress: true,
+                tryonSlug: 'bespoke_aodai',
+                badge: 'Gấm Bảo Lộc Dát Chỉ Vàng'
             },
             {
                 id: 'tuart',
@@ -935,9 +968,20 @@
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all border border-gray-150 flex flex-col justify-between group";
 
-                const linkHref = v.isDress ? 'tryon.html' : 'detail.html';
-                const actionLabel = v.isDress ? 'Ướm Thử AR Ngay' : 'Xem Chi Tiết';
-                const actionIcon = v.isDress ? 'styler' : 'arrow_forward';
+                let linkHref = 'detail.html';
+                let actionLabel = 'Xem Chi Tiết';
+                let actionIcon = 'arrow_forward';
+
+                if (v.isDress) {
+                    linkHref = v.tryonSlug ? `tryon.html?model=user&dress=${v.tryonSlug}` : 'tryon.html';
+                    if (v.category === 'MayDo') {
+                        actionLabel = 'May Đo Thiết Kế (Bespoke 3D)';
+                        actionIcon = 'design_services';
+                    } else {
+                        actionLabel = 'Ướm Thử AR Ngay';
+                        actionIcon = 'styler';
+                    }
+                }
 
                 card.innerHTML = `
                     <div>

@@ -589,32 +589,143 @@
                                 <!-- Populated dynamically by JS -->
                             </div>
 
-                            <!-- Customization options if BESPOKE is active -->
-                            <div id="bespoke-customizer-box" class="hidden bg-purple-50/70 rounded-2xl p-3 border border-purple-200 space-y-2 text-xs">
-                                <div class="flex items-center justify-between">
-                                    <span class="font-bold text-purple-900 flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-sm">palette</span> Tùy Biến May Đo Riêng:
+                            <!-- Comprehensive Bespoke Haute Couture Atelier & AI Co-Design Suite -->
+                            <div id="bespoke-customizer-box" class="hidden bg-gradient-to-b from-purple-50/90 to-white rounded-3xl p-4 sm:p-5 border-2 border-purple-300 shadow-md space-y-4 text-xs">
+                                
+                                <!-- Studio Header -->
+                                <div class="flex items-center justify-between border-b border-purple-200 pb-2.5">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-xl bg-purple-600 text-white flex items-center justify-center shadow-xs">
+                                            <span class="material-symbols-outlined text-sm">design_services</span>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-black text-purple-950 text-xs sm:text-sm">Haute Couture Atelier: Đồng Thiết Kế AI</h4>
+                                            <p class="text-[10px] text-purple-700">Tùy biến từng chi tiết độc bản & lấy số đo chuẩn xác</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-[9px] font-extrabold text-purple-800 bg-purple-100 px-2 py-0.5 rounded-full border border-purple-300 uppercase tracking-wider">
+                                        Bespoke 100%
                                     </span>
-                                    <span class="text-[10px] text-purple-700 font-semibold">Giao sau 15-20 ngày</span>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2 text-[10px]">
+
+                                <!-- 1. KIỂU CỔ ÁO (NECKLINE) -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-bold text-gray-800 flex items-center justify-between">
+                                        <span class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm text-purple-600">styler</span> 1. Kiểu dáng Cổ Áo:
+                                        </span>
+                                        <span class="text-[10px] text-purple-700 font-extrabold" id="cur-neckline-label">Cổ Tim Sweetheart</span>
+                                    </label>
+                                    <div class="grid grid-cols-3 gap-1.5 text-[10px]">
+                                        <button type="button" onclick="selectBespokeOption('neckline', 'sweetheart', 'Cổ Tim Sweetheart', 0)" class="bespoke-neck-btn py-1.5 px-2 rounded-xl border-2 border-purple-500 bg-purple-100 text-purple-950 font-bold transition-all flex flex-col items-center">
+                                            <span>💖 Cổ Tim</span>
+                                            <span class="text-[8px] text-gray-500 font-normal">Tôn ngực đầy</span>
+                                        </button>
+                                        <button type="button" onclick="selectBespokeOption('neckline', 'offshoulder', 'Trễ Vai Quý Tộc', 500000)" class="bespoke-neck-btn py-1.5 px-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-purple-300 font-medium transition-all flex flex-col items-center">
+                                            <span>👗 Trễ Vai</span>
+                                            <span class="text-[8px] text-gray-500 font-normal">Che bắp tay</span>
+                                        </button>
+                                        <button type="button" onclick="selectBespokeOption('neckline', 'square', 'Cổ Vuông Quý Tộc Pháp', 400000)" class="bespoke-neck-btn py-1.5 px-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-purple-300 font-medium transition-all flex flex-col items-center">
+                                            <span>⚜️ Cổ Vuông</span>
+                                            <span class="text-[8px] text-gray-500 font-normal">Cổ điển Pháp</span>
+                                        </button>
+                                        <button type="button" onclick="selectBespokeOption('neckline', 'deepv', 'Cổ Chữ V Xẻ Sâu', 300000)" class="bespoke-neck-btn py-1.5 px-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-purple-300 font-medium transition-all flex flex-col items-center">
+                                            <span>🔻 Cổ Chữ V</span>
+                                            <span class="text-[8px] text-gray-500 font-normal">Kéo dài cổ</span>
+                                        </button>
+                                        <button type="button" onclick="selectBespokeOption('neckline', 'halter', 'Cổ Yếm Hoàng Tộc', 600000)" class="bespoke-neck-btn py-1.5 px-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-purple-300 font-medium transition-all flex flex-col items-center">
+                                            <span>🪢 Cổ Yếm</span>
+                                            <span class="text-[8px] text-gray-500 font-normal">Lưng trần gợi cảm</span>
+                                        </button>
+                                        <button type="button" onclick="selectBespokeOption('neckline', 'boat', 'Cổ Thuyền Thanh Lịch', 0)" class="bespoke-neck-btn py-1.5 px-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-purple-300 font-medium transition-all flex flex-col items-center">
+                                            <span>👑 Cổ Thuyền</span>
+                                            <span class="text-[8px] text-gray-500 font-normal">Kín đáo quý phái</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 2. KIỂU TAY ÁO (SLEEVES) -->
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-bold text-gray-800 flex items-center justify-between">
+                                        <span class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm text-purple-600">accessibility_new</span> 2. Kiểu dáng Tay Áo:
+                                        </span>
+                                        <span class="text-[10px] text-purple-700 font-extrabold" id="cur-sleeve-label">Cúp Ngực Không Tay</span>
+                                    </label>
+                                    <div class="grid grid-cols-4 gap-1.5 text-[10px]">
+                                        <button type="button" onclick="selectBespokeOption('sleeve', 'sleeveless', 'Cúp Ngực Không Tay', 0)" class="bespoke-sleeve-btn py-1.5 px-1.5 rounded-xl border-2 border-purple-500 bg-purple-100 text-purple-950 font-bold transition-all text-center">
+                                            💎 Cúp Ngực
+                                        </button>
+                                        <button type="button" onclick="selectBespokeOption('sleeve', 'puff', 'Tay Bồng Hoàng Gia', 700000)" class="bespoke-sleeve-btn py-1.5 px-1.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-purple-300 font-medium transition-all text-center">
+                                            👑 Tay Bồng
+                                        </button>
+                                        <button type="button" onclick="selectBespokeOption('sleeve', 'longlace', 'Tay Ren Dài Chantilly', 1200000)" class="bespoke-sleeve-btn py-1.5 px-1.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-purple-300 font-medium transition-all text-center">
+                                            🪡 Ren Dài Ôm
+                                        </button>
+                                        <button type="button" onclick="selectBespokeOption('sleeve', 'flutter', 'Tay Cánh Tiên Voan', 800000)" class="bespoke-sleeve-btn py-1.5 px-1.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-purple-300 font-medium transition-all text-center">
+                                            🦋 Cánh Tiên
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 3. CHẤT LIỆU VẢI & ĐỘ DÀI ĐUÔI VÁY (GRID 2 CỘT) -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                                     <div>
-                                        <label class="font-bold text-gray-600 block mb-0.5">Chất liệu vải cao cấp:</label>
-                                        <select id="bespoke-fabric" class="w-full bg-white border border-purple-200 rounded-lg p-1.5 font-medium text-gray-800 focus:outline-none">
-                                            <option value="mikado">Lụa Satin Mikado Ý</option>
-                                            <option value="chantilly">Ren Pháp Chantilly thêu cườm</option>
-                                            <option value="voan">Voan tơ kim tuyến hoàng gia</option>
+                                        <label class="font-bold text-gray-700 block mb-1 text-[11px] flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-xs text-purple-600">texture</span> 3. Chất liệu vải may:
+                                        </label>
+                                        <select id="bespoke-fabric" onchange="calculateBespokeCustomPrice()" class="w-full bg-white border border-purple-200 focus:border-purple-500 rounded-xl p-2 text-xs font-semibold text-gray-800 focus:outline-none shadow-2xs">
+                                            <option value="mikado" data-price="0">Lụa Satin Mikado Ý (Đứng phom)</option>
+                                            <option value="chantilly" data-price="3000000">Ren Pháp Chantilly thêu cườm (+3tr)</option>
+                                            <option value="tulle" data-price="2000000">Tulle 7 lớp ánh kim tuyến (+2tr)</option>
+                                            <option value="silk" data-price="1500000">Gấm Tơ Tằm Bảo Lộc Dệt Ẩn (+1.5tr)</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="font-bold text-gray-600 block mb-0.5">Độ dài đuôi váy:</label>
-                                        <select id="bespoke-train" class="w-full bg-white border border-purple-200 rounded-lg p-1.5 font-medium text-gray-800 focus:outline-none">
-                                            <option value="50cm">0.5m (Linh hoạt đón khách)</option>
-                                            <option value="150cm" selected>1.5m (Lễ đường nhà thờ)</option>
-                                            <option value="250cm">2.5m (Grand Ballroom VIP)</option>
+                                        <label class="font-bold text-gray-700 block mb-1 text-[11px] flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-xs text-purple-600">straighten</span> 4. Độ dài đuôi váy (Train):
+                                        </label>
+                                        <select id="bespoke-train" onchange="calculateBespokeCustomPrice()" class="w-full bg-white border border-purple-200 focus:border-purple-500 rounded-xl p-2 text-xs font-semibold text-gray-800 focus:outline-none shadow-2xs">
+                                            <option value="50cm" data-price="0">0.5m (Sweep Train - Linh hoạt)</option>
+                                            <option value="150cm" data-price="1000000" selected>1.5m (Cathedral - Chuẩn lễ đường +1tr)</option>
+                                            <option value="250cm" data-price="2500000">2.5m (Royal Grand Ballroom +2.5tr)</option>
                                         </select>
                                     </div>
                                 </div>
+
+                                <!-- 4. ĐÍNH KẾT THỦ CÔNG & CÁ NHÂN HÓA HAUTE COUTURE -->
+                                <div class="p-3 bg-purple-100/50 rounded-2xl border border-purple-200 space-y-2">
+                                    <span class="font-bold text-purple-900 block text-[11px] flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm text-purple-700">diamond</span> 5. Đính kết thủ công & Dấu ấn riêng:
+                                    </span>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
+                                        <label class="flex items-center gap-2 bg-white p-2 rounded-xl border border-purple-200 cursor-pointer hover:bg-purple-50 transition-colors">
+                                            <input type="checkbox" id="bespoke-opt-swarovski" onchange="calculateBespokeCustomPrice()" checked class="rounded accent-purple-600 w-3.5 h-3.5">
+                                            <span>💎 Pha lê Swarovski & cườm (+1.8tr)</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 bg-white p-2 rounded-xl border border-purple-200 cursor-pointer hover:bg-purple-50 transition-colors">
+                                            <input type="checkbox" id="bespoke-opt-flower3d" onchange="calculateBespokeCustomPrice()" class="rounded accent-purple-600 w-3.5 h-3.5">
+                                            <span>🌸 Đắp hoa ren 3D Organza (+1.2tr)</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 bg-white p-2 rounded-xl border border-purple-200 cursor-pointer hover:bg-purple-50 transition-colors sm:col-span-2">
+                                            <input type="checkbox" id="bespoke-opt-monogram" onchange="calculateBespokeCustomPrice()" checked class="rounded accent-purple-600 w-3.5 h-3.5">
+                                            <span class="font-bold text-purple-900">✍️ Thêu Monogram Tên & Ngày Cưới vào gấu váy (Miễn phí qua Trạm Hỷ)</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons: View Spec Sheet & Confirm Bespoke -->
+                                <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
+                                    <button type="button" onclick="openSpecSheetModal()" class="w-full sm:w-auto flex-1 py-2.5 px-3 bg-white hover:bg-purple-50 text-purple-900 border border-purple-300 font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 active:scale-95 text-[11px]">
+                                        <span class="material-symbols-outlined text-sm text-purple-600">description</span>
+                                        <span>Xem & Xuất Hồ Sơ May Đo (Spec Sheet)</span>
+                                    </button>
+                                    <div class="text-[10px] text-gray-500 flex items-center gap-1 shrink-0">
+                                        <span class="material-symbols-outlined text-xs text-emerald-600">verified</span>
+                                        <span>Bảo chứng Escrow 3 chặng</span>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <!-- Action Trigger Button: BẮT ĐẦU THỬ VÁY -->
@@ -650,8 +761,8 @@
 
                                 <!-- 3-Stage Milestone Payment Visual -->
                                 <div class="pt-2 border-t border-gray-100 text-[10px] space-y-1">
-                                    <span class="font-bold text-gray-600 block">Lộ trình giải ngân 3 đợt Escrow:</span>
-                                    <div class="grid grid-cols-3 gap-1 text-center font-medium">
+                                    <span class="font-bold text-gray-600 block" id="escrow-milestone-title">Lộ trình giải ngân 3 đợt Escrow:</span>
+                                    <div class="grid grid-cols-3 gap-1 text-center font-medium" id="escrow-milestone-container">
                                         <div class="bg-amber-50 p-1.5 rounded-lg border border-brand-gold/30 text-brand-goldDark">
                                             <b>Đợt 1: 30%</b>
                                             <span class="block text-[9px] text-gray-500">Giữ lịch thử</span>
@@ -871,7 +982,196 @@
         </div>
     </div>
 
+    <!-- ========================================================================= -->
+    <!-- MODAL 2A: HỒ SƠ MAY ĐO KỸ THUẬT SỐ & NHÂN TRẮC HỌC (HAUTE COUTURE SPEC SHEET) -->
+    <!-- ========================================================================= -->
+    <div id="spec-sheet-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-[1050] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border-2 border-purple-400 space-y-4 max-h-[92vh] overflow-y-auto">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-purple-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 text-white flex items-center justify-center shadow-md">
+                        <span class="material-symbols-outlined text-xl">description</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="serif-title text-base sm:text-lg font-black text-brand-text">Hồ Sơ May Đo Kỹ Thuật Số (Digital Spec Sheet)</h3>
+                            <span class="text-[9px] font-black text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full border border-purple-300 uppercase">Haute Couture</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500">Mã định danh: <b class="text-purple-900" id="spec-code-label">SPEC-TH-2026-88294</b> • Niêm phong bởi Trạm Hỷ Escrow</p>
+                    </div>
+                </div>
+                <button onclick="closeSpecSheetModal()" class="text-gray-400 hover:text-brand-text p-1 rounded-lg">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- Main Spec Sheet Grid (2 Columns) -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                
+                <!-- Left: Anthropometric Measurements (7 cols) -->
+                <div class="md:col-span-7 bg-purple-50/50 rounded-2xl p-4 border border-purple-200 space-y-3">
+                    <span class="text-xs font-black uppercase text-purple-950 flex items-center gap-1.5 border-b border-purple-200/80 pb-2">
+                        <span class="material-symbols-outlined text-sm text-purple-600">accessibility</span>
+                        1. Thông Số Nhân Trắc Học 3 Vòng
+                    </span>
+
+                    <!-- Height & Heel -->
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-white p-2.5 rounded-xl border border-purple-150">
+                            <span class="text-[10px] text-gray-500 block">Chiều cao cơ thể:</span>
+                            <span class="font-extrabold text-brand-text text-sm" id="spec-val-height">162 cm</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-purple-150">
+                            <span class="text-[10px] text-gray-500 block">Độ cao giày cưới:</span>
+                            <select id="spec-input-heel" onchange="updateSpecHeel()" class="w-full bg-transparent font-extrabold text-purple-900 text-sm focus:outline-none cursor-pointer">
+                                <option value="5">Giày 5 cm</option>
+                                <option value="7" selected>Giày 7 cm</option>
+                                <option value="9">Giày 9 cm</option>
+                                <option value="12">Giày 12 cm</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 3 Measurements Sliders -->
+                    <div class="space-y-2 text-xs">
+                        <div class="bg-white p-2 rounded-xl border border-purple-150 space-y-1">
+                            <div class="flex justify-between items-center text-[11px]">
+                                <span class="font-bold text-gray-700">Vòng 1 (Ngực):</span>
+                                <span class="font-black text-purple-800" id="spec-val-bust">84 cm</span>
+                            </div>
+                            <input type="range" id="spec-input-bust" min="75" max="105" value="84" oninput="updateSpecMeasurements()" class="w-full h-1.5 bg-gray-200 rounded-lg accent-purple-600 cursor-pointer">
+                        </div>
+
+                        <div class="bg-white p-2 rounded-xl border border-purple-150 space-y-1">
+                            <div class="flex justify-between items-center text-[11px]">
+                                <span class="font-bold text-gray-700">Vòng 2 (Eo - Thắt Corset):</span>
+                                <span class="font-black text-purple-800" id="spec-val-waist">63 cm</span>
+                            </div>
+                            <input type="range" id="spec-input-waist" min="55" max="90" value="63" oninput="updateSpecMeasurements()" class="w-full h-1.5 bg-gray-200 rounded-lg accent-purple-600 cursor-pointer">
+                        </div>
+
+                        <div class="bg-white p-2 rounded-xl border border-purple-150 space-y-1">
+                            <div class="flex justify-between items-center text-[11px]">
+                                <span class="font-bold text-gray-700">Vòng 3 (Mông):</span>
+                                <span class="font-black text-purple-800" id="spec-val-hip">90 cm</span>
+                            </div>
+                            <input type="range" id="spec-input-hip" min="80" max="115" value="90" oninput="updateSpecMeasurements()" class="w-full h-1.5 bg-gray-200 rounded-lg accent-purple-600 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- AI Stylist Tailoring Strategy -->
+                    <div class="p-2.5 rounded-xl bg-purple-100/70 border border-purple-300 text-[10px] space-y-1">
+                        <span class="font-black text-purple-950 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs text-purple-700">psychology</span>
+                            Khuyến nghị dựng rập từ AI Stylist:
+                        </span>
+                        <p class="text-purple-900 leading-snug" id="spec-ai-advice">
+                            • Phom Corset 12 xương cá siết eo 3cm không gây khó thở.<br>
+                            • Hạ ngực 24cm, rộng vai 37cm; dựng cúp nâng ngực tự nhiên không cần áo lót phụ trợ.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right: Dress Spec & Sealed QR (5 cols) -->
+                <div class="md:col-span-5 bg-stone-900 text-white rounded-2xl p-4 border border-brand-gold/30 flex flex-col justify-between space-y-3">
+                    <div class="space-y-2.5">
+                        <span class="text-xs font-black uppercase text-brand-gold flex items-center gap-1.5 border-b border-stone-800 pb-2">
+                            <span class="material-symbols-outlined text-sm">palette</span>
+                            2. Tùy Biến Thiết Kế Độc Bản
+                        </span>
+
+                        <div class="text-[11px] space-y-1.5 text-stone-300">
+                            <div class="flex justify-between items-center">
+                                <span class="text-stone-400">Kiểu Cổ Áo:</span>
+                                <b class="text-white" id="spec-neck-val">Cổ Tim Sweetheart</b>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-stone-400">Kiểu Tay Áo:</span>
+                                <b class="text-white" id="spec-sleeve-val">Cúp Ngực Không Tay</b>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-stone-400">Chất Liệu:</span>
+                                <b class="text-white" id="spec-fabric-val">Lụa Satin Mikado Ý</b>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-stone-400">Độ Dài Đuôi:</span>
+                                <b class="text-white" id="spec-train-val">1.5m (Cathedral)</b>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-stone-400">Đính Kết:</span>
+                                <b class="text-brand-goldLight" id="spec-decor-val">Swarovski + Monogram</b>
+                            </div>
+                        </div>
+
+                        <!-- Atelier Partner Box -->
+                        <div class="p-2.5 bg-stone-800/90 rounded-xl border border-stone-700 text-[10px] space-y-0.5">
+                            <span class="text-stone-400 block">Xưởng may tiếp nhận:</span>
+                            <span class="font-extrabold text-brand-gold block text-[11px]" id="spec-studio-val">Trạm Hỷ Atelier & NTK Lê Lan</span>
+                            <span class="text-emerald-400 font-semibold flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-xs">verified</span> Đối tác Tích xanh Haute Couture
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Sealed QR Stamp -->
+                    <div class="p-2.5 bg-black/60 rounded-xl border border-brand-gold/30 flex items-center gap-3">
+                        <div class="w-12 h-12 bg-white rounded-lg p-1 shrink-0 flex items-center justify-center">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=TRAMHY-BESPOKE-SPEC-2026" alt="QR Spec Sheet" class="w-full h-full object-contain">
+                        </div>
+                        <div class="text-[9px] text-stone-300 leading-tight">
+                            <b class="text-brand-gold block text-[10px]">MÃ NIÊM PHONG SPEC</b>
+                            Quét để đối soát số đo trực tiếp tại xưởng may. Cam kết không thể làm sai lệch.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Milestone 3-Stage Escrow Timeline for Bespoke -->
+            <div class="bg-amber-50/80 rounded-2xl p-3 border border-brand-gold/30 space-y-1.5 text-xs">
+                <span class="font-black text-brand-goldDark flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm text-brand-gold">shield</span>
+                    Lộ Trình Giải Ngân Bảo Chứng Escrow 3 Chặng (An Toàn Tuyệt Đối Cho Cô Dâu):
+                </span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px]">
+                    <div class="bg-white p-2 rounded-xl border border-brand-gold/20 shadow-2xs">
+                        <b class="text-brand-goldDark block">Chặng 1: Cọc 30%</b>
+                        <span class="text-gray-600 leading-tight block">Duyệt phác thảo 3D & gửi vải mẫu thật đến tận nhà khách.</span>
+                    </div>
+                    <div class="bg-white p-2 rounded-xl border border-brand-gold/20 shadow-2xs">
+                        <b class="text-purple-800 block">Chặng 2: 40%</b>
+                        <span class="text-gray-600 leading-tight block">Thử rập vải thô (Toile Fitting) tại xưởng. Vừa vặn mới mở tiền.</span>
+                    </div>
+                    <div class="bg-white p-2 rounded-xl border border-brand-gold/20 shadow-2xs">
+                        <b class="text-emerald-700 block">Chặng 3: 30%</b>
+                        <span class="text-gray-600 leading-tight block">Giao váy đính kết hoàn thiện tại lễ đường, bảo hành chỉnh sửa 0đ.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="pt-2 border-t border-gray-150 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                <button type="button" onclick="printSpecSheet()" class="w-full sm:w-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm">print</span>
+                    <span>Tải / In Bản Kỹ Thuật (PDF)</span>
+                </button>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button type="button" onclick="closeSpecSheetModal()" class="flex-1 sm:flex-none px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold rounded-xl">Đóng</button>
+                    <button type="button" onclick="transferSpecToBooking()" class="flex-1 sm:flex-none px-5 py-2.5 gold-gradient text-white text-xs font-bold rounded-xl shadow-md hover:opacity-95 transition-all flex items-center justify-center gap-1.5 active:scale-95">
+                        <span class="material-symbols-outlined text-sm">handshake</span>
+                        <span>Đồng Ý Số Đo & Ký Cọc Escrow</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
     <!-- MODAL 2: DIRECT BOOKING & ESCROW DEPOSIT WITH AUTO-FILLED MEASUREMENTS -->
+    <!-- ========================================================================= -->
     <div id="booking-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[1000] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-brand-gold/30 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b border-gray-100 pb-3">
@@ -880,8 +1180,8 @@
                         <span class="material-symbols-outlined text-lg">verified_user</span>
                     </div>
                     <div>
-                        <h3 class="serif-title text-base font-bold text-brand-text">Đặt Lịch & Giữ Cọc Qua Trạm Hỷ Escrow</h3>
-                        <span class="text-[10px] text-emerald-600 font-bold">Cam kết bảo vệ 2 chiều cho cả Cô Dâu và Studio</span>
+                        <h3 class="serif-title text-base font-bold text-brand-text" id="booking-modal-title">Đặt Lịch & Giữ Cọc Qua Trạm Hỷ Escrow</h3>
+                        <span class="text-[10px] text-emerald-600 font-bold" id="booking-modal-subtitle">Cam kết bảo vệ 2 chiều cho cả Cô Dâu và Studio</span>
                     </div>
                 </div>
                 <button onclick="closeBookingModal()" class="text-gray-400 hover:text-brand-text">
@@ -896,6 +1196,22 @@
                     <span class="text-[10px] font-bold text-brand-goldDark" id="modal-studio-tag">2H Studio (Cầu Giấy, Hà Nội)</span>
                     <h4 class="text-xs font-bold text-brand-text" id="modal-dress-title">Váy cưới Đuôi cá đính pha lê Royal</h4>
                     <span class="text-xs font-extrabold text-brand-goldDark block mt-0.5" id="modal-dress-price">Giá: 3.500.000đ (Ưu đãi sàn -15%)</span>
+                </div>
+            </div>
+
+            <!-- Bespoke Customization Attached Badge (Shown only when Bespoke mode is active) -->
+            <div id="modal-bespoke-spec-badge" class="hidden p-3 rounded-2xl bg-purple-50 border border-purple-300 text-xs space-y-1">
+                <div class="flex items-center justify-between">
+                    <span class="font-extrabold text-purple-900 flex items-center gap-1 text-[11px]">
+                        <span class="material-symbols-outlined text-sm text-purple-700">task_alt</span>
+                        Hồ Sơ May Đo Đã Kèm Bản Spec Sheet Kỹ Thuật:
+                    </span>
+                    <button type="button" onclick="openSpecSheetModal()" class="text-[10px] font-bold text-purple-700 underline">Xem lại</button>
+                </div>
+                <div class="text-[10px] text-purple-950 font-medium grid grid-cols-2 gap-1 pt-1">
+                    <div>• Số đo 3 vòng: <b id="modal-bespoke-stats">84 - 63 - 90 cm</b></div>
+                    <div>• Chiều cao giày: <b id="modal-bespoke-heel">7 cm</b></div>
+                    <div class="col-span-2">• Tùy biến: <b id="modal-bespoke-summary">Cổ Tim • Cúp Ngực • Lụa Mikado • Đuôi 1.5m</b></div>
                 </div>
             </div>
 
@@ -924,7 +1240,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="text-[10px] font-bold text-gray-600 block uppercase mb-1">Ngày đến thử váy / Fitting *</label>
+                        <label class="text-[10px] font-bold text-gray-600 block uppercase mb-1" id="modal-label-date">Ngày đến thử váy / Fitting *</label>
                         <input type="date" id="cust-date" required class="w-full bg-brand-blush/40 border border-gray-200 focus:border-brand-gold rounded-xl px-3 py-2 text-xs text-brand-text focus:outline-none">
                     </div>
                     <div>
@@ -941,10 +1257,10 @@
                 <!-- 2-Way Escrow Deposit Details -->
                 <div class="bg-stone-900 text-white rounded-2xl p-3.5 space-y-2 text-xs border border-brand-gold/40">
                     <div class="flex items-center justify-between">
-                        <span class="text-stone-300">Tiền cọc Đợt 1 (Giữ lịch thử):</span>
+                        <span class="text-stone-300" id="modal-deposit-title">Tiền cọc Đợt 1 (Giữ lịch thử):</span>
                         <span class="font-extrabold text-brand-goldLight text-sm" id="modal-deposit-amount">1.050.000đ (30%)</span>
                     </div>
-                    <div class="text-[10px] text-stone-400 leading-snug">
+                    <div class="text-[10px] text-stone-400 leading-snug" id="modal-deposit-desc">
                         ✓ Tiền được lưu tại <b>Tài khoản Bảo chứng Trạm Hỷ Escrow</b>.<br>
                         ✓ Studio chỉ nhận giải ngân sau khi bạn đã đến thử và xác nhận ưng ý.<br>
                         ✓ Hoàn tiền 100% trong 2h nếu váy sai lệch cam kết.
@@ -953,7 +1269,7 @@
 
                 <div class="flex items-center justify-end gap-2 pt-2">
                     <button type="button" onclick="closeBookingModal()" class="px-4 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-500 hover:bg-gray-100">Hủy</button>
-                    <button type="submit" class="gold-gradient text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-md hover:opacity-95">Xác Nhận Giữ Lịch & Cọc Escrow</button>
+                    <button type="submit" id="modal-btn-submit" class="gold-gradient text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-md hover:opacity-95">Xác Nhận Giữ Lịch & Cọc Escrow</button>
                 </div>
             </form>
         </div>
@@ -1173,6 +1489,36 @@
                 fitPercent: 95,
                 fitNote: "Đường cắt xẻ tinh tế kéo dài đôi chân, phù hợp cô dâu có bờ vai và thắt eo thon gọn.",
                 thumb: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&q=80&w=300"
+            },
+            9: {
+                id: 9,
+                name: "Váy May Đo Công Chúa Sparkling Tiara",
+                studio: "Bella Bridal Atelier (Tây Hồ, Hà Nội)",
+                price: "15.500.000đ",
+                originalPrice: "18.500.000đ",
+                type: "bespoke",
+                theme: "fairy",
+                themeLabel: "May Đo Nàng Thơ",
+                shapeMatch: "all",
+                fitVerdict: "Lộng lẫy công chúa",
+                fitPercent: 97,
+                fitNote: "Tùng váy 7 lớp voan ánh nhũ lấp lánh, đính pha lê Swarovski thủ công toàn thân áo.",
+                thumb: "https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&q=80&w=300"
+            },
+            10: {
+                id: 10,
+                name: "Áo Dài Cưới Gấm Hoàng Tộc Thêu Phượng Triều Nguyễn",
+                studio: "Trạm Hỷ Heritage Silk (Hoàn Kiếm, Hà Nội)",
+                price: "9.800.000đ",
+                originalPrice: "12.000.000đ",
+                type: "bespoke",
+                theme: "heritage",
+                themeLabel: "May Đo Di Sản",
+                shapeMatch: "all",
+                fitVerdict: "Sang trọng đài các",
+                fitPercent: 99,
+                fitNote: "Gấm Bảo Lộc dệt hoa văn hoàng gia chìm, nghệ nhân thêu tay chỉ vàng 24K truyền thống.",
+                thumb: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=300"
             }
         };
 
@@ -1195,7 +1541,9 @@
                 5: "user_tryon_royal.jpg",
                 6: "user_tryon_satin.jpg",
                 7: "user_tryon_white_royal.jpg",
-                8: "user_tryon_mermaid.jpg"
+                8: "user_tryon_mermaid.jpg",
+                9: "user_tryon_royal.jpg",
+                10: "user_tryon_aodai.jpg"
             },
             bride1: {
                 1: "bride_1_tryon_royal.jpg",
@@ -1205,7 +1553,9 @@
                 5: "bride_1_tryon_royal.jpg",
                 6: "bride_3_tryon_satin.jpg",
                 7: "bride_1_tryon_royal.jpg",
-                8: "bride_4_tryon_mermaid.jpg"
+                8: "bride_4_tryon_mermaid.jpg",
+                9: "bride_1_tryon_royal.jpg",
+                10: "user_tryon_aodai.jpg"
             },
             bride2: {
                 1: "bride_4_tryon_mermaid.jpg",
@@ -1215,7 +1565,9 @@
                 5: "bride_1_tryon_royal.jpg",
                 6: "bride_3_tryon_satin.jpg",
                 7: "bride_1_tryon_royal.jpg",
-                8: "bride_4_tryon_mermaid.jpg"
+                8: "bride_4_tryon_mermaid.jpg",
+                9: "bride_1_tryon_royal.jpg",
+                10: "user_tryon_aodai.jpg"
             },
             bride3: {
                 1: "bride_4_tryon_mermaid.jpg",
@@ -1225,7 +1577,9 @@
                 5: "bride_1_tryon_royal.jpg",
                 6: "bride_3_tryon_satin.jpg",
                 7: "bride_1_tryon_royal.jpg",
-                8: "bride_4_tryon_mermaid.jpg"
+                8: "bride_4_tryon_mermaid.jpg",
+                9: "bride_1_tryon_royal.jpg",
+                10: "user_tryon_aodai.jpg"
             },
             bride4: {
                 1: "bride_4_tryon_mermaid.jpg",
@@ -1235,9 +1589,198 @@
                 5: "bride_1_tryon_royal.jpg",
                 6: "bride_3_tryon_satin.jpg",
                 7: "bride_1_tryon_royal.jpg",
-                8: "bride_4_tryon_mermaid.jpg"
+                8: "bride_4_tryon_mermaid.jpg",
+                9: "bride_1_tryon_royal.jpg",
+                10: "user_tryon_aodai.jpg"
             }
         };
+
+        // Bespoke Tailoring Configuration & State
+        const bespokeConfig = {
+            neckline: 'sweetheart',
+            necklineLabel: 'Cổ Tim Sweetheart',
+            necklinePrice: 0,
+            sleeve: 'sleeveless',
+            sleeveLabel: 'Cúp Ngực Không Tay',
+            sleevePrice: 0,
+            fabric: 'mikado',
+            fabricLabel: 'Lụa Satin Mikado Ý',
+            fabricPrice: 0,
+            train: '150cm',
+            trainLabel: '1.5m (Cathedral)',
+            trainPrice: 1000000,
+            swarovski: true,
+            swarovskiPrice: 1800000,
+            flower3d: false,
+            flower3dPrice: 0,
+            monogram: true,
+            bust: 84,
+            waist: 63,
+            hip: 90,
+            heel: 7,
+            totalPrice: 15300000
+        };
+
+        function selectBespokeOption(category, key, label, extraPrice) {
+            if (category === 'neckline') {
+                bespokeConfig.neckline = key;
+                bespokeConfig.necklineLabel = label;
+                bespokeConfig.necklinePrice = extraPrice;
+                const curNeckLabel = document.getElementById('cur-neckline-label');
+                if (curNeckLabel) curNeckLabel.innerText = label;
+
+                document.querySelectorAll('.bespoke-neck-btn').forEach(btn => {
+                    btn.classList.remove('border-2', 'border-purple-500', 'bg-purple-100', 'text-purple-950', 'font-bold');
+                    btn.classList.add('border-gray-200', 'bg-white', 'text-gray-700');
+                });
+                if (window.event && window.event.currentTarget) {
+                    window.event.currentTarget.classList.add('border-2', 'border-purple-500', 'bg-purple-100', 'text-purple-950', 'font-bold');
+                    window.event.currentTarget.classList.remove('border-gray-200', 'bg-white', 'text-gray-700');
+                }
+            } else if (category === 'sleeve') {
+                bespokeConfig.sleeve = key;
+                bespokeConfig.sleeveLabel = label;
+                bespokeConfig.sleevePrice = extraPrice;
+                const curSleeveLabel = document.getElementById('cur-sleeve-label');
+                if (curSleeveLabel) curSleeveLabel.innerText = label;
+
+                document.querySelectorAll('.bespoke-sleeve-btn').forEach(btn => {
+                    btn.classList.remove('border-2', 'border-purple-500', 'bg-purple-100', 'text-purple-950', 'font-bold');
+                    btn.classList.add('border-gray-200', 'bg-white', 'text-gray-700');
+                });
+                if (window.event && window.event.currentTarget) {
+                    window.event.currentTarget.classList.add('border-2', 'border-purple-500', 'bg-purple-100', 'text-purple-950', 'font-bold');
+                    window.event.currentTarget.classList.remove('border-gray-200', 'bg-white', 'text-gray-700');
+                }
+            }
+            calculateBespokeCustomPrice();
+        }
+
+        function calculateBespokeCustomPrice() {
+            const dress = dressData[selectedDressId];
+            let basePrice = 12500000;
+            if (dress && dress.type === 'bespoke') {
+                basePrice = parseInt(dress.price.replace(/\D/g, '')) || 12500000;
+            }
+
+            const fabricSelect = document.getElementById('bespoke-fabric');
+            const trainSelect = document.getElementById('bespoke-train');
+            const swarovskiCheck = document.getElementById('bespoke-opt-swarovski');
+            const flower3dCheck = document.getElementById('bespoke-opt-flower3d');
+
+            const fabricOpt = fabricSelect ? fabricSelect.options[fabricSelect.selectedIndex] : null;
+            const trainOpt = trainSelect ? trainSelect.options[trainSelect.selectedIndex] : null;
+
+            bespokeConfig.fabricPrice = fabricOpt ? parseInt(fabricOpt.getAttribute('data-price')) || 0 : 0;
+            bespokeConfig.fabricLabel = fabricOpt ? fabricOpt.text.split('(')[0].trim() : 'Lụa Satin Mikado Ý';
+
+            bespokeConfig.trainPrice = trainOpt ? parseInt(trainOpt.getAttribute('data-price')) || 0 : 0;
+            bespokeConfig.trainLabel = trainOpt ? trainOpt.text.split('(')[0].trim() : '1.5m';
+
+            bespokeConfig.swarovski = swarovskiCheck ? swarovskiCheck.checked : true;
+            bespokeConfig.swarovskiPrice = bespokeConfig.swarovski ? 1800000 : 0;
+
+            bespokeConfig.flower3d = flower3dCheck ? flower3dCheck.checked : false;
+            bespokeConfig.flower3dPrice = bespokeConfig.flower3d ? 1200000 : 0;
+
+            const total = basePrice + bespokeConfig.necklinePrice + bespokeConfig.sleevePrice + bespokeConfig.fabricPrice + bespokeConfig.trainPrice + bespokeConfig.swarovskiPrice + bespokeConfig.flower3dPrice;
+            bespokeConfig.totalPrice = total;
+
+            const finalPriceEl = document.getElementById('cta-final-price');
+            if (finalPriceEl) {
+                finalPriceEl.innerText = `${total.toLocaleString('vi-VN')}đ`;
+            }
+
+            // Sync with Spec Modal labels
+            const specNeck = document.getElementById('spec-neck-val');
+            if (specNeck) specNeck.innerText = bespokeConfig.necklineLabel;
+            const specSleeve = document.getElementById('spec-sleeve-val');
+            if (specSleeve) specSleeve.innerText = bespokeConfig.sleeveLabel;
+            const specFabric = document.getElementById('spec-fabric-val');
+            if (specFabric) specFabric.innerText = bespokeConfig.fabricLabel;
+            const specTrain = document.getElementById('spec-train-val');
+            if (specTrain) specTrain.innerText = bespokeConfig.trainLabel;
+            const specDecor = document.getElementById('spec-decor-val');
+            if (specDecor) {
+                let decs = [];
+                if (bespokeConfig.swarovski) decs.push('Swarovski');
+                if (bespokeConfig.flower3d) decs.push('Hoa 3D');
+                decs.push('Monogram');
+                specDecor.innerText = decs.join(' + ');
+            }
+
+            // Sync with Milestone Escrow container in Step 3
+            const mContainer = document.getElementById('escrow-milestone-container');
+            const mTitle = document.getElementById('escrow-milestone-title');
+            if (mTitle) mTitle.innerText = 'Lộ trình giải ngân 3 chặng May đo (Milestone Escrow):';
+            if (mContainer) {
+                const c1 = Math.round(total * 0.3);
+                const c2 = Math.round(total * 0.4);
+                const c3 = Math.round(total * 0.3);
+                mContainer.innerHTML = `
+                    <div class="bg-amber-50 p-1.5 rounded-lg border border-brand-gold/30 text-brand-goldDark">
+                        <b>Chặng 1: 30%</b>
+                        <span class="block text-[8px] text-gray-500">${c1.toLocaleString('vi-VN')}đ (Duyệt phác thảo)</span>
+                    </div>
+                    <div class="bg-purple-50 p-1.5 rounded-lg border border-purple-200 text-purple-900">
+                        <b>Chặng 2: 40%</b>
+                        <span class="block text-[8px] text-gray-500">${c2.toLocaleString('vi-VN')}đ (Thử rập Toile)</span>
+                    </div>
+                    <div class="bg-emerald-50 p-1.5 rounded-lg border border-emerald-200 text-emerald-800">
+                        <b>Chặng 3: 30%</b>
+                        <span class="block text-[8px] text-gray-500">${c3.toLocaleString('vi-VN')}đ (Nghiệm thu váy)</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Spec Sheet Modal Controllers
+        function openSpecSheetModal() {
+            calculateBespokeCustomPrice();
+            const dress = dressData[selectedDressId] || dressData[6];
+            const specStudio = document.getElementById('spec-studio-val');
+            if (specStudio) specStudio.innerText = dress.studio;
+
+            document.getElementById('spec-val-height').innerText = `${bodyMetrics.height} cm`;
+            document.getElementById('spec-input-bust').value = bespokeConfig.bust;
+            document.getElementById('spec-val-bust').innerText = `${bespokeConfig.bust} cm`;
+            document.getElementById('spec-input-waist').value = bespokeConfig.waist;
+            document.getElementById('spec-val-waist').innerText = `${bespokeConfig.waist} cm`;
+            document.getElementById('spec-input-hip').value = bespokeConfig.hip;
+            document.getElementById('spec-val-hip').innerText = `${bespokeConfig.hip} cm`;
+
+            document.getElementById('spec-sheet-modal').classList.remove('hidden');
+        }
+
+        function closeSpecSheetModal() {
+            document.getElementById('spec-sheet-modal').classList.add('hidden');
+        }
+
+        function updateSpecMeasurements() {
+            bespokeConfig.bust = document.getElementById('spec-input-bust').value;
+            bespokeConfig.waist = document.getElementById('spec-input-waist').value;
+            bespokeConfig.hip = document.getElementById('spec-input-hip').value;
+
+            document.getElementById('spec-val-bust').innerText = `${bespokeConfig.bust} cm`;
+            document.getElementById('spec-val-waist').innerText = `${bespokeConfig.waist} cm`;
+            document.getElementById('spec-val-hip').innerText = `${bespokeConfig.hip} cm`;
+        }
+
+        function updateSpecHeel() {
+            bespokeConfig.heel = document.getElementById('spec-input-heel').value;
+        }
+
+        function printSpecSheet() {
+            showToast('Đang tạo bản PDF Hồ Sơ May Đo Kỹ Thuật Số (Spec Sheet) có QR bảo chứng...');
+            setTimeout(() => {
+                window.print();
+            }, 600);
+        }
+
+        function transferSpecToBooking() {
+            closeSpecSheetModal();
+            openBookingModal();
+        }
 
         // Initialize Workspace on Page Load
         document.addEventListener('DOMContentLoaded', () => {
@@ -1257,6 +1800,8 @@
                 'bespoke': 6,
                 'bespoke_mikado': 6,
                 'bespoke_chantilly': 7,
+                'bespoke_fairy': 9,
+                'bespoke_aodai': 10,
                 'siren': 8
             };
 
@@ -1590,9 +2135,18 @@
             const dress = dressData[selectedDressId];
             if (!dress) return;
 
-            document.getElementById('modal-dress-title').innerText = dress.name;
+            const isBespoke = (dress.type === 'bespoke' || activeCollectionType === 'bespoke');
+            
+            // Calculate price & deposit
+            let priceNum = parseInt(dress.price.replace(/\D/g, '')) || 3500000;
+            if (isBespoke && bespokeConfig.totalPrice) {
+                priceNum = bespokeConfig.totalPrice;
+            }
+            const depositNum = Math.round(priceNum * 0.3);
+
+            document.getElementById('modal-dress-title').innerText = isBespoke ? `${dress.name} (Bespoke Co-Design)` : dress.name;
             document.getElementById('modal-studio-tag').innerText = dress.studio;
-            document.getElementById('modal-dress-price').innerText = `Giá: ${dress.price} (Ưu đãi Trạm Hỷ)`;
+            document.getElementById('modal-dress-price').innerText = `Tổng định giá: ${priceNum.toLocaleString('vi-VN')}đ`;
             document.getElementById('modal-dress-img').src = dress.thumb;
 
             // Auto-fill body metrics to show Studio
@@ -1607,10 +2161,53 @@
             };
             document.getElementById('modal-metric-shape').innerText = shapeNames[bodyMetrics.shape] || 'Cân đối';
 
-            // Calculate 30% deposit
-            const priceNum = parseInt(dress.price.replace(/\D/g, '')) || 3500000;
-            const depositNum = Math.round(priceNum * 0.3);
-            document.getElementById('modal-deposit-amount').innerText = `${depositNum.toLocaleString('vi-VN')}đ (30%)`;
+            const bespokeBadge = document.getElementById('modal-bespoke-spec-badge');
+            const modalTitle = document.getElementById('booking-modal-title');
+            const modalSub = document.getElementById('booking-modal-subtitle');
+            const modalLabelDate = document.getElementById('modal-label-date');
+            const depositTitle = document.getElementById('modal-deposit-title');
+            const depositAmount = document.getElementById('modal-deposit-amount');
+            const depositDesc = document.getElementById('modal-deposit-desc');
+            const submitBtn = document.getElementById('modal-btn-submit');
+
+            if (isBespoke) {
+                if (bespokeBadge) bespokeBadge.classList.remove('hidden');
+                if (modalTitle) modalTitle.innerText = 'Ký Hợp Đồng May Đo & Khóa Cọc Chặng 1 (Escrow)';
+                if (modalSub) modalSub.innerText = 'Bảo chứng 3 chặng: Phác thảo 30% → Rập Toile 40% → Nghiệm thu 30%';
+                if (modalLabelDate) modalLabelDate.innerText = 'Ngày hẹn gặp NTK lấy số đo & duyệt vải mẫu *';
+                if (depositTitle) depositTitle.innerText = 'Cọc Chặng 1 (Duyệt phác thảo & mẫu vải):';
+                if (depositAmount) depositAmount.innerText = `${depositNum.toLocaleString('vi-VN')}đ (30%)`;
+                if (depositDesc) {
+                    depositDesc.innerHTML = `
+                        ✓ Cọc Chặng 1 (30%) lưu tại <b>Trạm Hỷ Escrow</b> để NTK dựng rập 3D & gửi swatch vải tận nhà.<br>
+                        ✓ Tiền Chặng 2 (40%) chỉ giải ngân khi bạn thử rập mộc (Toile) vừa khít.<br>
+                        ✓ Nghiệm thu váy cưới thực tế đạt 100% phom dáng mới giải ngân 30% còn lại.
+                    `;
+                }
+                if (submitBtn) submitBtn.innerText = 'Ký Hợp Đồng May Đo & Đặt Cọc Chặng 1';
+
+                const bStats = document.getElementById('modal-bespoke-stats');
+                if (bStats) bStats.innerText = `${bespokeConfig.bust} - ${bespokeConfig.waist} - ${bespokeConfig.hip} cm`;
+                const bHeel = document.getElementById('modal-bespoke-heel');
+                if (bHeel) bHeel.innerText = `${bespokeConfig.heel} cm`;
+                const bSumm = document.getElementById('modal-bespoke-summary');
+                if (bSumm) bSumm.innerText = `${bespokeConfig.necklineLabel} • ${bespokeConfig.sleeveLabel} • ${bespokeConfig.fabricLabel} • Đuôi ${bespokeConfig.trainLabel}`;
+            } else {
+                if (bespokeBadge) bespokeBadge.classList.add('hidden');
+                if (modalTitle) modalTitle.innerText = 'Đặt Lịch & Giữ Cọc Qua Trạm Hỷ Escrow';
+                if (modalSub) modalSub.innerText = 'Cam kết bảo vệ 2 chiều cho cả Cô Dâu và Studio';
+                if (modalLabelDate) modalLabelDate.innerText = 'Ngày đến thử váy / Fitting *';
+                if (depositTitle) depositTitle.innerText = 'Tiền cọc Đợt 1 (Giữ lịch thử):';
+                if (depositAmount) depositAmount.innerText = `${depositNum.toLocaleString('vi-VN')}đ (30%)`;
+                if (depositDesc) {
+                    depositDesc.innerHTML = `
+                        ✓ Tiền được lưu tại <b>Tài khoản Bảo chứng Trạm Hỷ Escrow</b>.<br>
+                        ✓ Studio chỉ nhận giải ngân sau khi bạn đã đến thử và xác nhận ưng ý.<br>
+                        ✓ Hoàn tiền 100% trong 2h nếu váy sai lệch cam kết.
+                    `;
+                }
+                if (submitBtn) submitBtn.innerText = 'Xác Nhận Giữ Lịch & Cọc Escrow';
+            }
 
             // Default date tomorrow
             const tomorrow = new Date();
@@ -1632,16 +2229,20 @@
             const time = document.getElementById('cust-time').value;
             const dress = dressData[selectedDressId];
 
-            const priceNum = parseInt(dress.price.replace(/\D/g, '')) || 3500000;
+            const isBespoke = (dress.type === 'bespoke' || activeCollectionType === 'bespoke');
+            let priceNum = parseInt(dress.price.replace(/\D/g, '')) || 3500000;
+            if (isBespoke && bespokeConfig.totalPrice) {
+                priceNum = bespokeConfig.totalPrice;
+            }
             const depositNum = Math.round(priceNum * 0.3);
 
             const newBooking = {
                 id: `BK-${Math.floor(100000 + Math.random() * 900000)}`,
                 customerName: name,
                 phone: phone,
-                dressName: dress.name,
+                dressName: isBespoke ? `${dress.name} (May Đo Riêng)` : dress.name,
                 studio: dress.studio,
-                price: dress.price,
+                price: `${priceNum.toLocaleString('vi-VN')}đ`,
                 numericPrice: priceNum,
                 depositPaid: depositNum,
                 date: date,
@@ -1649,8 +2250,23 @@
                 height: bodyMetrics.height,
                 weight: bodyMetrics.weight,
                 shape: bodyMetrics.shape,
-                status: "deposit_locked",
-                depositStatus: "Đã giữ cọc an toàn (Milestone Pay Escrow)",
+                type: isBespoke ? 'bespoke' : 'rental',
+                bespokeDetails: isBespoke ? {
+                    bust: bespokeConfig.bust,
+                    waist: bespokeConfig.waist,
+                    hip: bespokeConfig.hip,
+                    heel: bespokeConfig.heel,
+                    neckline: bespokeConfig.necklineLabel,
+                    sleeve: bespokeConfig.sleeveLabel,
+                    fabric: bespokeConfig.fabricLabel,
+                    train: bespokeConfig.trainLabel,
+                    swarovski: bespokeConfig.swarovski,
+                    flower3d: bespokeConfig.flower3d,
+                    totalPrice: priceNum,
+                    milestone: 1
+                } : null,
+                status: isBespoke ? "bespoke_milestone_1" : "deposit_locked",
+                depositStatus: isBespoke ? "Đang cọc Chặng 1 (30% - Duyệt phác thảo 3D & Vải)" : "Đã giữ cọc an toàn (Milestone Pay Escrow)",
                 createdAt: new Date().toISOString()
             };
 
@@ -1659,7 +2275,10 @@
             localStorage.setItem('tramhy_bookings', JSON.stringify(existing));
 
             closeBookingModal();
-            showToast(`Tuyệt vời! Đã giữ lịch và kích hoạt Bảo Chứng Cọc cho ${name}.`);
+            const toastMsg = isBespoke 
+                ? `Hợp đồng may đo kích hoạt thành công! Cọc Chặng 1 (${depositNum.toLocaleString('vi-VN')}đ) đã vào Trạm Hỷ Escrow.` 
+                : `Tuyệt vời! Đã giữ lịch và kích hoạt Bảo Chứng Cọc cho ${name}.`;
+            showToast(toastMsg);
 
             setTimeout(() => {
                 window.location.href = `bookings.html?new_booking=${newBooking.id}`;
