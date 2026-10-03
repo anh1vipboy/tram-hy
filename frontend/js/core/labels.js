@@ -35,6 +35,12 @@ export const VENDOR_CATEGORY = {
   venue:  'Nhà hàng tiệc',
 };
 
+export const VENDOR_STATUS = {
+  pending:  { label: 'Chờ duyệt', tone: 'gold' },
+  approved: { label: 'Đang hoạt động', tone: 'green' },
+  rejected: { label: 'Bị từ chối', tone: 'red' },
+};
+
 export const DRESS_THEME = {
   mermaid:    'Đuôi cá',
   fairy:      'Công chúa',

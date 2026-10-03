@@ -22,11 +22,13 @@
     <div class="grid" id="stats" style="margin-bottom:24px"></div>
 
     <div class="tabs" style="margin-bottom:16px">
-      <button class="tab active" data-tab="disputes" type="button">Khiếu nại</button>
+      <button class="tab active" data-tab="approvals" type="button">Duyệt đối tác <span class="badge badge-gold" id="pending-count">0</span></button>
+      <button class="tab" data-tab="disputes" type="button">Khiếu nại</button>
       <button class="tab" data-tab="vendors" type="button">Đối tác</button>
       <button class="tab" data-tab="bookings" type="button">Tất cả đơn</button>
     </div>
-    <section id="tab-disputes"></section>
+    <section id="tab-approvals"></section>
+    <section id="tab-disputes" hidden></section>
     <section id="tab-vendors" hidden></section>
     <section id="tab-bookings" hidden></section>
   </main>

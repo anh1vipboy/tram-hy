@@ -1,6 +1,6 @@
 import { initLayout } from '../core/layout.js';
 import { $, html, render, money, param, date } from '../core/utils.js';
-import { badge, DRESS_THEME, VENDOR_CATEGORY } from '../core/labels.js';
+import { badge, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
 import { getVendorBySlug, listDresses, listReviews } from '../services/catalog.js';
 import { dressThumb } from '../data/tryon-data.js';
@@ -32,6 +32,8 @@ function renderPage(vendor, dresses, reviews) {
   const isBridal = vendor.category === 'bridal';
   render(page, html`
     <a href="marketplace.html" class="small">← Dịch vụ cưới</a>
+    ${vendor.status !== 'approved' ? html`<div class="notice" style="margin-top:12px"><strong>Bản xem trước – tiệm chưa hiện với khách</strong>
+      Trạng thái hồ sơ: ${VENDOR_STATUS[vendor.status]?.label}. Chỉ chủ tiệm và Trạm Hỷ xem được trang này.</div>` : ''}
     <div class="grid-2" style="margin-top:12px;align-items:start">
       <div class="stack">
         ${vendor.cover_url ? html`<img src="${vendor.cover_url}" alt="" style="border-radius:var(--radius);aspect-ratio:16/9;object-fit:cover;width:100%">` : ''}
@@ -43,7 +45,7 @@ function renderPage(vendor, dresses, reviews) {
           ${vendor.description ? html`<p>${vendor.description}</p>` : ''}
         </div>
       </div>
-      ${isBridal ? bridalBox(vendor) : serviceBox(vendor)}
+      ${vendor.status !== 'approved' ? '' : isBridal ? bridalBox(vendor) : serviceBox(vendor)}
     </div>
 
     ${isBridal ? html`

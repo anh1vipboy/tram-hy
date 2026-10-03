@@ -8,6 +8,7 @@ const LOGIN_ERRORS = {
   'Invalid login credentials': 'Sai email hoặc mật khẩu',
   'Email not confirmed': 'Email chưa được xác nhận – hãy bấm link trong email Trạm Hỷ gửi bạn',
   'User already registered': 'Email này đã có tài khoản – hãy đăng nhập',
+  'email rate limit exceeded': 'Hệ thống đang gửi quá nhiều email xác nhận, vui lòng thử lại sau ít phút',
 };
 
 function showNotice(type, title, message) {

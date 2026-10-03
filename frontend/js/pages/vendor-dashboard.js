@@ -1,12 +1,15 @@
 import { initLayout } from '../core/layout.js';
 import { requireAuth } from '../core/auth.js';
 import { $, html, render, money, dateTime, debounce } from '../core/utils.js';
-import { BOOKING_STATUS, BOOKING_TYPE, statusBadge } from '../core/labels.js';
-import { openDialog, toast, toastError } from '../core/ui.js';
+import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_STATUS, statusBadge } from '../core/labels.js';
+import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
-import { listMyShops } from '../services/catalog.js';
+import {
+  listMyShops, registerVendor, updateMyShop, resubmitVendor, subscribeVendorChanges,
+} from '../services/catalog.js';
 import { listVendorBookings, vendorSetStatus, openDispute, subscribeBookingChanges } from '../services/bookings.js';
 import { milestonesView, detailsView, openDisputeView } from '../components/booking-card.js';
+import { shopFields, readShopForm } from '../components/shop-form.js';
 
 const COLUMNS = [
   { title: 'Chờ khách đặt cọc', statuses: ['pending'] },
@@ -18,10 +21,11 @@ const COLUMNS = [
 let profile = null;
 let shops = [];
 let bookings = [];
+let unsubscribeBookings = null;
 
 async function load() {
   try {
-    bookings = await listVendorBookings(shops.map((s) => s.id));
+    bookings = await listVendorBookings(shops.filter((s) => s.status === 'approved').map((s) => s.id));
     renderStats();
     renderBoard();
   } catch (error) {
@@ -129,16 +133,102 @@ const ACTIONS = {
   },
 };
 
+// ---------- HỒ SƠ TIỆM ----------
+// Chưa có tiệm → form đăng ký; chờ duyệt → thông báo; bị từ chối → lý do + sửa & gửi lại;
+// đã duyệt → bảng đơn hàng.
+async function refreshShops() {
+  try {
+    shops = await listMyShops(profile.id);
+  } catch (error) {
+    toastError(error);
+    return;
+  }
+  const approved = shops.filter((s) => s.status === 'approved');
+  $('#shop-name').textContent = approved.length ? approved.map((s) => s.name).join(', ') : 'Mở tiệm trên Trạm Hỷ';
+  renderShopStatus();
+
+  if (approved.length) {
+    await load();
+    unsubscribeBookings ??= subscribeBookingChanges('vendor-bookings', debounce(load, 300));
+  } else {
+    render($('#stats'), '');
+    render($('#board'), '');
+  }
+}
+
+function renderShopStatus() {
+  const container = $('#shop-status');
+  if (!shops.length) {
+    render(container, html`
+      <form class="card stack" id="register-form">
+        <div>
+          <h2 style="margin:0">Đăng ký mở tiệm</h2>
+          <p class="muted">Điền thông tin tiệm. Trạm Hỷ kiểm tra và duyệt trong 1–2 ngày làm việc; trong lúc chờ, tiệm chưa hiện với khách.</p>
+        </div>
+        ${shopFields()}
+        <button class="btn btn-primary" type="submit">Gửi hồ sơ cho Trạm Hỷ</button>
+      </form>`);
+    $('#register-form').addEventListener('submit', (e) => submitShop(e, (shop) => registerVendor(shop),
+      'Đã gửi hồ sơ! Trạm Hỷ sẽ duyệt sớm.'));
+    return;
+  }
+
+  render(container, shops.map((shop) => {
+    if (shop.status === 'pending') {
+      return html`<div class="notice"><strong>Hồ sơ "${shop.name}" đang chờ Trạm Hỷ duyệt</strong>
+        Bạn sẽ thấy kết quả ngay tại đây khi được duyệt – không cần tải lại trang.</div>`;
+    }
+    if (shop.status === 'rejected') {
+      return html`
+        <form class="card stack" data-resubmit="${shop.id}">
+          <div class="notice notice-error"><strong>Hồ sơ "${shop.name}" chưa được duyệt</strong>
+            Lý do: ${shop.review_note || 'Không ghi rõ'}. Hãy sửa thông tin bên dưới rồi gửi lại.</div>
+          ${shopFields(shop, { withCategory: false })}
+          <button class="btn btn-primary" type="submit">Sửa & gửi duyệt lại</button>
+        </form>`;
+    }
+    return html`<div class="row small">${statusBadge(VENDOR_STATUS, shop.status)}
+      <strong>${shop.name}</strong>
+      <a href="vendor.html?slug=${shop.slug}">Xem trang tiệm</a>
+      <button class="btn btn-outline btn-sm" type="button" data-edit-shop="${shop.id}">Sửa thông tin tiệm</button></div>`;
+  }));
+
+  container.querySelectorAll('[data-resubmit]').forEach((form) => {
+    form.addEventListener('submit', (e) => submitShop(e, async (shop) => {
+      await updateMyShop(form.dataset.resubmit, shop);
+      await resubmitVendor(form.dataset.resubmit);
+    }, 'Đã gửi lại hồ sơ cho Trạm Hỷ.'));
+  });
+  container.querySelectorAll('[data-edit-shop]').forEach((btn) => {
+    btn.addEventListener('click', () => editShop(shops.find((s) => s.id === btn.dataset.editShop)));
+  });
+}
+
+async function submitShop(e, save, successMessage) {
+  e.preventDefault();
+  await withBusy(e.submitter, async () => {
+    try {
+      await save(readShopForm(new FormData(e.target)));
+      toast(successMessage, 'success');
+      await refreshShops();
+    } catch (error) {
+      toastError(error);
+    }
+  });
+}
+
+async function editShop(shop) {
+  const done = await openDialog({
+    title: 'Sửa thông tin tiệm',
+    confirmText: 'Lưu',
+    content: shopFields(shop, { withCategory: false }),
+    onConfirm: (form) => updateMyShop(shop.id, readShopForm(form)),
+  });
+  if (done) { toast('Đã cập nhật thông tin tiệm.', 'success'); refreshShops(); }
+}
+
 // ---------- KHỞI CHẠY TRANG ----------
 await initLayout('vendor');
 profile = await requireAuth(['vendor']);
-shops = await listMyShops(profile.id);
-
-if (!shops.length) {
-  render($('#board'), html`<div class="empty">Tài khoản của bạn chưa được gắn với tiệm nào.
-    Liên hệ Trạm Hỷ để xác minh và kích hoạt tiệm (cung cấp email: <strong>${profile.email}</strong>).</div>`);
-} else {
-  $('#shop-name').textContent = shops.map((s) => s.name).join(', ');
-  await load();
-  subscribeBookingChanges('vendor-bookings', debounce(load, 300));
-}
+await refreshShops();
+subscribeVendorChanges('vendor-shops', debounce(refreshShops, 300));

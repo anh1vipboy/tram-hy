@@ -35,8 +35,8 @@ export function renderImageFor(modelKey, theme) {
   return IMG + (set[theme] || set.fairy);
 }
 
-// Ảnh đại diện cho một mẫu váy: ảnh thử váy thật cùng kiểu dáng
-export const dressThumb = (dress) => renderImageFor('user', dress.theme);
+// Ảnh đại diện cho một mẫu váy: ảnh đối tác tải lên, nếu chưa có thì dùng ảnh thử váy cùng kiểu dáng
+export const dressThumb = (dress) => dress.image_url || renderImageFor('user', dress.theme);
 
 export const BODY_SHAPES = [
   { key: 'hourglass', label: 'Đồng hồ cát' },

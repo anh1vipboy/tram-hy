@@ -47,7 +47,9 @@ exe202/
 │   ├── 02_functions.sql      Nghiệp vụ: đặt lịch, Escrow 3 chặng, khiếu nại
 │   ├── 03_storage_realtime.sql  Kho ảnh + realtime
 │   ├── 04_seed.sql           Dữ liệu mẫu: 31 đối tác, 10 mẫu váy
-│   └── 05_reviews_admin.sql  Đánh giá, admin gắn chủ tiệm, dọn ảnh bìa
+│   ├── 05_reviews_admin.sql  Đánh giá, admin gắn chủ tiệm, dọn ảnh bìa
+│   ├── 06_vendor_onboarding.sql  Đối tác đăng ký mở tiệm → admin duyệt
+│   └── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │
 ├── docs/                     Báo cáo, kịch bản demo, góp ý mentor (.md, .docx)
 ├── legacy/                   Bản demo cũ – giữ để đối chiếu, có thể xóa
@@ -85,7 +87,7 @@ exe202/
 | Bảng | Nội dung | Ai xem được |
 |---|---|---|
 | `profiles` | Họ tên, SĐT, vai trò (bride / vendor / admin) | Chính chủ, admin |
-| `vendors` | Đối tác: tên, loại, khu vực, giá từ, sao, Tích Xanh, chủ tiệm | Mọi người |
+| `vendors` | Đối tác: tên, loại, khu vực, giá từ, sao, Tích Xanh, chủ tiệm | Tiệm đã duyệt: mọi người · Chờ duyệt/bị từ chối: chủ tiệm, admin |
 | `dresses` | Mẫu váy: thuê / may đo, kiểu, giá | Mọi người |
 | `body_profiles` | Chiều cao, cân nặng, giày, dáng người | Chính chủ |
 | `bookings` | Đơn đặt lịch (chung cho thuê váy, may đo, dịch vụ) | Cô dâu của đơn, chủ tiệm, admin |
@@ -118,6 +120,9 @@ Nhánh phụ: `disputed` (đang khiếu nại), `cancelled`, `refunded`.
 | `resolve_dispute` | Admin | Hoàn tiền cô dâu hoặc xử lý cho tiệm |
 | `set_vendor_verified` | Admin | Cấp / thu hồi Tích Xanh |
 | `admin_link_vendor_owner` | Admin | Gắn tài khoản (theo email) làm chủ tiệm |
+| `register_vendor` | Đối tác | Gửi hồ sơ mở tiệm (trạng thái *chờ duyệt*, chưa hiện với khách) |
+| `resubmit_vendor` | Đối tác | Gửi lại hồ sơ sau khi bị từ chối và đã sửa |
+| `admin_review_vendor` | Admin | Duyệt (tiệm lên sàn) hoặc từ chối (bắt buộc ghi lý do) |
 
 ### 4.4 Storage & Realtime
 - `bride-photos` (riêng tư): ảnh cô dâu tải lên ở phòng thử, lưu theo thư mục `<user_id>/`, chỉ chính chủ đọc được.
@@ -165,9 +170,9 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 
 ## 6. Cách chạy
 
-### Lần đầu (đã làm xong 01–04, còn **05**)
-1. Supabase → **SQL Editor** → New query → dán `backend/supabase/05_reviews_admin.sql` → Run.
-   (Nếu tạo project mới: chạy lần lượt 01 → 05.)
+### Lần đầu
+1. Supabase → **SQL Editor** → chạy lần lượt các file `backend/supabase/01` → `06` (mỗi file 1 query mới).
+   Project hiện tại đã chạy 01–05, chỉ còn **06_vendor_onboarding.sql**.
 2. Supabase → **Authentication → Sign In / Providers → Email**: tắt *Confirm email* khi đang phát triển.
 3. Chạy web:
    ```powershell
@@ -197,6 +202,12 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 - Chưa có đơn: Supabase → Authentication → Users → ⋯ → Delete user.
 - Đã có đơn (báo *Database error deleting user*): chạy [`backend/supabase/tools/xoa_tai_khoan_test.sql`](backend/supabase/tools/xoa_tai_khoan_test.sql) sau khi sửa danh sách email.
 - Mẹo: dùng `ten+test1@gmail.com`, `ten+test2@gmail.com`… – mỗi địa chỉ là 1 tài khoản riêng nhưng thư về cùng hộp Gmail.
+
+### Đối tác mới mở tiệm
+1. Đối tác: Tạo tài khoản, chọn "Đối tác" → vào **Kênh đối tác** → điền form **Đăng ký mở tiệm** → Gửi.
+2. Admin: **Quản trị → Duyệt đối tác** (có số hồ sơ chờ) → **Duyệt** hoặc **Từ chối** kèm lý do.
+3. Đối tác thấy kết quả ngay (realtime). Bị từ chối → sửa thông tin ngay trên trang → **Sửa & gửi duyệt lại**.
+4. Tiệm được duyệt mới hiện ở Dịch vụ cưới và nhận đơn. Tiệm có sẵn trong dữ liệu mẫu thì dùng nút **Gắn chủ tiệm** ở tab Đối tác.
 
 ### Tạo tài khoản admin và đối tác
 1. Đăng ký 2 tài khoản trên web (trang Đăng nhập → Tạo tài khoản).

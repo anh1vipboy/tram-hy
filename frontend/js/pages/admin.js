@@ -1,12 +1,13 @@
 import { initLayout } from '../core/layout.js';
 import { requireAuth } from '../core/auth.js';
 import { $, $$, html, render, money, dateTime, debounce } from '../core/utils.js';
-import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_CATEGORY, badge, statusBadge } from '../core/labels.js';
+import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_CATEGORY, VENDOR_STATUS, badge, statusBadge } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
 import { listAllBookings, subscribeBookingChanges } from '../services/bookings.js';
+import { subscribeVendorChanges } from '../services/catalog.js';
 import {
-  listOpenDisputes, resolveDispute, listVendorsWithOwners, setVendorVerified, linkVendorOwner,
+  listOpenDisputes, resolveDispute, listVendorsWithOwners, setVendorVerified, linkVendorOwner, reviewVendor,
 } from '../services/admin.js';
 
 const data = { bookings: [], disputes: [], vendors: [] };
@@ -17,6 +18,7 @@ async function load() {
       listAllBookings(), listOpenDisputes(), listVendorsWithOwners(),
     ]);
     renderStats();
+    renderApprovals();
     renderDisputes();
     renderVendors();
     renderBookings();
@@ -34,10 +36,69 @@ function renderStats() {
     ['Đang giữ trong Escrow', money(sum('paid'))],
     ['Đã giải ngân cho đối tác', money(released)],
     ['Doanh thu phí sàn (10%)', money(Math.round(released * PLATFORM_FEE_RATE))],
+    ['Đối tác chờ duyệt', data.vendors.filter((v) => v.status === 'pending').length],
     ['Khiếu nại chờ xử lý', data.disputes.length],
   ];
   render($('#stats'), stats.map(([label, value]) => html`
     <div class="card stat"><div class="stat-label">${label}</div><div class="stat-value">${value}</div></div>`));
+}
+
+// ---------- DUYỆT ĐỐI TÁC ----------
+function renderApprovals() {
+  const pending = data.vendors.filter((v) => v.status === 'pending')
+    .sort((a, b) => a.created_at.localeCompare(b.created_at));
+  $('#pending-count').textContent = pending.length;
+
+  const container = $('#tab-approvals');
+  if (!pending.length) {
+    render(container, html`<div class="empty">Không có hồ sơ đối tác nào đang chờ duyệt.</div>`);
+    return;
+  }
+  render(container, html`<div class="stack">${pending.map((v) => html`
+    <article class="card stack" data-vendor="${v.id}">
+      <div class="row">
+        ${badge(VENDOR_CATEGORY[v.category], 'gold')}
+        <strong style="font-size:17px">${v.name}</strong>
+        <span class="spacer"></span>
+        <span class="small muted">Gửi lúc ${dateTime(v.created_at)}</span>
+      </div>
+      <div class="grid-2 small">
+        <div>
+          <div><strong>Chủ tiệm:</strong> ${v.owner?.full_name || '—'}</div>
+          <div><strong>Điện thoại:</strong> ${v.phone || v.owner?.phone || '—'}</div>
+          <div><strong>Địa chỉ:</strong> ${[v.address, v.district].filter(Boolean).join(', ') || '—'}</div>
+          <div><strong>Giá khởi điểm:</strong> <span class="price">${money(v.base_price)}</span></div>
+        </div>
+        <div><strong>Giới thiệu:</strong> ${v.description || html`<span class="muted">Không có</span>`}</div>
+      </div>
+      <div class="row">
+        <button class="btn btn-primary btn-sm" data-review="approve">Duyệt – cho lên sàn</button>
+        <button class="btn btn-danger btn-sm" data-review="reject">Từ chối</button>
+        <a class="small" href="vendor.html?slug=${v.slug}" target="_blank" rel="noopener">Xem trang tiệm →</a>
+      </div>
+    </article>`)}</div>`);
+
+  container.querySelectorAll('[data-review]').forEach((btn) => {
+    const vendor = data.vendors.find((v) => v.id === btn.closest('[data-vendor]').dataset.vendor);
+    btn.addEventListener('click', () => review(vendor, btn.dataset.review === 'approve'));
+  });
+}
+
+async function review(vendor, approve) {
+  const done = await openDialog({
+    title: approve ? `Duyệt "${vendor.name}"?` : `Từ chối "${vendor.name}"?`,
+    confirmText: approve ? 'Duyệt' : 'Từ chối',
+    danger: !approve,
+    content: approve
+      ? html`<p>Tiệm sẽ hiện trên trang Dịch vụ cưới và nhận được đơn đặt lịch.</p>
+          <label class="field"><span>Ghi chú cho đối tác (không bắt buộc)</span>
+            <textarea class="input" name="note" maxlength="500"></textarea></label>`
+      : html`<label class="field"><span>Lý do từ chối (đối tác sẽ thấy để sửa hồ sơ)</span>
+          <textarea class="input" name="note" required minlength="5" maxlength="500"
+            placeholder="VD: Thiếu địa chỉ cụ thể, giá khởi điểm chưa hợp lý…"></textarea></label>`,
+    onConfirm: (form) => reviewVendor(vendor.id, approve, form.get('note').trim()),
+  });
+  if (done) { toast(approve ? 'Đã duyệt đối tác.' : 'Đã từ chối hồ sơ.', 'success'); load(); }
 }
 
 // ---------- KHIẾU NẠI ----------
@@ -90,17 +151,19 @@ function renderVendors() {
   render($('#tab-vendors'), html`
     <div class="card table-wrap">
       <table>
-        <thead><tr><th>Đối tác</th><th>Loại</th><th>Chủ tiệm</th><th>Tích Xanh</th><th></th></tr></thead>
+        <thead><tr><th>Đối tác</th><th>Loại</th><th>Chủ tiệm</th><th>Trạng thái</th><th>Tích Xanh</th><th></th></tr></thead>
         <tbody>
           ${data.vendors.map((v) => html`
             <tr data-vendor="${v.id}">
               <td><a href="vendor.html?slug=${v.slug}">${v.name}</a><div class="small muted">${v.district}</div></td>
               <td>${VENDOR_CATEGORY[v.category]}</td>
               <td>${v.owner?.full_name || html`<span class="muted">Chưa gắn</span>`}</td>
+              <td>${statusBadge(VENDOR_STATUS, v.status)}</td>
               <td>${v.is_verified ? badge('✓ Đã cấp', 'blue') : badge('Chưa')}</td>
               <td><div class="row">
-                <button class="btn btn-outline btn-sm" data-verify="${v.is_verified ? 'off' : 'on'}">
-                  ${v.is_verified ? 'Thu hồi' : 'Cấp Tích Xanh'}</button>
+                ${v.status === 'approved' ? html`
+                  <button class="btn btn-outline btn-sm" data-verify="${v.is_verified ? 'off' : 'on'}">
+                    ${v.is_verified ? 'Thu hồi' : 'Cấp Tích Xanh'}</button>` : ''}
                 <button class="btn btn-outline btn-sm" data-link-owner>Gắn chủ tiệm</button>
               </div></td>
             </tr>`)}
@@ -165,7 +228,7 @@ function initTabs() {
   for (const tab of $$('[data-tab]')) {
     tab.addEventListener('click', () => {
       for (const t of $$('[data-tab]')) t.classList.toggle('active', t === tab);
-      for (const name of ['disputes', 'vendors', 'bookings']) $(`#tab-${name}`).hidden = name !== tab.dataset.tab;
+      for (const name of ['approvals', 'disputes', 'vendors', 'bookings']) $(`#tab-${name}`).hidden = name !== tab.dataset.tab;
     });
   }
 }
@@ -175,4 +238,6 @@ await initLayout('admin');
 await requireAuth(['admin']);
 initTabs();
 await load();
-subscribeBookingChanges('admin-bookings', debounce(load, 500));
+const reload = debounce(load, 500);
+subscribeBookingChanges('admin-bookings', reload);
+subscribeVendorChanges('admin-vendors', reload);
