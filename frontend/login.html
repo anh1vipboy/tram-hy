@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập – Trạm Hỷ</title>
+  <link rel="icon" href="assets/images/logo.jpg">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/pages/login.js"></script>
+</head>
+<body>
+  <header id="app-header"></header>
+
+  <main class="container" style="max-width:480px">
+    <div class="card stack">
+      <h1 style="font-size:28px">Chào mừng đến Trạm Hỷ</h1>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="signin" type="button">Đăng nhập</button>
+        <button class="tab" data-tab="signup" type="button">Tạo tài khoản</button>
+      </div>
+
+      <form id="signin-form" class="stack">
+        <label class="field"><span>Email</span><input class="input" type="email" name="email" required autocomplete="email"></label>
+        <label class="field"><span>Mật khẩu</span><input class="input" type="password" name="password" required minlength="6" autocomplete="current-password"></label>
+        <button class="btn btn-primary btn-block" type="submit">Đăng nhập</button>
+      </form>
+
+      <form id="signup-form" class="stack" hidden>
+        <label class="field"><span>Bạn là</span>
+          <select class="input" name="role">
+            <option value="bride">Cô dâu / chú rể</option>
+            <option value="vendor">Đối tác (tiệm váy, studio, decor…)</option>
+          </select>
+        </label>
+        <label class="field"><span>Họ tên</span><input class="input" name="fullName" required maxlength="100" autocomplete="name"></label>
+        <label class="field"><span>Số điện thoại</span><input class="input" type="tel" name="phone" pattern="[0-9+ ]{9,15}" autocomplete="tel"></label>
+        <label class="field"><span>Email</span><input class="input" type="email" name="email" required autocomplete="email"></label>
+        <label class="field"><span>Mật khẩu (ít nhất 6 ký tự)</span><input class="input" type="password" name="password" required minlength="6" autocomplete="new-password"></label>
+        <button class="btn btn-primary btn-block" type="submit">Tạo tài khoản</button>
+        <p class="small muted">Tài khoản đối tác cần Trạm Hỷ xác minh và gắn với tiệm trước khi nhận đơn.</p>
+      </form>
+    </div>
+  </main>
+
+  <footer id="app-footer"></footer>
+</body>
+</html>

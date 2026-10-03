@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản trị – Trạm Hỷ</title>
+  <link rel="icon" href="assets/images/logo.jpg">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/pages/admin.js"></script>
+</head>
+<body>
+  <header id="app-header"></header>
+
+  <main class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Quản trị Trạm Hỷ</div>
+        <h1>Dòng tiền Escrow & đối tác</h1>
+      </div>
+    </div>
+    <div class="grid" id="stats" style="margin-bottom:24px"></div>
+
+    <div class="tabs" style="margin-bottom:16px">
+      <button class="tab active" data-tab="disputes" type="button">Khiếu nại</button>
+      <button class="tab" data-tab="vendors" type="button">Đối tác</button>
+      <button class="tab" data-tab="bookings" type="button">Tất cả đơn</button>
+    </div>
+    <section id="tab-disputes"></section>
+    <section id="tab-vendors" hidden></section>
+    <section id="tab-bookings" hidden></section>
+  </main>
+
+  <footer id="app-footer"></footer>
+</body>
+</html>

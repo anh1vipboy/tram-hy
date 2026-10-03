@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dịch vụ cưới – Trạm Hỷ</title>
+  <link rel="icon" href="assets/images/logo.jpg">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/pages/marketplace.js"></script>
+</head>
+<body>
+  <header id="app-header"></header>
+
+  <main class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Dịch vụ cưới</div>
+        <h1>Đối tác được Trạm Hỷ bảo chứng</h1>
+        <p>Mọi đơn đặt qua Trạm Hỷ đều thanh toán 3 đợt, tiền chỉ đến tay đối tác khi bạn nghiệm thu.</p>
+      </div>
+    </div>
+
+    <div class="card stack" style="margin-bottom:20px">
+      <div class="chips" id="category-filter"></div>
+      <div class="form-grid">
+        <label class="field"><span>Tìm theo tên hoặc khu vực</span>
+          <input class="input" id="search" type="search" placeholder="VD: Cầu Giấy, TuArt…"></label>
+        <label class="field"><span>Sắp xếp</span>
+          <select class="input" id="sort">
+            <option value="rating">Đánh giá cao nhất</option>
+            <option value="price-asc">Giá thấp → cao</option>
+            <option value="price-desc">Giá cao → thấp</option>
+          </select>
+        </label>
+        <label class="field"><span>Giá khởi điểm tối đa</span>
+          <select class="input" id="max-price">
+            <option value="">Không giới hạn</option>
+            <option value="5000000">Dưới 5 triệu</option>
+            <option value="20000000">Dưới 20 triệu</option>
+            <option value="50000000">Dưới 50 triệu</option>
+            <option value="150000000">Dưới 150 triệu</option>
+          </select>
+        </label>
+        <label class="row" style="align-self:end">
+          <input type="checkbox" id="verified-only"> Chỉ đối tác Tích Xanh ✓
+        </label>
+      </div>
+    </div>
+
+    <p class="muted small" id="result-count"></p>
+    <div class="grid" id="vendor-grid"><div class="empty">Đang tải đối tác…</div></div>
+  </main>
+
+  <footer id="app-footer"></footer>
+</body>
+</html>

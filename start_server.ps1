@@ -1,6 +1,6 @@
 $port = 8080
 $prefix = "http://localhost:$port/"
-$root = $PSScriptRoot
+$root = Join-Path $PSScriptRoot "frontend"
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add($prefix)
@@ -45,6 +45,7 @@ while ($listener.IsListening) {
                 ".gif"  { $mime = "image/gif" }
                 ".svg"  { $mime = "image/svg+xml" }
                 ".ico"  { $mime = "image/x-icon" }
+                ".webp" { $mime = "image/webp" }
             }
 
             $bytes = [System.IO.File]::ReadAllBytes($filePath)

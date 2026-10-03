@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phòng thử váy AI – Trạm Hỷ</title>
+  <link rel="icon" href="assets/images/logo.jpg">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/pages/tryon.js"></script>
+</head>
+<body class="has-sticky-cta">
+  <header id="app-header"></header>
+
+  <main class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Phòng thử váy AI</div>
+        <h1>Xem váy lên dáng của bạn</h1>
+      </div>
+    </div>
+
+    <div class="studio">
+      <!-- CỘT TRÁI: GƯƠNG THỬ -->
+      <section class="mirror" aria-label="Gương thử váy">
+        <div class="mirror-frame">
+          <img id="mirror-img" alt="Ảnh thử váy">
+          <span class="mirror-label" id="mirror-label"></span>
+          <div class="mirror-note" id="mirror-note" hidden></div>
+          <div class="mirror-scan" id="mirror-scan" hidden>AI đang ướm váy theo số đo của bạn…</div>
+        </div>
+        <div class="mirror-actions">
+          <button class="btn btn-outline btn-sm" id="toggle-original" type="button">Xem ảnh gốc</button>
+          <a class="btn btn-outline btn-sm" id="download-img" download>Tải ảnh</a>
+        </div>
+        <div class="fit-score">
+          <div class="score" id="fit-score">–</div>
+          <div>
+            <strong>Độ tôn dáng</strong>
+            <p id="fit-tip"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CỘT PHẢI: ĐIỀU KHIỂN -->
+      <div class="stack">
+        <section class="card stack">
+          <h3>1. Ảnh & số đo</h3>
+          <div class="models" id="models"></div>
+          <label class="btn btn-outline btn-sm" style="width:fit-content">
+            Tải ảnh toàn thân của bạn
+            <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp" hidden>
+          </label>
+          <label class="field"><span>Chiều cao: <strong id="height-value"></strong> cm</span>
+            <input type="range" id="height" min="140" max="185" value="160"></label>
+          <label class="field"><span>Cân nặng: <strong id="weight-value"></strong> kg</span>
+            <input type="range" id="weight" min="38" max="90" value="49"></label>
+          <label class="field"><span>Giày cưới</span>
+            <select class="input" id="heel">
+              <option value="0">Giày bệt</option>
+              <option value="5">Cao 5cm</option>
+              <option value="7" selected>Cao 7cm</option>
+              <option value="10">Cao 10cm</option>
+            </select>
+          </label>
+          <div class="field"><span>Dáng người</span><div class="chips" id="shapes"></div></div>
+          <p class="small muted" id="body-save-note"></p>
+        </section>
+
+        <section class="card stack">
+          <h3>2. Chọn váy</h3>
+          <div class="tabs">
+            <button class="tab active" data-mode="catalog" type="button">Mẫu có sẵn</button>
+            <button class="tab" data-mode="bespoke" type="button">Tự thiết kế may đo</button>
+          </div>
+
+          <div id="catalog-panel" class="stack">
+            <div class="chips" id="theme-filter"></div>
+            <div class="dress-list" id="dress-list"><div class="muted">Đang tải mẫu váy…</div></div>
+          </div>
+
+          <div id="bespoke-panel" class="stack" hidden>
+            <div id="bespoke-options" class="stack"></div>
+            <label class="field"><span>Độ dài đuôi váy: <strong id="train-value"></strong> m</span>
+              <input type="range" id="train" min="0.5" max="2.5" step="0.5" value="1"></label>
+            <div class="stack" id="bespoke-extras"></div>
+            <label class="field"><span>Mô tả thêm ý tưởng (không bắt buộc)</span>
+              <textarea class="input" id="bespoke-notes" maxlength="500" placeholder="VD: thêu tên hai vợ chồng ở gấu váy, ren hoa nhỏ ở lưng…"></textarea></label>
+          </div>
+        </section>
+
+        <section class="card stack">
+          <h3>3. Đặt lịch thử & giữ cọc</h3>
+          <div id="summary"></div>
+          <button class="btn btn-primary btn-block" id="book-btn" type="button">Đặt lịch thử váy</button>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="sticky-cta">
+    <div class="stack" style="gap:0;flex:1;min-width:0">
+      <strong id="cta-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></strong>
+      <span class="price" id="cta-price"></span>
+    </div>
+    <button class="btn btn-primary" id="cta-book" type="button">Đặt lịch</button>
+  </div>
+
+  <footer id="app-footer"></footer>
+</body>
+</html>

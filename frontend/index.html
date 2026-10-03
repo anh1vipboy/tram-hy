@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trạm Hỷ – Thử váy cưới AI & giữ cọc an toàn</title>
+  <link rel="icon" href="assets/images/logo.jpg">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/pages/home.js"></script>
+</head>
+<body>
+  <header id="app-header"></header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Nền tảng cưới hỏi công nghệ</div>
+        <h1>Thử váy cưới trên chính dáng của bạn – đặt lịch không lo mất cọc</h1>
+        <p class="lead">Chọn ảnh, nhập chiều cao cân nặng, xem váy lên dáng trong vài giây. Tiền cọc được Trạm Hỷ giữ và chỉ chuyển cho tiệm sau khi bạn hài lòng.</p>
+        <div class="row">
+          <a class="btn btn-primary" href="tryon.html">Thử váy miễn phí</a>
+          <a class="btn btn-outline" href="marketplace.html">Xem dịch vụ cưới</a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="assets/images/user_tryon_mermaid.jpg" alt="Cô dâu thử váy đuôi cá trên Trạm Hỷ">
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Cách hoạt động</div>
+          <h2>3 bước chọn váy an tâm</h2>
+        </div>
+      </div>
+      <div class="grid grid-3 steps">
+        <div class="card">
+          <h3>Thử váy trên dáng bạn</h3>
+          <p class="muted">Chọn ảnh mẫu hoặc ảnh của bạn, nhập số đo – stylist AI chấm điểm độ tôn dáng cho từng mẫu.</p>
+        </div>
+        <div class="card">
+          <h3>Thuê sẵn hoặc may đo</h3>
+          <p class="muted">Thuê váy từ tiệm uy tín, hoặc tự thiết kế phom, cổ, chất liệu để xưởng may riêng.</p>
+        </div>
+        <div class="card">
+          <h3>Cọc 3 đợt qua Trạm Hỷ</h3>
+          <p class="muted">Bạn trả theo từng đợt, Trạm Hỷ giữ tiền. Tiệm sai cam kết → bạn được hoàn tiền.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Bộ sưu tập</div>
+          <h2>Mẫu váy được thử nhiều</h2>
+        </div>
+        <a href="tryon.html">Xem tất cả mẫu →</a>
+      </div>
+      <div class="grid" id="featured-dresses"><div class="empty">Đang tải mẫu váy…</div></div>
+    </section>
+
+    <section class="section grid-2">
+      <div class="card">
+        <div class="eyebrow">Công cụ</div>
+        <h2>Gợi ý chia ngân sách cưới</h2>
+        <p class="muted">Nhập tổng ngân sách, Trạm Hỷ gợi ý mức chi cho từng hạng mục theo tỷ lệ phổ biến tại Hà Nội.</p>
+        <form id="budget-form" class="row">
+          <input class="input" id="budget-input" type="number" min="10000000" step="1000000" value="150000000" style="flex:1" aria-label="Tổng ngân sách (VNĐ)">
+          <button class="btn btn-primary" type="submit">Chia ngân sách</button>
+        </form>
+        <div id="budget-result" class="stack" style="margin-top:14px"></div>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Đối tác uy tín</div>
+        <h2>Được đánh giá cao nhất</h2>
+        <div id="top-vendors" class="stack"><div class="muted">Đang tải…</div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="app-footer"></footer>
+</body>
+</html>
