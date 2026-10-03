@@ -51,6 +51,7 @@ exe202/
 │   ├── 06_vendor_onboarding.sql  Đối tác đăng ký mở tiệm → admin duyệt
 │   ├── 07_vendor_media.sql   Ảnh thực tế (portfolio) của tiệm
 │   ├── 08_dress_photos.sql   Ảnh nhiều góc cho mẫu váy + sửa quyền đọc kho ảnh
+│   ├── 09_fix_storage_policies.sql  Sửa quyền tải ảnh của đối tác
 │   └── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │
 ├── docs/                     Báo cáo, kịch bản demo, góp ý mentor (.md, .docx)
@@ -174,7 +175,7 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 
 ### Lần đầu
 1. Supabase → **SQL Editor** → chạy lần lượt các file `backend/supabase/01` → `06` (mỗi file 1 query mới).
-   Project hiện tại đã chạy 01–07, chỉ còn **08_dress_photos.sql**.
+   Project hiện tại đã chạy 01–08, chỉ còn **09_fix_storage_policies.sql**.
 2. Supabase → **Authentication → Sign In / Providers → Email**: tắt *Confirm email* khi đang phát triển.
 3. Chạy web:
    ```powershell
