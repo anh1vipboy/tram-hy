@@ -1,5 +1,6 @@
 // Số đo cơ thể + ảnh riêng tư của cô dâu
 import { sb, unwrap } from '../core/supabase.js';
+import { compressImage } from '../core/image.js';
 
 export async function getBodyProfile(userId) {
   return unwrap(await sb.from('body_profiles').select('*').eq('user_id', userId).maybeSingle());
@@ -17,8 +18,8 @@ export async function saveBodyProfile(userId, body) {
 
 // Ảnh lưu trong bucket riêng tư bride-photos/<user_id>/... – chỉ chính chủ đọc được
 export async function uploadBridePhoto(userId, file) {
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-  const path = `${userId}/body-${Date.now()}.${ext}`;
-  unwrap(await sb.storage.from('bride-photos').upload(path, file, { contentType: file.type }));
+  const blob = await compressImage(file, { maxSize: 2000, quality: 0.9 });
+  const path = `${userId}/body-${Date.now()}.jpg`;
+  unwrap(await sb.storage.from('bride-photos').upload(path, blob, { contentType: 'image/jpeg' }));
   return path;
 }

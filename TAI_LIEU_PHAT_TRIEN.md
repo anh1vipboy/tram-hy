@@ -49,6 +49,7 @@ exe202/
 │   ├── 04_seed.sql           Dữ liệu mẫu: 31 đối tác, 10 mẫu váy
 │   ├── 05_reviews_admin.sql  Đánh giá, admin gắn chủ tiệm, dọn ảnh bìa
 │   ├── 06_vendor_onboarding.sql  Đối tác đăng ký mở tiệm → admin duyệt
+│   ├── 07_vendor_media.sql   Ảnh thực tế (portfolio) của tiệm
 │   └── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │
 ├── docs/                     Báo cáo, kịch bản demo, góp ý mentor (.md, .docx)
@@ -126,7 +127,7 @@ Nhánh phụ: `disputed` (đang khiếu nại), `cancelled`, `refunded`.
 
 ### 4.4 Storage & Realtime
 - `bride-photos` (riêng tư): ảnh cô dâu tải lên ở phòng thử, lưu theo thư mục `<user_id>/`, chỉ chính chủ đọc được.
-- `dress-images`, `vendor-portfolio` (công khai): để đối tác tải ảnh váy / portfolio (chưa có giao diện).
+- `dress-images`, `vendor-portfolio` (công khai): ảnh mẫu váy, ảnh bìa, ảnh thực tế do đối tác tải lên ở Kênh đối tác (ảnh được nén còn ~1600px trước khi tải). Bảng `vendor_photos` lưu danh sách ảnh thực tế, tối đa 20 ảnh/tiệm.
 - Realtime bật cho `bookings`, `milestones`, `disputes` → trang Đơn của tôi, Kênh đối tác, Quản trị tự cập nhật.
 
 ---
@@ -134,7 +135,7 @@ Nhánh phụ: `disputed` (đang khiếu nại), `cancelled`, `refunded`.
 ## 5. Frontend
 
 ### 5.1 Quy ước code
-1. **Không gọi Supabase trong `pages/`** – mọi truy vấn viết trong `services/` (1 chỗ để sửa khi đổi database).
+1. **Không gọi Supabase trong `pages/`** – mọi truy vấn viết trong `services/` (1 chỗ để sửa khi đổi database): `catalog.js` đọc dữ liệu công khai, `shop.js` thao tác của chủ tiệm, `bookings.js` đơn hàng & Escrow, `admin.js` quản trị.
 2. **Dựng HTML bằng `html\`...\``** (trong `core/utils.js`): tự escape dữ liệu, chống chèn mã độc (XSS) từ tên/ghi chú người dùng nhập.
 3. **Không dùng `localStorage`** cho dữ liệu nghiệp vụ. Phiên đăng nhập do supabase-js tự quản lý.
 4. Mỗi trang JS có phần `KHỞI CHẠY TRANG` ở cuối file; phần trên là hàm.
@@ -172,7 +173,7 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 
 ### Lần đầu
 1. Supabase → **SQL Editor** → chạy lần lượt các file `backend/supabase/01` → `06` (mỗi file 1 query mới).
-   Project hiện tại đã chạy 01–05, chỉ còn **06_vendor_onboarding.sql**.
+   Project hiện tại đã chạy 01–06, chỉ còn **07_vendor_media.sql**.
 2. Supabase → **Authentication → Sign In / Providers → Email**: tắt *Confirm email* khi đang phát triển.
 3. Chạy web:
    ```powershell
@@ -208,6 +209,7 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 2. Admin: **Quản trị → Duyệt đối tác** (có số hồ sơ chờ) → **Duyệt** hoặc **Từ chối** kèm lý do.
 3. Đối tác thấy kết quả ngay (realtime). Bị từ chối → sửa thông tin ngay trên trang → **Sửa & gửi duyệt lại**.
 4. Tiệm được duyệt mới hiện ở Dịch vụ cưới và nhận đơn. Tiệm có sẵn trong dữ liệu mẫu thì dùng nút **Gắn chủ tiệm** ở tab Đối tác.
+5. Kênh đối tác có 3 tab: **Đơn hàng** · **Mẫu váy** (tiệm váy cưới: thêm/sửa/ẩn/xóa mẫu, tải ảnh) · **Ảnh tiệm** (ảnh bìa + tối đa 20 ảnh thực tế, hiện ở trang chi tiết tiệm).
 
 ### Tạo tài khoản admin và đối tác
 1. Đăng ký 2 tài khoản trên web (trang Đăng nhập → Tạo tài khoản).
@@ -245,14 +247,19 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 
 | # | Việc | Nằm ở |
 |---|---|---|
-| 1 | Giao diện để đối tác **thêm/sửa mẫu váy, tải ảnh bìa** (bảng + bucket đã sẵn) | `frontend/` |
-| 2 | Kiểm thử đầy đủ trên điện thoại thật (bản Vercel) và sửa chi tiết giao diện còn vướng | `frontend/css` |
-| 3 | **Cổng thanh toán thật** (PayOS / SePay): Edge Function nhận webhook → gọi `pay_milestone` thay cho nút bấm tay | `backend/supabase/functions/` |
-| 4 | **AI thử váy thật** (fashn.ai): Edge Function giữ API key, nhận ảnh từ `bride-photos`, trả ảnh kết quả | `backend/supabase/functions/` |
-| 5 | **Tự xóa ảnh cô dâu sau 24 giờ** (cam kết bảo mật trong báo cáo): Scheduled Edge Function | `backend/supabase/functions/` |
-| 6 | Thông báo email / Zalo khi có đơn mới, khi được giải ngân | Edge Function |
+| ✅ | Đối tác tự quản lý mẫu váy, ảnh bìa, ảnh thực tế | Đã xong (SQL 07) |
+| 1 | **Chặn trùng lịch**: tiệm khai báo giờ làm việc, khách chỉ chọn được khung giờ còn trống | SQL + `frontend/` |
+| 2 | **Trang "Tài khoản của tôi"**: sửa tên/SĐT, xem số đo, **xóa ảnh đã tải** | `frontend/` |
+| 3 | **Thông báo email** khi có đơn mới, đã cọc, chờ nghiệm thu, khiếu nại được xử lý | Edge Function |
+| 4 | **Thanh toán thật** (PayOS): webhook xác nhận chuyển khoản → gọi `pay_milestone` | Edge Function |
+| 5 | **AI thử váy thật** (fashn.ai), giới hạn lượt miễn phí/tài khoản | Edge Function |
+| 6 | **Tự xóa ảnh cô dâu sau 24 giờ** (cam kết bảo mật trong báo cáo) | Scheduled Edge Function |
+| 7 | Đo lường hành vi (Vercel Analytics) để có số liệu cho báo cáo | `frontend/` |
+| 8 | Ảnh xem trước khi chia sẻ link thiệp / tiệm qua Zalo, Facebook | `frontend/` |
+| 9 | Tách project Supabase test và thật trước khi mời người dùng thật | Supabase |
+| 10 | Chống spam RSVP (giới hạn số lần gửi) | SQL |
 
-Các mục 3–6 là những việc **bắt buộc phải chạy ở server** (cần khóa bí mật hoặc chạy định kỳ). Khi làm sẽ tạo thư mục `backend/supabase/functions/`.
+Các mục dùng **Edge Function** là việc bắt buộc chạy ở server (cần khóa bí mật hoặc chạy định kỳ) – sẽ nằm trong `backend/supabase/functions/`.
 
 ---
 

@@ -2,7 +2,7 @@ import { initLayout } from '../core/layout.js';
 import { $, html, render, money, param, date } from '../core/utils.js';
 import { badge, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
-import { getVendorBySlug, listDresses, listReviews } from '../services/catalog.js';
+import { getVendorBySlug, listDresses, listReviews, listVendorPhotos } from '../services/catalog.js';
 import { dressThumb } from '../data/tryon-data.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
 
@@ -17,18 +17,19 @@ try {
     render(page, html`<div class="empty">Không tìm thấy đối tác. <a href="marketplace.html">Quay lại danh sách</a></div>`);
   } else {
     document.title = `${vendor.name} – Trạm Hỷ`;
-    const [dresses, reviews] = await Promise.all([
+    const [dresses, reviews, photos] = await Promise.all([
       vendor.category === 'bridal' ? listDresses({ vendorId: vendor.id }) : [],
       listReviews(vendor.id),
+      listVendorPhotos(vendor.id),
     ]);
-    renderPage(vendor, dresses, reviews);
+    renderPage(vendor, dresses, reviews, photos);
   }
 } catch (error) {
   render(page, html`<div class="empty">Không tải được thông tin đối tác.</div>`);
   toastError(error);
 }
 
-function renderPage(vendor, dresses, reviews) {
+function renderPage(vendor, dresses, reviews, photos) {
   const isBridal = vendor.category === 'bridal';
   render(page, html`
     <a href="marketplace.html" class="small">← Dịch vụ cưới</a>
@@ -47,6 +48,14 @@ function renderPage(vendor, dresses, reviews) {
       </div>
       ${vendor.status !== 'approved' ? '' : isBridal ? bridalBox(vendor) : serviceBox(vendor)}
     </div>
+
+    ${photos.length ? html`
+      <section class="section" style="margin-top:32px">
+        <h2>Ảnh thực tế</h2>
+        <p class="muted small">Ảnh do tiệm chụp và đăng – bấm để xem ảnh lớn.</p>
+        <div class="photo-grid">${photos.map((p) => html`
+          <a class="photo" href="${p.url}" target="_blank" rel="noopener"><img src="${p.url}" alt="" loading="lazy"></a>`)}</div>
+      </section>` : ''}
 
     ${isBridal ? html`
       <section class="section" style="margin-top:32px">

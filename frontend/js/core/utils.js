@@ -68,3 +68,11 @@ export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export function initials(name) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
 }
+
+// "Váy Cưới Hà Nội" → "vay-cuoi-ha-noi" (dùng làm đường dẫn)
+export function slugify(text) {
+  return text.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+export const randomSuffix = () => Math.random().toString(36).slice(2, 7);

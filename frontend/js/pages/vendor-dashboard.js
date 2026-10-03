@@ -1,15 +1,16 @@
 import { initLayout } from '../core/layout.js';
 import { requireAuth } from '../core/auth.js';
-import { $, html, render, money, dateTime, debounce } from '../core/utils.js';
+import { $, $$, html, render, money, dateTime, debounce } from '../core/utils.js';
 import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_STATUS, statusBadge } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
-import {
-  listMyShops, registerVendor, updateMyShop, resubmitVendor, subscribeVendorChanges,
-} from '../services/catalog.js';
+import { subscribeVendorChanges } from '../services/catalog.js';
+import { listMyShops, registerVendor, updateMyShop, resubmitVendor } from '../services/shop.js';
 import { listVendorBookings, vendorSetStatus, openDispute, subscribeBookingChanges } from '../services/bookings.js';
 import { milestonesView, detailsView, openDisputeView } from '../components/booking-card.js';
 import { shopFields, readShopForm } from '../components/shop-form.js';
+import { mountDressManager } from '../components/dress-manager.js';
+import { mountShopMedia } from '../components/shop-media.js';
 
 const COLUMNS = [
   { title: 'Chờ khách đặt cọc', statuses: ['pending'] },
@@ -22,6 +23,9 @@ let profile = null;
 let shops = [];
 let bookings = [];
 let unsubscribeBookings = null;
+let activePanel = 'orders';
+let managedShopId = null;    // tiệm đang quản lý mẫu váy / ảnh (khi tài khoản có nhiều tiệm)
+let mountedPanels = {};     // { dresses: shopId, media: shopId } – tab đã vẽ cho tiệm nào
 
 async function load() {
   try {
@@ -143,16 +147,64 @@ async function refreshShops() {
     toastError(error);
     return;
   }
-  const approved = shops.filter((s) => s.status === 'approved');
+  const approved = approvedShops();
   $('#shop-name').textContent = approved.length ? approved.map((s) => s.name).join(', ') : 'Mở tiệm trên Trạm Hỷ';
   renderShopStatus();
+  renderWorkspace();
 
   if (approved.length) {
     await load();
     unsubscribeBookings ??= subscribeBookingChanges('vendor-bookings', debounce(load, 300));
-  } else {
-    render($('#stats'), '');
-    render($('#board'), '');
+  }
+}
+
+// ---------- KHU LÀM VIỆC: Đơn hàng | Mẫu váy | Ảnh tiệm ----------
+// Tab Mẫu váy / Ảnh tiệm chỉ vẽ khi mở lần đầu (hoặc khi đổi tiệm), để realtime cập nhật đơn
+// không làm mất thao tác đang dở ở các tab đó.
+const approvedShops = () => shops.filter((s) => s.status === 'approved');
+const managedShop = () => approvedShops().find((s) => s.id === managedShopId);
+
+function initWorkspace() {
+  $$('[data-panel]').forEach((tab) => tab.addEventListener('click', () => showPanel(tab.dataset.panel)));
+  $('#shop-select').addEventListener('change', (e) => {
+    managedShopId = e.target.value;
+    mountedPanels = {};
+    renderWorkspace();
+  });
+}
+
+function renderWorkspace() {
+  const approved = approvedShops();
+  $('#workspace').hidden = !approved.length;
+  if (!approved.length) return;
+
+  if (!managedShop()) {
+    managedShopId = approved[0].id;
+    mountedPanels = {};
+  }
+  const select = $('#shop-select');
+  select.hidden = approved.length < 2;
+  render(select, approved.map((s) => html`<option value="${s.id}" ${s.id === managedShopId ? 'selected' : ''}>${s.name}</option>`));
+
+  // Chỉ tiệm váy cưới mới đăng mẫu váy
+  $('#tab-dresses').hidden = managedShop().category !== 'bridal';
+  if (activePanel === 'dresses' && $('#tab-dresses').hidden) activePanel = 'orders';
+  showPanel(activePanel);
+}
+
+function showPanel(name) {
+  activePanel = name;
+  $$('[data-panel]').forEach((t) => t.classList.toggle('active', t.dataset.panel === name));
+  for (const panel of ['orders', 'dresses', 'media']) $(`#panel-${panel}`).hidden = panel !== name;
+
+  const shop = managedShop();
+  if (name === 'dresses' && mountedPanels.dresses !== shop.id) {
+    mountedPanels.dresses = shop.id;
+    mountDressManager($('#panel-dresses'), shop);
+  }
+  if (name === 'media' && mountedPanels.media !== shop.id) {
+    mountedPanels.media = shop.id;
+    mountShopMedia($('#panel-media'), shop);
   }
 }
 
@@ -230,5 +282,6 @@ async function editShop(shop) {
 // ---------- KHỞI CHẠY TRANG ----------
 await initLayout('vendor');
 profile = await requireAuth(['vendor']);
+initWorkspace();
 await refreshShops();
 subscribeVendorChanges('vendor-shops', debounce(refreshShops, 300));
