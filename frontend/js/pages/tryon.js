@@ -115,7 +115,7 @@ async function onPhotoSelected(e) {
   state.customPhotoUrl = URL.createObjectURL(file);
   state.model = { key: 'custom', name: 'Ảnh của bạn', photo: state.customPhotoUrl };
   renderModels();
-  tryOn();
+  tryOn({ reveal: true });
 
   if (state.profile) {
     try {
@@ -127,10 +127,14 @@ async function onPhotoSelected(e) {
   }
 }
 
-// Hiệu ứng AI xử lý ngắn rồi hiện kết quả
-async function tryOn() {
+const isPhoneLayout = () => matchMedia('(max-width: 900px)').matches;
+
+// Hiệu ứng AI xử lý ngắn rồi hiện kết quả.
+// reveal: trên điện thoại gương nằm ở đầu trang → cuộn lên để người dùng thấy kết quả vừa chọn.
+async function tryOn({ reveal = false } = {}) {
   state.showOriginal = false;
   renderAll();
+  if (reveal && isPhoneLayout()) $('.mirror').scrollIntoView({ behavior: 'smooth', block: 'start' });
   const scan = $('#mirror-scan');
   scan.hidden = false;
   await sleep(900);
@@ -240,7 +244,7 @@ function renderModels() {
   for (const btn of $$('[data-model]')) {
     btn.addEventListener('click', () => {
       state.model = models.find((m) => m.key === btn.dataset.model);
-      tryOn();
+      tryOn({ reveal: true });
     });
   }
 }
@@ -299,7 +303,7 @@ function renderDressList() {
     btn.addEventListener('click', () => {
       state.dress = state.dresses.find((d) => d.id === btn.dataset.dress);
       history.replaceState(null, '', `?dress=${state.dress.slug}`);
-      tryOn();
+      tryOn({ reveal: true });
     });
   }
 }
@@ -318,7 +322,7 @@ function renderBespoke() {
   for (const chip of $$('[data-group]')) {
     chip.addEventListener('click', () => {
       state.bespoke[chip.dataset.group] = chip.dataset.choice;
-      if (chip.dataset.group === 'silhouette') tryOn();
+      if (chip.dataset.group === 'silhouette') tryOn({ reveal: true });
       else { renderBespoke(); renderSummary(); }
     });
   }

@@ -175,6 +175,24 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
    ```
    Mở **http://localhost:8080**. (Phải chạy qua server, không mở file trực tiếp vì ES modules không chạy với `file://`.)
 
+### Đưa lên mạng (Vercel) – dùng cùng database với local
+1. Vercel → Project → **Settings → Build and Deployment**: Framework Preset `Other`, **Root Directory** `frontend`, các lệnh Build/Output/Install để mặc định (tắt Override) → Save.
+2. Push code lên nhánh `main` trên GitHub → Vercel tự deploy (~30 giây).
+3. Supabase → **Authentication → URL Configuration**:
+   - **Site URL**: tên miền Vercel, vd `https://tram-hy.vercel.app`
+   - **Redirect URLs**: thêm `https://tram-hy.vercel.app/**` và `http://localhost:8080/**`
+
+### Xác nhận email (bật *Confirm email* trong Supabase)
+- Link trong email quay về `login.html?confirmed=1` **trên đúng web nơi người dùng đăng ký** → hiện "Xác nhận tài khoản thành công!" và tự đăng nhập, kể cả khi bấm link trên điện thoại khác thiết bị đăng ký (client dùng `flowType: 'implicit'`).
+- Link hết hạn / đã dùng → trang báo rõ lý do.
+- Đăng ký ở `localhost` thì link chỉ mở được trên chính máy tính đó. Muốn bấm link trên điện thoại → đăng ký trên bản Vercel.
+- Địa chỉ quay về phải có trong *Redirect URLs*, nếu không Supabase sẽ dùng *Site URL*.
+
+### Giao diện điện thoại
+- Mọi trang 1 cột dưới 900px; danh sách váy/đối tác 2 cột dưới 560px; Kanban xếp dọc.
+- Phòng thử: nút "Đặt lịch" dính đáy màn hình; chọn váy xong tự cuộn lên gương xem kết quả.
+- Ô nhập cỡ chữ 16px để iPhone không tự phóng to khi bấm vào.
+
 ### Tạo tài khoản admin và đối tác
 1. Đăng ký 2 tài khoản trên web (trang Đăng nhập → Tạo tài khoản).
 2. Supabase → SQL Editor, chạy (thay email):
@@ -212,7 +230,7 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 | # | Việc | Nằm ở |
 |---|---|---|
 | 1 | Giao diện để đối tác **thêm/sửa mẫu váy, tải ảnh bìa** (bảng + bucket đã sẵn) | `frontend/` |
-| 2 | **Đưa web lên mạng**: Netlify / Vercel / GitHub Pages (kéo thả thư mục `frontend/`). Sau đó sửa *Site URL* trong Supabase Auth | Hosting |
+| 2 | Kiểm thử đầy đủ trên điện thoại thật (bản Vercel) và sửa chi tiết giao diện còn vướng | `frontend/css` |
 | 3 | **Cổng thanh toán thật** (PayOS / SePay): Edge Function nhận webhook → gọi `pay_milestone` thay cho nút bấm tay | `backend/supabase/functions/` |
 | 4 | **AI thử váy thật** (fashn.ai): Edge Function giữ API key, nhận ảnh từ `bride-photos`, trả ảnh kết quả | `backend/supabase/functions/` |
 | 5 | **Tự xóa ảnh cô dâu sau 24 giờ** (cam kết bảo mật trong báo cáo): Scheduled Edge Function | `backend/supabase/functions/` |

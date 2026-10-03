@@ -225,20 +225,47 @@ dialog.modal::backdrop { background: rgba(30, 24, 20, .55); }
 .swatch { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--line); cursor: pointer; }
 .swatch.active { border-color: var(--ink); box-shadow: 0 0 0 2px #fff inset; }
 
+/* Thông báo nổi bật trong trang (vd: xác nhận email thành công) */
+.notice { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--gold-soft); }
+.notice-success { background: var(--green-soft); border-color: #b9dfc9; color: var(--green); }
+.notice-error { background: var(--red-soft); border-color: #efc2bd; color: var(--red); }
+.notice strong { display: block; font-size: 16px; margin-bottom: 2px; }
+
 /* ---------- 8. RESPONSIVE ---------- */
 @media (max-width: 900px) {
-  .hero, .studio, .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  .hero { padding: 20px; }
-  .mirror { position: static; }
-  .milestones { grid-template-columns: 1fr; }
-  .site-header .container { flex-wrap: wrap; gap: 8px; padding-block: 8px; }
-  .nav { order: 3; flex-basis: 100%; }
+  /* minmax(0, 1fr) thay vì 1fr: không cho nội dung bên trong (dải ảnh, chip) kéo cột rộng hơn màn hình */
+  .hero, .studio, .grid-2, .grid-3, .kanban { grid-template-columns: minmax(0, 1fr); }
+  .kanban { overflow-x: visible; }
+  .hero { padding: 20px; gap: 20px; }
+  .hero-image { max-height: 420px; }
+  .mirror { position: static; padding: 10px; }
+  .mirror-frame { max-height: 72vh; }
+  .milestones { grid-template-columns: minmax(0, 1fr); }
+  .site-header .container { flex-wrap: wrap; gap: 6px; padding-block: 8px; }
+  .nav { order: 3; flex-basis: 100%; margin-inline: -16px; padding-inline: 12px; }
   .brand { flex: 1; }
+  .section { margin-bottom: 36px; }
   /* Nút đặt lịch dính đáy màn hình trên điện thoại */
-  .sticky-cta { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; gap: 10px; align-items: center; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: #fff; border-top: 1px solid var(--line); }
-  body.has-sticky-cta { padding-bottom: 76px; }
+  .sticky-cta { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; gap: 10px; align-items: center; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: #fff; border-top: 1px solid var(--line); box-shadow: 0 -4px 16px rgba(42, 36, 33, .06); }
+  body.has-sticky-cta { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+  body.has-sticky-cta .toast-host { bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
 }
 @media (max-width: 560px) {
-  .form-grid { grid-template-columns: 1fr; }
+  main.container { padding-block: 18px 40px; }
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
   .card { padding: 14px; }
+  .user-name { display: none; }
+  .section-head { align-items: flex-start; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .grid.grid-3 { grid-template-columns: minmax(0, 1fr); }
+  .item-card .body { padding: 10px 12px 12px; }
+  .item-card h3 { font-size: 15px; }
+  /* iPhone tự phóng to khi bấm vào ô nhập có chữ nhỏ hơn 16px */
+  .input, select.input, textarea.input { font-size: 16px; }
+  .btn { padding: 10px 16px; }
+  dialog.modal { width: calc(100% - 20px); max-height: calc(100% - 20px); }
+  .modal-body { max-height: 60vh; }
+  .modal-foot .btn { flex: 1; }
+  .invite-card { padding: 24px 16px; }
+  .invite-card .names { font-size: 24px; }
 }

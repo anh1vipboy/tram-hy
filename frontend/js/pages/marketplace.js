@@ -15,12 +15,12 @@ let vendors = [];
 
 initLayout('marketplace');
 bindFilters();
+renderCategories();
 try {
   vendors = await listVendors();
 } catch (error) {
   toastError(error);
 }
-renderCategories();
 renderVendors();
 
 function bindFilters() {

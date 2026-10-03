@@ -58,8 +58,9 @@ export async function signUp({ email, password, fullName, phone, role }) {
     password,
     options: {
       data: { full_name: fullName, phone, role },
-      // Link xác nhận trong email quay về đúng web nơi người dùng đăng ký (localhost hoặc tên miền thật)
-      emailRedirectTo: new URL('login.html', location.href).href,
+      // Link xác nhận trong email quay về đúng web nơi người dùng đăng ký (localhost hoặc tên miền thật).
+      // Địa chỉ này phải nằm trong Authentication → URL Configuration → Redirect URLs của Supabase.
+      emailRedirectTo: new URL('login.html?confirmed=1', location.href).href,
     },
   }));
   return { needsEmailConfirm: !data.session };
