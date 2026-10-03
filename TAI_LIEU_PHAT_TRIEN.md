@@ -193,6 +193,11 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 - Phòng thử: nút "Đặt lịch" dính đáy màn hình; chọn váy xong tự cuộn lên gương xem kết quả.
 - Ô nhập cỡ chữ 16px để iPhone không tự phóng to khi bấm vào.
 
+### Xóa tài khoản test
+- Chưa có đơn: Supabase → Authentication → Users → ⋯ → Delete user.
+- Đã có đơn (báo *Database error deleting user*): chạy [`backend/supabase/tools/xoa_tai_khoan_test.sql`](backend/supabase/tools/xoa_tai_khoan_test.sql) sau khi sửa danh sách email.
+- Mẹo: dùng `ten+test1@gmail.com`, `ten+test2@gmail.com`… – mỗi địa chỉ là 1 tài khoản riêng nhưng thư về cùng hộp Gmail.
+
 ### Tạo tài khoản admin và đối tác
 1. Đăng ký 2 tài khoản trên web (trang Đăng nhập → Tạo tài khoản).
 2. Supabase → SQL Editor, chạy (thay email):
