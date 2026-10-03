@@ -2,7 +2,8 @@
 import { sb, unwrap } from '../core/supabase.js';
 
 export const VENDOR_FIELDS = 'id, slug, name, category, district, address, phone, base_price, rating, review_count, is_verified, cover_url, description, status, review_note, created_at';
-const DRESS_FIELDS = 'id, slug, name, type, theme, price, original_price, image_url, tryon_slug, vendor:vendors(id, slug, name, district, is_verified)';
+// photos: số ảnh các góc (để hiện nhãn "N ảnh" và nút xem ảnh)
+const DRESS_FIELDS = 'id, slug, name, type, theme, price, original_price, image_url, tryon_slug, photos:dress_photos(count), vendor:vendors(id, slug, name, district, is_verified)';
 
 // Chỉ tiệm đã được duyệt (admin/chủ tiệm đọc được cả tiệm chờ duyệt nên phải lọc rõ)
 export async function listVendors() {
@@ -40,4 +41,10 @@ export function subscribeVendorChanges(channelName, onChange) {
 export async function listVendorPhotos(vendorId) {
   return unwrap(await sb.from('vendor_photos').select('id, path, url, created_at')
     .eq('vendor_id', vendorId).order('created_at'));
+}
+
+// Ảnh các góc của một mẫu váy (ảnh chính nằm ở dresses.image_url)
+export async function listDressPhotos(dressId) {
+  return unwrap(await sb.from('dress_photos').select('id, url, created_at')
+    .eq('dress_id', dressId).order('created_at'));
 }

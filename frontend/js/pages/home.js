@@ -3,7 +3,7 @@ import { $, html, render, money } from '../core/utils.js';
 import { badge, DRESS_THEME, VENDOR_CATEGORY } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
 import { listDresses, listVendors } from '../services/catalog.js';
-import { dressThumb } from '../data/tryon-data.js';
+import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
 
 // Tỷ lệ chia ngân sách cưới phổ biến (category khớp bảng vendors)
 const BUDGET_SPLIT = [
@@ -29,7 +29,7 @@ async function loadFeaturedDresses() {
     const dresses = await listDresses({ limit: 4 });
     render(container, dresses.map((dress) => html`
       <article class="card item-card">
-        <img class="thumb" src="${dressThumb(dress)}" alt="${dress.name}" loading="lazy">
+        ${dressThumbButton(dress)}
         <div class="body">
           <div class="row">${badge(DRESS_THEME[dress.theme] ?? dress.theme, 'gold')}
             ${dress.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê sẵn')}</div>
@@ -39,6 +39,7 @@ async function loadFeaturedDresses() {
           <a class="btn btn-primary btn-sm" href="tryon.html?dress=${dress.slug}">Thử váy này</a>
         </div>
       </article>`));
+    bindDressGalleries(container, dresses);
   } catch (error) {
     render(container, html`<div class="empty">Không tải được mẫu váy.</div>`);
     toastError(error);

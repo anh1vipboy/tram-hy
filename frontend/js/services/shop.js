@@ -92,14 +92,30 @@ export async function deletePortfolioPhoto(photo) {
 // ---------- MẪU VÁY ----------
 
 // Gồm cả mẫu đã ẩn (chủ tiệm được xem hết)
+export const MAX_DRESS_ANGLE_PHOTOS = 10;
+
+// Gồm cả mẫu đã ẩn, kèm ảnh các góc
 export async function listShopDresses(vendorId) {
-  return unwrap(await sb.from('dresses')
-    .select('id, slug, name, type, theme, price, original_price, image_url, is_active, created_at')
+  const dresses = unwrap(await sb.from('dresses')
+    .select('id, slug, name, type, theme, price, original_price, image_url, is_active, created_at, photos:dress_photos(id, path, url, created_at)')
     .eq('vendor_id', vendorId).order('created_at', { ascending: false }));
+  for (const d of dresses) d.photos.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  return dresses;
 }
 
-/** dress = null → thêm mới. values: { name, type, theme, price, originalPrice, imageFile } */
+/**
+ * dress = null → thêm mới.
+ * values: { name, type, theme, price, originalPrice,
+ *           imageFile      – ảnh chính (hiện ở ngoài danh sách), có thể bỏ trống
+ *           angleFiles     – ảnh các góc thêm mới
+ *           removePhotoIds – id ảnh góc cũ cần xóa }
+ */
 export async function saveDress(vendorId, dress, values) {
+  const keptCount = (dress?.photos.length ?? 0) - values.removePhotoIds.length;
+  if (keptCount + values.angleFiles.length > MAX_DRESS_ANGLE_PHOTOS) {
+    throw new Error(`Mỗi mẫu váy tối đa ${MAX_DRESS_ANGLE_PHOTOS} ảnh các góc`);
+  }
+
   const row = {
     name: values.name,
     type: values.type,
@@ -107,15 +123,32 @@ export async function saveDress(vendorId, dress, values) {
     price: values.price,
     original_price: values.originalPrice || null,
   };
-  const hasNewImage = values.imageFile?.size > 0;
-  if (hasNewImage) row.image_url = (await uploadImage('dress-images', vendorId, values.imageFile, 'dress')).url;
+  const hasNewCover = values.imageFile?.size > 0;
+  if (hasNewCover) row.image_url = (await uploadImage('dress-images', vendorId, values.imageFile, 'dress')).url;
 
-  const query = dress
-    ? sb.from('dresses').update(row).eq('id', dress.id)
-    : sb.from('dresses').insert({ ...row, vendor_id: vendorId, slug: `${slugify(values.name)}-${randomSuffix()}` });
-  unwrap(await query);
+  let dressId = dress?.id;
+  if (dress) {
+    unwrap(await sb.from('dresses').update(row).eq('id', dress.id));
+  } else {
+    const slug = `${slugify(values.name)}-${randomSuffix()}`;
+    dressId = unwrap(await sb.from('dresses').insert({ ...row, vendor_id: vendorId, slug }).select('id').single()).id;
+  }
 
-  if (hasNewImage && dress?.image_url) await removeImage('dress-images', dress.image_url);
+  for (const file of values.angleFiles) {
+    const { path, url } = await uploadImage('dress-images', vendorId, file, 'angle');
+    const { error } = await sb.from('dress_photos').insert({ dress_id: dressId, path, url });
+    if (error) {
+      await sb.storage.from('dress-images').remove([path]);
+      throw new Error(error.message);
+    }
+  }
+
+  const removed = dress?.photos.filter((p) => values.removePhotoIds.includes(p.id)) ?? [];
+  if (removed.length) {
+    unwrap(await sb.from('dress_photos').delete().in('id', removed.map((p) => p.id)));
+    await sb.storage.from('dress-images').remove(removed.map((p) => p.path));
+  }
+  if (hasNewCover && dress?.image_url) await removeImage('dress-images', dress.image_url);
 }
 
 export async function setDressActive(dressId, active) {
@@ -129,5 +162,7 @@ export async function deleteDress(dress) {
       ? 'Mẫu này đã có khách đặt nên không xóa được – hãy bấm "Ẩn" để ngừng bán'
       : error.message);
   }
-  await removeImage('dress-images', dress.image_url);
+  // Dòng ảnh góc tự xóa theo mẫu váy (on delete cascade), còn file trong kho phải xóa tay
+  const paths = [pathFromUrl('dress-images', dress.image_url), ...dress.photos.map((p) => p.path)].filter(Boolean);
+  if (paths.length) await sb.storage.from('dress-images').remove(paths);
 }

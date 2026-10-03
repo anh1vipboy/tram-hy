@@ -50,6 +50,7 @@ exe202/
 │   ├── 05_reviews_admin.sql  Đánh giá, admin gắn chủ tiệm, dọn ảnh bìa
 │   ├── 06_vendor_onboarding.sql  Đối tác đăng ký mở tiệm → admin duyệt
 │   ├── 07_vendor_media.sql   Ảnh thực tế (portfolio) của tiệm
+│   ├── 08_dress_photos.sql   Ảnh nhiều góc cho mẫu váy + sửa quyền đọc kho ảnh
 │   └── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │
 ├── docs/                     Báo cáo, kịch bản demo, góp ý mentor (.md, .docx)
@@ -127,7 +128,7 @@ Nhánh phụ: `disputed` (đang khiếu nại), `cancelled`, `refunded`.
 
 ### 4.4 Storage & Realtime
 - `bride-photos` (riêng tư): ảnh cô dâu tải lên ở phòng thử, lưu theo thư mục `<user_id>/`, chỉ chính chủ đọc được.
-- `dress-images`, `vendor-portfolio` (công khai): ảnh mẫu váy, ảnh bìa, ảnh thực tế do đối tác tải lên ở Kênh đối tác (ảnh được nén còn ~1600px trước khi tải). Bảng `vendor_photos` lưu danh sách ảnh thực tế, tối đa 20 ảnh/tiệm.
+- `dress-images`, `vendor-portfolio` (công khai): ảnh mẫu váy, ảnh bìa, ảnh thực tế do đối tác tải lên ở Kênh đối tác (ảnh được nén còn ~1600px trước khi tải). Bảng `vendor_photos` lưu ảnh thực tế (tối đa 20 ảnh/tiệm), bảng `dress_photos` lưu ảnh các góc của mẫu váy (tối đa 10 ảnh/mẫu; ảnh chính vẫn là `dresses.image_url`). Hai kho này cần cả quyền đọc (SELECT) thì Storage mới ghi/xóa được – xem 08.
 - Realtime bật cho `bookings`, `milestones`, `disputes` → trang Đơn của tôi, Kênh đối tác, Quản trị tự cập nhật.
 
 ---
@@ -173,7 +174,7 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 
 ### Lần đầu
 1. Supabase → **SQL Editor** → chạy lần lượt các file `backend/supabase/01` → `06` (mỗi file 1 query mới).
-   Project hiện tại đã chạy 01–06, chỉ còn **07_vendor_media.sql**.
+   Project hiện tại đã chạy 01–07, chỉ còn **08_dress_photos.sql**.
 2. Supabase → **Authentication → Sign In / Providers → Email**: tắt *Confirm email* khi đang phát triển.
 3. Chạy web:
    ```powershell
@@ -209,7 +210,7 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 2. Admin: **Quản trị → Duyệt đối tác** (có số hồ sơ chờ) → **Duyệt** hoặc **Từ chối** kèm lý do.
 3. Đối tác thấy kết quả ngay (realtime). Bị từ chối → sửa thông tin ngay trên trang → **Sửa & gửi duyệt lại**.
 4. Tiệm được duyệt mới hiện ở Dịch vụ cưới và nhận đơn. Tiệm có sẵn trong dữ liệu mẫu thì dùng nút **Gắn chủ tiệm** ở tab Đối tác.
-5. Kênh đối tác có 3 tab: **Đơn hàng** · **Mẫu váy** (tiệm váy cưới: thêm/sửa/ẩn/xóa mẫu, tải ảnh) · **Ảnh tiệm** (ảnh bìa + tối đa 20 ảnh thực tế, hiện ở trang chi tiết tiệm).
+5. Kênh đối tác có 3 tab: **Đơn hàng** · **Mẫu váy** (tiệm váy cưới: thêm/sửa/ẩn/xóa mẫu; 1 ảnh chính + tối đa 10 ảnh các góc, khách bấm vào ảnh để xem từng góc) · **Ảnh tiệm** (ảnh bìa + tối đa 20 ảnh thực tế, hiện ở trang chi tiết tiệm).
 
 ### Tạo tài khoản admin và đối tác
 1. Đăng ký 2 tài khoản trên web (trang Đăng nhập → Tạo tài khoản).

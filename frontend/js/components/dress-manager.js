@@ -2,8 +2,8 @@
 import { html, render, money } from '../core/utils.js';
 import { badge, DRESS_THEME } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
-import { listShopDresses, saveDress, setDressActive, deleteDress } from '../services/shop.js';
-import { dressThumb } from '../data/tryon-data.js';
+import { listShopDresses, saveDress, setDressActive, deleteDress, MAX_DRESS_ANGLE_PHOTOS } from '../services/shop.js';
+import { dressThumbButton, bindDressGalleries } from './dress-gallery.js';
 
 export async function mountDressManager(container, shop) {
   let dresses = [];
@@ -31,6 +31,7 @@ export async function mountDressManager(container, shop) {
         : html`<div class="empty">Tiệm chưa có mẫu váy nào. Bấm "Thêm mẫu váy" để đăng mẫu đầu tiên.</div>`}`);
 
     container.querySelector('[data-add]').addEventListener('click', () => edit(null));
+    bindDressGalleries(container, dresses);
     container.querySelectorAll('[data-dress]').forEach((el) => {
       const dress = dresses.find((d) => d.id === el.dataset.dress);
       el.querySelector('[data-edit]').addEventListener('click', () => edit(dress));
@@ -51,14 +52,14 @@ export async function mountDressManager(container, shop) {
   function dressCard(d) {
     return html`
       <article class="card item-card" data-dress="${d.id}" style="${d.is_active ? '' : 'opacity:.6'}">
-        <img class="thumb" src="${dressThumb(d)}" alt="${d.name}" loading="lazy">
+        ${dressThumbButton(d)}
         <div class="body">
           <div class="row">${badge(DRESS_THEME[d.theme] ?? d.theme, 'gold')}
             ${d.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê')}
             ${d.is_active ? badge('Đang bán', 'green') : badge('Đã ẩn')}</div>
           <h3>${d.name}</h3>
           <div class="price">${money(d.price)}</div>
-          ${d.image_url ? '' : html`<div class="small muted">Chưa có ảnh thật – đang dùng ảnh minh họa</div>`}
+          ${d.image_url ? '' : html`<div class="small muted">Chưa có ảnh chính – đang dùng ảnh minh họa</div>`}
           <div class="row">
             <button class="btn btn-outline btn-sm" type="button" data-edit>Sửa</button>
             <button class="btn btn-outline btn-sm" type="button" data-toggle>${d.is_active ? 'Ẩn' : 'Mở bán'}</button>
@@ -69,6 +70,7 @@ export async function mountDressManager(container, shop) {
   }
 
   async function edit(dress) {
+    const removePhotoIds = new Set();
     const done = await openDialog({
       title: dress ? 'Sửa mẫu váy' : 'Thêm mẫu váy',
       confirmText: dress ? 'Lưu' : 'Thêm mẫu',
@@ -90,10 +92,37 @@ export async function mountDressManager(container, shop) {
             <input class="input" type="number" name="price" value="${dress?.price || ''}" required min="100000" step="50000"></label>
           <label class="field"><span>Giá gốc trước giảm (không bắt buộc)</span>
             <input class="input" type="number" name="originalPrice" value="${dress?.original_price || ''}" min="0" step="50000"></label>
-          <label class="field full"><span>Ảnh mẫu váy ${dress?.image_url ? '(chọn ảnh mới để thay)' : ''}</span>
-            <input class="input" type="file" name="image" accept="image/*"></label>
-          ${dress?.image_url ? html`<img src="${dress.image_url}" alt="" class="full" style="max-height:160px;width:auto;border-radius:10px">` : ''}
+          <div class="field full"><span>Ảnh chính – hiện ở ngoài danh sách để thu hút khách
+              ${dress?.image_url ? '(chọn ảnh mới để thay)' : ''}</span>
+            ${dress?.image_url ? html`<img src="${dress.image_url}" alt="" style="max-height:160px;width:auto;border-radius:10px">` : ''}
+            <input class="input" type="file" name="image" accept="image/*"></div>
+          <div class="field full"><span>Ảnh các góc (trước, sau, cận chi tiết…) – tối đa ${MAX_DRESS_ANGLE_PHOTOS} ảnh</span>
+            ${dress?.photos.length ? html`
+              <div class="photo-grid" style="grid-template-columns:repeat(auto-fill,minmax(80px,1fr))">
+                ${dress.photos.map((p) => html`
+                  <figure class="photo" data-angle="${p.id}">
+                    <img src="${p.url}" alt="">
+                    <button class="btn btn-danger btn-sm" type="button" data-toggle-remove aria-label="Xóa ảnh">✕</button>
+                  </figure>`)}
+              </div>
+              <span class="small muted" data-remove-note hidden></span>` : ''}
+            <input class="input" type="file" name="angles" accept="image/*" multiple></div>
         </div>`,
+      // Bấm ✕ chỉ đánh dấu ảnh sẽ xóa; bấm Lưu mới xóa thật (bấm Hủy thì giữ nguyên)
+      onOpen: (dialogEl) => {
+        dialogEl.querySelectorAll('[data-toggle-remove]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const figure = btn.closest('[data-angle]');
+            const id = figure.dataset.angle;
+            if (removePhotoIds.has(id)) removePhotoIds.delete(id); else removePhotoIds.add(id);
+            figure.style.opacity = removePhotoIds.has(id) ? '.3' : '';
+            btn.textContent = removePhotoIds.has(id) ? '↺' : '✕';
+            const note = dialogEl.querySelector('[data-remove-note]');
+            note.hidden = !removePhotoIds.size;
+            note.textContent = `${removePhotoIds.size} ảnh sẽ bị xóa khi bấm Lưu`;
+          });
+        });
+      },
       onConfirm: (form) => {
         const price = Number(form.get('price'));
         const originalPrice = Number(form.get('originalPrice')) || null;
@@ -105,6 +134,8 @@ export async function mountDressManager(container, shop) {
           price,
           originalPrice,
           imageFile: form.get('image'),
+          angleFiles: form.getAll('angles').filter((f) => f.size > 0),
+          removePhotoIds: [...removePhotoIds],
         });
       },
     });

@@ -6,6 +6,7 @@ import { BESPOKE_VENDOR_SLUG } from '../config.js';
 import { listDresses, getVendorBySlug } from '../services/catalog.js';
 import { getBodyProfile, saveBodyProfile, uploadBridePhoto } from '../services/profile.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
+import { openDressGallery, realPhotoCount } from '../components/dress-gallery.js';
 import {
   MODELS, BODY_SHAPES, BESPOKE_OPTIONS, BESPOKE_EXTRAS,
   renderImageFor, dressThumb, fitScore, bespokePrice, bespokeTheme, bespokeLabel,
@@ -358,9 +359,13 @@ function renderSummary() {
     ? ['Duyệt thiết kế & vải', 'Thử rập mộc', 'Nhận váy hoàn thiện']
     : ['Giữ lịch', 'Sau buổi thử', 'Trả váy / hoàn tất'];
 
+  const realPhotos = state.mode === 'catalog' && state.dress ? realPhotoCount(state.dress) : 0;
+
   render($('#summary'), html`
     <div class="stack" style="gap:6px">
       <strong>${selection.title}</strong>
+      ${realPhotos ? html`<button class="btn btn-outline btn-sm" type="button" data-view-photos style="width:fit-content">
+        Xem ${realPhotos} ảnh thật của tiệm</button>` : ''}
       <span class="muted small">${selection.vendorName}</span>
       <span class="price" style="font-size:20px">${money(selection.price)}</span>
       <div class="milestones">
@@ -373,6 +378,7 @@ function renderSummary() {
       </div>
       <p class="small muted">Tiền được Trạm Hỷ giữ, chỉ chuyển cho tiệm khi bạn nghiệm thu từng đợt. Tiệm sai cam kết → hoàn 100%.</p>
     </div>`);
+  $('#summary [data-view-photos]')?.addEventListener('click', () => openDressGallery(state.dress));
   $('#cta-name').textContent = selection.title;
   $('#cta-price').textContent = money(selection.price);
 }

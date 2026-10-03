@@ -3,7 +3,7 @@ import { $, html, render, money, param, date } from '../core/utils.js';
 import { badge, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
 import { getVendorBySlug, listDresses, listReviews, listVendorPhotos } from '../services/catalog.js';
-import { dressThumb } from '../data/tryon-data.js';
+import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
 
 const page = $('#vendor-page');
@@ -71,6 +71,8 @@ function renderPage(vendor, dresses, reviews, photos) {
                        : html`<div class="empty">Chưa có đánh giá xác thực nào.</div>`}
     </section>`);
 
+  bindDressGalleries(page, dresses);
+
   $('#book-service')?.addEventListener('click', () => {
     openBookingDialog({
       vendorId: vendor.id,
@@ -110,7 +112,7 @@ function bridalBox(vendor) {
 function dressCard(dress) {
   return html`
     <article class="card item-card">
-      <img class="thumb" src="${dressThumb(dress)}" alt="${dress.name}" loading="lazy">
+      ${dressThumbButton(dress)}
       <div class="body">
         <div class="row">${badge(DRESS_THEME[dress.theme] ?? dress.theme, 'gold')}
           ${dress.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê sẵn')}</div>

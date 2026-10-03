@@ -23,9 +23,10 @@ export const toastError = (error) => toast(error?.message || String(error), 'err
  * - content: html`` – nếu có ô nhập (input/select/textarea có name), kết quả trả về là FormData.
  *   Không đặt thẻ <form> trong content: hộp thoại đã là một form.
  * - onConfirm(result): chạy khi bấm xác nhận; ném lỗi thì hộp thoại giữ nguyên và báo lỗi.
+ * - onOpen(dialogEl): chạy ngay sau khi hộp thoại hiện ra – để gắn sự kiện cho nội dung bên trong.
  * Trả về Promise: kết quả onConfirm (hoặc true/FormData), hoặc null nếu hủy.
  */
-export function openDialog({ title, content, confirmText = 'Xác nhận', cancelText = 'Hủy', danger = false, onConfirm }) {
+export function openDialog({ title, content, confirmText = 'Xác nhận', cancelText = 'Hủy', danger = false, onConfirm, onOpen }) {
   const dialog = document.createElement('dialog');
   dialog.className = 'modal';
   render(dialog, html`
@@ -71,6 +72,7 @@ export function openDialog({ title, content, confirmText = 'Xác nhận', cancel
     });
 
     dialog.showModal();
+    onOpen?.(dialog);
   });
 }
 
