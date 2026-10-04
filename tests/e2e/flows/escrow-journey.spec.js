@@ -16,6 +16,7 @@ test('đặt lịch → cọc → đối tác thực hiện → khiếu nại �
   // ---- 1. Cô dâu đặt lịch thuê váy của 2H Studio ----
   await bride.goto('/tryon.html?dress=royal-mermaid');
   await bride.locator('#book-btn').click();
+  await bride.getByLabel('Số điện thoại').fill('0900000000');   // tài khoản test chưa có SĐT, ô này bắt buộc
   await bride.getByRole('button', { name: 'Xác nhận đặt lịch' }).click();
   await expect(bride).toHaveURL(/bookings\.html\?new=BK/);
   const code = new URL(bride.url()).searchParams.get('new');

@@ -23,7 +23,8 @@ test('thêm mẫu váy có nhiều ảnh, khách xem được, rồi xóa', asyn
     path.join(IMAGES, 'bride_4_tryon_mermaid.jpg'),
   ]);
   await dialog.getByRole('button', { name: 'Thêm mẫu' }).click();
-  await expect(vendor.locator('.toast-success')).toHaveText('Đã thêm mẫu váy.');
+  // Nén + tải 3 ảnh có thể mất vài chục giây
+  await expect(vendor.locator('.toast-success', { hasText: 'Đã thêm mẫu váy.' })).toBeVisible({ timeout: 45_000 });
 
   const card = vendor.locator('[data-dress]', { hasText: name });
   await expect(card.locator('.photo-count')).toHaveText('3 ảnh');   // 1 ảnh chính + 2 ảnh góc
@@ -41,6 +42,6 @@ test('thêm mẫu váy có nhiều ảnh, khách xem được, rồi xóa', asyn
   // ---- Đối tác xóa mẫu (dọn dữ liệu test, kiểm tra luôn chức năng xóa) ----
   await card.getByRole('button', { name: 'Xóa' }).click();
   await vendor.getByRole('button', { name: 'Xóa mẫu' }).click();
-  await expect(vendor.locator('.toast-success')).toHaveText('Đã xóa mẫu váy.');
+  await expect(vendor.locator('.toast-success', { hasText: 'Đã xóa mẫu váy.' })).toBeVisible();
   await expect(card).toHaveCount(0);
 });

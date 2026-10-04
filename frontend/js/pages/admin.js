@@ -234,9 +234,9 @@ function initTabs() {
 }
 
 // ---------- KHỞI CHẠY TRANG ----------
+initTabs();                    // gắn sự kiện tab ngay, không chờ kiểm tra đăng nhập (bấm sớm vẫn ăn)
 await initLayout('admin');
 await requireAuth(['admin']);
-initTabs();
 await load();
 const reload = debounce(load, 500);
 subscribeBookingChanges('admin-bookings', reload);
