@@ -349,6 +349,9 @@ function renderBespoke() {
 
 function renderSummary() {
   const selection = currentSelection();
+  // Khóa nút đặt lịch cho tới khi đã tải xong và có mẫu được chọn
+  $('#book-btn').disabled = !selection?.vendorId;
+  $('#cta-book').disabled = !selection?.vendorId;
   if (!selection) {
     render($('#summary'), html`<p class="muted">Chọn một mẫu váy để đặt lịch.</p>`);
     return;

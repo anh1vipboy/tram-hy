@@ -54,6 +54,7 @@ exe202/
 │   ├── 09_fix_storage_policies.sql  Sửa quyền tải ảnh của đối tác
 │   └── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │
+├── tests/                    ← KIỂM THỬ TỰ ĐỘNG (Playwright) – xem mục "Kiểm thử tự động"
 ├── docs/                     Báo cáo, kịch bản demo, góp ý mentor (.md, .docx)
 ├── legacy/                   Bản demo cũ – giữ để đối chiếu, có thể xóa
 ├── start_server.ps1          Chạy web ở http://localhost:8080
@@ -182,6 +183,19 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
    powershell -ExecutionPolicy Bypass -File .\start_server.ps1
    ```
    Mở **http://localhost:8080**. (Phải chạy qua server, không mở file trực tiếp vì ES modules không chạy với `file://`.)
+
+### Kiểm thử tự động (Playwright)
+Cần Node.js 24 LTS. Lần đầu: `cd tests` → `npm install` → `npx playwright install chromium`.
+
+| Lệnh (chạy trong `tests/`) | Tác dụng |
+|---|---|
+| `npm test` | Chạy toàn bộ test với frontend ở máy (tự bật server cổng 4173), trên máy tính + điện thoại (Pixel 7) |
+| `npm run test:vercel` | Chạy test với bản trên Vercel |
+| `npm run test:ui` | Mở giao diện xem từng bước test chạy |
+| `npm run report` | Xem báo cáo, ảnh chụp + video lúc test lỗi |
+
+Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi trang mở được không lỗi JS, không tràn màn hình; trang cần đăng nhập tự chuyển sang Đăng nhập; lọc/tìm đối tác; trình xem ảnh; chọn váy, điểm tôn dáng, giá may đo; báo lỗi đăng nhập; kết quả xác nhận email.
+**Nên chạy `npm test` trước mỗi lần push.** Test đọc database Supabase thật nhưng không ghi gì.
 
 ### Đưa lên mạng (Vercel) – dùng cùng database với local
 1. Vercel → Project → **Settings → Build and Deployment**: Framework Preset `Other`, **Root Directory** `frontend`, các lệnh Build/Output/Install để mặc định (tắt Override) → Save.

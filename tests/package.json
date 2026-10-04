@@ -1,0 +1,15 @@
+{
+  "name": "tram-hy-tests",
+  "private": true,
+  "description": "Kiểm thử tự động giao diện Trạm Hỷ bằng Playwright",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:vercel": "cross-env BASE_URL=https://tram-hy-alpha.vercel.app playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "cross-env": "^10.1.0"
+  }
+}
