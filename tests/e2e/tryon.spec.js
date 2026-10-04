@@ -1,6 +1,5 @@
 // Phòng thử váy khi chưa đăng nhập
-const { test, expect } = require('@playwright/test');
-const { trackErrors } = require('./helpers');
+const { test, expect, trackErrors } = require('./helpers');
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/tryon.html');

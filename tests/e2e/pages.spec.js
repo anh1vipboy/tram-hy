@@ -1,6 +1,5 @@
 // Mọi trang công khai mở được, không lỗi, không tràn màn hình; trang cần đăng nhập thì chuyển sang Đăng nhập
-const { test, expect } = require('@playwright/test');
-const { trackErrors, expectNoHorizontalOverflow } = require('./helpers');
+const { test, expect, trackErrors, expectNoHorizontalOverflow } = require('./helpers');
 
 const PUBLIC_PAGES = [
   { path: '/index.html', heading: /Thử váy cưới trên chính dáng/ },

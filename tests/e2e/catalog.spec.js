@@ -1,6 +1,5 @@
 // Trang chủ, Dịch vụ cưới, Chi tiết đối tác – dữ liệu đọc thật từ Supabase
-const { test, expect } = require('@playwright/test');
-const { trackErrors } = require('./helpers');
+const { test, expect, trackErrors } = require('./helpers');
 
 test.describe('Trang chủ', () => {
   test('hiện 4 mẫu váy nổi bật và đối tác uy tín', async ({ page }) => {

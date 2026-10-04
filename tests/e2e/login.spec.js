@@ -1,5 +1,5 @@
 // Trang đăng nhập: báo lỗi tiếng Việt, kết quả xác nhận email
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./helpers');
 
 test('sai mật khẩu báo lỗi tiếng Việt', async ({ page }) => {
   await page.goto('/login.html');
