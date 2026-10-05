@@ -14,7 +14,7 @@ test('chọn mẫu váy: gương đổi ảnh, tóm tắt và đường dẫn c�
   await option.click();
   await expect(page.locator('#summary strong').first()).toHaveText(dressName);
   await expect(page).toHaveURL(/tryon\.html\?dress=/);
-  await expect(page.locator('#mirror-label')).toContainText('Đã thử');
+  await expect(page.locator('#mirror-label')).toContainText('Minh họa');
   await expect(page.locator('#fit-score')).toHaveText(/\d+%/);
   await tracker.expectNoErrors();
 });
@@ -45,4 +45,16 @@ test('đặt lịch khi chưa đăng nhập chuyển sang trang đăng nhập r�
   await page.goto('/tryon.html?dress=korean-satin');
   await page.locator('#book-btn').click();
   await expect(page).toHaveURL(/login\.html\?next=tryon\.html%3Fdress%3Dkorean-satin/);
+});
+
+test('nút "Ướm thử bằng AI thật": chưa đăng nhập thì mời đăng nhập và quay lại đúng mẫu', async ({ page }) => {
+  await page.goto('/tryon.html?dress=korean-satin');
+  await expect(page.locator('#ai-hint')).toHaveText('Đăng nhập để ghép váy lên ảnh bằng AI thật');
+  await page.getByRole('button', { name: '✨ Ướm thử bằng AI thật' }).click();
+  await expect(page).toHaveURL(/login\.html\?next=tryon\.html%3Fdress%3Dkorean-satin/);
+});
+
+test('chế độ tự thiết kế may đo thì ẩn nút AI (chưa có ảnh váy thật để ghép)', async ({ page }) => {
+  await page.getByRole('button', { name: 'Tự thiết kế may đo' }).click();
+  await expect(page.locator('#ai-tryon-box')).toBeHidden();
 });

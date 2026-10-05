@@ -7,6 +7,8 @@ import { listDresses, getVendorBySlug } from '../services/catalog.js';
 import { getBodyProfile, saveBodyProfile, uploadBridePhoto } from '../services/profile.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
 import { openDressGallery, realPhotoCount } from '../components/dress-gallery.js';
+import { aiTryOn, remainingAiTries, AI_DAILY_LIMIT } from '../services/tryon-ai.js';
+import { loginUrl } from '../core/auth.js';
 import {
   MODELS, BODY_SHAPES, BESPOKE_OPTIONS, BESPOKE_EXTRAS,
   renderImageFor, dressThumb, fitScore, bespokePrice, bespokeTheme, bespokeLabel,
@@ -22,6 +24,10 @@ const state = {
   dress: null,                  // mẫu đang chọn (mode catalog)
   model: MODELS[0],
   customPhotoUrl: null,         // ảnh người dùng tự tải lên (xem trước trong trình duyệt)
+  customPhotoPath: null,        // đường dẫn ảnh đó trong kho riêng tư (có khi đã đăng nhập & tải xong)
+  aiResults: new Map(),         // ảnh AI đã ghép: "người mẫu|váy" → link (tránh gọi AI lại, tốn tiền)
+  aiRemaining: null,            // số lượt AI còn lại hôm nay (null = chưa biết)
+  aiBusy: false,
   showOriginal: false,
   body: { height: 160, weight: 49, heel: 7, shape: 'hourglass' },
   bespoke: { silhouette: 'aline', neckline: 'sweetheart', sleeve: 'none', fabric: 'mikado', train: 1, extras: [] },
@@ -102,6 +108,7 @@ function initControls() {
   $('#bespoke-notes').addEventListener('input', debounce(renderSummary, 300));
 
   $('#book-btn').addEventListener('click', book);
+  $('#ai-tryon').addEventListener('click', runAiTryOn);
   $('#cta-book').addEventListener('click', book);
 }
 
@@ -114,17 +121,100 @@ async function onPhotoSelected(e) {
   }
   if (state.customPhotoUrl) URL.revokeObjectURL(state.customPhotoUrl);
   state.customPhotoUrl = URL.createObjectURL(file);
+  state.customPhotoPath = null;
   state.model = { key: 'custom', name: 'Ảnh của bạn', photo: state.customPhotoUrl };
   renderModels();
   tryOn({ reveal: true });
 
   if (state.profile) {
     try {
-      await uploadBridePhoto(state.profile.id, file);
+      state.customPhotoPath = await uploadBridePhoto(state.profile.id, file);   // AI thật cần ảnh nằm trên server
       toast('Ảnh đã được lưu riêng tư trong tài khoản của bạn.', 'success');
+      renderAiButton();
     } catch (error) {
       toastError(error);
     }
+  }
+}
+
+// ---------- THỬ VÁY BẰNG AI THẬT ----------
+// Chọn váy chỉ hiện ảnh minh họa (miễn phí, tức thì). AI thật chỉ chạy khi bấm nút vì mỗi lần tốn phí.
+// AI chưa bật (key Free tier / chưa cấu hình) → server trả fallback → giữ ảnh minh họa, báo lý do.
+
+const AI_FALLBACK_MESSAGES = {
+  'not-configured': 'AI thử váy thật chưa được bật – đang hiển thị ảnh minh họa cùng kiểu váy.',
+  'free-tier': 'AI thử váy thật chưa được bật – đang hiển thị ảnh minh họa cùng kiểu váy.',
+  'no-dress-photo': 'Mẫu này chưa có ảnh thật từ tiệm nên chưa thử bằng AI được.',
+  'provider-error': 'Dịch vụ AI đang bận, vui lòng thử lại sau ít phút.',
+};
+
+// Khóa ảnh AI theo đúng người mẫu/ảnh + đúng váy đang chọn
+const aiKey = () => `${state.model.key === 'custom' ? state.customPhotoPath : state.model.key}|${state.dress?.id}`;
+const currentAiImage = () => (state.mode === 'catalog' ? state.aiResults.get(aiKey()) : null);
+
+async function loadAiRemaining() {
+  if (!state.profile) return;
+  try {
+    state.aiRemaining = await remainingAiTries();
+  } catch {
+    state.aiRemaining = null;        // chưa chạy SQL 11 → không biết số lượt, nút vẫn dùng được
+  }
+}
+
+function renderAiButton() {
+  const box = $('#ai-tryon-box');
+  const button = $('#ai-tryon');
+  const hint = $('#ai-hint');
+  box.hidden = state.mode !== 'catalog' || !state.dress;
+  if (box.hidden) return;
+
+  let reason = '';
+  if (!state.profile) reason = 'Đăng nhập để ghép váy lên ảnh bằng AI thật';
+  else if (!state.dress.image_url) reason = 'Mẫu này chưa có ảnh thật từ tiệm';
+  else if (state.model.key === 'custom' && !state.customPhotoPath) reason = 'Đang lưu ảnh của bạn…';
+  else if (state.aiRemaining === 0) reason = `Đã dùng hết ${AI_DAILY_LIMIT} lượt AI hôm nay`;
+  else if (currentAiImage()) reason = 'Đang xem ảnh AI đã ghép';
+  else if (state.aiRemaining !== null) reason = `Còn ${state.aiRemaining}/${AI_DAILY_LIMIT} lượt hôm nay`;
+
+  // Chưa đăng nhập vẫn bấm được → đưa tới trang đăng nhập
+  button.disabled = state.aiBusy || (Boolean(state.profile) && (!state.dress.image_url
+    || (state.model.key === 'custom' && !state.customPhotoPath) || state.aiRemaining === 0 || Boolean(currentAiImage())));
+  hint.textContent = reason;
+}
+
+async function runAiTryOn() {
+  if (!state.profile) {
+    location.href = loginUrl(`tryon.html?dress=${state.dress.slug}`);
+    return;
+  }
+  const key = aiKey();
+  const scan = $('#mirror-scan');
+  const defaultScanText = scan.textContent;
+  state.aiBusy = true;
+  renderAiButton();
+  scan.textContent = 'AI đang ghép váy lên ảnh của bạn… (khoảng 10–30 giây)';
+  scan.hidden = false;
+  try {
+    const result = await aiTryOn(state.model.key === 'custom'
+      ? { dressId: state.dress.id, photoPath: state.customPhotoPath }
+      : { dressId: state.dress.id, sampleModel: state.model.key });
+
+    if (result.fallback) {
+      toast(AI_FALLBACK_MESSAGES[result.reason] ?? AI_FALLBACK_MESSAGES['provider-error']);
+    } else {
+      state.aiResults.set(key, result.imageUrl);
+      state.aiRemaining = result.remaining;
+      state.showOriginal = false;
+      toast('Đã ghép váy bằng AI! Ảnh được lưu riêng tư trong tài khoản của bạn.', 'success');
+    }
+  } catch (error) {
+    if (/hết .* lượt/.test(error.message)) state.aiRemaining = 0;
+    toastError(error);
+  } finally {
+    state.aiBusy = false;
+    scan.hidden = true;
+    scan.textContent = defaultScanText;
+    renderMirror();
   }
 }
 
@@ -210,20 +300,26 @@ function renderMirror() {
   const isCustom = state.model.key === 'custom';
   const img = $('#mirror-img');
 
+  const aiImage = currentAiImage();
+
   if (state.showOriginal || !theme) {
     img.src = state.model.photo;
     $('#mirror-label').textContent = 'Ảnh gốc';
+  } else if (aiImage) {
+    img.src = aiImage;
+    $('#mirror-label').textContent = '✨ Ảnh AI ghép váy thật';
   } else {
     img.src = renderImageFor(isCustom ? 'user' : state.model.key, theme);
-    $('#mirror-label').textContent = `Đã thử: ${DRESS_THEME[theme]}`;
+    $('#mirror-label').textContent = `Minh họa: ${DRESS_THEME[theme]}`;
   }
   $('#download-img').href = img.src;
   $('#toggle-original').textContent = state.showOriginal ? 'Xem ảnh đã thử váy' : 'Xem ảnh gốc';
 
   const note = $('#mirror-note');
-  note.hidden = !(isCustom && !state.showOriginal);
-  note.textContent = 'Bản demo: ảnh kết quả là ảnh minh họa cùng kiểu váy. AI ghép váy lên ảnh thật sẽ có ở giai đoạn tích hợp fashn.ai.';
+  note.hidden = !(isCustom && !state.showOriginal && !aiImage);
+  note.textContent = 'Đây là ảnh minh họa cùng kiểu váy. Bấm "Ướm thử bằng AI thật" để ghép váy lên chính ảnh của bạn.';
   renderFit();
+  renderAiButton();
 }
 
 function renderFit() {
@@ -393,5 +489,5 @@ renderModels();
 renderBody();
 renderMirror();
 state.profile = await initLayout('tryon');
-await Promise.all([loadDresses(), loadBodyProfile()]);
+await Promise.all([loadDresses(), loadBodyProfile(), loadAiRemaining()]);
 renderAll();

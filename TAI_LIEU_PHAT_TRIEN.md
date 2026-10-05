@@ -54,7 +54,9 @@ exe202/
 │   ├── 08_dress_photos.sql   Ảnh nhiều góc cho mẫu váy + sửa quyền đọc kho ảnh
 │   ├── 09_fix_storage_policies.sql  Sửa quyền tải ảnh của đối tác
 │   ├── 10_welcome_email.sql  Trigger gửi email chào mừng khi đăng ký bằng Google
+│   ├── 11_ai_tryon.sql       Bảng đếm lượt AI + kho ảnh kết quả riêng tư
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
+│   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (Gemini, sau này FASHN)
 │   └── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │
 ├── tests/                    ← KIỂM THỬ TỰ ĐỘNG (Playwright) – xem mục "Kiểm thử tự động"
@@ -214,6 +216,13 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - Deploy lại function sau khi sửa: trong `backend/` chạy `npx supabase functions deploy gui-email-chao-mung --project-ref vsjdijmuvuetmhmszcrl --no-verify-jwt`.
 - Không nhận mail → xem Supabase → Edge Functions → Logs (403 = bí mật không khớp, 502 = Brevo từ chối) và Brevo → Transactional → Logs.
 
+### Thử váy bằng AI thật
+- Phòng thử: chọn váy chỉ hiện **ảnh minh họa** (miễn phí). Nút **✨ Ướm thử bằng AI thật** mới gọi Edge Function `thu-vay-ai` → ghép **ảnh thật của mẫu váy** lên ảnh người mẫu / ảnh cô dâu tải lên. Cần đăng nhập; mẫu chưa có ảnh thật thì không thử AI được.
+- Mặc định dùng **Gemini 3.1 Flash Image** (~0,045 USD/ảnh). Key **Free tier** hoặc chưa đặt key → web tự quay về ảnh minh họa, báo "AI chưa được bật". Bật thanh toán cho key là chạy thật, không sửa code.
+- Đổi sang FASHN sau này: `npx supabase secrets set --project-ref vsjdijmuvuetmhmszcrl TRYON_PROVIDER=fashn FASHN_API_KEY=...` (phần FASHN chưa chạy thử với tài khoản thật).
+- Giới hạn **5 lượt/người/ngày** (giờ Việt Nam) – đổi bằng secret `DAILY_LIMIT` và hằng `AI_DAILY_LIMIT` trong `frontend/js/services/tryon-ai.js`. Mỗi lần thử ghi vào bảng `tryon_jobs` (theo dõi chi phí); ảnh kết quả ở bucket riêng tư `tryon-results`.
+- Deploy lại: trong `backend/` chạy `npx supabase functions deploy thu-vay-ai --project-ref vsjdijmuvuetmhmszcrl`.
+
 ### Quên mật khẩu
 - Trang Đăng nhập → **Quên mật khẩu?** → nhập email → Supabase gửi link về `reset-password.html` → nhập mật khẩu mới 2 lần → tự đăng nhập và vào đúng trang theo vai trò.
 - Web không cho biết email có tồn tại hay không (tránh bị dò tài khoản).
@@ -285,7 +294,7 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 | 2 | **Trang "Tài khoản của tôi"**: sửa tên/SĐT, xem số đo, **xóa ảnh đã tải** | `frontend/` |
 | 3 | **Thông báo email** khi có đơn mới, đã cọc, chờ nghiệm thu, khiếu nại được xử lý | Edge Function |
 | 4 | **Thanh toán thật** (PayOS): webhook xác nhận chuyển khoản → gọi `pay_milestone` | Edge Function |
-| 5 | **AI thử váy thật** (fashn.ai), giới hạn lượt miễn phí/tài khoản | Edge Function |
+| ✅ | AI thử váy thật (Gemini, sẵn chỗ cắm FASHN), 5 lượt/người/ngày | Đã xong (SQL 11 + function thu-vay-ai) |
 | 6 | **Tự xóa ảnh cô dâu sau 24 giờ** (cam kết bảo mật trong báo cáo) | Scheduled Edge Function |
 | 7 | Đo lường hành vi (Vercel Analytics) để có số liệu cho báo cáo | `frontend/` |
 | 8 | Ảnh xem trước khi chia sẻ link thiệp / tiệm qua Zalo, Facebook | `frontend/` |
