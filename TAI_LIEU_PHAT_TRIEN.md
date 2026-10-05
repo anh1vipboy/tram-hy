@@ -53,6 +53,8 @@ exe202/
 │   ├── 07_vendor_media.sql   Ảnh thực tế (portfolio) của tiệm
 │   ├── 08_dress_photos.sql   Ảnh nhiều góc cho mẫu váy + sửa quyền đọc kho ảnh
 │   ├── 09_fix_storage_policies.sql  Sửa quyền tải ảnh của đối tác
+│   ├── 10_welcome_email.sql  Trigger gửi email chào mừng khi đăng ký bằng Google
+│   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   └── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │
 ├── tests/                    ← KIỂM THỬ TỰ ĐỘNG (Playwright) – xem mục "Kiểm thử tự động"
@@ -204,6 +206,13 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 3. Supabase → **Authentication → URL Configuration**:
    - **Site URL**: tên miền Vercel, vd `https://tram-hy.vercel.app`
    - **Redirect URLs**: thêm `https://tram-hy.vercel.app/**` và `http://localhost:8080/**`
+
+### Đăng nhập Google + email chào mừng
+- Nút **Tiếp tục với Google** ở trang Đăng nhập (Supabase → Authentication → Providers → Google, Client ID/Secret lấy ở Google Cloud Console; redirect URI `https://vsjdijmuvuetmhmszcrl.supabase.co/auth/v1/callback`). Tài khoản Google mới có vai trò cô dâu.
+- Tài khoản **mới** tạo bằng Google → trigger (SQL 10) gọi Edge Function `gui-email-chao-mung` → gửi email chào mừng qua **Brevo** (300 mail/ngày, người gửi là Gmail đã xác minh).
+- Bí mật: function dùng Supabase Secrets `BREVO_API_KEY`, `SENDER_EMAIL`, `WEBHOOK_SECRET`; database dùng Vault secret `welcome_email_secret` (phải **trùng** `WEBHOOK_SECRET`). Không có bí mật nào trong code.
+- Deploy lại function sau khi sửa: trong `backend/` chạy `npx supabase functions deploy gui-email-chao-mung --project-ref vsjdijmuvuetmhmszcrl --no-verify-jwt`.
+- Không nhận mail → xem Supabase → Edge Functions → Logs (403 = bí mật không khớp, 502 = Brevo từ chối) và Brevo → Transactional → Logs.
 
 ### Quên mật khẩu
 - Trang Đăng nhập → **Quên mật khẩu?** → nhập email → Supabase gửi link về `reset-password.html` → nhập mật khẩu mới 2 lần → tự đăng nhập và vào đúng trang theo vai trò.
