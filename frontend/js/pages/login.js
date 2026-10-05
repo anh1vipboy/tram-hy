@@ -1,5 +1,5 @@
 import { initLayout } from '../core/layout.js';
-import { clearProfileCache, getProfile, homeForRole, signIn, signUp, requestPasswordReset, friendlyAuthError } from '../core/auth.js';
+import { clearProfileCache, getProfile, homeForRole, signIn, signUp, signInWithGoogle, requestPasswordReset, friendlyAuthError } from '../core/auth.js';
 import { authRedirectParams } from '../core/supabase.js';
 import { $, $$, html, render, param, sleep } from '../core/utils.js';
 import { openDialog, toastError, withBusy } from '../core/ui.js';
@@ -120,11 +120,24 @@ $('#forgot-password').addEventListener('click', async () => {
   }
 });
 
+$('#google-signin').addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
+  try {
+    await signInWithGoogle(param('next'));   // trình duyệt chuyển sang trang Google
+  } catch (error) {
+    toastError(friendlyAuthError(error));
+  }
+}));
+
 // ---------- KHỞI CHẠY TRANG ----------
 const profile = await initLayout('login');
+const oauthError = !param('confirmed') && (authRedirectParams.get('error') || param('error'));
 if (param('confirmed')) {
   history.replaceState(null, '', 'login.html');   // bấm F5 không hiện lại thông báo
   await handleEmailConfirmation(profile);
+} else if (oauthError) {
+  // Quay về từ Google nhưng không thành công (vd bấm Hủy)
+  history.replaceState(null, '', location.pathname + location.search);
+  showNotice('error', 'Chưa đăng nhập được bằng Google', 'Bạn đã hủy hoặc Google từ chối yêu cầu. Hãy thử lại hoặc dùng email và mật khẩu.');
 } else if (profile) {
-  await redirectAfterLogin();
+  await redirectAfterLogin();   // vừa đăng nhập Google xong, hoặc đã đăng nhập từ trước
 }

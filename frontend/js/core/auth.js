@@ -66,6 +66,14 @@ export async function signUp({ email, password, fullName, phone, role }) {
   return { needsEmailConfirm: !data.session };
 }
 
+// Đăng nhập bằng Google: chuyển sang trang Google, xong quay về login.html (giữ ?next= để về đúng trang đang dở).
+// Tài khoản Google mới tự được tạo với vai trò cô dâu; họ tên lấy từ Google.
+export async function signInWithGoogle(next) {
+  const back = new URL('login.html', location.href);
+  if (next) back.searchParams.set('next', next);
+  unwrap(await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: back.href } }));
+}
+
 // Lỗi Supabase Auth (tiếng Anh) → câu tiếng Việt. Khớp theo đầu câu vì một số lỗi có số giây thay đổi.
 const AUTH_ERRORS = [
   ['Invalid login credentials', 'Sai email hoặc mật khẩu'],
@@ -76,6 +84,7 @@ const AUTH_ERRORS = [
   ['New password should be different', 'Mật khẩu mới phải khác mật khẩu cũ'],
   ['Password should be at least', 'Mật khẩu phải có ít nhất 6 ký tự'],
   ['Auth session missing', 'Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn – hãy gửi lại link mới'],
+  ['Unsupported provider', 'Đăng nhập bằng Google chưa được bật – vui lòng dùng email và mật khẩu'],
 ];
 
 export function friendlyAuthError(error) {

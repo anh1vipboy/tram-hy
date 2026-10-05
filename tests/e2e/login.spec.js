@@ -49,3 +49,18 @@ test.describe('Quên mật khẩu', () => {
     await expect(page.getByText('Link đã hết hạn hoặc đã được dùng')).toBeVisible();
   });
 });
+
+test.describe('Đăng nhập bằng Google', () => {
+  test('nút Google chuyển sang trang đăng nhập Google qua Supabase', async ({ page }) => {
+    await page.goto('/login.html?next=bookings.html');
+    const request = page.waitForRequest((r) => r.url().includes('/auth/v1/authorize') && r.url().includes('provider=google'));
+    await page.getByRole('button', { name: 'Tiếp tục với Google' }).click();
+    const url = new URL((await request).url());
+    expect(url.searchParams.get('redirect_to')).toContain('login.html?next=bookings.html');   // quay về đúng trang đang dở
+  });
+
+  test('bấm Hủy ở Google thì quay về báo rõ', async ({ page }) => {
+    await page.goto('/login.html#error=access_denied&error_description=The+user+denied+the+request');
+    await expect(page.locator('#auth-notice')).toContainText('Chưa đăng nhập được bằng Google');
+  });
+});
