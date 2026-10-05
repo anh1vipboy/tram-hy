@@ -77,3 +77,58 @@ test.describe('Chi tiết đối tác', () => {
     await expect(page.getByText('Không tìm thấy đối tác.')).toBeVisible();
   });
 });
+
+test.describe('Kiểm tra số tiền nhập', () => {
+  test('chia ngân sách: tự thêm dấu chấm, chặn dưới 10 triệu và trên 10 tỷ', async ({ page }) => {
+    await page.goto('/index.html');
+    const input = page.locator('#budget-input');
+    const error = page.locator('#budget-error');
+    const submit = page.getByRole('button', { name: 'Chia ngân sách' });
+
+    await input.fill('abc250000000xyz');                 // chữ bị bỏ, số được định dạng
+    await expect(input).toHaveValue('250.000.000');
+    await submit.click();
+    await expect(page.locator('#budget-result')).toContainText('125.000.000đ');
+
+    await input.fill('5000000');
+    await submit.click();
+    await expect(error).toHaveText('Số tiền tối thiểu là 10.000.000đ');
+    await expect(page.locator('#budget-result')).toBeEmpty();      // không chia khi nhập sai
+
+    await input.fill('20000000000');
+    await expect(error).toHaveText('Số tiền tối đa là 10.000.000.000đ');
+    await expect(page.locator('#budget-result')).toBeEmpty();
+
+    await input.fill('');
+    await submit.click();
+    await expect(error).toHaveText('Vui lòng nhập số tiền');
+  });
+
+  test('dịch vụ cưới: tự nhập ngân sách tối đa, tối đa 10 tỷ', async ({ page }) => {
+    await page.goto('/marketplace.html');
+    await expect(page.locator('#vendor-grid article').first()).toBeVisible();
+    await expect(page.locator('#max-custom-wrap')).toBeHidden();
+
+    await page.locator('#max-price').selectOption('custom');
+    const input = page.locator('#max-custom');
+    await expect(input).toBeVisible();
+    await input.fill('5000000');
+    await expect(input).toHaveValue('5.000.000');
+    const prices = await page.locator('#vendor-grid .price').allTextContents();
+    expect(prices.length).toBeGreaterThan(0);
+    for (const p of prices) expect(Number(p.replace(/\D/g, ''))).toBeLessThanOrEqual(5_000_000);
+
+    await input.fill('99999999999');
+    await expect(page.locator('#max-error')).toHaveText('Số tiền tối đa là 10.000.000.000đ');
+
+    await page.locator('#max-price').selectOption('');       // về "Không giới hạn" thì ẩn ô và lỗi
+    await expect(page.locator('#max-custom-wrap')).toBeHidden();
+    await expect(page.locator('#max-error')).toBeHidden();
+  });
+
+  test('ngân sách từ trang chủ (?max=) không trùng mốc thì điền vào ô tự nhập', async ({ page }) => {
+    await page.goto('/marketplace.html?category=studio&max=30000000');
+    await expect(page.locator('#max-price')).toHaveValue('custom');
+    await expect(page.locator('#max-custom')).toHaveValue('30.000.000');
+  });
+});

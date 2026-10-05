@@ -67,9 +67,16 @@
         <div class="eyebrow">Công cụ</div>
         <h2>Gợi ý chia ngân sách cưới</h2>
         <p class="muted">Nhập tổng ngân sách, Trạm Hỷ gợi ý mức chi cho từng hạng mục theo tỷ lệ phổ biến tại Hà Nội.</p>
-        <form id="budget-form" class="row">
-          <input class="input" id="budget-input" type="number" min="10000000" step="1000000" value="150000000" style="flex:1" aria-label="Tổng ngân sách (VNĐ)">
-          <button class="btn btn-primary" type="submit">Chia ngân sách</button>
+        <form id="budget-form" class="stack" style="gap:6px" novalidate>
+          <div class="row">
+            <div class="money-field" style="flex:1;min-width:180px">
+              <input class="input" id="budget-input" value="150.000.000" aria-label="Tổng ngân sách cưới (VNĐ)">
+              <span class="suffix">đ</span>
+            </div>
+            <button class="btn btn-primary" type="submit">Chia ngân sách</button>
+          </div>
+          <p class="field-error" id="budget-error" hidden></p>
+          <p class="small muted" style="margin:0">Từ 10 triệu đến 10 tỷ đồng.</p>
         </form>
         <div id="budget-result" class="stack" style="margin-top:14px"></div>
       </div>

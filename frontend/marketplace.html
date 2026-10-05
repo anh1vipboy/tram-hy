@@ -33,15 +33,21 @@
             <option value="price-desc">Giá cao → thấp</option>
           </select>
         </label>
-        <label class="field"><span>Giá khởi điểm tối đa</span>
-          <select class="input" id="max-price">
+        <div class="field"><span id="max-price-label">Ngân sách tối đa</span>
+          <select class="input" id="max-price" aria-labelledby="max-price-label">
             <option value="">Không giới hạn</option>
             <option value="5000000">Dưới 5 triệu</option>
             <option value="20000000">Dưới 20 triệu</option>
             <option value="50000000">Dưới 50 triệu</option>
             <option value="150000000">Dưới 150 triệu</option>
+            <option value="custom">Tự nhập số tiền…</option>
           </select>
-        </label>
+          <div class="money-field" id="max-custom-wrap" hidden>
+            <input class="input" id="max-custom" placeholder="VD: 30.000.000" aria-label="Nhập ngân sách tối đa (VNĐ)">
+            <span class="suffix">đ</span>
+          </div>
+          <p class="field-error" id="max-error" hidden></p>
+        </div>
         <label class="row" style="align-self:end">
           <input type="checkbox" id="verified-only"> Chỉ đối tác Tích Xanh ✓
         </label>

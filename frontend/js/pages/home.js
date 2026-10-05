@@ -4,6 +4,7 @@ import { badge, DRESS_THEME, VENDOR_CATEGORY } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
 import { listDresses, listVendors } from '../services/catalog.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
+import { bindMoneyInput } from '../components/money-input.js';
 
 // Tỷ lệ chia ngân sách cưới phổ biến (category khớp bảng vendors)
 const BUDGET_SPLIT = [
@@ -17,11 +18,17 @@ const BUDGET_SPLIT = [
 initLayout('home');
 loadFeaturedDresses();
 loadTopVendors();
+// Ngân sách cưới: 10 triệu → 10 tỷ. Nhập sai thì báo lỗi dưới ô và ẩn kết quả cũ.
+const budgetInput = bindMoneyInput($('#budget-input'), {
+  errorEl: $('#budget-error'),
+  min: 10_000_000,
+  onChange: (value) => { if (!value) renderBudget(null); },   // đang nhập sai thì ẩn kết quả cũ
+});
 $('#budget-form').addEventListener('submit', (e) => {
   e.preventDefault();
-  renderBudget(Number($('#budget-input').value));
+  renderBudget(budgetInput.check());
 });
-renderBudget(Number($('#budget-input').value));
+renderBudget(budgetInput.check());
 
 async function loadFeaturedDresses() {
   const container = $('#featured-dresses');
@@ -62,7 +69,10 @@ async function loadTopVendors() {
 }
 
 function renderBudget(total) {
-  if (!total || total < 1) return;
+  if (!total) {
+    render($('#budget-result'), '');
+    return;
+  }
   render($('#budget-result'), BUDGET_SPLIT.map((item) => html`
     <div class="row">
       <span style="width:120px">${item.label}</span>
