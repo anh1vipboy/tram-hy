@@ -32,6 +32,11 @@
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
+  /* Footer luôn nằm sát đáy màn hình kể cả khi trang ít nội dung */
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.55;
@@ -50,7 +55,7 @@ p { margin: 0 0 .75em; }
 
 /* ---------- 2. BỐ CỤC ---------- */
 .container { width: min(1180px, 100%); margin: 0 auto; padding: 0 16px; }
-main.container { padding-block: 28px 56px; }
+main.container { padding-block: 28px 56px; flex: 1 0 auto; }
 .section { margin-bottom: 48px; }
 .section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
 .section-head p { color: var(--muted); margin: 0; }
