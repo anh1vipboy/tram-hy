@@ -30,6 +30,7 @@ exe202/
 │   ├── bookings.html         Đơn của tôi: trả cọc, nghiệm thu, khiếu nại, đánh giá
 │   ├── invitation.html       Thiệp cưới online + RSVP (?i=<mã thiệp> cho khách mời)
 │   ├── login.html            Đăng nhập / đăng ký
+│   ├── reset-password.html   Đặt lại mật khẩu (mở từ link trong email)
 │   ├── vendor-dashboard.html Kênh đối tác: Kanban đơn hàng
 │   ├── admin.html            Quản trị: khiếu nại, Tích Xanh, toàn bộ đơn
 │   ├── css/styles.css        Toàn bộ giao diện (1 file)
@@ -203,6 +204,13 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 3. Supabase → **Authentication → URL Configuration**:
    - **Site URL**: tên miền Vercel, vd `https://tram-hy.vercel.app`
    - **Redirect URLs**: thêm `https://tram-hy.vercel.app/**` và `http://localhost:8080/**`
+
+### Quên mật khẩu
+- Trang Đăng nhập → **Quên mật khẩu?** → nhập email → Supabase gửi link về `reset-password.html` → nhập mật khẩu mới 2 lần → tự đăng nhập và vào đúng trang theo vai trò.
+- Web không cho biết email có tồn tại hay không (tránh bị dò tài khoản).
+- Link chỉ dùng 1 lần; hết hạn hoặc mở sai thì trang báo rõ và dẫn về Đăng nhập để gửi lại.
+- Cần `reset-password.html` nằm trong *Redirect URLs* – đã có sẵn nhờ `https://tram-hy-alpha.vercel.app/**` và `http://localhost:8080/**`.
+- Nội dung email: Supabase → Authentication → Emails → Templates → **Reset Password** (có thể dịch sang tiếng Việt).
 
 ### Xác nhận email (bật *Confirm email* trong Supabase)
 - Link trong email quay về `login.html?confirmed=1` **trên đúng web nơi người dùng đăng ký** → hiện "Xác nhận tài khoản thành công!" và tự đăng nhập, kể cả khi bấm link trên điện thoại khác thiết bị đăng ký (client dùng `flowType: 'implicit'`).

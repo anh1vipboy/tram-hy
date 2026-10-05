@@ -66,6 +66,36 @@ export async function signUp({ email, password, fullName, phone, role }) {
   return { needsEmailConfirm: !data.session };
 }
 
+// Lỗi Supabase Auth (tiếng Anh) → câu tiếng Việt. Khớp theo đầu câu vì một số lỗi có số giây thay đổi.
+const AUTH_ERRORS = [
+  ['Invalid login credentials', 'Sai email hoặc mật khẩu'],
+  ['Email not confirmed', 'Email chưa được xác nhận – hãy bấm link trong email Trạm Hỷ gửi bạn'],
+  ['User already registered', 'Email này đã có tài khoản – hãy đăng nhập'],
+  ['email rate limit exceeded', 'Hệ thống đang gửi quá nhiều email, vui lòng thử lại sau ít phút'],
+  ['For security purposes, you can only request this after', 'Vui lòng đợi khoảng 1 phút rồi thử gửi lại'],
+  ['New password should be different', 'Mật khẩu mới phải khác mật khẩu cũ'],
+  ['Password should be at least', 'Mật khẩu phải có ít nhất 6 ký tự'],
+  ['Auth session missing', 'Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn – hãy gửi lại link mới'],
+];
+
+export function friendlyAuthError(error) {
+  const match = AUTH_ERRORS.find(([english]) => error?.message?.startsWith(english));
+  return new Error(match ? match[1] : error?.message || String(error));
+}
+
+// Quên mật khẩu: Supabase gửi email có link về trang reset-password.html (phải nằm trong Redirect URLs).
+// Supabase không báo email có tồn tại hay không – tránh lộ danh sách tài khoản.
+export async function requestPasswordReset(email) {
+  unwrap(await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: new URL('reset-password.html', location.href).href,
+  }));
+}
+
+// Đặt mật khẩu mới – chỉ dùng được khi đang có phiên (vào từ link đặt lại mật khẩu hoặc đã đăng nhập)
+export async function updatePassword(password) {
+  unwrap(await sb.auth.updateUser({ password }));
+}
+
 export async function signOut() {
   await sb.auth.signOut();
   location.href = 'index.html';

@@ -1,15 +1,8 @@
 import { initLayout } from '../core/layout.js';
-import { clearProfileCache, getProfile, homeForRole, signIn, signUp } from '../core/auth.js';
+import { clearProfileCache, getProfile, homeForRole, signIn, signUp, requestPasswordReset, friendlyAuthError } from '../core/auth.js';
 import { authRedirectParams } from '../core/supabase.js';
 import { $, $$, html, render, param, sleep } from '../core/utils.js';
-import { toastError, withBusy } from '../core/ui.js';
-
-const LOGIN_ERRORS = {
-  'Invalid login credentials': 'Sai email hoặc mật khẩu',
-  'Email not confirmed': 'Email chưa được xác nhận – hãy bấm link trong email Trạm Hỷ gửi bạn',
-  'User already registered': 'Email này đã có tài khoản – hãy đăng nhập',
-  'email rate limit exceeded': 'Hệ thống đang gửi quá nhiều email xác nhận, vui lòng thử lại sau ít phút',
-};
+import { openDialog, toastError, withBusy } from '../core/ui.js';
 
 function showNotice(type, title, message) {
   const box = $('#auth-notice');
@@ -71,7 +64,7 @@ $('#signin-form').addEventListener('submit', async (e) => {
       await signIn(form.get('email').trim(), form.get('password'));
       await redirectAfterLogin();
     } catch (error) {
-      toastError(new Error(LOGIN_ERRORS[error.message] ?? error.message));
+      toastError(friendlyAuthError(error));
     }
   });
 });
@@ -98,9 +91,33 @@ $('#signup-form').addEventListener('submit', async (e) => {
         await redirectAfterLogin();
       }
     } catch (error) {
-      toastError(new Error(LOGIN_ERRORS[error.message] ?? error.message));
+      toastError(friendlyAuthError(error));
     }
   });
+});
+
+$('#forgot-password').addEventListener('click', async () => {
+  const done = await openDialog({
+    title: 'Quên mật khẩu',
+    confirmText: 'Gửi link đặt lại',
+    content: html`
+      <p class="small muted">Nhập email bạn đã dùng để đăng ký. Trạm Hỷ sẽ gửi link để đặt mật khẩu mới.</p>
+      <label class="field"><span>Email</span>
+        <input class="input" type="email" name="email" required autocomplete="email"
+               value="${$('#signin-form [name=email]').value}"></label>`,
+    onConfirm: async (form) => {
+      try {
+        await requestPasswordReset(form.get('email').trim());
+      } catch (error) {
+        throw friendlyAuthError(error);
+      }
+    },
+  });
+  if (done) {
+    // Không nói "email có tồn tại hay không" để người lạ không dò được ai đã đăng ký
+    showNotice('info', 'Kiểm tra email để đặt lại mật khẩu',
+      'Nếu email này đã đăng ký Trạm Hỷ, bạn sẽ nhận được link đặt mật khẩu mới trong vài phút. Không thấy thư? Xem thêm mục Spam/Quảng cáo.');
+  }
 });
 
 // ---------- KHỞI CHẠY TRANG ----------

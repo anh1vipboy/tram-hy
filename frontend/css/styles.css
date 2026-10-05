@@ -99,6 +99,8 @@ main.container { padding-block: 28px 56px; }
 .btn-danger:hover { background: var(--red-soft); }
 .btn-sm { padding: 6px 12px; font-size: 13px; }
 .btn-block { width: 100%; }
+.btn-link { align-self: center; background: none; color: var(--gold-dark); padding: 4px 8px; }
+.btn-link:hover { text-decoration: underline; }
 
 .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
 .card-title { font-family: var(--font-title); font-size: 18px; font-weight: 700; margin: 0 0 4px; }

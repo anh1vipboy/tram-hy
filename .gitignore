@@ -1,3 +1,4 @@
 .gemini/
 .agents/
 *.log
+graphify-out/
