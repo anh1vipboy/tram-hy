@@ -24,12 +24,13 @@ export async function listRsvps(invitationId) {
 }
 
 // Nghe phản hồi mới của một thiệp theo thời gian thực (RLS: chỉ chủ thiệp nhận được). Trả về hàm hủy.
-export function subscribeRsvps(invitationId, onInsert) {
+// onReady: gọi mỗi lần kết nối xong (cả khi mạng chập chờn rồi nối lại) → tải lại để không sót phản hồi.
+export function subscribeRsvps(invitationId, onInsert, onReady) {
   const channel = sb.channel(`rsvps-${invitationId}`)
     .on('postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'rsvps', filter: `invitation_id=eq.${invitationId}` },
       (payload) => onInsert(payload.new))
-    .subscribe();
+    .subscribe((status) => { if (status === 'SUBSCRIBED') onReady?.(); });
   return () => sb.removeChannel(channel);
 }
 

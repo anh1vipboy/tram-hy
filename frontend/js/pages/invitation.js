@@ -176,11 +176,22 @@ function renderShare(invitation) {
 async function showRsvps(invitation) {
   let rsvps = await listRsvps(invitation.id);
   renderRsvps(rsvps);
+  const announce = (rsvp) => toast(
+    `${rsvp.guest_name} vừa phản hồi: ${rsvp.attending ? `sẽ đến (${rsvp.guest_count} người)` : 'không thể đến'}`, 'success');
+
   subscribeRsvps(invitation.id, (rsvp) => {
     if (rsvps.some((r) => r.id === rsvp.id)) return;
     rsvps = [rsvp, ...rsvps];
     renderRsvps(rsvps, rsvp.id);
-    toast(`${rsvp.guest_name} vừa phản hồi: ${rsvp.attending ? `sẽ đến (${rsvp.guest_count} người)` : 'không thể đến'}`, 'success');
+    announce(rsvp);
+  }, async () => {
+    // Vừa kết nối (lại): phản hồi gửi trong lúc đang kết nối sẽ không có sự kiện → tải lại cho chắc
+    const latest = await listRsvps(invitation.id).catch(() => null);
+    const missed = latest?.filter((r) => !rsvps.some((old) => old.id === r.id)) ?? [];
+    if (!missed.length) return;
+    rsvps = latest;
+    renderRsvps(rsvps, missed[0].id);
+    missed.forEach(announce);
   });
 }
 
