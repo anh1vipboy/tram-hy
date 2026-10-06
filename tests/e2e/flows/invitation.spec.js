@@ -1,4 +1,4 @@
-// Thiệp cưới: cô dâu tạo/sửa thiệp → khách mời (không đăng nhập) mở link gửi RSVP → cô dâu thấy phản hồi
+// Thiệp cưới: cô dâu tạo/sửa thiệp → khách mời (không đăng nhập) mở link gửi RSVP → cô dâu thấy phản hồi ngay (realtime)
 const { test, expect, openAs, requireAccounts } = require('../helpers');
 
 test('tạo thiệp → khách gửi phản hồi qua link → cô dâu thấy số khách', async ({ browser }) => {
@@ -29,8 +29,8 @@ test('tạo thiệp → khách gửi phản hồi qua link → cô dâu thấy s
   await guest.getByRole('button', { name: 'Gửi phản hồi' }).click();
   await expect(guest.getByText('Cảm ơn bạn!')).toBeVisible();
 
-  // Cô dâu thấy phản hồi
-  await bride.reload();
+  // Cô dâu thấy phản hồi ngay, KHÔNG tải lại trang (realtime – SQL 14)
+  await expect(bride.locator('.toast-success', { hasText: `${guestName} vừa phản hồi` })).toBeVisible({ timeout: 15_000 });
   await expect(bride.locator('#rsvps')).toContainText(guestName);
   await expect(bride.locator('#rsvps')).toContainText('đến (2 người)');
 });

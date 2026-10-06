@@ -5,7 +5,7 @@ import { initLayout } from '../core/layout.js';
 import { requireAuth } from '../core/auth.js';
 import { $, $$, html, render, param, dateTime } from '../core/utils.js';
 import { toast, toastError, withBusy } from '../core/ui.js';
-import { getMyInvitation, getInvitationBySlug, saveInvitation, listRsvps, submitRsvp } from '../services/invitations.js';
+import { getMyInvitation, getInvitationBySlug, saveInvitation, listRsvps, submitRsvp, subscribeRsvps } from '../services/invitations.js';
 
 const THEMES = [
   { key: 'gold', label: 'Champagne', color: '#f3e3c3' },
@@ -132,10 +132,12 @@ async function renderEditor(profile) {
     e.preventDefault();
     await withBusy(e.submitter, async () => {
       try {
+        const isNew = !invitation;
         invitation = await saveInvitation(profile.id, invitation, readForm());
         e.submitter.textContent = 'Lưu thay đổi';
         toast('Đã lưu thiệp.', 'success');
         renderShare(invitation);
+        if (isNew) await showRsvps(invitation);       // thiệp vừa tạo → bắt đầu nhận phản hồi
       } catch (error) {
         toastError(error);
       }
@@ -145,7 +147,7 @@ async function renderEditor(profile) {
   refreshPreview();
   if (invitation) {
     renderShare(invitation);
-    renderRsvps(await listRsvps(invitation.id));
+    await showRsvps(invitation);
   } else {
     render($('#rsvps'), html`<p class="muted">Tạo thiệp để nhận phản hồi từ khách mời.</p>`);
   }
@@ -170,14 +172,27 @@ function renderShare(invitation) {
   });
 }
 
-function renderRsvps(rsvps) {
+// Danh sách phản hồi + tự cập nhật khi khách vừa gửi (realtime)
+async function showRsvps(invitation) {
+  let rsvps = await listRsvps(invitation.id);
+  renderRsvps(rsvps);
+  subscribeRsvps(invitation.id, (rsvp) => {
+    if (rsvps.some((r) => r.id === rsvp.id)) return;
+    rsvps = [rsvp, ...rsvps];
+    renderRsvps(rsvps, rsvp.id);
+    toast(`${rsvp.guest_name} vừa phản hồi: ${rsvp.attending ? `sẽ đến (${rsvp.guest_count} người)` : 'không thể đến'}`, 'success');
+  });
+}
+
+function renderRsvps(rsvps, newId = null) {
   const attending = rsvps.filter((r) => r.attending);
   const totalGuests = attending.reduce((t, r) => t + r.guest_count, 0);
   render($('#rsvps'), html`
     <h3>Phản hồi khách mời</h3>
     <p><strong>${totalGuests}</strong> khách sẽ đến · ${rsvps.length - attending.length} không thể đến</p>
+    <p class="small muted" style="margin-top:-6px">● Tự cập nhật khi khách gửi phản hồi</p>
     ${rsvps.length ? html`<div class="stack">${rsvps.map((r) => html`
-      <div class="small"><strong>${r.guest_name}</strong> –
+      <div class="small rsvp-item ${r.id === newId ? 'is-new' : ''}"><strong>${r.guest_name}</strong> –
         ${r.attending ? `đến (${r.guest_count} người)` : 'không đến'}
         ${r.message ? html`<div class="muted">“${r.message}”</div>` : ''}</div>`)}</div>`
       : html`<p class="muted small">Chưa có phản hồi nào.</p>`}`);

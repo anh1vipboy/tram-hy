@@ -57,6 +57,7 @@ exe202/
 │   ├── 11_ai_tryon.sql       Bảng đếm lượt AI + kho ảnh kết quả riêng tư
 │   ├── 12_tryon_own_garment.sql  Ghi ảnh váy tự tải vào lịch sử thử AI
 │   ├── 13_vendor_logo.sql    Ảnh đại diện (logo) của tiệm
+│   ├── 14_rsvp_realtime.sql  Phản hồi thiệp cưới tự hiện (realtime)
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -139,7 +140,11 @@ Nhánh phụ: `disputed` (đang khiếu nại), `cancelled`, `refunded`.
 ### 4.4 Storage & Realtime
 - `bride-photos` (riêng tư): ảnh cô dâu tải lên ở phòng thử, lưu theo thư mục `<user_id>/`, chỉ chính chủ đọc được.
 - `dress-images`, `vendor-portfolio` (công khai): ảnh mẫu váy, logo (nén còn 512px), ảnh bìa, ảnh thực tế do đối tác tải lên ở Kênh đối tác (ảnh được nén còn ~1600px trước khi tải). Bảng `vendor_photos` lưu ảnh thực tế (tối đa 20 ảnh/tiệm), bảng `dress_photos` lưu ảnh các góc của mẫu váy (tối đa 10 ảnh/mẫu; ảnh chính vẫn là `dresses.image_url`). Hai kho này cần cả quyền đọc (SELECT) thì Storage mới ghi/xóa được – xem 08.
-- Realtime bật cho `bookings`, `milestones`, `disputes` → trang Đơn của tôi, Kênh đối tác, Quản trị tự cập nhật.
+- Realtime (tự cập nhật, không cần F5; vẫn theo RLS – ai chỉ nhận dữ liệu của mình):
+  - `bookings`, `milestones`, `disputes` → Đơn của tôi, Kênh đối tác, Quản trị (đặt lịch, cọc, nghiệm thu, khiếu nại).
+  - `vendors` → admin thấy hồ sơ mở tiệm mới; đối tác thấy kết quả duyệt / Tích Xanh (SQL 06).
+  - `rsvps` → cô dâu thấy khách phản hồi thiệp ngay, kèm thông báo (SQL 14).
+  - Không bật cho trang khách xem (Dịch vụ cưới, trang tiệm, mẫu váy): mở trang là có bản mới nhất, bật realtime chỉ tốn tài nguyên.
 
 ---
 

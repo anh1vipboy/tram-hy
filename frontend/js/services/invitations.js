@@ -23,6 +23,16 @@ export async function listRsvps(invitationId) {
     .eq('invitation_id', invitationId).order('created_at', { ascending: false }));
 }
 
+// Nghe phản hồi mới của một thiệp theo thời gian thực (RLS: chỉ chủ thiệp nhận được). Trả về hàm hủy.
+export function subscribeRsvps(invitationId, onInsert) {
+  const channel = sb.channel(`rsvps-${invitationId}`)
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'rsvps', filter: `invitation_id=eq.${invitationId}` },
+      (payload) => onInsert(payload.new))
+    .subscribe();
+  return () => sb.removeChannel(channel);
+}
+
 // Khách mời không cần đăng nhập
 export async function submitRsvp(invitationId, { guestName, attending, guestCount, message }) {
   unwrap(await sb.from('rsvps').insert({
