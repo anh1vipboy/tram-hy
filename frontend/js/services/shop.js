@@ -1,4 +1,4 @@
-// Chủ tiệm quản lý: hồ sơ tiệm, mẫu váy, ảnh bìa, ảnh thực tế.
+// Chủ tiệm quản lý: hồ sơ tiệm, mẫu váy, logo, ảnh bìa, ảnh thực tế.
 // Database chỉ cho sửa tiệm của chính mình (RLS + owns_vendor), ảnh lưu trong thư mục <vendor_id>/ của bucket.
 import { sb, unwrap } from '../core/supabase.js';
 import { compressImage } from '../core/image.js';
@@ -43,8 +43,8 @@ export async function resubmitVendor(vendorId) {
 // ---------- ẢNH (dùng chung) ----------
 
 /** Nén rồi tải ảnh lên bucket công khai, trả về { path, url }. */
-async function uploadImage(bucket, vendorId, file, prefix) {
-  const blob = await compressImage(file);
+async function uploadImage(bucket, vendorId, file, prefix, options) {
+  const blob = await compressImage(file, options);
   const path = `${vendorId}/${prefix}-${Date.now()}-${randomSuffix()}.jpg`;
   unwrap(await sb.storage.from(bucket).upload(path, blob, { contentType: 'image/jpeg' }));
   return { path, url: sb.storage.from(bucket).getPublicUrl(path).data.publicUrl };
@@ -60,6 +60,20 @@ function pathFromUrl(bucket, url) {
 async function removeImage(bucket, url) {
   const path = pathFromUrl(bucket, url);
   if (path) await sb.storage.from(bucket).remove([path]);
+}
+
+// ---------- LOGO (ẢNH ĐẠI DIỆN) ----------
+
+export async function changeLogo(shop, file) {
+  const { url } = await uploadImage('vendor-portfolio', shop.id, file, 'logo', { maxSize: 512, quality: 0.9 });
+  unwrap(await sb.from('vendors').update({ logo_url: url }).eq('id', shop.id));
+  await removeImage('vendor-portfolio', shop.logo_url);
+  return url;
+}
+
+export async function removeLogo(shop) {
+  unwrap(await sb.from('vendors').update({ logo_url: null }).eq('id', shop.id));
+  await removeImage('vendor-portfolio', shop.logo_url);
 }
 
 // ---------- ẢNH BÌA ----------

@@ -1,8 +1,9 @@
-// Kênh đối tác → tab "Ảnh tiệm": ảnh bìa + ảnh thực tế (portfolio) hiện trên trang tiệm
+// Kênh đối tác → tab "Ảnh tiệm": logo, ảnh bìa, ảnh thực tế (portfolio) hiện trên trang tiệm
 import { html, render, initials } from '../core/utils.js';
 import { openDialog, toast, toastError } from '../core/ui.js';
 import { listVendorPhotos } from '../services/catalog.js';
-import { changeCover, addPortfolioPhotos, deletePortfolioPhoto } from '../services/shop.js';
+import { changeLogo, removeLogo, changeCover, addPortfolioPhotos, deletePortfolioPhoto } from '../services/shop.js';
+import { vendorLogo } from './vendor-logo.js';
 
 const MAX_PHOTOS = 20;
 
@@ -23,6 +24,21 @@ export async function mountShopMedia(container, shop) {
     const full = photos.length >= MAX_PHOTOS;
     render(container, html`
       <div class="stack">
+        <section class="card stack">
+          <div>
+            <h2 style="margin:0">Ảnh đại diện (logo)</h2>
+            <p class="muted small">Hiện cạnh tên tiệm ở Dịch vụ cưới, trang tiệm và trang chủ. Nên dùng ảnh vuông, logo nằm giữa.</p>
+          </div>
+          <div class="row">
+            ${vendorLogo(shop, { size: 88 })}
+            <label class="btn btn-outline btn-sm">
+              ${shop.logo_url ? 'Đổi logo' : 'Tải logo'}
+              <input type="file" accept="image/*" data-logo hidden ${busyText ? 'disabled' : ''}>
+            </label>
+            ${shop.logo_url ? html`<button class="btn btn-link btn-sm" type="button" data-remove-logo>Gỡ logo</button>` : ''}
+          </div>
+        </section>
+
         <section class="card stack">
           <div>
             <h2 style="margin:0">Ảnh bìa</h2>
@@ -61,6 +77,16 @@ export async function mountShopMedia(container, shop) {
         </section>
       </div>`);
 
+    container.querySelector('[data-logo]')?.addEventListener('change', (e) => upload(
+      'Đang tải logo…',
+      async () => { shop.logo_url = await changeLogo(shop, e.target.files[0]); },
+      'Đã cập nhật logo.',
+    ));
+    container.querySelector('[data-remove-logo]')?.addEventListener('click', () => upload(
+      'Đang gỡ logo…',
+      async () => { await removeLogo(shop); shop.logo_url = null; },
+      'Đã gỡ logo.',
+    ));
     container.querySelector('[data-cover]')?.addEventListener('change', (e) => upload(
       'Đang tải ảnh bìa…',
       async () => { shop.cover_url = await changeCover(shop, e.target.files[0]); },

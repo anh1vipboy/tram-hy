@@ -5,6 +5,7 @@ import { toastError } from '../core/ui.js';
 import { getVendorBySlug, listDresses, listReviews, listVendorPhotos } from '../services/catalog.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
+import { vendorLogo } from '../components/vendor-logo.js';
 
 const page = $('#vendor-page');
 const slug = param('slug');
@@ -41,7 +42,7 @@ function renderPage(vendor, dresses, reviews, photos) {
         <div>
           <div class="row">${badge(VENDOR_CATEGORY[vendor.category], 'gold')}
             ${vendor.is_verified ? badge('✓ Đối tác Tích Xanh', 'blue') : badge('Chưa xác minh')}</div>
-          <h1 style="margin-top:8px">${vendor.name}</h1>
+          <div class="vendor-title" style="margin-top:8px">${vendorLogo(vendor, { size: 64 })}<h1 style="margin:0">${vendor.name}</h1></div>
           <p class="muted">${vendor.address || vendor.district} · ★ ${vendor.rating} (${vendor.review_count} đánh giá)</p>
           ${vendor.description ? html`<p>${vendor.description}</p>` : ''}
         </div>

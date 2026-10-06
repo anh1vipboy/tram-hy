@@ -56,6 +56,7 @@ exe202/
 │   ├── 10_welcome_email.sql  Trigger gửi email chào mừng khi đăng ký bằng Google
 │   ├── 11_ai_tryon.sql       Bảng đếm lượt AI + kho ảnh kết quả riêng tư
 │   ├── 12_tryon_own_garment.sql  Ghi ảnh váy tự tải vào lịch sử thử AI
+│   ├── 13_vendor_logo.sql    Ảnh đại diện (logo) của tiệm
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -137,7 +138,7 @@ Nhánh phụ: `disputed` (đang khiếu nại), `cancelled`, `refunded`.
 
 ### 4.4 Storage & Realtime
 - `bride-photos` (riêng tư): ảnh cô dâu tải lên ở phòng thử, lưu theo thư mục `<user_id>/`, chỉ chính chủ đọc được.
-- `dress-images`, `vendor-portfolio` (công khai): ảnh mẫu váy, ảnh bìa, ảnh thực tế do đối tác tải lên ở Kênh đối tác (ảnh được nén còn ~1600px trước khi tải). Bảng `vendor_photos` lưu ảnh thực tế (tối đa 20 ảnh/tiệm), bảng `dress_photos` lưu ảnh các góc của mẫu váy (tối đa 10 ảnh/mẫu; ảnh chính vẫn là `dresses.image_url`). Hai kho này cần cả quyền đọc (SELECT) thì Storage mới ghi/xóa được – xem 08.
+- `dress-images`, `vendor-portfolio` (công khai): ảnh mẫu váy, logo (nén còn 512px), ảnh bìa, ảnh thực tế do đối tác tải lên ở Kênh đối tác (ảnh được nén còn ~1600px trước khi tải). Bảng `vendor_photos` lưu ảnh thực tế (tối đa 20 ảnh/tiệm), bảng `dress_photos` lưu ảnh các góc của mẫu váy (tối đa 10 ảnh/mẫu; ảnh chính vẫn là `dresses.image_url`). Hai kho này cần cả quyền đọc (SELECT) thì Storage mới ghi/xóa được – xem 08.
 - Realtime bật cho `bookings`, `milestones`, `disputes` → trang Đơn của tôi, Kênh đối tác, Quản trị tự cập nhật.
 
 ---
@@ -275,7 +276,7 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 2. Admin: **Quản trị → Duyệt đối tác** (có số hồ sơ chờ) → **Duyệt** hoặc **Từ chối** kèm lý do.
 3. Đối tác thấy kết quả ngay (realtime). Bị từ chối → sửa thông tin ngay trên trang → **Sửa & gửi duyệt lại**.
 4. Tiệm được duyệt mới hiện ở Dịch vụ cưới và nhận đơn. Tiệm có sẵn trong dữ liệu mẫu thì dùng nút **Gắn chủ tiệm** ở tab Đối tác.
-5. Kênh đối tác có 3 tab: **Đơn hàng** · **Mẫu váy** (tiệm váy cưới: thêm/sửa/ẩn/xóa mẫu; 1 ảnh chính + tối đa 10 ảnh các góc, khách bấm vào ảnh để xem từng góc) · **Ảnh tiệm** (ảnh bìa + tối đa 20 ảnh thực tế, hiện ở trang chi tiết tiệm).
+5. Kênh đối tác có 3 tab: **Đơn hàng** · **Mẫu váy** (tiệm váy cưới: thêm/sửa/ẩn/xóa mẫu; 1 ảnh chính + tối đa 10 ảnh các góc, khách bấm vào ảnh để xem từng góc) · **Ảnh tiệm** (**logo** – hiện cạnh tên tiệm ở Dịch vụ cưới, trang tiệm, trang chủ; ảnh bìa; tối đa 20 ảnh thực tế, hiện ở trang chi tiết tiệm).
 
 ### Tạo tài khoản admin và đối tác
 1. Đăng ký 2 tài khoản trên web (trang Đăng nhập → Tạo tài khoản).
@@ -313,7 +314,7 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 
 | # | Việc | Nằm ở |
 |---|---|---|
-| ✅ | Đối tác tự quản lý mẫu váy, ảnh bìa, ảnh thực tế | Đã xong (SQL 07) |
+| ✅ | Đối tác tự quản lý mẫu váy, logo, ảnh bìa, ảnh thực tế | Đã xong (SQL 07, 13) |
 | 1 | **Chặn trùng lịch**: tiệm khai báo giờ làm việc, khách chỉ chọn được khung giờ còn trống | SQL + `frontend/` |
 | 2 | **Trang "Tài khoản của tôi"**: sửa tên/SĐT, xem số đo (xem/xóa ảnh đã tải: đã có ở Phòng thử) | `frontend/` |
 | 3 | **Thông báo email** khi có đơn mới, đã cọc, chờ nghiệm thu, khiếu nại được xử lý | Edge Function |

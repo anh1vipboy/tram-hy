@@ -4,6 +4,7 @@ import { badge, VENDOR_CATEGORY } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
 import { listVendors } from '../services/catalog.js';
 import { bindMoneyInput, MAX_MONEY } from '../components/money-input.js';
+import { vendorLogo } from '../components/vendor-logo.js';
 
 const filters = {
   category: param('category') || 'all',
@@ -118,7 +119,7 @@ function renderVendors() {
       <div class="body">
         <div class="row">${badge(VENDOR_CATEGORY[v.category], 'gold')}
           ${v.is_verified ? badge('✓ Tích Xanh', 'blue') : ''}</div>
-        <h3>${v.name}</h3>
+        <div class="vendor-title">${vendorLogo(v, { size: 36 })}<h3>${v.name}</h3></div>
         <div class="muted small">${v.district} · ★ ${v.rating} (${v.review_count} đánh giá)</div>
         <div>Từ <span class="price">${money(v.base_price)}</span></div>
         <a class="btn btn-outline btn-sm" href="vendor.html?slug=${v.slug}">Xem chi tiết</a>

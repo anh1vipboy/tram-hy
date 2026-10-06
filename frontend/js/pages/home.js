@@ -5,6 +5,7 @@ import { toastError, withBusy } from '../core/ui.js';
 import { listDresses, listVendors } from '../services/catalog.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
 import { bindMoneyInput } from '../components/money-input.js';
+import { vendorLogo } from '../components/vendor-logo.js';
 import { adviseBudget } from '../services/budget-ai.js';
 
 // Tỷ lệ chia ngân sách cưới phổ biến (category khớp bảng vendors)
@@ -49,7 +50,7 @@ async function loadTopVendors() {
     const vendors = (await listVendors()).filter((v) => v.is_verified).slice(0, 5);
     render(container, vendors.map((v) => html`
       <a class="row" href="vendor.html?slug=${v.slug}" style="color:inherit">
-        <strong>${v.name}</strong><span class="verified" title="Đối tác Tích Xanh">✓</span>
+        ${vendorLogo(v, { size: 32 })}<strong>${v.name}</strong><span class="verified" title="Đối tác Tích Xanh">✓</span>
         <span class="spacer"></span>
         <span class="muted small">${VENDOR_CATEGORY[v.category]} · ★ ${v.rating}</span>
       </a>`));

@@ -162,6 +162,10 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: v
 .item-card .thumb-placeholder { aspect-ratio: 4 / 3; display: grid; place-items: center; font-family: var(--font-title); font-size: 34px; color: var(--gold-dark); background: linear-gradient(135deg, var(--gold-soft), #f3e3e3); }
 .item-card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .item-card .body .btn { margin-top: auto; }
+/* Logo tròn của tiệm (chưa có logo → chữ cái đầu) */
+.vendor-logo { flex: none; display: inline-grid; place-items: center; border-radius: 50%; object-fit: cover; background: var(--gold-soft); color: var(--gold-dark); font-family: var(--font-title); font-weight: 700; border: 1px solid var(--line); }
+.vendor-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.vendor-title h3 { margin: 0; }
 .item-card h3 { font-size: 16px; margin: 0; }
 
 /* Toast */

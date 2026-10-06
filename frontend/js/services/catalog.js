@@ -1,7 +1,7 @@
 // Dữ liệu công khai: đối tác, mẫu váy, đánh giá, ảnh thực tế (thao tác của chủ tiệm nằm ở shop.js)
 import { sb, unwrap } from '../core/supabase.js';
 
-export const VENDOR_FIELDS = 'id, slug, name, category, district, address, phone, base_price, rating, review_count, is_verified, cover_url, description, status, review_note, created_at';
+export const VENDOR_FIELDS = 'id, slug, name, category, district, address, phone, base_price, rating, review_count, is_verified, cover_url, logo_url, description, status, review_note, created_at';
 // photos: số ảnh các góc (để hiện nhãn "N ảnh" và nút xem ảnh)
 const DRESS_FIELDS = 'id, slug, name, type, theme, price, original_price, image_url, tryon_slug, photos:dress_photos(count), vendor:vendors(id, slug, name, district, is_verified)';
 

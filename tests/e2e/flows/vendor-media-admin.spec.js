@@ -40,6 +40,31 @@ test('đối tác đổi ảnh bìa, thêm 2 ảnh thực tế → khách thấy
   }
 });
 
+test('đối tác tải logo → khách thấy logo ở trang tiệm và Dịch vụ cưới → gỡ logo', async ({ browser }) => {
+  requireAccounts('vendor');
+  test.setTimeout(90_000);
+  const vendor = await openAs(browser, 'vendor');
+  await vendor.goto('/vendor-dashboard.html');
+  await vendor.locator('[data-panel="media"]').click();
+  const panel = vendor.locator('#panel-media');
+  await expect(panel.getByRole('heading', { name: 'Ảnh đại diện (logo)' })).toBeVisible({ timeout: 30_000 });
+
+  await panel.locator('input[data-logo]').setInputFiles(path.join(IMAGES, 'logo.jpg'));
+  await expect(vendor.locator('.toast-success', { hasText: 'Đã cập nhật logo.' })).toBeVisible({ timeout: 30_000 });
+  await expect(panel.locator('img.vendor-logo')).toBeVisible();
+
+  const guest = await openAs(browser, null);
+  await guest.goto('/vendor.html?slug=2h-studio');
+  await expect(guest.locator('.vendor-title img.vendor-logo')).toBeVisible();
+  await guest.goto('/marketplace.html');
+  await expect(guest.locator('#vendor-grid article', { hasText: '2H Studio' }).locator('img.vendor-logo')).toBeVisible();
+
+  // Dọn: gỡ logo → quay về chữ cái đầu
+  await panel.getByRole('button', { name: 'Gỡ logo' }).click();
+  await expect(vendor.locator('.toast-success', { hasText: 'Đã gỡ logo.' })).toBeVisible({ timeout: 30_000 });
+  await expect(panel.locator('span.vendor-logo')).toBeVisible();
+});
+
 test('admin cấp rồi thu hồi Tích Xanh cho đối tác', async ({ browser }) => {
   requireAccounts('admin');
   const admin = await openAs(browser, 'admin');
