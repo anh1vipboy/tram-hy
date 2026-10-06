@@ -19,17 +19,6 @@ const BUDGET_SPLIT = [
 initLayout('home');
 loadFeaturedDresses();
 loadTopVendors();
-// Ngân sách cưới: 10 triệu → 10 tỷ. Nhập sai thì báo lỗi dưới ô và ẩn kết quả cũ.
-const budgetInput = bindMoneyInput($('#budget-input'), {
-  errorEl: $('#budget-error'),
-  min: 10_000_000,
-  onChange: (value) => { if (!value) renderBudget(null); },   // đang nhập sai thì ẩn kết quả cũ
-});
-$('#budget-form').addEventListener('submit', (e) => {
-  e.preventDefault();
-  renderBudget(budgetInput.check());
-});
-renderBudget(budgetInput.check());
 
 async function loadFeaturedDresses() {
   const container = $('#featured-dresses');
@@ -71,30 +60,68 @@ async function loadTopVendors() {
 
 
 // ---------- CHIA NGÂN SÁCH ----------
-// Chia nhanh theo tỷ lệ cố định (tức thì), hoặc nhờ AI tư vấn theo số khách / thành phố / ưu tiên.
+// Trái: người dùng nhập. Phải: bảng chia (tỷ lệ cố định hoặc AI) + trò chuyện với AI để điều chỉnh.
+
+const CHAT_LIMIT = 15;   // số câu hỏi mỗi lần mở trang – giữ lượt miễn phí của Gemini
+const AI_FALLBACK_NOTE = {
+  'not-configured': 'AI tư vấn chưa được bật – đang hiển thị cách chia theo tỷ lệ phổ biến.',
+  busy: 'AI đang quá tải, đang hiển thị cách chia theo tỷ lệ phổ biến. Thử lại sau ít phút nhé.',
+  error: 'Chưa kết nối được AI, đang hiển thị cách chia theo tỷ lệ phổ biến.',
+};
+
+const budget = {
+  plan: null,          // bảng chia đang hiển thị: [{ category, label, amount, percent, reason? }]
+  extra: {},           // { ai, tips, warning, note }
+  history: [],         // [{ role: 'user' | 'ai', text }] gửi kèm để AI nhớ ngữ cảnh
+  asked: 0,
+};
+
+// Ngân sách cưới: 10 triệu → 10 tỷ. Nhập sai thì báo lỗi dưới ô và ẩn kết quả cũ.
+const budgetInput = bindMoneyInput($('#budget-input'), {
+  errorEl: $('#budget-error'),
+  min: 10_000_000,
+  onChange: (value) => { if (!value) showPlan(null); },
+});
 
 function fixedSplit(total) {
   return BUDGET_SPLIT.map((item) => ({ ...item, amount: Math.round(total * item.percent / 100) }));
 }
 
-function renderBudget(total) {
-  renderAllocations(total ? fixedSplit(total) : null);
+/** Thông tin đám cưới ở cột trái; null nếu nhập sai (đã báo lỗi) */
+function readWedding() {
+  const total = budgetInput.check();
+  if (!total) return null;
+  const guests = Number($('#ai-guests').value);
+  if ($('#ai-guests').value && (!Number.isInteger(guests) || guests < 10 || guests > 3000)) {
+    toastError(new Error('Số khách mời từ 10 đến 3.000'));
+    return null;
+  }
+  return {
+    total,
+    guests: guests || undefined,
+    city: $('#ai-city').value,
+    priorities: $$('#ai-priorities .chip.active').map((c) => c.textContent.trim()),
+    note: $('#ai-note').value.trim(),
+  };
 }
 
-/** allocations: [{ category, label, amount, percent, reason? }] · extra: { ai, tips, warning, note } */
-function renderAllocations(allocations, extra = {}) {
-  if (!allocations) {
+function showPlan(plan, extra = {}) {
+  budget.plan = plan;
+  budget.extra = extra;
+  render($('#budget-source'), plan
+    ? (extra.ai ? html`<span class="badge badge-purple">✨ Gợi ý bởi AI</span>` : html`<span class="badge">Tỷ lệ phổ biến</span>`)
+    : '');
+  if (!plan) {
     render($('#budget-result'), '');
     return;
   }
   render($('#budget-result'), html`
-    ${extra.ai ? html`<div class="badge badge-purple" style="width:fit-content">✨ Gợi ý bởi AI theo đám cưới của bạn</div>` : ''}
     ${extra.note ? html`<p class="small muted" style="margin:0">${extra.note}</p>` : ''}
     ${extra.warning ? html`<div class="notice notice-error small">${extra.warning}</div>` : ''}
-    ${allocations.map((item) => html`
-      <div class="stack" style="gap:2px">
+    ${plan.map((item) => html`
+      <div class="budget-item">
         <div class="row">
-          <span style="width:150px">${item.label}</span>
+          <span class="budget-label">${item.label}</span>
           <strong>${money(item.amount)}</strong>
           <span class="muted small">(${item.percent}%)</span>
           <span class="spacer"></span>
@@ -102,6 +129,7 @@ function renderAllocations(allocations, extra = {}) {
             ? html`<a class="small" href="marketplace.html?category=${item.category}&max=${item.amount}">Tìm đối tác →</a>`
             : ''}
         </div>
+        <div class="budget-bar"><span style="width:${Math.min(100, item.percent)}%"></span></div>
         ${item.reason ? html`<div class="small muted">${item.reason}</div>` : ''}
       </div>`)}
     ${extra.tips?.length ? html`
@@ -109,41 +137,109 @@ function renderAllocations(allocations, extra = {}) {
         <ul style="margin:4px 0 0;padding-left:18px">${extra.tips.map((t) => html`<li>${t}</li>`)}</ul></div>` : ''}`);
 }
 
-const AI_FALLBACK_NOTE = {
-  'not-configured': 'AI tư vấn chưa được bật – đang hiển thị cách chia theo tỷ lệ phổ biến.',
-  busy: 'AI đang quá tải, đang hiển thị cách chia theo tỷ lệ phổ biến. Thử lại sau ít phút nhé.',
-  error: 'Chưa kết nối được AI, đang hiển thị cách chia theo tỷ lệ phổ biến.',
-};
+function resetChat() {
+  budget.history = [];
+  $$('#chat-log .msg').slice(1).forEach((m) => m.remove());   // giữ câu chào
+}
+
+function addMessage(role, text) {
+  const el = document.createElement('div');
+  el.className = `msg ${role}`;
+  el.textContent = text;
+  $('#chat-log').append(el);
+  $('#chat-log').scrollTop = $('#chat-log').scrollHeight;
+  return el;
+}
+
+function updateChatRemaining() {
+  $('#chat-remaining').textContent = `Còn ${CHAT_LIMIT - budget.asked}/${CHAT_LIMIT} câu hỏi`;
+}
+
+// Chia nhanh theo tỷ lệ cố định – tức thì, không cần AI
+$('#quick-split-btn').addEventListener('click', () => {
+  const total = budgetInput.check();
+  if (!total) return;
+  resetChat();
+  showPlan(fixedSplit(total));
+});
+
+// AI tư vấn theo số khách / thành phố / ưu tiên (Enter trong form cũng chạy cái này)
+$('#budget-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  withBusy($('#ai-budget-btn'), async () => {
+    const wedding = readWedding();
+    if (!wedding) return;
+    render($('#budget-result'), html`<div class="muted">✨ AI đang tính toán cho đám cưới của bạn…</div>`);
+    resetChat();
+    try {
+      const result = await adviseBudget(wedding);
+      if (result.fallback) {
+        showPlan(fixedSplit(wedding.total), { note: AI_FALLBACK_NOTE[result.reason] ?? AI_FALLBACK_NOTE.error });
+      } else {
+        showPlan(result.allocations, { ai: true, tips: result.tips, warning: result.warning });
+      }
+    } catch (error) {
+      toastError(error);
+      showPlan(fixedSplit(wedding.total));
+    }
+  });
+});
 
 $$('#ai-priorities .chip').forEach((chip) => {
   chip.addEventListener('click', () => chip.classList.toggle('active'));
 });
 
-$('#ai-budget-btn').addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
-  const total = budgetInput.check();
-  if (!total) return;
-  const guests = Number($('#ai-guests').value);
-  if ($('#ai-guests').value && (!Number.isInteger(guests) || guests < 10 || guests > 3000)) {
-    toastError(new Error('Số khách mời từ 10 đến 3.000'));
+// Trò chuyện: gửi câu hỏi + bảng chia hiện tại + lịch sử; AI có thể trả bảng chia mới
+async function ask(question) {
+  question = question.trim();
+  if (!question) return;
+  if (budget.asked >= CHAT_LIMIT) {
+    toastError(new Error('Bạn đã hỏi đủ lượt cho lần này – tải lại trang để hỏi tiếp nhé'));
     return;
   }
+  const wedding = readWedding();
+  if (!wedding) return;
+  if (!budget.plan) showPlan(fixedSplit(wedding.total));
 
-  render($('#budget-result'), html`<div class="muted">✨ AI đang tính toán cho đám cưới của bạn…</div>`);
+  addMessage('user', question);
+  $('#chat-input').value = '';
+  const typing = addMessage('ai typing', 'AI đang trả lời…');
   try {
     const result = await adviseBudget({
-      total,
-      guests: guests || undefined,
-      city: $('#ai-city').value,
-      priorities: $$('#ai-priorities .chip.active').map((c) => c.textContent.trim()),
-      note: $('#ai-note').value.trim(),
+      ...wedding,
+      question,
+      plan: budget.plan.map(({ category, percent }) => ({ category, percent })),
+      history: budget.history,
     });
+    typing.remove();
     if (result.fallback) {
-      renderAllocations(fixedSplit(total), { note: AI_FALLBACK_NOTE[result.reason] ?? AI_FALLBACK_NOTE.error });
-    } else {
-      renderAllocations(result.allocations, { ai: true, tips: result.tips, warning: result.warning });
+      addMessage('ai', result.reason === 'busy'
+        ? 'AI đang quá tải, bạn thử hỏi lại sau ít phút nhé.'
+        : 'Mình chưa kết nối được AI, bạn thử lại sau nhé.');
+      return;
+    }
+    budget.asked += 1;
+    updateChatRemaining();
+    budget.history.push({ role: 'user', text: question }, { role: 'ai', text: result.reply });
+    addMessage('ai', result.allocations ? `${result.reply}\n\n→ Đã cập nhật bảng chia ở trên.` : result.reply);
+    if (result.allocations) {
+      showPlan(result.allocations, { ai: true, tips: budget.extra.tips, note: 'Đã điều chỉnh theo trao đổi của bạn.' });
     }
   } catch (error) {
+    typing.remove();
     toastError(error);
-    renderBudget(total);
   }
-}));
+}
+
+$('#chat-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  withBusy($('#chat-form button'), () => ask($('#chat-input').value));
+});
+$$('#chat-suggest .chip').forEach((chip) => {
+  chip.addEventListener('click', () => withBusy(chip, () => ask(chip.textContent)));
+});
+
+$$('#ai-budget-btn, #quick-split-btn, #chat-form [type=submit]').forEach((b) => { b.disabled = false; });   // xử lý đã gắn → mở nút
+// Mở trang: hiện ngay cách chia theo tỷ lệ phổ biến
+updateChatRemaining();
+showPlan(fixedSplit(budgetInput.check()));

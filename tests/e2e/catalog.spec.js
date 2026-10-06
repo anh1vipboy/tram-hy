@@ -13,7 +13,7 @@ test.describe('Trang chủ', () => {
   test('chia ngân sách cưới theo tỷ lệ', async ({ page }) => {
     await page.goto('/index.html');
     await page.locator('#budget-input').fill('100000000');
-    await page.getByRole('button', { name: 'Chia ngân sách' }).click();
+    await page.getByRole('button', { name: 'Chia nhanh theo tỷ lệ phổ biến' }).click();
     const result = page.locator('#budget-result');
     await expect(result).toContainText('50.000.000đ');   // nhà hàng 50%
     await expect(result).toContainText('20.000.000đ');   // chụp ảnh 20%
@@ -41,13 +41,12 @@ test.describe('Trang chủ', () => {
     });
     await page.goto('/index.html');
     await page.locator('#budget-input').fill('100000000');
-    await page.getByText('Nhờ AI tư vấn chi tiết').click();
     await page.locator('#ai-guests').fill('200');
     await page.getByRole('button', { name: 'Ảnh cưới đẹp' }).click();
     await page.getByRole('button', { name: 'AI tư vấn chia ngân sách' }).click();
 
     const result = page.locator('#budget-result');
-    await expect(result).toContainText('Gợi ý bởi AI');
+    await expect(page.locator('#budget-source')).toContainText('Gợi ý bởi AI');
     await expect(result).toContainText('60.000.000đ');
     await expect(result).toContainText('Tiệc 20 bàn');
     await expect(result).toContainText('Đặt tiệc sớm để được giá tốt');
@@ -58,12 +57,40 @@ test.describe('Trang chủ', () => {
     await mockBudgetAi(page, { fallback: true, reason: 'busy' });
     await page.goto('/index.html');
     await page.locator('#budget-input').fill('100000000');
-    await page.getByText('Nhờ AI tư vấn chi tiết').click();
     await page.getByRole('button', { name: 'AI tư vấn chia ngân sách' }).click();
 
     const result = page.locator('#budget-result');
     await expect(result).toContainText('AI đang quá tải');
     await expect(result).toContainText('50.000.000đ');   // vẫn có kết quả chia theo tỷ lệ
+  });
+
+  test('trao đổi với AI: gửi câu hỏi kèm bảng chia, AI trả lời và cập nhật bảng', async ({ page }) => {
+    let sent;
+    await page.route('**/functions/v1/tu-van-ngan-sach', (route) => {
+      sent = route.request().postDataJSON();
+      route.fulfill({
+        status: 200, contentType: 'application/json', body: JSON.stringify({
+          source: 'ai',
+          reply: 'Được bạn nhé, chuyển 5 triệu từ tiệc sang ảnh cưới.',
+          allocations: [
+            { category: 'venue', label: 'Nhà hàng tiệc', amount: 45_000_000, percent: 45, reason: 'Giảm 5 triệu' },
+            { category: 'studio', label: 'Chụp ảnh cưới', amount: 55_000_000, percent: 55, reason: 'Tăng 5 triệu' },
+          ],
+        }),
+      });
+    });
+    await page.goto('/index.html');
+    await page.locator('#budget-input').fill('100000000');
+    await page.locator('#chat-input').fill('Giảm tiệc 5 triệu cho ảnh cưới');
+    await page.getByRole('button', { name: 'Gửi', exact: true }).click();
+
+    const log = page.locator('#chat-log');
+    await expect(log.locator('.msg.user')).toHaveText('Giảm tiệc 5 triệu cho ảnh cưới');
+    await expect(log).toContainText('chuyển 5 triệu từ tiệc sang ảnh cưới');
+    await expect(page.locator('#budget-result')).toContainText('55.000.000đ');
+    await expect(page.locator('#chat-remaining')).toHaveText('Còn 14/15 câu hỏi');
+    expect(sent.question).toBe('Giảm tiệc 5 triệu cho ảnh cưới');
+    expect(sent.plan).toContainEqual({ category: 'venue', percent: 50 });   // bảng chia đang hiển thị
   });
 });
 
@@ -130,7 +157,7 @@ test.describe('Kiểm tra số tiền nhập', () => {
     await page.goto('/index.html');
     const input = page.locator('#budget-input');
     const error = page.locator('#budget-error');
-    const submit = page.getByRole('button', { name: 'Chia ngân sách' });
+    const submit = page.getByRole('button', { name: 'Chia nhanh theo tỷ lệ phổ biến' });
 
     await input.fill('abc250000000xyz');                 // chữ bị bỏ, số được định dạng
     await expect(input).toHaveValue('250.000.000');

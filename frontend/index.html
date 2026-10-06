@@ -62,55 +62,88 @@
       <div class="grid" id="featured-dresses"><div class="empty">Đang tải mẫu váy…</div></div>
     </section>
 
-    <section class="section grid-2">
-      <div class="card">
-        <div class="eyebrow">Công cụ</div>
-        <h2>Gợi ý chia ngân sách cưới</h2>
-        <p class="muted">Nhập tổng ngân sách, Trạm Hỷ gợi ý mức chi cho từng hạng mục theo tỷ lệ phổ biến tại Hà Nội.</p>
-        <form id="budget-form" class="stack" style="gap:6px" novalidate>
-          <div class="row">
-            <div class="money-field" style="flex:1;min-width:180px">
+    <section class="section" id="budget">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Công cụ</div>
+          <h2>Gợi ý chia ngân sách cưới</h2>
+          <p>Kể cho Trạm Hỷ về đám cưới của bạn – AI chia ngân sách cho từng hạng mục, rồi trò chuyện để điều chỉnh.</p>
+        </div>
+      </div>
+      <div class="grid-2 budget-tool">
+        <!-- TRÁI: người dùng nhập -->
+        <!-- Các nút khóa sẵn, home.js mở khi đã gắn xử lý (bấm sớm sẽ tải lại trang, mất dữ liệu nhập) -->
+        <form id="budget-form" class="card stack" novalidate>
+          <h3 style="margin:0">Đám cưới của bạn</h3>
+          <div class="field"><span>Tổng ngân sách</span>
+            <div class="money-field">
               <input class="input" id="budget-input" value="150.000.000" aria-label="Tổng ngân sách cưới (VNĐ)">
               <span class="suffix">đ</span>
             </div>
-            <button class="btn btn-primary" type="submit">Chia ngân sách</button>
+            <p class="field-error" id="budget-error" hidden></p>
+            <span class="small muted" style="font-weight:400">Từ 10 triệu đến 10 tỷ đồng.</span>
           </div>
-          <p class="field-error" id="budget-error" hidden></p>
-          <p class="small muted" style="margin:0">Từ 10 triệu đến 10 tỷ đồng.</p>
-
-          <details id="ai-budget">
-            <summary class="ai-summary">✨ Nhờ AI tư vấn chi tiết theo đám cưới của bạn</summary>
-            <div class="stack" style="margin-top:10px">
-              <div class="form-grid">
-                <label class="field"><span>Số khách mời dự kiến</span>
-                  <input class="input" type="number" id="ai-guests" min="10" max="3000" step="10" placeholder="VD: 300"></label>
-                <label class="field"><span>Tổ chức tại</span>
-                  <select class="input" id="ai-city">
-                    <option>Hà Nội</option><option>TP. Hồ Chí Minh</option><option>Đà Nẵng</option><option>Tỉnh/thành khác</option>
-                  </select></label>
-              </div>
-              <div class="field"><span>Bạn ưu tiên điều gì? (chọn nhiều)</span>
-                <div class="chips" id="ai-priorities">
-                  <button class="chip" type="button">Ảnh cưới đẹp</button>
-                  <button class="chip" type="button">Tiệc sang trọng</button>
-                  <button class="chip" type="button">Váy cưới lộng lẫy</button>
-                  <button class="chip" type="button">Trang trí ấn tượng</button>
-                  <button class="chip" type="button">Tiết kiệm tối đa</button>
-                </div>
-              </div>
-              <label class="field"><span>Ghi chú thêm (không bắt buộc)</span>
-                <input class="input" id="ai-note" maxlength="200" placeholder="VD: cưới ngoài trời, đã có nhẫn cưới"></label>
-              <button class="btn btn-dark" type="button" id="ai-budget-btn">✨ AI tư vấn chia ngân sách</button>
+          <div class="form-grid">
+            <label class="field"><span>Số khách mời dự kiến</span>
+              <input class="input" type="number" id="ai-guests" min="10" max="3000" step="10" placeholder="VD: 300"></label>
+            <label class="field"><span>Tổ chức tại</span>
+              <select class="input" id="ai-city">
+                <option>Hà Nội</option><option>TP. Hồ Chí Minh</option><option>Đà Nẵng</option><option>Tỉnh/thành khác</option>
+              </select></label>
+          </div>
+          <div class="field"><span>Bạn ưu tiên điều gì? (chọn nhiều)</span>
+            <div class="chips" id="ai-priorities">
+              <button class="chip" type="button">Ảnh cưới đẹp</button>
+              <button class="chip" type="button">Tiệc sang trọng</button>
+              <button class="chip" type="button">Váy cưới lộng lẫy</button>
+              <button class="chip" type="button">Trang trí ấn tượng</button>
+              <button class="chip" type="button">Tiết kiệm tối đa</button>
             </div>
-          </details>
+          </div>
+          <label class="field"><span>Ghi chú thêm (không bắt buộc)</span>
+            <input class="input" id="ai-note" maxlength="200" placeholder="VD: cưới ngoài trời, đã có nhẫn cưới"></label>
+          <button class="btn btn-dark" type="submit" id="ai-budget-btn" disabled>✨ AI tư vấn chia ngân sách</button>
+          <button class="btn btn-outline" type="button" id="quick-split-btn" disabled>Chia nhanh theo tỷ lệ phổ biến</button>
         </form>
-        <div id="budget-result" class="stack" style="margin-top:14px"></div>
+
+        <!-- PHẢI: kết quả + trao đổi với AI -->
+        <div class="card stack budget-panel">
+          <div class="row">
+            <h3 style="margin:0">Gợi ý chia ngân sách</h3>
+            <span class="spacer"></span>
+            <span id="budget-source"></span>
+          </div>
+          <div id="budget-result" class="stack budget-result"></div>
+
+          <div class="budget-chat" id="budget-chat">
+            <div class="row"><strong>💬 Trao đổi với AI</strong><span class="spacer"></span>
+              <span class="small muted" id="chat-remaining"></span></div>
+            <div class="chat-log" id="chat-log" aria-live="polite">
+              <div class="msg ai">Chào bạn! Hỏi mình bất cứ điều gì về bảng chia bên trên – ví dụ muốn giảm tiền tiệc, mời thêm khách hay nên thuê hay may váy.</div>
+            </div>
+            <div class="chips" id="chat-suggest">
+              <button class="chip" type="button">Giảm tiền tiệc, tăng chụp ảnh</button>
+              <button class="chip" type="button">Nếu mời thêm 50 khách thì sao?</button>
+              <button class="chip" type="button">Nên thuê hay may váy cưới?</button>
+            </div>
+            <form id="chat-form" class="row chat-form" novalidate>
+              <input class="input" id="chat-input" maxlength="300" autocomplete="off" placeholder="Nhập câu hỏi cho AI…" aria-label="Câu hỏi cho AI">
+              <button class="btn btn-primary" type="submit" disabled>Gửi</button>
+            </form>
+          </div>
+        </div>
       </div>
-      <div class="card">
-        <div class="eyebrow">Đối tác uy tín</div>
-        <h2>Được đánh giá cao nhất</h2>
-        <div id="top-vendors" class="stack"><div class="muted">Đang tải…</div></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Đối tác uy tín</div>
+          <h2>Được đánh giá cao nhất</h2>
+        </div>
+        <a href="marketplace.html">Xem tất cả đối tác →</a>
       </div>
+      <div class="card"><div id="top-vendors" class="stack"><div class="muted">Đang tải…</div></div></div>
     </section>
   </main>
 

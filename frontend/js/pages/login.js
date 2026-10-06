@@ -129,6 +129,7 @@ $('#google-signin').addEventListener('click', (e) => withBusy(e.currentTarget, a
 }));
 
 // ---------- KHỞI CHẠY TRANG ----------
+$$('#signin-form [type=submit], #signup-form [type=submit]').forEach((b) => { b.disabled = false; });   // xử lý đã gắn → mở nút
 const profile = await initLayout('login');
 const oauthError = !param('confirmed') && (authRedirectParams.get('error') || param('error'));
 if (param('confirmed')) {
