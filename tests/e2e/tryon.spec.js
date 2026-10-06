@@ -54,6 +54,14 @@ test('nút "Ướm thử bằng AI thật": chưa đăng nhập thì mời đăn
   await expect(page).toHaveURL(/login\.html\?next=tryon\.html%3Fdress%3Dkorean-satin/);
 });
 
+test('chưa đăng nhập: tải ảnh vẫn xem thử được, nhắc đăng nhập để lưu ảnh', async ({ page }) => {
+  await expect(page.locator('#photo-note')).toHaveText('Đăng nhập để lưu ảnh và chọn lại ở lần sau.');
+  await page.locator('#photo-input').setInputFiles(require('node:path')
+    .resolve(__dirname, '../../frontend/assets/images/bride_model_2.jpg'));
+  await expect(page.locator('#models [data-model="local"]')).toHaveClass(/active/);
+  await expect(page.locator('#models [data-remove]')).toHaveCount(0);   // chưa lưu thì không có nút xóa
+});
+
 test('chế độ tự thiết kế may đo thì ẩn nút AI (chưa có ảnh váy thật để ghép)', async ({ page }) => {
   await page.getByRole('button', { name: 'Tự thiết kế may đo' }).click();
   await expect(page.locator('#ai-tryon-box')).toBeHidden();

@@ -218,6 +218,7 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - Không nhận mail → xem Supabase → Edge Functions → Logs (403 = bí mật không khớp, 502 = Brevo từ chối) và Brevo → Transactional → Logs.
 
 ### Thử váy bằng AI thật
+- **Ảnh của cô dâu được lưu lại**: đã đăng nhập thì ảnh toàn thân tải lên được nén và lưu vào bucket riêng tư `bride-photos/<user_id>/` (chỉ chính chủ xem được). Lần sau mở Phòng thử, các ảnh này hiện cạnh người mẫu để chọn lại; nút **×** trên ảnh để xóa hẳn. Tối đa 6 ảnh/người (`MAX_BRIDE_PHOTOS` trong `services/profile.js`). Chưa đăng nhập thì ảnh chỉ dùng tạm trong trình duyệt.
 - Phòng thử: chọn váy chỉ hiện **ảnh minh họa** (miễn phí). Nút **✨ Ướm thử bằng AI thật** mới gọi Edge Function `thu-vay-ai` → ghép **ảnh thật của mẫu váy** lên ảnh người mẫu / ảnh cô dâu tải lên. Cần đăng nhập; mẫu chưa có ảnh thật thì không thử AI được.
 - Mặc định dùng **Gemini 3.1 Flash Image** (~0,045 USD/ảnh). Key **Free tier** hoặc chưa đặt key → web tự quay về ảnh minh họa, báo "AI chưa được bật". Bật thanh toán cho key là chạy thật, không sửa code.
 - Đổi sang FASHN sau này: `npx supabase secrets set --project-ref vsjdijmuvuetmhmszcrl TRYON_PROVIDER=fashn FASHN_API_KEY=...` (phần FASHN chưa chạy thử với tài khoản thật).
@@ -300,7 +301,7 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 |---|---|---|
 | ✅ | Đối tác tự quản lý mẫu váy, ảnh bìa, ảnh thực tế | Đã xong (SQL 07) |
 | 1 | **Chặn trùng lịch**: tiệm khai báo giờ làm việc, khách chỉ chọn được khung giờ còn trống | SQL + `frontend/` |
-| 2 | **Trang "Tài khoản của tôi"**: sửa tên/SĐT, xem số đo, **xóa ảnh đã tải** | `frontend/` |
+| 2 | **Trang "Tài khoản của tôi"**: sửa tên/SĐT, xem số đo (xem/xóa ảnh đã tải: đã có ở Phòng thử) | `frontend/` |
 | 3 | **Thông báo email** khi có đơn mới, đã cọc, chờ nghiệm thu, khiếu nại được xử lý | Edge Function |
 | 4 | **Thanh toán thật** (PayOS): webhook xác nhận chuyển khoản → gọi `pay_milestone` | Edge Function |
 | ✅ | AI thử váy thật (Gemini, sẵn chỗ cắm FASHN), 5 lượt/người/ngày | Đã xong (SQL 11 + function thu-vay-ai) |

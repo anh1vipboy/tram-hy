@@ -230,10 +230,14 @@ dialog.modal::backdrop { background: rgba(30, 24, 20, .55); }
 .fit-score { display: flex; gap: 12px; align-items: center; margin-top: 12px; padding: 12px; border-radius: 12px; background: #2a2421; }
 .fit-score .score { flex: none; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 18px; background: var(--gold); color: #fff; }
 .fit-score p { margin: 0; font-size: 13px; color: #d9cbbb; }
-.models { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+.models { display: flex; gap: 10px; overflow-x: auto; padding: 6px 6px 4px 0; }   /* chừa chỗ cho nút × */
 .model { flex: none; width: 68px; border: 2px solid transparent; border-radius: 12px; padding: 0; background: none; cursor: pointer; text-align: center; font: 600 12px var(--font-body); color: var(--muted); }
 .model img { width: 64px; height: 64px; object-fit: cover; object-position: top; border-radius: 10px; }
 .model.active { border-color: var(--gold); color: var(--gold-dark); }
+/* Ảnh người dùng đã lưu: nút × xóa ở góc */
+.model-wrap { position: relative; flex: none; }
+.model-remove { position: absolute; top: -4px; right: -4px; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--red); font: 700 14px/1 var(--font-body); cursor: pointer; box-shadow: var(--shadow); }
+.model-remove:hover { background: var(--red-soft); }
 .dress-list { display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; }
 .dress-option { display: flex; gap: 12px; align-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer; text-align: left; font: inherit; color: inherit; }
 .dress-option:hover { border-color: var(--gold); }

@@ -1,10 +1,12 @@
 import { initLayout } from '../core/layout.js';
 import { $, $$, html, render, money, param, debounce, sleep } from '../core/utils.js';
 import { badge, DRESS_THEME } from '../core/labels.js';
-import { toast, toastError } from '../core/ui.js';
+import { toast, toastError, openDialog } from '../core/ui.js';
 import { BESPOKE_VENDOR_SLUG } from '../config.js';
 import { listDresses, getVendorBySlug } from '../services/catalog.js';
-import { getBodyProfile, saveBodyProfile, uploadBridePhoto } from '../services/profile.js';
+import {
+  getBodyProfile, saveBodyProfile, uploadBridePhoto, listBridePhotos, deleteBridePhoto, MAX_BRIDE_PHOTOS,
+} from '../services/profile.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
 import { openDressGallery, realPhotoCount } from '../components/dress-gallery.js';
 import { aiTryOn, remainingAiTries, AI_DAILY_LIMIT } from '../services/tryon-ai.js';
@@ -23,8 +25,8 @@ const state = {
   themeFilter: 'all',
   dress: null,                  // mẫu đang chọn (mode catalog)
   model: MODELS[0],
-  customPhotoUrl: null,         // ảnh người dùng tự tải lên (xem trước trong trình duyệt)
-  customPhotoPath: null,        // đường dẫn ảnh đó trong kho riêng tư (có khi đã đăng nhập & tải xong)
+  myPhotos: [],                 // ảnh toàn thân đã lưu trong tài khoản: [{ path, url }] (mới nhất trước)
+  localPhoto: null,             // ảnh vừa chọn nhưng chưa lưu (chưa đăng nhập / đang tải lên)
   aiResults: new Map(),         // ảnh AI đã ghép: "người mẫu|váy" → link (tránh gọi AI lại, tốn tiền)
   aiRemaining: null,            // số lượt AI còn lại hôm nay (null = chưa biết)
   aiBusy: false,
@@ -54,6 +56,15 @@ async function loadBodyProfile() {
       state.body = { height: saved.height_cm, weight: saved.weight_kg, heel: saved.heel_cm, shape: saved.body_shape || 'hourglass' };
     }
     $('#body-save-note').textContent = 'Số đo được tự lưu vào tài khoản của bạn.';
+  } catch (error) {
+    toastError(error);
+  }
+}
+
+async function loadMyPhotos() {
+  if (!state.profile) return;
+  try {
+    state.myPhotos = await listBridePhotos(state.profile.id);
   } catch (error) {
     toastError(error);
   }
@@ -112,29 +123,59 @@ function initControls() {
   $('#cta-book').addEventListener('click', book);
 }
 
+// Ảnh của người dùng: { key, name, photo, custom: true, path } – path = null khi chưa lưu lên server
+const photoModel = ({ path, url }) => ({ key: `photo:${path}`, name: 'Ảnh của bạn', photo: url, custom: true, path });
+
 async function onPhotoSelected(e) {
   const file = e.target.files[0];
+  e.target.value = '';                    // chọn lại đúng file đó vẫn nhận
   if (!file) return;
   if (file.size > 10 * 1024 * 1024) {
     toastError(new Error('Ảnh tối đa 10MB'));
     return;
   }
-  if (state.customPhotoUrl) URL.revokeObjectURL(state.customPhotoUrl);
-  state.customPhotoUrl = URL.createObjectURL(file);
-  state.customPhotoPath = null;
-  state.model = { key: 'custom', name: 'Ảnh của bạn', photo: state.customPhotoUrl };
+  if (state.profile && state.myPhotos.length >= MAX_BRIDE_PHOTOS) {
+    toastError(new Error(`Bạn đã lưu đủ ${MAX_BRIDE_PHOTOS} ảnh – bấm × trên ảnh cũ để xóa bớt rồi tải lại`));
+    return;
+  }
+  if (state.localPhoto) URL.revokeObjectURL(state.localPhoto.photo);
+  const local = { key: 'local', name: 'Ảnh của bạn', photo: URL.createObjectURL(file), custom: true, path: null };
+  state.localPhoto = local;
+  state.model = local;
   renderModels();
   tryOn({ reveal: true });
 
-  if (state.profile) {
-    try {
-      state.customPhotoPath = await uploadBridePhoto(state.profile.id, file);   // AI thật cần ảnh nằm trên server
-      toast('Ảnh đã được lưu riêng tư trong tài khoản của bạn.', 'success');
-      renderAiButton();
-    } catch (error) {
-      toastError(error);
-    }
+  if (!state.profile) return;
+  try {
+    const path = await uploadBridePhoto(state.profile.id, file);   // AI thật cần ảnh nằm trên server
+    const saved = photoModel({ path, url: local.photo });          // vẫn hiện bằng ảnh trong máy, khỏi tải lại
+    state.myPhotos.unshift({ path, url: local.photo });
+    state.localPhoto = null;
+    if (state.model === local) state.model = saved;
+    toast('Đã lưu ảnh riêng tư vào tài khoản – lần sau vào vẫn chọn lại được.', 'success');
+    renderModels();
+    renderAiButton();
+  } catch (error) {
+    toastError(error);
   }
+}
+
+function confirmDeletePhoto(path) {
+  openDialog({
+    title: 'Xóa ảnh này?',
+    content: html`<p>Ảnh sẽ bị xóa hẳn khỏi tài khoản của bạn và không khôi phục được.</p>`,
+    confirmText: 'Xóa ảnh',
+    danger: true,
+    onConfirm: async () => {
+      await deleteBridePhoto(path);
+      state.myPhotos = state.myPhotos.filter((p) => p.path !== path);
+      for (const key of state.aiResults.keys()) if (key.startsWith(`${path}|`)) state.aiResults.delete(key);
+      if (state.model.path === path) state.model = MODELS[0];
+      toast('Đã xóa ảnh.', 'success');
+      renderModels();
+      tryOn({ reveal: true });
+    },
+  });
 }
 
 // ---------- THỬ VÁY BẰNG AI THẬT ----------
@@ -149,7 +190,7 @@ const AI_FALLBACK_MESSAGES = {
 };
 
 // Khóa ảnh AI theo đúng người mẫu/ảnh + đúng váy đang chọn
-const aiKey = () => `${state.model.key === 'custom' ? state.customPhotoPath : state.model.key}|${state.dress?.id}`;
+const aiKey = () => `${state.model.custom ? state.model.path : state.model.key}|${state.dress?.id}`;
 const currentAiImage = () => (state.mode === 'catalog' ? state.aiResults.get(aiKey()) : null);
 
 async function loadAiRemaining() {
@@ -171,14 +212,14 @@ function renderAiButton() {
   let reason = '';
   if (!state.profile) reason = 'Đăng nhập để ghép váy lên ảnh bằng AI thật';
   else if (!state.dress.image_url) reason = 'Mẫu này chưa có ảnh thật từ tiệm';
-  else if (state.model.key === 'custom' && !state.customPhotoPath) reason = 'Đang lưu ảnh của bạn…';
+  else if (state.model.custom && !state.model.path) reason = 'Đang lưu ảnh của bạn…';
   else if (state.aiRemaining === 0) reason = `Đã dùng hết ${AI_DAILY_LIMIT} lượt AI hôm nay`;
   else if (currentAiImage()) reason = 'Đang xem ảnh AI đã ghép';
   else if (state.aiRemaining !== null) reason = `Còn ${state.aiRemaining}/${AI_DAILY_LIMIT} lượt hôm nay`;
 
   // Chưa đăng nhập vẫn bấm được → đưa tới trang đăng nhập
   button.disabled = state.aiBusy || (Boolean(state.profile) && (!state.dress.image_url
-    || (state.model.key === 'custom' && !state.customPhotoPath) || state.aiRemaining === 0 || Boolean(currentAiImage())));
+    || (state.model.custom && !state.model.path) || state.aiRemaining === 0 || Boolean(currentAiImage())));
   hint.textContent = reason;
 }
 
@@ -195,8 +236,8 @@ async function runAiTryOn() {
   scan.textContent = 'AI đang ghép váy lên ảnh của bạn… (khoảng 10–30 giây)';
   scan.hidden = false;
   try {
-    const result = await aiTryOn(state.model.key === 'custom'
-      ? { dressId: state.dress.id, photoPath: state.customPhotoPath }
+    const result = await aiTryOn(state.model.custom
+      ? { dressId: state.dress.id, photoPath: state.model.path }
       : { dressId: state.dress.id, sampleModel: state.model.key });
 
     if (result.fallback) {
@@ -297,7 +338,7 @@ function renderAll() {
 
 function renderMirror() {
   const theme = currentTheme();
-  const isCustom = state.model.key === 'custom';
+  const isCustom = Boolean(state.model.custom);
   const img = $('#mirror-img');
 
   const aiImage = currentAiImage();
@@ -331,19 +372,30 @@ function renderFit() {
 }
 
 function renderModels() {
-  const models = state.customPhotoUrl
-    ? [...MODELS, { key: 'custom', name: 'Ảnh của bạn', photo: state.customPhotoUrl }]
-    : MODELS;
+  const models = [
+    ...MODELS,
+    ...(state.localPhoto ? [state.localPhoto] : []),
+    ...state.myPhotos.map(photoModel),
+  ];
   render($('#models'), models.map((m) => html`
-    <button class="model ${m.key === state.model.key ? 'active' : ''}" type="button" data-model="${m.key}">
-      <img src="${m.photo}" alt="">${m.name}
-    </button>`));
+    <div class="model-wrap">
+      <button class="model ${m.key === state.model.key ? 'active' : ''}" type="button" data-model="${m.key}">
+        <img src="${m.photo}" alt="">${m.name}
+      </button>
+      ${m.path ? html`<button class="model-remove" type="button" data-remove="${m.path}" title="Xóa ảnh" aria-label="Xóa ảnh">×</button>` : ''}
+    </div>`));
   for (const btn of $$('[data-model]')) {
     btn.addEventListener('click', () => {
       state.model = models.find((m) => m.key === btn.dataset.model);
       tryOn({ reveal: true });
     });
   }
+  for (const btn of $$('[data-remove]')) {
+    btn.addEventListener('click', () => confirmDeletePhoto(btn.dataset.remove));
+  }
+  $('#photo-note').textContent = !state.profile
+    ? 'Đăng nhập để lưu ảnh và chọn lại ở lần sau.'
+    : `Ảnh được lưu riêng tư – chỉ bạn xem được (${state.myPhotos.length}/${MAX_BRIDE_PHOTOS} ảnh).`;
 }
 
 function renderBody() {
@@ -489,5 +541,5 @@ renderModels();
 renderBody();
 renderMirror();
 state.profile = await initLayout('tryon');
-await Promise.all([loadDresses(), loadBodyProfile(), loadAiRemaining()]);
+await Promise.all([loadDresses(), loadBodyProfile(), loadAiRemaining(), loadMyPhotos()]);
 renderAll();
