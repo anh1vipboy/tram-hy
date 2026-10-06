@@ -25,7 +25,7 @@ test('đối tác mới đăng ký → mở tiệm → bị từ chối → gử
 
   // ---- Gửi hồ sơ mở tiệm ----
   await vendor.getByLabel('Tên tiệm / thương hiệu').fill(shopName);
-  await vendor.getByLabel('Loại dịch vụ').selectOption('decor');
+  await vendor.getByRole('radio', { name: /Trang trí/ }).check();
   await vendor.getByLabel('Số điện thoại liên hệ').fill('0911222333');
   await vendor.getByLabel('Quận / khu vực').fill('Cầu Giấy, Hà Nội');
   await vendor.getByLabel('Giá khởi điểm (VNĐ)').fill('15000000');
