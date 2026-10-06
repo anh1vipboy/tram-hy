@@ -210,6 +210,8 @@ dialog.modal::backdrop { background: rgba(30, 24, 20, .55); }
 .ai-summary { cursor: pointer; color: var(--gold-dark); font-weight: 600; font-size: 14px; margin-top: 6px; }
 /* Công cụ chia ngân sách (trang chủ): trái nhập – phải kết quả + chat */
 .budget-tool { align-items: start; }
+/* Cột nhập "dính" dưới thanh menu (cao ~65px) khi cuộn xem kết quả / chat ở cột phải */
+.budget-tool > form { position: sticky; top: 84px; max-height: calc(100dvh - 100px); overflow-y: auto; }
 .budget-result:empty::before { content: "Nhập ngân sách bên trái để xem gợi ý."; color: var(--muted); font-size: 14px; }
 .budget-item { display: flex; flex-direction: column; gap: 4px; }
 .budget-label { width: 150px; }
@@ -295,6 +297,7 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
 @media (max-width: 900px) {
   /* minmax(0, 1fr) thay vì 1fr: không cho nội dung bên trong (dải ảnh, chip) kéo cột rộng hơn màn hình */
   .hero, .studio, .grid-2, .grid-3, .kanban { grid-template-columns: minmax(0, 1fr); }
+  .budget-tool > form { position: static; max-height: none; overflow: visible; }   /* 1 cột: không dính */
   .kanban { overflow-x: visible; }
   .hero { padding: 20px; gap: 20px; }
   .hero-image { max-height: 420px; }
