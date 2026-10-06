@@ -60,6 +60,19 @@ const SHAPE_TIPS = {
   petite: 'Dáng nhỏ – váy tối giản, đuôi ngắn giúp không bị "nuốt" người.',
 };
 
+// BMI theo ngưỡng cho người châu Á (WHO): dùng gợi ý phom váy, lời lẽ nhẹ nhàng – chỉ để tham khảo
+const BMI_LEVELS = [
+  { max: 18.5, label: 'Hơi mảnh', tip: 'Váy bồng, xếp tầng hoặc tay phồng giúp dáng đầy đặn, mềm mại hơn.' },
+  { max: 23, label: 'Cân đối', tip: 'Hầu hết phom váy đều hợp – cứ chọn theo phong cách bạn thích.' },
+  { max: 25, label: 'Đầy đặn nhẹ', tip: 'Phom chữ A, eo cao và cổ V giúp dáng thon gọn, thanh thoát.' },
+  { max: Infinity, label: 'Đầy đặn', tip: 'Phom chữ A, corset định hình eo và vải đứng phom (mikado, satin dày) tôn dáng nhất.' },
+];
+
+export function bmiInfo(height, weight) {
+  const value = Math.round((weight / (height / 100) ** 2) * 10) / 10;
+  return { value, ...BMI_LEVELS.find((level) => value < level.max) };
+}
+
 export function fitScore({ shape, height, heel }, theme) {
   let score = FIT_TABLE[shape]?.[theme] ?? 85;
   const tips = [SHAPE_TIPS[shape]];

@@ -14,7 +14,7 @@ import { aiTryOn, remainingAiTries, listAiResults, AI_DAILY_LIMIT } from '../ser
 import { loginUrl } from '../core/auth.js';
 import {
   MODELS, BODY_SHAPES, BESPOKE_OPTIONS, BESPOKE_EXTRAS,
-  renderImageFor, dressThumb, fitScore, bespokePrice, bespokeTheme, bespokeLabel,
+  renderImageFor, dressThumb, fitScore, bmiInfo, bespokePrice, bespokeTheme, bespokeLabel,
 } from '../data/tryon-data.js';
 
 // ---------- TRẠNG THÁI TRANG ----------
@@ -544,6 +544,9 @@ function renderBody() {
   $('#heel').value = String(state.body.heel);
   $('#height-value').textContent = state.body.height;
   $('#weight-value').textContent = state.body.weight;
+  const bmi = bmiInfo(state.body.height, state.body.weight);
+  render($('#bmi'), html`BMI <strong>${bmi.value.toLocaleString('vi-VN')}</strong> · ${bmi.label}
+    <span class="muted">– ${bmi.tip}</span>`);
 
   render($('#shapes'), BODY_SHAPES.map((s) => html`
     <button class="chip ${s.key === state.body.shape ? 'active' : ''}" type="button" data-shape="${s.key}">${s.label}</button>`));

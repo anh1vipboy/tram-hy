@@ -239,6 +239,7 @@ dialog.modal::backdrop { background: rgba(30, 24, 20, .55); }
 .model-remove { position: absolute; top: -4px; right: -4px; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--red); font: 700 14px/1 var(--font-body); cursor: pointer; box-shadow: var(--shadow); }
 .model-remove:hover { background: var(--red-soft); }
 .tips-list { margin: 0; padding-left: 18px; }
+.bmi { margin: -6px 0 0; padding: 8px 12px; border-radius: 10px; background: var(--gold-soft); color: var(--ink); }
 /* Ảnh đã thử bằng AI (dưới gương) */
 .ai-history { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; color: #f3ead9; }
 .ai-history-list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }

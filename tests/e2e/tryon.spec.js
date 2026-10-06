@@ -32,6 +32,14 @@ test('đổi dáng người làm đổi điểm tôn dáng', async ({ page }) =>
   await expect(page.locator('#fit-score')).not.toHaveText(hourglass);
 });
 
+test('BMI tính theo chiều cao, cân nặng và đổi gợi ý phom váy', async ({ page }) => {
+  const bmi = page.locator('#bmi');
+  await expect(bmi).toContainText('BMI 19,1 · Cân đối');          // mặc định 160cm, 49kg
+  await page.locator('#weight').fill('70');
+  await expect(bmi).toContainText('BMI 27,3 · Đầy đặn');
+  await expect(bmi).toContainText('Phom chữ A');
+});
+
 test('tự thiết kế may đo: giá thay đổi theo lựa chọn', async ({ page }) => {
   await page.getByRole('button', { name: 'Tự thiết kế may đo' }).click();
   await expect(page.locator('#summary strong').first()).toContainText('Váy may đo');
