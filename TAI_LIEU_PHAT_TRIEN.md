@@ -58,10 +58,12 @@ exe202/
 │   ├── 12_tryon_own_garment.sql  Ghi ảnh váy tự tải vào lịch sử thử AI
 │   ├── 13_vendor_logo.sql    Ảnh đại diện (logo) của tiệm
 │   ├── 14_rsvp_realtime.sql  Phản hồi thiệp cưới tự hiện (realtime)
+│   ├── 15_demo_data.sql      Dữ liệu demo: ảnh bìa, ảnh thực tế, mẫu váy, đánh giá có bình luận
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
-│   └── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
+│   ├── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
+│   └── tools/xoa_du_lieu_demo.sql    Xóa dữ liệu demo của file 15
 │
 ├── tests/                    ← KIỂM THỬ TỰ ĐỘNG (Playwright) – xem mục "Kiểm thử tự động"
 ├── docs/                     Báo cáo, kịch bản demo, góp ý mentor (.md, .docx)

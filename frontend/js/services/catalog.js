@@ -24,8 +24,9 @@ export async function listDresses({ vendorId, limit } = {}) {
 }
 
 export async function listReviews(vendorId) {
+  // '*' để có cả is_demo (SQL 15) mà không lỗi khi database chưa có cột này; bảng đánh giá vốn công khai
   return unwrap(await sb.from('reviews')
-    .select('id, rating, content, reviewer_name, created_at')
+    .select('*')
     .eq('vendor_id', vendorId)
     .order('created_at', { ascending: false }));
 }

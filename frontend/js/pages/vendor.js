@@ -68,6 +68,7 @@ function renderPage(vendor, dresses, reviews, photos) {
     <section class="section" style="margin-top:32px">
       <h2>Đánh giá từ khách đã cưới</h2>
       <p class="muted small">Chỉ khách có đơn hoàn tất qua Trạm Hỷ mới được đánh giá.</p>
+      ${reviews.some((r) => r.is_demo) ? html`<p class="small muted">Một số đánh giá là dữ liệu mẫu phục vụ demo.</p>` : ''}
       ${reviews.length ? html`<div class="stack">${reviews.map(reviewCard)}</div>`
                        : html`<div class="empty">Chưa có đánh giá xác thực nào.</div>`}
     </section>`);
