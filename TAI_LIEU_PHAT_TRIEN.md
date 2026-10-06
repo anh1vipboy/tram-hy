@@ -55,8 +55,9 @@ exe202/
 │   ├── 09_fix_storage_policies.sql  Sửa quyền tải ảnh của đối tác
 │   ├── 10_welcome_email.sql  Trigger gửi email chào mừng khi đăng ký bằng Google
 │   ├── 11_ai_tryon.sql       Bảng đếm lượt AI + kho ảnh kết quả riêng tư
+│   ├── 12_tryon_own_garment.sql  Ghi ảnh váy tự tải vào lịch sử thử AI
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
-│   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (Gemini, sau này FASHN)
+│   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
 │   └── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │
@@ -217,13 +218,26 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - Deploy lại function sau khi sửa: trong `backend/` chạy `npx supabase functions deploy gui-email-chao-mung --project-ref vsjdijmuvuetmhmszcrl --no-verify-jwt`.
 - Không nhận mail → xem Supabase → Edge Functions → Logs (403 = bí mật không khớp, 502 = Brevo từ chối) và Brevo → Transactional → Logs.
 
-### Thử váy bằng AI thật
-- **Ảnh của cô dâu được lưu lại**: đã đăng nhập thì ảnh toàn thân tải lên được nén và lưu vào bucket riêng tư `bride-photos/<user_id>/` (chỉ chính chủ xem được). Lần sau mở Phòng thử, các ảnh này hiện cạnh người mẫu để chọn lại; nút **×** trên ảnh để xóa hẳn. Tối đa 6 ảnh/người (`MAX_BRIDE_PHOTOS` trong `services/profile.js`). Chưa đăng nhập thì ảnh chỉ dùng tạm trong trình duyệt.
-- Phòng thử: chọn váy chỉ hiện **ảnh minh họa** (miễn phí). Nút **✨ Ướm thử bằng AI thật** mới gọi Edge Function `thu-vay-ai` → ghép **ảnh thật của mẫu váy** lên ảnh người mẫu / ảnh cô dâu tải lên. Cần đăng nhập; mẫu chưa có ảnh thật thì không thử AI được.
-- Mặc định dùng **Gemini 3.1 Flash Image** (~0,045 USD/ảnh). Key **Free tier** hoặc chưa đặt key → web tự quay về ảnh minh họa, báo "AI chưa được bật". Bật thanh toán cho key là chạy thật, không sửa code.
-- Đổi sang FASHN sau này: `npx supabase secrets set --project-ref vsjdijmuvuetmhmszcrl TRYON_PROVIDER=fashn FASHN_API_KEY=...` (phần FASHN chưa chạy thử với tài khoản thật).
-- Giới hạn **5 lượt/người/ngày** (giờ Việt Nam) – đổi bằng secret `DAILY_LIMIT` và hằng `AI_DAILY_LIMIT` trong `frontend/js/services/tryon-ai.js`. Mỗi lần thử ghi vào bảng `tryon_jobs` (theo dõi chi phí); ảnh kết quả ở bucket riêng tư `tryon-results`.
-- Deploy lại: trong `backend/` chạy `npx supabase functions deploy thu-vay-ai --project-ref vsjdijmuvuetmhmszcrl`.
+### Thử váy bằng AI thật (luồng chính)
+**Luồng:** Phòng thử → bước 1 chọn **ảnh của bạn** (hoặc người mẫu) + số đo → bước 2 chọn váy theo 1 trong 3 cách → **✨ Ướm thử bằng AI thật** → ảnh ghép hiện trên gương và được lưu vào **Ảnh đã thử bằng AI** (dưới gương, lần sau vào vẫn xem lại được).
+
+| Bước 2 – chọn váy | Ảnh váy đưa cho AI | Đặt lịch |
+|---|---|---|
+| Mẫu có sẵn | Ảnh thật của mẫu do tiệm đăng | Thuê / may tại tiệm đó |
+| **✨ Váy bạn chọn** | Ảnh váy người dùng tự tải (trên mạng, ở tiệm…) | "Đặt may theo mẫu này" → chuyển sang may đo, ghi chú sẵn |
+| Tự thiết kế may đo | (chưa có ảnh thật → chỉ ảnh minh họa) | Trạm Hỷ Atelier |
+
+- **Ảnh lưu riêng tư** trong bucket `bride-photos/<user_id>/`: ảnh người `body-*.jpg` (tối đa 6) và ảnh váy `garment-*.jpg` (tối đa 10) – hằng `MAX_BRIDE_PHOTOS`, `MAX_GARMENT_PHOTOS` trong `services/profile.js`. Lần sau vào hiện lại để chọn; nút **×** để xóa hẳn. Chưa đăng nhập thì ảnh chỉ dùng tạm trong trình duyệt.
+- **"Chuẩn kích thước"**: FASHN ghép váy **theo đúng dáng người trong ảnh** (giữ vai, eo, tư thế) – nên ảnh của bạn phải là ảnh toàn thân đứng thẳng. Web gửi kèm chiều cao / cân nặng / giày; model `tryon-max` và Gemini dùng số đo này trong prompt để đặt độ dài váy, eo cho đúng tỷ lệ (`tryon-v1.6` không nhận prompt, dựa hoàn toàn vào ảnh).
+- **Nhà cung cấp AI** (Edge Function `thu-vay-ai`, chọn tự động):
+  - Có secret `FASHN_API_KEY` → dùng **FASHN** (chuyên thử đồ). `FASHN_MODEL=tryon-v1.6` (mặc định, 1 credit ≈ 0,075 USD/ảnh) hoặc `tryon-max` (nét hơn, nhận prompt số đo, 2 credit/ảnh).
+  - Không có → Gemini (`GEMINI_API_KEY`, cần bật thanh toán). Ép một bên: `TRYON_PROVIDER=fashn|gemini`.
+  - AI chưa chạy được (chưa có key, hết credit, ảnh không nhận ra người/váy) → web báo rõ lý do và giữ ảnh minh họa, không trừ lượt.
+- **Bật FASHN:** đăng ký https://app.fashn.ai → nạp credit → mục **API** tạo key → trong `backend/` chạy
+  `npx supabase secrets set --project-ref vsjdijmuvuetmhmszcrl FASHN_API_KEY=<key>` (không cần deploy lại). Chạy **`12_tryon_own_garment.sql`** trên database để ghi lịch sử ảnh váy tự tải.
+- Giới hạn **5 lượt/người/ngày** (giờ Việt Nam) – secret `DAILY_LIMIT` + hằng `AI_DAILY_LIMIT` trong `frontend/js/services/tryon-ai.js`. Mỗi lần thử ghi vào `tryon_jobs` (theo dõi chi phí); ảnh kết quả ở bucket riêng tư `tryon-results`.
+- Test: `flows/own-garment-tryon.spec.js` giả lập function (không tốn credit), vẫn lưu/xóa ảnh váy thật trên Storage.
+- Deploy lại function: trong `backend/` chạy `npx supabase functions deploy thu-vay-ai --project-ref vsjdijmuvuetmhmszcrl`.
 
 ### AI tư vấn chia ngân sách cưới
 - Trang chủ → **Gợi ý chia ngân sách cưới** chia 2 cột. **Trái**: nhập ngân sách, số khách, nơi tổ chức, ưu tiên, ghi chú → *✨ AI tư vấn* (hoặc *Chia nhanh theo tỷ lệ phổ biến*, không cần AI). **Phải**: bảng chia 6 hạng mục (thanh %, lý do, *Tìm đối tác →* lọc sẵn loại + mức tiền), mẹo, cảnh báo nếu ngân sách không đủ cho số khách.

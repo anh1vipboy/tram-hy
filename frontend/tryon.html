@@ -37,6 +37,10 @@
           <button class="btn btn-primary btn-sm" id="ai-tryon" type="button">✨ Ướm thử bằng AI thật</button>
           <span class="small" id="ai-hint"></span>
         </div>
+        <div class="ai-history" id="ai-history" hidden>
+          <strong class="small">Ảnh đã thử bằng AI</strong>
+          <div class="ai-history-list" id="ai-history-list"></div>
+        </div>
         <div class="fit-score">
           <div class="score" id="fit-score">–</div>
           <div>
@@ -76,12 +80,28 @@
           <h3>2. Chọn váy</h3>
           <div class="tabs">
             <button class="tab active" data-mode="catalog" type="button">Mẫu có sẵn</button>
+            <button class="tab" data-mode="own" type="button">✨ Váy bạn chọn</button>
             <button class="tab" data-mode="bespoke" type="button">Tự thiết kế may đo</button>
           </div>
 
           <div id="catalog-panel" class="stack">
             <div class="chips" id="theme-filter"></div>
             <div class="dress-list" id="dress-list"><div class="muted">Đang tải mẫu váy…</div></div>
+          </div>
+
+          <!-- Váy bạn chọn: tải ảnh váy bất kỳ (trên mạng, ở tiệm) → AI ướm lên ảnh của bạn -->
+          <div id="own-panel" class="stack" hidden>
+            <p class="small muted" style="margin:0">Thấy chiếc váy ưng ý trên mạng hay ở tiệm? Tải ảnh lên – AI ghép váy lên chính ảnh của bạn, giữ đúng dáng người và theo số đo ở bước 1.</p>
+            <div class="models" id="garments"></div>
+            <label class="btn btn-outline btn-sm" style="width:fit-content">
+              Tải ảnh váy mẫu
+              <input type="file" id="garment-input" accept="image/jpeg,image/png,image/webp" hidden>
+            </label>
+            <p class="small muted" id="garment-note" style="margin:0"></p>
+            <ul class="small muted tips-list">
+              <li>Ảnh của bạn: đứng thẳng, thấy toàn thân, ánh sáng đủ.</li>
+              <li>Ảnh váy: rõ nét, thấy trọn chiếc váy (trải phẳng hoặc người mẫu đang mặc).</li>
+            </ul>
           </div>
 
           <div id="bespoke-panel" class="stack" hidden>

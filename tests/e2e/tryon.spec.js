@@ -62,6 +62,20 @@ test('chưa đăng nhập: tải ảnh vẫn xem thử được, nhắc đăng n
   await expect(page.locator('#models [data-remove]')).toHaveCount(0);   // chưa lưu thì không có nút xóa
 });
 
+test('"Váy bạn chọn": tải ảnh váy mẫu, mời đăng nhập để AI ướm, đặt may chuyển sang may đo', async ({ page }) => {
+  await page.getByRole('button', { name: '✨ Váy bạn chọn' }).click();
+  await expect(page.locator('#ai-hint')).toHaveText('Đăng nhập để ghép váy lên ảnh bằng AI thật');
+  await page.locator('#garment-input').setInputFiles(require('node:path')
+    .resolve(__dirname, '../../frontend/assets/images/bride_3_tryon_satin.jpg'));
+  await expect(page.locator('#garments .model.active')).toBeVisible();
+  await expect(page.locator('#mirror-label')).toHaveText('Chưa ghép váy');
+  await expect(page.locator('#fit-score')).toHaveText('–');
+
+  await page.locator('#book-btn').click();                       // "Đặt may theo mẫu này"
+  await expect(page.locator('#bespoke-panel')).toBeVisible();
+  await expect(page.locator('#bespoke-notes')).toHaveValue(/ảnh váy mẫu/);
+});
+
 test('chế độ tự thiết kế may đo thì ẩn nút AI (chưa có ảnh váy thật để ghép)', async ({ page }) => {
   await page.getByRole('button', { name: 'Tự thiết kế may đo' }).click();
   await expect(page.locator('#ai-tryon-box')).toBeHidden();
