@@ -39,7 +39,8 @@ Web dùng **Supabase** làm backend (database, đăng nhập, lưu ảnh, realti
 - [Tài liệu toàn diện & định hướng phát triển](docs/DU_AN_TRAM_HY_VA_DINH_HUONG_PHAT_TRIEN.md)
 - [Góp ý mentor & lộ trình](docs/MENTOR_FEEDBACK_AND_ROADMAP.md)
 - [Sitemap & tính năng](docs/Sitemap_Features.md)
-- [Kịch bản demo](docs/Kich_Ban_Demo.md)
+- **[Kịch bản review (bản chạy thật)](docs/KICH_BAN_REVIEW.md)**
+- [Kịch bản demo bản prototype cũ](docs/Kich_Ban_Demo.md)
 
 ---
 *© 2026 Trạm Hỷ – Kết duyên cát hỷ, trọn vẹn niềm tin.*
