@@ -18,6 +18,53 @@ test.describe('Trang chủ', () => {
     await expect(result).toContainText('50.000.000đ');   // nhà hàng 50%
     await expect(result).toContainText('20.000.000đ');   // chụp ảnh 20%
   });
+
+  // Giả lập Edge Function "tu-van-ngan-sach" để test không phụ thuộc Gemini (và không tốn lượt gọi)
+  const mockBudgetAi = (page, body) => page.route('**/functions/v1/tu-van-ngan-sach', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) }));
+
+  test('AI tư vấn ngân sách: gửi số khách, ưu tiên và hiện lý do, mẹo', async ({ page }) => {
+    let sent;
+    await page.route('**/functions/v1/tu-van-ngan-sach', (route) => {
+      sent = route.request().postDataJSON();
+      route.fulfill({
+        status: 200, contentType: 'application/json', body: JSON.stringify({
+          source: 'ai',
+          allocations: [
+            { category: 'venue', label: 'Nhà hàng tiệc', amount: 60_000_000, percent: 60, reason: 'Tiệc 20 bàn' },
+            { category: 'other', label: 'Chi phí khác & dự phòng', amount: 40_000_000, percent: 40, reason: 'Nhẫn, thiệp' },
+          ],
+          tips: ['Đặt tiệc sớm để được giá tốt'],
+          warning: '',
+        }),
+      });
+    });
+    await page.goto('/index.html');
+    await page.locator('#budget-input').fill('100000000');
+    await page.getByText('Nhờ AI tư vấn chi tiết').click();
+    await page.locator('#ai-guests').fill('200');
+    await page.getByRole('button', { name: 'Ảnh cưới đẹp' }).click();
+    await page.getByRole('button', { name: 'AI tư vấn chia ngân sách' }).click();
+
+    const result = page.locator('#budget-result');
+    await expect(result).toContainText('Gợi ý bởi AI');
+    await expect(result).toContainText('60.000.000đ');
+    await expect(result).toContainText('Tiệc 20 bàn');
+    await expect(result).toContainText('Đặt tiệc sớm để được giá tốt');
+    expect(sent).toMatchObject({ total: 100_000_000, guests: 200, priorities: ['Ảnh cưới đẹp'] });
+  });
+
+  test('AI tư vấn ngân sách quá tải → tự dùng cách chia cố định', async ({ page }) => {
+    await mockBudgetAi(page, { fallback: true, reason: 'busy' });
+    await page.goto('/index.html');
+    await page.locator('#budget-input').fill('100000000');
+    await page.getByText('Nhờ AI tư vấn chi tiết').click();
+    await page.getByRole('button', { name: 'AI tư vấn chia ngân sách' }).click();
+
+    const result = page.locator('#budget-result');
+    await expect(result).toContainText('AI đang quá tải');
+    await expect(result).toContainText('50.000.000đ');   // vẫn có kết quả chia theo tỷ lệ
+  });
 });
 
 test.describe('Dịch vụ cưới', () => {

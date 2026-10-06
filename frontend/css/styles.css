@@ -207,6 +207,7 @@ dialog.modal::backdrop { background: rgba(30, 24, 20, .55); }
 @keyframes scan { from { top: 0; } to { top: 100%; } }
 .mirror-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 .mirror-actions .btn-outline { background: transparent; color: #f3ead9; border-color: #5a4c43; }
+.ai-summary { cursor: pointer; color: var(--gold-dark); font-weight: 600; font-size: 14px; margin-top: 6px; }
 .ai-tryon { display: flex; gap: 8px 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
 .ai-tryon .small { color: #d9cbbb; }
 .fit-score { display: flex; gap: 12px; align-items: center; margin-top: 12px; padding: 12px; border-radius: 12px; background: #2a2421; }

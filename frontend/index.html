@@ -77,6 +77,32 @@
           </div>
           <p class="field-error" id="budget-error" hidden></p>
           <p class="small muted" style="margin:0">Từ 10 triệu đến 10 tỷ đồng.</p>
+
+          <details id="ai-budget">
+            <summary class="ai-summary">✨ Nhờ AI tư vấn chi tiết theo đám cưới của bạn</summary>
+            <div class="stack" style="margin-top:10px">
+              <div class="form-grid">
+                <label class="field"><span>Số khách mời dự kiến</span>
+                  <input class="input" type="number" id="ai-guests" min="10" max="3000" step="10" placeholder="VD: 300"></label>
+                <label class="field"><span>Tổ chức tại</span>
+                  <select class="input" id="ai-city">
+                    <option>Hà Nội</option><option>TP. Hồ Chí Minh</option><option>Đà Nẵng</option><option>Tỉnh/thành khác</option>
+                  </select></label>
+              </div>
+              <div class="field"><span>Bạn ưu tiên điều gì? (chọn nhiều)</span>
+                <div class="chips" id="ai-priorities">
+                  <button class="chip" type="button">Ảnh cưới đẹp</button>
+                  <button class="chip" type="button">Tiệc sang trọng</button>
+                  <button class="chip" type="button">Váy cưới lộng lẫy</button>
+                  <button class="chip" type="button">Trang trí ấn tượng</button>
+                  <button class="chip" type="button">Tiết kiệm tối đa</button>
+                </div>
+              </div>
+              <label class="field"><span>Ghi chú thêm (không bắt buộc)</span>
+                <input class="input" id="ai-note" maxlength="200" placeholder="VD: cưới ngoài trời, đã có nhẫn cưới"></label>
+              <button class="btn btn-dark" type="button" id="ai-budget-btn">✨ AI tư vấn chia ngân sách</button>
+            </div>
+          </details>
         </form>
         <div id="budget-result" class="stack" style="margin-top:14px"></div>
       </div>

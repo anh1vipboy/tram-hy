@@ -57,6 +57,7 @@ exe202/
 │   ├── 11_ai_tryon.sql       Bảng đếm lượt AI + kho ảnh kết quả riêng tư
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (Gemini, sau này FASHN)
+│   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
 │   └── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │
 ├── tests/                    ← KIỂM THỬ TỰ ĐỘNG (Playwright) – xem mục "Kiểm thử tự động"
@@ -223,6 +224,13 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - Giới hạn **5 lượt/người/ngày** (giờ Việt Nam) – đổi bằng secret `DAILY_LIMIT` và hằng `AI_DAILY_LIMIT` trong `frontend/js/services/tryon-ai.js`. Mỗi lần thử ghi vào bảng `tryon_jobs` (theo dõi chi phí); ảnh kết quả ở bucket riêng tư `tryon-results`.
 - Deploy lại: trong `backend/` chạy `npx supabase functions deploy thu-vay-ai --project-ref vsjdijmuvuetmhmszcrl`.
 
+### AI tư vấn chia ngân sách cưới
+- Trang chủ → ô **Gợi ý chia ngân sách cưới**: nút *Chia ngân sách* chia theo tỷ lệ cố định (không cần mạng). Mở **✨ Nhờ AI tư vấn chi tiết** → nhập số khách, nơi tổ chức, ưu tiên, ghi chú → AI chia 6 hạng mục, mỗi mục có **lý do**, kèm **3 mẹo** và **cảnh báo** nếu ngân sách không đủ cho số khách. Mỗi hạng mục có link *Tìm đối tác →* lọc sẵn theo loại và mức tiền.
+- Edge Function `tu-van-ngan-sach` dùng chung secret `GEMINI_API_KEY` với thử váy, gọi **model chữ (chạy được với key Free tier)**, ép AI trả JSON đúng khuôn rồi chuẩn hóa ở server: đủ 6 mục, tổng 100%, tiền làm tròn 100.000đ, cộng lại đúng bằng ngân sách.
+- Model hay bị Google báo **quá tải (503)** → function thử lại 1 lần rồi chuyển lần lượt `gemini-3.8-flash` → `gemini-3.1-flash-lite` → `gemini-3.7-flash` → `gemini-3-flash-preview`. Tất cả đều bận → web báo "AI đang quá tải" và tự hiện cách chia cố định, người dùng không bị kẹt. Muốn ưu tiên model khác: secret `GEMINI_TEXT_MODEL`.
+- Khách chưa đăng nhập cũng dùng được (deploy `--no-verify-jwt`): trong `backend/` chạy `npx supabase functions deploy tu-van-ngan-sach --project-ref vsjdijmuvuetmhmszcrl --no-verify-jwt`.
+- Test Playwright giả lập phản hồi của function (`page.route`) nên không tốn lượt gọi Gemini.
+
 ### Quên mật khẩu
 - Trang Đăng nhập → **Quên mật khẩu?** → nhập email → Supabase gửi link về `reset-password.html` → nhập mật khẩu mới 2 lần → tự đăng nhập và vào đúng trang theo vai trò.
 - Web không cho biết email có tồn tại hay không (tránh bị dò tài khoản).
@@ -295,6 +303,7 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 | 3 | **Thông báo email** khi có đơn mới, đã cọc, chờ nghiệm thu, khiếu nại được xử lý | Edge Function |
 | 4 | **Thanh toán thật** (PayOS): webhook xác nhận chuyển khoản → gọi `pay_milestone` | Edge Function |
 | ✅ | AI thử váy thật (Gemini, sẵn chỗ cắm FASHN), 5 lượt/người/ngày | Đã xong (SQL 11 + function thu-vay-ai) |
+| ✅ | AI tư vấn chia ngân sách cưới theo số khách, thành phố, ưu tiên | Đã xong (function tu-van-ngan-sach) |
 | 6 | **Tự xóa ảnh cô dâu sau 24 giờ** (cam kết bảo mật trong báo cáo) | Scheduled Edge Function |
 | 7 | Đo lường hành vi (Vercel Analytics) để có số liệu cho báo cáo | `frontend/` |
 | 8 | Ảnh xem trước khi chia sẻ link thiệp / tiệm qua Zalo, Facebook | `frontend/` |

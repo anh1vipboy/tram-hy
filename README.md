@@ -26,7 +26,7 @@ Web dùng **Supabase** làm backend (database, đăng nhập, lưu ảnh, realti
 
 | Trang | Chức năng |
 |---|---|
-| Trang chủ | Mẫu váy nổi bật, gợi ý chia ngân sách cưới, đối tác uy tín |
+| Trang chủ | Mẫu váy nổi bật, chia ngân sách cưới (tỷ lệ cố định hoặc AI tư vấn), đối tác uy tín |
 | Thử váy AI | Chọn người mẫu / tải ảnh, số đo, điểm tôn dáng, thuê sẵn hoặc tự thiết kế may đo |
 | Dịch vụ cưới | 31 đối tác: váy cưới, chụp ảnh, trang trí, trang điểm, nhà hàng – lọc, tìm, sắp xếp |
 | Chi tiết đối tác | Mẫu váy, bảng thanh toán 3 đợt, đánh giá xác thực |

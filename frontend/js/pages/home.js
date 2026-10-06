@@ -1,10 +1,11 @@
 import { initLayout } from '../core/layout.js';
-import { $, html, render, money } from '../core/utils.js';
+import { $, $$, html, render, money } from '../core/utils.js';
 import { badge, DRESS_THEME, VENDOR_CATEGORY } from '../core/labels.js';
-import { toastError } from '../core/ui.js';
+import { toastError, withBusy } from '../core/ui.js';
 import { listDresses, listVendors } from '../services/catalog.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
 import { bindMoneyInput } from '../components/money-input.js';
+import { adviseBudget } from '../services/budget-ai.js';
 
 // Tỷ lệ chia ngân sách cưới phổ biến (category khớp bảng vendors)
 const BUDGET_SPLIT = [
@@ -68,17 +69,81 @@ async function loadTopVendors() {
   }
 }
 
+
+// ---------- CHIA NGÂN SÁCH ----------
+// Chia nhanh theo tỷ lệ cố định (tức thì), hoặc nhờ AI tư vấn theo số khách / thành phố / ưu tiên.
+
+function fixedSplit(total) {
+  return BUDGET_SPLIT.map((item) => ({ ...item, amount: Math.round(total * item.percent / 100) }));
+}
+
 function renderBudget(total) {
-  if (!total) {
+  renderAllocations(total ? fixedSplit(total) : null);
+}
+
+/** allocations: [{ category, label, amount, percent, reason? }] · extra: { ai, tips, warning, note } */
+function renderAllocations(allocations, extra = {}) {
+  if (!allocations) {
     render($('#budget-result'), '');
     return;
   }
-  render($('#budget-result'), BUDGET_SPLIT.map((item) => html`
-    <div class="row">
-      <span style="width:120px">${item.label}</span>
-      <strong>${money(Math.round(total * item.percent / 100))}</strong>
-      <span class="muted small">(${item.percent}%)</span>
-      <span class="spacer"></span>
-      <a class="small" href="marketplace.html?category=${item.category}&max=${Math.round(total * item.percent / 100)}">Tìm đối tác →</a>
-    </div>`));
+  render($('#budget-result'), html`
+    ${extra.ai ? html`<div class="badge badge-purple" style="width:fit-content">✨ Gợi ý bởi AI theo đám cưới của bạn</div>` : ''}
+    ${extra.note ? html`<p class="small muted" style="margin:0">${extra.note}</p>` : ''}
+    ${extra.warning ? html`<div class="notice notice-error small">${extra.warning}</div>` : ''}
+    ${allocations.map((item) => html`
+      <div class="stack" style="gap:2px">
+        <div class="row">
+          <span style="width:150px">${item.label}</span>
+          <strong>${money(item.amount)}</strong>
+          <span class="muted small">(${item.percent}%)</span>
+          <span class="spacer"></span>
+          ${item.category !== 'other'
+            ? html`<a class="small" href="marketplace.html?category=${item.category}&max=${item.amount}">Tìm đối tác →</a>`
+            : ''}
+        </div>
+        ${item.reason ? html`<div class="small muted">${item.reason}</div>` : ''}
+      </div>`)}
+    ${extra.tips?.length ? html`
+      <div class="notice small"><strong>Mẹo cho bạn</strong>
+        <ul style="margin:4px 0 0;padding-left:18px">${extra.tips.map((t) => html`<li>${t}</li>`)}</ul></div>` : ''}`);
 }
+
+const AI_FALLBACK_NOTE = {
+  'not-configured': 'AI tư vấn chưa được bật – đang hiển thị cách chia theo tỷ lệ phổ biến.',
+  busy: 'AI đang quá tải, đang hiển thị cách chia theo tỷ lệ phổ biến. Thử lại sau ít phút nhé.',
+  error: 'Chưa kết nối được AI, đang hiển thị cách chia theo tỷ lệ phổ biến.',
+};
+
+$$('#ai-priorities .chip').forEach((chip) => {
+  chip.addEventListener('click', () => chip.classList.toggle('active'));
+});
+
+$('#ai-budget-btn').addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
+  const total = budgetInput.check();
+  if (!total) return;
+  const guests = Number($('#ai-guests').value);
+  if ($('#ai-guests').value && (!Number.isInteger(guests) || guests < 10 || guests > 3000)) {
+    toastError(new Error('Số khách mời từ 10 đến 3.000'));
+    return;
+  }
+
+  render($('#budget-result'), html`<div class="muted">✨ AI đang tính toán cho đám cưới của bạn…</div>`);
+  try {
+    const result = await adviseBudget({
+      total,
+      guests: guests || undefined,
+      city: $('#ai-city').value,
+      priorities: $$('#ai-priorities .chip.active').map((c) => c.textContent.trim()),
+      note: $('#ai-note').value.trim(),
+    });
+    if (result.fallback) {
+      renderAllocations(fixedSplit(total), { note: AI_FALLBACK_NOTE[result.reason] ?? AI_FALLBACK_NOTE.error });
+    } else {
+      renderAllocations(result.allocations, { ai: true, tips: result.tips, warning: result.warning });
+    }
+  } catch (error) {
+    toastError(error);
+    renderBudget(total);
+  }
+}));
