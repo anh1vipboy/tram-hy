@@ -19,7 +19,7 @@ for (const { role, landing } of ROLES) {
     await form.getByLabel('Mật khẩu').fill(password);
     await form.getByRole('button', { name: 'Đăng nhập' }).click();
     await expect(page).toHaveURL(landing);   // đúng vai trò thì được đưa tới đúng trang
-    await expect(page.getByRole('button', { name: 'Đăng xuất' })).toBeVisible();
+    await expect(page.locator('.site-header [data-account]')).toBeVisible();   // avatar tài khoản ở header
     await page.context().storageState({ path: authFile(role) });
   });
 }

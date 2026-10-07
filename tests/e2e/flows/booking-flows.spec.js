@@ -115,3 +115,17 @@ test('số đo cơ thể được lưu vào tài khoản', async ({ browser }) =
   await expect(bride.locator('#height-value')).toHaveText(height);
   await expect(bride.getByRole('button', { name: 'Quả lê' })).toHaveClass(/active/);
 });
+
+test('menu tài khoản: hiện tên, vai trò và nút Đăng xuất', async ({ browser }) => {
+  requireAccounts('bride');
+  const bride = await openAs(browser, 'bride');
+  await bride.goto('/index.html');
+  const menu = bride.locator('#account-menu');
+  await expect(menu).toBeHidden();
+  await bride.locator('.site-header [data-account]').click();
+  await expect(menu).toBeVisible();
+  await expect(menu).toContainText('Cô dâu / chú rể');
+  await expect(menu.getByRole('menuitem', { name: 'Đăng xuất' })).toBeVisible();
+  await bride.keyboard.press('Escape');
+  await expect(menu).toBeHidden();
+});

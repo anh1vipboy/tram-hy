@@ -34,3 +34,15 @@ test('khách mời mở link thiệp không tồn tại', async ({ page }) => {
   await page.goto('/invitation.html?i=khong-co-thiep-nay');
   await expect(page.getByText('Thiệp không tồn tại hoặc đã bị xóa.')).toBeVisible();
 });
+
+test('điện thoại: thanh tab dưới đáy thay cho menu kéo ngang', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Chỉ kiểm tra trên điện thoại');
+  await page.goto('/marketplace.html');
+  await expect(page.locator('.site-header .nav')).toBeHidden();
+  const tabbar = page.locator('#app-tabbar');
+  await expect(tabbar).toBeVisible();
+  await expect(tabbar.getByRole('link', { name: /Dịch vụ/ })).toHaveClass(/active/);
+  await tabbar.getByRole('link', { name: /Thử váy/ }).click();
+  await expect(page).toHaveURL(/tryon\.html/);
+  await expect(tabbar.getByRole('link', { name: /Đăng nhập/ })).toBeVisible();   // chưa đăng nhập
+});

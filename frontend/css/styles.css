@@ -84,6 +84,23 @@ main.container { padding-block: 28px 56px; flex: 1 0 auto; }
 .nav a.active { color: var(--gold-dark); background: var(--gold-soft); }
 .user-area { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 .user-name { font-weight: 600; font-size: 14px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+.ellipsis { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Avatar + menu tài khoản */
+.user-area { position: relative; }
+.account-button { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); cursor: pointer; color: var(--ink); font: inherit; }
+.account-button:hover, .account-button[aria-expanded="true"] { border-color: var(--gold); }
+.avatar { flex: none; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #c99a3c, var(--gold-dark)); color: #fff; font-weight: 700; font-size: 13px; }
+.avatar.sm { width: 24px; height: 24px; font-size: 10px; }
+.avatar.lg { width: 44px; height: 44px; font-size: 16px; }
+.account-menu { position: fixed; right: max(16px, calc((100vw - 1180px) / 2 + 16px)); top: calc(64px + env(safe-area-inset-top, 0px)); z-index: 60; width: 280px; padding: 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); box-shadow: 0 12px 32px rgba(42, 36, 33, .16); display: flex; flex-direction: column; }
+.account-menu[hidden] { display: none; }
+.account-head { display: flex; gap: 10px; align-items: center; padding: 8px 8px 12px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+.account-menu a, .account-signout { display: block; padding: 11px 12px; border-radius: 10px; color: var(--ink); font-weight: 600; font-size: 14px; text-align: left; text-decoration: none; background: none; border: 0; cursor: pointer; font-family: inherit; }
+.account-menu a:hover, .account-menu a.active { background: var(--gold-soft); color: var(--gold-dark); }
+.account-signout { margin-top: 4px; border-top: 1px solid var(--line); border-radius: 0 0 10px 10px; color: var(--red); }
+.account-signout:hover { background: var(--red-soft); }
+/* Thanh tab dưới đáy – chỉ điện thoại */
+.tabbar { display: none; }
 .site-footer { border-top: 1px solid var(--line); padding: 24px 0 calc(24px + env(safe-area-inset-bottom, 0px)); color: var(--muted); font-size: 13px; text-align: center; background: var(--card); }
 
 /* ---------- 4. THÀNH PHẦN ---------- */
@@ -342,8 +359,26 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
   .section { margin-bottom: 36px; }
   /* Nút đặt lịch dính đáy màn hình trên điện thoại */
   .sticky-cta { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; gap: 10px; align-items: center; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: #fff; border-top: 1px solid var(--line); box-shadow: 0 -4px 16px rgba(42, 36, 33, .06); }
-  body.has-sticky-cta { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
-  body.has-sticky-cta .toast-host { bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
+  /* Điện thoại: bỏ menu kéo ngang ở header, dùng thanh tab cố định dưới đáy (kiểu Shopee/Tiki) */
+  .nav { display: none; }
+  .user-name { display: none; }
+  .account-button { padding: 3px; }
+  .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 45;
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px)); background: rgba(255, 255, 255, .97); backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line); }
+  .tabbar a, .tabbar button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border: 0; background: none;
+    color: var(--muted); font: 600 11px var(--font-body); text-decoration: none; cursor: pointer; border-radius: 10px; min-width: 0; }
+  .tabbar a span[aria-hidden] { font-size: 20px; line-height: 24px; }
+  .tabbar .active { color: var(--gold-dark); background: var(--gold-soft); }
+  body.has-tabbar { padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)); }
+  body.has-tabbar .toast-host { bottom: calc(74px + env(safe-area-inset-bottom, 0px)); }
+  /* Menu tài khoản thành tấm trượt từ dưới lên, nằm trên thanh tab */
+  .account-menu { position: fixed; left: 8px; right: 8px; top: auto; width: auto; bottom: calc(66px + env(safe-area-inset-bottom, 0px)); z-index: 46; }
+  body.account-open::after { content: ""; position: fixed; inset: 0; z-index: 44; background: rgba(30, 24, 20, .35); }
+  /* Thanh "Đặt lịch" ở Phòng thử nằm ngay trên thanh tab */
+  .sticky-cta { bottom: calc(58px + env(safe-area-inset-bottom, 0px)); padding-bottom: 10px; }
+  body.has-sticky-cta.has-tabbar { padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)); }
+  body.has-sticky-cta.has-tabbar .toast-host { bottom: calc(144px + env(safe-area-inset-bottom, 0px)); }
 }
 @media (max-width: 560px) {
   .budget-label { width: 100%; font-weight: 600; }
