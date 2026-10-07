@@ -6,6 +6,7 @@ import { listDresses, listVendors } from '../services/catalog.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
 import { bindMoneyInput } from '../components/money-input.js';
 import { vendorLogo } from '../components/vendor-logo.js';
+import { mountHeroSlider } from '../components/hero-slider.js';
 import { adviseBudget } from '../services/budget-ai.js';
 
 // Tỷ lệ chia ngân sách cưới phổ biến (category khớp bảng vendors)
@@ -18,6 +19,7 @@ const BUDGET_SPLIT = [
 ];
 
 initLayout('home');
+mountHeroSlider($('#hero-slider'));
 loadFeaturedDresses();
 loadTopVendors();
 
