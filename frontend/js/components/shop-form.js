@@ -1,6 +1,7 @@
 // Ô nhập thông tin tiệm – dùng cho đăng ký mở tiệm và sửa hồ sơ
 import { html } from '../core/utils.js';
 import { VENDOR_CATEGORY } from '../core/labels.js';
+import { moneyValue, readMoneyField } from './money-input.js';
 
 // Mô tả ngắn cho từng loại dịch vụ – khớp các mục lọc ở trang Dịch vụ cưới
 const CATEGORY_CHOICES = {
@@ -36,7 +37,8 @@ export function shopFields(shop = {}, { withCategory = true } = {}) {
       <label class="field"><span>Quận / khu vực</span>
         <input class="input" name="district" value="${shop.district || ''}" required maxlength="80" placeholder="VD: Cầu Giấy, Hà Nội"></label>
       <label class="field"><span>Giá khởi điểm (VNĐ)</span>
-        <input class="input" type="number" name="basePrice" value="${shop.base_price || ''}" required min="100000" step="100000"></label>
+        <input class="input" name="basePrice" data-money inputmode="numeric" autocomplete="off" placeholder="VD: 5.000.000"
+          value="${moneyValue(shop.base_price)}" required></label>
       <label class="field full"><span>Địa chỉ cụ thể</span>
         <input class="input" name="address" value="${shop.address || ''}" required maxlength="200"></label>
       <label class="field full"><span>Giới thiệu tiệm (không bắt buộc)</span>
@@ -53,7 +55,7 @@ export function readShopForm(form) {
     phone: text('phone'),
     district: text('district'),
     address: text('address'),
-    basePrice: Number(form.get('basePrice')),
+    basePrice: readMoneyField(form.get('basePrice'), 'Giá khởi điểm', { min: 100_000 }),
     description: text('description'),
   };
 }

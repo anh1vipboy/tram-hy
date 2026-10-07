@@ -1,6 +1,7 @@
 // Header + footer dùng chung cho mọi trang
 import { getProfile, signOut } from './auth.js';
 import { $, html, render } from './utils.js';
+import { sb } from './supabase.js';
 
 // roles: undefined = ai cũng thấy; 'any' = đã đăng nhập; mảng = chỉ các vai trò đó
 const NAV_ITEMS = [
@@ -17,6 +18,18 @@ function canSee(item, profile) {
   if (!item.roles) return true;
   if (!profile) return false;
   return item.roles === 'any' || item.roles.includes(profile.role);
+}
+
+// Các tab cùng trình duyệt dùng chung phiên đăng nhập: tab khác đăng nhập tài khoản khác / đăng xuất
+// thì tab này đang hiện dữ liệu của người cũ nhưng gửi yêu cầu bằng người mới (bị database chặn).
+// → tải lại để giao diện luôn khớp đúng tài khoản. (Trang đăng nhập tự điều hướng nên bỏ qua.)
+function watchAccountSwitch(profile) {
+  const shownUserId = profile?.id ?? null;
+  sb.auth.onAuthStateChange((event, session) => {
+    // Chỉ khi thật sự đổi tài khoản (không phản ứng với INITIAL_SESSION / làm mới token → tránh tải lại liên tục)
+    if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT') return;
+    if ((session?.user?.id ?? null) !== shownUserId) location.reload();
+  });
 }
 
 /** Vẽ header/footer và trả về hồ sơ người dùng (hoặc null) để trang dùng tiếp. */
@@ -43,6 +56,7 @@ export async function initLayout(activePage) {
       </div>
     </div>`);
   header.querySelector('[data-signout]')?.addEventListener('click', signOut);
+  if (activePage !== 'login') watchAccountSwitch(profile);
 
   const footer = $('#app-footer');
   footer.className = 'site-footer';

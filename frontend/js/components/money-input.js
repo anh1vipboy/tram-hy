@@ -11,6 +11,31 @@ export function parseMoney(text) {
 
 const formatDigits = (value) => (value === null ? '' : value.toLocaleString('vi-VN'));
 
+/** Giá trị ban đầu cho ô tiền trong template: 1500000 → "1.500.000" */
+export const moneyValue = (value) => (value ? formatDigits(Number(value)) : '');
+
+// Mọi ô <input data-money> (form đối tác, hộp thoại…) tự thêm dấu chấm khi gõ – đọc lại bằng parseMoney()
+document.addEventListener('input', (e) => {
+  const input = e.target;
+  if (!input.matches?.('input[data-money]')) return;
+  const fromEnd = input.value.length - (input.selectionStart ?? input.value.length);
+  input.value = formatDigits(parseMoney(input.value));
+  const caret = Math.max(0, input.value.length - fromEnd);   // giữ con trỏ đúng chỗ khi sửa giữa số
+  input.setSelectionRange?.(caret, caret);
+});
+
+/** Đọc ô tiền bắt buộc, sai thì báo lỗi rõ ràng. */
+export function readMoneyField(text, label, { min = 1, max = MAX_MONEY, required = true } = {}) {
+  const value = parseMoney(text);
+  if (value === null) {
+    if (required) throw new Error(`Vui lòng nhập ${label}`);
+    return null;
+  }
+  if (value < min) throw new Error(`${label} tối thiểu ${money(min)}`);
+  if (value > max) throw new Error(`${label} tối đa ${money(max)}`);
+  return value;
+}
+
 /**
  * input:   <input> cần gắn
  * errorEl: phần tử hiện lỗi (thường là <p class="field-error">)

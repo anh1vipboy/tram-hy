@@ -52,8 +52,29 @@ export function openDialog({ title, content, confirmText = 'Xác nhận', cancel
       resolve(value);
     };
 
-    dialog.querySelector('[data-cancel]')?.addEventListener('click', () => finish(null));
-    dialog.addEventListener('cancel', (e) => { e.preventDefault(); finish(null); });
+    // Đã nhập gì đó mà lỡ bấm Hủy / Esc / vuốt "quay lại" trên điện thoại → hỏi trước khi bỏ
+    let dirty = false;
+    form.addEventListener('input', () => { dirty = true; });
+    form.addEventListener('change', () => { dirty = true; });
+    const requestClose = () => {
+      if (!dirty) return finish(null);
+      if (dialog.querySelector('[data-discard-bar]')) return;
+      const bar = document.createElement('div');
+      bar.className = 'discard-bar';
+      bar.dataset.discardBar = '';
+      render(bar, html`<span>Bỏ những gì bạn đã nhập?</span>
+        <span class="row" style="gap:8px">
+          <button type="button" class="btn btn-primary btn-sm" data-keep>Tiếp tục nhập</button>
+          <button type="button" class="btn btn-danger btn-sm" data-discard>Bỏ</button>
+        </span>`);
+      dialog.querySelector('.modal-foot').before(bar);
+      bar.querySelector('[data-keep]').addEventListener('click', () => bar.remove());
+      bar.querySelector('[data-discard]').addEventListener('click', () => finish(null));
+      bar.querySelector('[data-keep]').focus();
+    };
+
+    dialog.querySelector('[data-cancel]')?.addEventListener('click', requestClose);
+    dialog.addEventListener('cancel', (e) => { e.preventDefault(); requestClose(); });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();

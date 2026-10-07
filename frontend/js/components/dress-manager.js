@@ -4,6 +4,7 @@ import { badge, DRESS_THEME } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { listShopDresses, saveDress, setDressActive, deleteDress, MAX_DRESS_ANGLE_PHOTOS } from '../services/shop.js';
 import { dressThumbButton, bindDressGalleries } from './dress-gallery.js';
+import { moneyValue, readMoneyField } from './money-input.js';
 
 export async function mountDressManager(container, shop) {
   let dresses = [];
@@ -89,9 +90,11 @@ export async function mountDressManager(container, shop) {
                 <option value="${key}" ${key === dress?.theme ? 'selected' : ''}>${label}</option>`)}
             </select></label>
           <label class="field"><span>Giá (VNĐ)</span>
-            <input class="input" type="number" name="price" value="${dress?.price || ''}" required min="100000" step="50000"></label>
+            <input class="input" name="price" data-money inputmode="numeric" autocomplete="off" placeholder="VD: 3.500.000"
+              value="${moneyValue(dress?.price)}" required></label>
           <label class="field"><span>Giá gốc trước giảm (không bắt buộc)</span>
-            <input class="input" type="number" name="originalPrice" value="${dress?.original_price || ''}" min="0" step="50000"></label>
+            <input class="input" name="originalPrice" data-money inputmode="numeric" autocomplete="off"
+              value="${moneyValue(dress?.original_price)}"></label>
           <div class="field full"><span>Ảnh chính – hiện ở ngoài danh sách để thu hút khách
               ${dress?.image_url ? '(chọn ảnh mới để thay)' : ''}</span>
             ${dress?.image_url ? html`<img src="${dress.image_url}" alt="" style="max-height:160px;width:auto;border-radius:10px">` : ''}
@@ -124,8 +127,8 @@ export async function mountDressManager(container, shop) {
         });
       },
       onConfirm: (form) => {
-        const price = Number(form.get('price'));
-        const originalPrice = Number(form.get('originalPrice')) || null;
+        const price = readMoneyField(form.get('price'), 'Giá', { min: 100_000 });
+        const originalPrice = readMoneyField(form.get('originalPrice'), 'Giá gốc', { required: false });
         if (originalPrice && originalPrice <= price) throw new Error('Giá gốc phải cao hơn giá bán');
         return saveDress(shop.id, dress, {
           name: form.get('name').trim(),

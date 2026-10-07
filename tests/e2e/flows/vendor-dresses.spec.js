@@ -45,3 +45,26 @@ test('thêm mẫu váy có nhiều ảnh, khách xem được, rồi xóa', asyn
   await expect(vendor.locator('.toast-success', { hasText: 'Đã xóa mẫu váy.' })).toBeVisible();
   await expect(card).toHaveCount(0);
 });
+
+test('hộp thoại thêm váy: giá tự thêm dấu chấm, lỡ đóng khi đang nhập thì hỏi lại', async ({ browser }) => {
+  requireAccounts('vendor');
+  const vendor = await openAs(browser, 'vendor');
+  await vendor.goto('/vendor-dashboard.html');
+  await vendor.getByRole('button', { name: 'Mẫu váy' }).click();
+  await vendor.getByRole('button', { name: '+ Thêm mẫu váy' }).click();
+  const dialog = vendor.locator('dialog.modal');
+
+  const price = dialog.getByLabel('Giá (VNĐ)');
+  await price.pressSequentially('3500000');
+  await expect(price).toHaveValue('3.500.000');                 // tự thêm dấu chấm khi gõ
+  await dialog.getByLabel('Tên mẫu váy').fill('Váy đang nhập dở');
+
+  await vendor.keyboard.press('Escape');                          // như vuốt "quay lại" trên điện thoại
+  await expect(dialog.getByText('Bỏ những gì bạn đã nhập?')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Tiếp tục nhập' }).click();
+  await expect(dialog.getByLabel('Tên mẫu váy')).toHaveValue('Váy đang nhập dở');   // dữ liệu còn nguyên
+
+  await dialog.getByRole('button', { name: 'Hủy' }).click();
+  await dialog.getByRole('button', { name: 'Bỏ', exact: true }).click();
+  await expect(vendor.locator('dialog.modal')).toHaveCount(0);
+});
