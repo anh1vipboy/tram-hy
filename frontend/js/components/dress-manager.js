@@ -1,6 +1,6 @@
 // Kênh đối tác → tab "Mẫu váy": thêm / sửa / ẩn / xóa mẫu váy của tiệm
 import { html, render, money } from '../core/utils.js';
-import { badge, DRESS_THEME } from '../core/labels.js';
+import { badge, priceTag, DRESS_THEME } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { listShopDresses, saveDress, setDressActive, deleteDress, MAX_DRESS_ANGLE_PHOTOS } from '../services/shop.js';
 import { dressThumbButton, bindDressGalleries } from './dress-gallery.js';
@@ -59,7 +59,7 @@ export async function mountDressManager(container, shop) {
             ${d.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê')}
             ${d.is_active ? badge('Đang bán', 'green') : badge('Đã ẩn')}</div>
           <h3>${d.name}</h3>
-          <div class="price">${money(d.price)}</div>
+          <div>${priceTag(d)}</div>
           ${d.image_url ? '' : html`<div class="small muted">Chưa có ảnh chính – đang dùng ảnh minh họa</div>`}
           <div class="row">
             <button class="btn btn-outline btn-sm" type="button" data-edit>Sửa</button>

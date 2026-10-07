@@ -1,6 +1,6 @@
 import { initLayout } from '../core/layout.js';
 import { $, $$, html, render, money } from '../core/utils.js';
-import { badge, DRESS_THEME, VENDOR_CATEGORY } from '../core/labels.js';
+import { badge, priceTag, DRESS_THEME, VENDOR_CATEGORY } from '../core/labels.js';
 import { toastError, withBusy } from '../core/ui.js';
 import { listDresses, listVendors } from '../services/catalog.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
@@ -35,7 +35,7 @@ async function loadFeaturedDresses() {
             ${dress.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê sẵn')}</div>
           <h3>${dress.name}</h3>
           <div class="muted small">${dress.vendor.name}</div>
-          <div class="price">${money(dress.price)}</div>
+          <div>${priceTag(dress)}</div>
           <a class="btn btn-primary btn-sm" href="tryon.html?dress=${dress.slug}">Thử váy này</a>
         </div>
       </article>`));

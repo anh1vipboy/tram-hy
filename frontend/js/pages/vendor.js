@@ -1,6 +1,6 @@
 import { initLayout } from '../core/layout.js';
 import { $, html, render, money, param, date } from '../core/utils.js';
-import { badge, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
+import { badge, priceTag, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
 import { getVendorBySlug, listDresses, listReviews, listVendorPhotos } from '../services/catalog.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
@@ -119,7 +119,7 @@ function dressCard(dress) {
         <div class="row">${badge(DRESS_THEME[dress.theme] ?? dress.theme, 'gold')}
           ${dress.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê sẵn')}</div>
         <h3>${dress.name}</h3>
-        <div class="price">${money(dress.price)}</div>
+        <div>${priceTag(dress)}</div>
         <a class="btn btn-primary btn-sm" href="tryon.html?dress=${dress.slug}">Thử váy này</a>
       </div>
     </article>`;

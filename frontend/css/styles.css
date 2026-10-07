@@ -275,6 +275,16 @@ dialog.modal::backdrop { background: rgba(30, 24, 20, .55); }
 .model-remove { position: absolute; top: -4px; right: -4px; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--red); font: 700 14px/1 var(--font-body); cursor: pointer; box-shadow: var(--shadow); }
 .model-remove:hover { background: var(--red-soft); }
 .tips-list { margin: 0; padding-left: 18px; }
+/* Giá giảm: giá bán nổi bật, giá gốc gạch ngang, nhãn -X% */
+.price-tag { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.price-tag .price { font-size: 17px; color: var(--red); }
+.price-tag:not(:has(.old-price)) .price { color: var(--gold-dark); }
+.old-price { color: var(--muted); font-size: 13px; }
+.sale-badge { padding: 1px 6px; border-radius: 6px; background: var(--red); color: #fff; font-size: 12px; font-weight: 700; }
+.price-tag.small { justify-content: flex-end; }
+.price-tag.small .price { font-size: 14px; }
+.price-tag.small .old-price { font-size: 12px; }
+.sale-ribbon { position: absolute; left: 8px; top: 8px; padding: 3px 8px; border-radius: 999px; background: var(--red); color: #fff; font-size: 12px; font-weight: 700; }
 /* Hộp thoại: hỏi lại trước khi bỏ dữ liệu đã nhập */
 .discard-bar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; margin: 0 20px 12px; padding: 10px 12px; border-radius: 10px; background: var(--red-soft); color: var(--red); font-weight: 600; font-size: 14px; }
 /* Đăng ký mở tiệm: chọn loại dịch vụ bằng thẻ lớn */
@@ -404,6 +414,13 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
   .user-name { display: none; }
   .section-head { align-items: flex-start; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  /* Thẻ tiệm 2 cột trên điện thoại: logo nhỏ trên tên, tên tối đa 2 dòng, chữ gọn */
+  .item-card .body { padding: 10px 12px 12px; gap: 4px; }
+  .item-card .body .badge { font-size: 11px; padding: 2px 8px; }
+  .item-card .vendor-title { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .item-card .vendor-title .vendor-logo { width: 28px !important; height: 28px !important; font-size: 11px !important; }
+  .item-card h3 { font-size: 15px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .item-card .body > .small { font-size: 12px; }
   .grid.grid-3 { grid-template-columns: minmax(0, 1fr); }
   .item-card .body { padding: 10px 12px 12px; }
   .item-card h3 { font-size: 15px; }

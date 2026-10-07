@@ -1,5 +1,5 @@
 // Nhãn tiếng Việt + màu badge cho các giá trị enum trong database
-import { html } from './utils.js';
+import { html, money } from './utils.js';
 
 export const BOOKING_STATUS = {
   pending:          { label: 'Chờ đặt cọc',     tone: '' },
@@ -50,5 +50,19 @@ export const DRESS_THEME = {
 };
 
 export const badge = (label, tone = '') => html`<span class="badge ${tone ? `badge-${tone}` : ''}">${label}</span>`;
+
+/** % giảm của mẫu váy (0 nếu không giảm) */
+export const discountPercent = (dress) =>
+  dress.original_price > dress.price ? Math.round((1 - dress.price / dress.original_price) * 100) : 0;
+
+/** Giá bán + giá gốc gạch ngang + nhãn -X% khi có giảm giá */
+export function priceTag(dress, { small = false } = {}) {
+  const off = discountPercent(dress);
+  return html`
+    <span class="price-tag ${small ? 'small' : ''}">
+      <span class="price">${money(dress.price)}</span>
+      ${off ? html`<s class="old-price">${money(dress.original_price)}</s><span class="sale-badge">-${off}%</span>` : ''}
+    </span>`;
+}
 
 export const statusBadge = (map, key) => badge(map[key]?.label ?? key, map[key]?.tone);

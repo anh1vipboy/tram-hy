@@ -1,6 +1,6 @@
 import { initLayout } from '../core/layout.js';
 import { $, $$, html, render, money, param, debounce, sleep } from '../core/utils.js';
-import { badge, DRESS_THEME } from '../core/labels.js';
+import { badge, priceTag, DRESS_THEME } from '../core/labels.js';
 import { toast, toastError, openDialog } from '../core/ui.js';
 import { BESPOKE_VENDOR_SLUG } from '../config.js';
 import { listDresses, getVendorBySlug } from '../services/catalog.js';
@@ -587,7 +587,7 @@ function renderDressList() {
         <span class="small muted">${d.vendor.name}</span>
       </span>
       <span class="stack" style="gap:4px;align-items:flex-end">
-        <span class="price small">${money(d.price)}</span>
+        ${priceTag(d, { small: true })}
         ${d.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê')}
       </span>
     </button>`));
@@ -673,7 +673,9 @@ function renderSummary() {
       ${realPhotos ? html`<button class="btn btn-outline btn-sm" type="button" data-view-photos style="width:fit-content">
         Xem ${realPhotos} ảnh thật của tiệm</button>` : ''}
       <span class="muted small">${selection.vendorName}</span>
-      <span class="price" style="font-size:20px">${money(selection.price)}</span>
+      ${state.mode === 'catalog' && state.dress
+        ? priceTag(state.dress)
+        : html`<span class="price" style="font-size:20px">${money(selection.price)}</span>`}
       <div class="milestones">
         ${split.map((p, i) => html`
           <div class="milestone">
