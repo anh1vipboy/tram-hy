@@ -12,7 +12,7 @@ export const SUPABASE_KEY = testOverride?.key ?? 'sb_publishable_2w5vXBrIRNTxEHj
 // Cloudflare Turnstile (CAPTCHA chống bot khi đăng nhập / đăng ký / quên mật khẩu).
 // Site key được phép công khai. Để trống = tắt CAPTCHA ở web (database test cũng không bật CAPTCHA).
 // Bật: điền site key ở đây, deploy, RỒI mới bật CAPTCHA trong Supabase (Authentication → Attack Protection).
-export const TURNSTILE_SITE_KEY = testOverride ? '' : '';
+export const TURNSTILE_SITE_KEY = testOverride ? '' : '0x4AAAAAAFRG60sMMTC5WQDR';
 
 // Tài khoản nhận tiền cọc Escrow của Trạm Hỷ – dùng để tạo mã VietQR. Thay bằng tài khoản thật khi vận hành.
 export const ESCROW_BANK = {
