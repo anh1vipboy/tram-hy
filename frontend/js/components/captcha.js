@@ -37,7 +37,7 @@ const STATUS = {
 export function mountCaptcha(container) {
   if (!captchaEnabled) {
     container.hidden = true;
-    return { show() {}, getToken: async () => undefined, reset() {} };
+    return { show: async () => {}, getToken: async () => undefined, reset() {} };
   }
 
   let token = null;
