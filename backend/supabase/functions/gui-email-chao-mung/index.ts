@@ -19,7 +19,7 @@ function welcomeEmail(name: string) {
   <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px"><tr><td align="center">
     <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#fff;border:1px solid #eadfd6;border-radius:16px">
       <tr><td align="center" style="padding:32px 28px 8px">
-        <img src="${SITE_URL}/assets/images/logo.jpg" width="72" height="72" alt="Trạm Hỷ" style="border-radius:50%;border:2px solid #b8892d">
+        <img src="${SITE_URL}/assets/images/logo.jpg" width="72" height="72" alt="Trạm Hỷ" style="border-radius:50%;border:2px solid #9b2335">
         <h1 style="font-family:Georgia,serif;font-size:24px;margin:16px 0 4px">Chào mừng ${safeName} đến Trạm Hỷ!</h1>
         <p style="color:#74675e;margin:0">Kết duyên cát hỷ – Trọn vẹn niềm tin</p>
       </td></tr>
@@ -32,7 +32,7 @@ function welcomeEmail(name: string) {
         </ul>
       </td></tr>
       <tr><td align="center" style="padding:8px 28px 28px">
-        <a href="${SITE_URL}" style="display:inline-block;background:#b8892d;color:#fff;text-decoration:none;font-weight:bold;padding:12px 28px;border-radius:999px">Vào Trạm Hỷ</a>
+        <a href="${SITE_URL}" style="display:inline-block;background:#9b2335;color:#fff;text-decoration:none;font-weight:bold;padding:12px 28px;border-radius:999px">Vào Trạm Hỷ</a>
       </td></tr>
       <tr><td style="padding:16px 28px;border-top:1px solid #eadfd6;font-size:12px;color:#74675e">
         Nếu bạn không đăng nhập Trạm Hỷ, có thể bỏ qua email này hoặc trả lời để báo cho chúng tôi.

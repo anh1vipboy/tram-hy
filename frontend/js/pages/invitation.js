@@ -156,7 +156,7 @@ async function renderEditor(profile) {
 function renderShare(invitation) {
   const link = new URL(`invitation.html?i=${invitation.slug}`, location.href).href;
   render($('#share'), html`
-    <div class="card stack" style="background:var(--gold-soft);padding:12px">
+    <div class="card stack" style="background:var(--brand-soft);padding:12px">
       <strong>Link gửi khách mời</strong>
       <div class="row"><input class="input" value="${link}" readonly style="flex:1">
         <button class="btn btn-dark btn-sm" type="button" id="copy-link">Sao chép</button></div>
