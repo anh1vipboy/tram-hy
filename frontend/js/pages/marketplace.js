@@ -120,7 +120,9 @@ function renderVendors() {
         <div class="row">${badge(VENDOR_CATEGORY[v.category], 'gold')}
           ${v.is_verified ? badge('✓ Tích Xanh', 'blue') : ''}</div>
         <div class="vendor-title">${vendorLogo(v, { size: 36 })}<h3>${v.name}</h3></div>
-        <div class="muted small">${v.district} · ★ ${v.rating} (${v.review_count} đánh giá)</div>
+        <div class="muted small vendor-district">📍 ${v.district}</div>
+        <div class="small vendor-rating"><span class="stars">★</span> <strong>${v.rating}</strong>
+          <span class="muted">(${v.review_count} đánh giá)</span></div>
         <div>Từ <span class="price">${money(v.base_price)}</span></div>
         <a class="btn btn-outline btn-sm" href="vendor.html?slug=${v.slug}">Xem chi tiết</a>
       </div>

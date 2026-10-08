@@ -185,6 +185,9 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: v
 .vendor-logo { flex: none; display: inline-grid; place-items: center; border-radius: 50%; object-fit: cover; background: var(--brand-soft); color: var(--brand-dark); font-family: var(--font-title); font-weight: 700; border: 1px solid var(--line); }
 .vendor-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .vendor-title h3 { margin: 0; }
+.vendor-district { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vendor-rating { white-space: nowrap; }
+.vendor-rating .stars { color: #e0a800; }
 .item-card h3 { font-size: 16px; margin: 0; }
 
 /* Toast */
