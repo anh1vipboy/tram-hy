@@ -583,12 +583,10 @@ function renderDressList() {
     <button class="dress-option ${d.id === state.dress?.id ? 'active' : ''}" type="button" data-dress="${d.id}">
       <img src="${dressThumb(d)}" alt="">
       <span class="info">
-        <span class="name">${d.name}</span><br>
-        <span class="small muted">${d.vendor.name}</span>
-      </span>
-      <span class="stack" style="gap:4px;align-items:flex-end">
-        ${priceTag(d, { small: true })}
-        ${d.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê')}
+        <span class="name">${d.name}</span>
+        <span class="small muted vendor">${d.vendor.name}</span>
+        <span class="meta">${priceTag(d, { small: true })}
+          ${d.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê')}</span>
       </span>
     </button>`));
   for (const btn of $$('[data-dress]')) {

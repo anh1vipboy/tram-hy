@@ -313,10 +313,13 @@ dialog.modal::backdrop { background: rgba(30, 24, 20, .55); }
 .dress-list { display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; }
 .dress-option { display: flex; gap: 12px; align-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer; text-align: left; font: inherit; color: inherit; }
 .dress-option:hover { border-color: var(--brand); }
-.dress-option.active { border-color: var(--brand); background: #fffaf0; box-shadow: 0 0 0 2px var(--brand-soft); }
+.dress-option.active { border-color: var(--brand); background: #fffaf7; box-shadow: 0 0 0 2px var(--brand-soft); }
 .dress-option img, .dress-option .ph { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; flex: none; background: var(--brand-soft); }
-.dress-option .info { flex: 1; min-width: 0; }
-.dress-option .name { font-weight: 600; font-size: 14px; }
+.dress-option .info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dress-option .name { font-weight: 600; font-size: 14px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.dress-option .vendor { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dress-option .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 2px; }
+.dress-option .meta .price-tag.small { justify-content: flex-start; }
 .sticky-cta { display: none; }
 
 /* ---------- 6. KANBAN (đối tác) ---------- */
@@ -416,6 +419,9 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
   .user-name { display: none; }
   .section-head { align-items: flex-start; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  /* Phòng thử: 3 tab chọn váy chia đều, không bị cắt chữ */
+  .studio .tabs { width: 100%; }
+  .studio .tab { flex: 1; padding: 8px 4px; font-size: 13px; white-space: normal; line-height: 1.25; }
   /* Thẻ tiệm 2 cột trên điện thoại: logo nhỏ trên tên, tên tối đa 2 dòng, chữ gọn */
   .item-card .body { padding: 10px 12px 12px; gap: 4px; }
   .item-card .body .badge { font-size: 11px; padding: 2px 8px; }
