@@ -27,10 +27,48 @@ test('tạo thiệp → khách gửi phản hồi qua link → cô dâu thấy s
   await guest.getByLabel('Số người đi cùng (tính cả bạn)').fill('2');
   await guest.getByLabel('Lời chúc').fill('Chúc hai bạn trăm năm hạnh phúc!');
   await guest.getByRole('button', { name: 'Gửi phản hồi' }).click();
-  await expect(guest.getByText('Cảm ơn bạn!')).toBeVisible();
+  await expect(guest.getByText(`Cảm ơn ${guestName}!`)).toBeVisible();
 
   // Cô dâu thấy phản hồi ngay, KHÔNG tải lại trang (realtime – SQL 14)
   await expect(bride.locator('.toast-success', { hasText: `${guestName} vừa phản hồi` })).toBeVisible({ timeout: 15_000 });
   await expect(bride.locator('#rsvps')).toContainText(guestName);
   await expect(bride.locator('#rsvps')).toContainText('đến (2 người)');
 });
+
+test('chống spam phản hồi thiệp: trùng tên bị chặn, bot điền ô bẫy không gửi được, lời chúc không chứa link', async ({ browser }) => {
+  requireAccounts('bride');
+  const bride = await openAs(browser, 'bride');
+  await bride.goto('/invitation.html');
+  const link = await bride.locator('#share input').inputValue();      // thiệp tạo ở bài trước
+  const path = link.replace(/^https?:\/\/[^/]+/, '');
+  const guest = await openAs(browser, null);
+  const name = `Khách chống spam ${Date.now()}`;
+  const send = async (guestName, message = '') => {
+    await guest.getByLabel('Tên của bạn').fill(guestName);
+    await guest.getByLabel('Lời chúc').fill(message);
+    await guest.getByRole('button', { name: 'Gửi phản hồi' }).click();
+  };
+
+  await guest.goto(path);
+  await send(name);
+  await expect(guest.getByText(`Cảm ơn ${name}!`)).toBeVisible();
+
+  // Máy này đã gửi → mở lại thiệp vẫn thấy lời cảm ơn; bấm gửi cho người khác mới hiện form
+  await guest.reload();
+  await expect(guest.getByText(`Cảm ơn ${name}!`)).toBeVisible();
+  await guest.getByRole('button', { name: 'Gửi phản hồi cho người khác' }).click();
+
+  await send(name.toUpperCase());                                     // trùng tên (khác hoa/thường)
+  await expect(guest.locator('.toast-error')).toContainText('đã gửi phản hồi cho thiệp này rồi');
+
+  await send(`${name} 2`, 'Xem quà tại https://spam.example');        // lời chúc chứa link
+  await expect(guest.locator('.toast-error').last()).toContainText('không được chứa đường link');
+
+  let requests = 0;
+  guest.on('request', (r) => { if (r.url().includes('/rest/v1/rsvps') && r.method() === 'POST') requests += 1; });
+  await guest.locator('[name=website]').fill('http://bot.example', { force: true });   // bot điền ô bẫy
+  await send(`${name} bot`);
+  await expect(guest.getByText('Cảm ơn bạn!')).toBeVisible();
+  expect(requests).toBe(0);                                          // không gửi gì lên server
+});
+

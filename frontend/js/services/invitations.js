@@ -19,7 +19,7 @@ export async function saveInvitation(userId, invitation, values) {
 }
 
 export async function listRsvps(invitationId) {
-  return unwrap(await sb.from('rsvps').select('*')
+  return unwrap(await sb.from('rsvps').select('id, invitation_id, guest_name, attending, guest_count, message, created_at')
     .eq('invitation_id', invitationId).order('created_at', { ascending: false }));
 }
 

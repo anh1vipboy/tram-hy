@@ -38,6 +38,7 @@ function invitationCard(inv) {
 }
 
 // ---------- KHÁCH MỜI ----------
+let guestWantsForm = false;   // khách bấm "Gửi phản hồi cho người khác" → luôn hiện form
 async function renderGuestView(slug) {
   const inv = await getInvitationBySlug(slug);
   if (!inv) {
@@ -58,13 +59,36 @@ async function renderGuestView(slug) {
         <label class="field"><span>Số người đi cùng (tính cả bạn)</span>
           <input class="input" type="number" name="guestCount" min="1" max="10" value="1"></label>
         <label class="field"><span>Lời chúc</span><textarea class="input" name="message" maxlength="500"></textarea></label>
+        <!-- Bẫy bot: người thật không thấy ô này, bot tự điền mọi ô sẽ điền vào → bỏ qua -->
+        <label class="hp-field" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
         <button class="btn btn-primary" type="submit">Gửi phản hồi</button>
       </form>
     </div>`);
 
+  // Máy này đã gửi phản hồi cho thiệp này → hiện lời cảm ơn, vẫn cho gửi thêm cho người khác (vd người nhà)
+  const sentKey = `tramhy-rsvp-${inv.id}`;
+  const thanks = (form, name) => {
+    render(form, html`<div class="center stack" style="gap:6px"><h3>Cảm ơn ${name || 'bạn'}!</h3>
+      <p class="muted" style="margin:0">Phản hồi đã được gửi tới cô dâu chú rể.</p>
+      <button class="btn btn-link" type="button" data-again>Gửi phản hồi cho người khác</button></div>`);
+    form.querySelector('[data-again]').addEventListener('click', () => {
+      guestWantsForm = true;
+      renderGuestView(slug);
+    });
+  };
+  const alreadySent = (() => { try { return localStorage.getItem(sentKey); } catch { return null; } })();
+  if (alreadySent && !guestWantsForm) {
+    thanks($('#rsvp-form'), alreadySent);
+    return;
+  }
+
   $('#rsvp-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = new FormData(e.target);
+    if (form.get('website')) {                       // bot điền ô bẫy → giả vờ thành công, không gửi
+      thanks(e.target, '');
+      return;
+    }
     await withBusy(e.submitter, async () => {
       try {
         await submitRsvp(inv.id, {
@@ -73,7 +97,9 @@ async function renderGuestView(slug) {
           guestCount: Number(form.get('guestCount')),
           message: form.get('message').trim() || null,
         });
-        render(e.target, html`<div class="center"><h3>Cảm ơn bạn!</h3><p class="muted">Phản hồi đã được gửi tới cô dâu chú rể.</p></div>`);
+        const name = form.get('guestName').trim();
+        try { localStorage.setItem(sentKey, name); } catch { /* chế độ riêng tư: bỏ qua */ }
+        thanks(e.target, name);
       } catch (error) {
         toastError(error);
       }

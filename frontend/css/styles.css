@@ -280,6 +280,10 @@ dialog.modal::backdrop { background: rgba(30, 24, 20, .55); }
 .model-remove { position: absolute; top: -4px; right: -4px; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--red); font: 700 14px/1 var(--font-body); cursor: pointer; box-shadow: var(--shadow); }
 .model-remove:hover { background: var(--red-soft); }
 .tips-list { margin: 0; padding-left: 18px; }
+.captcha-box:empty { display: none; }
+.captcha-box { display: flex; justify-content: center; }
+/* Ô bẫy bot: ẩn khỏi người dùng nhưng vẫn nằm trong form */
+.hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 /* Giá giảm: giá bán nổi bật, giá gốc gạch ngang, nhãn -X% */
 .price-tag { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
 .price-tag .price { font-size: 17px; color: #d0312d; }

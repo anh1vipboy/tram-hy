@@ -3,6 +3,7 @@ import { clearProfileCache, getProfile, homeForRole, signIn, signUp, signInWithG
 import { authRedirectParams } from '../core/supabase.js';
 import { $, $$, html, render, param, sleep } from '../core/utils.js';
 import { openDialog, toastError, withBusy } from '../core/ui.js';
+import { mountCaptcha } from '../components/captcha.js';
 
 function showNotice(type, title, message) {
   const box = $('#auth-notice');
@@ -52,6 +53,16 @@ async function handleEmailConfirmation(profile) {
 }
 
 // ---------- SỰ KIỆN ----------
+// Một ô CAPTCHA dùng chung cho đăng nhập / đăng ký / quên mật khẩu; token dùng 1 lần → reset sau mỗi lần gửi
+const captcha = mountCaptcha($('#captcha'));
+async function withCaptcha(task) {
+  try {
+    return await task(await captcha.getToken());
+  } finally {
+    captcha.reset();
+  }
+}
+
 for (const tab of $$('[data-tab]')) {
   tab.addEventListener('click', () => switchTab(tab.dataset.tab));
 }
@@ -61,7 +72,7 @@ $('#signin-form').addEventListener('submit', async (e) => {
   const form = new FormData(e.target);
   await withBusy(e.submitter, async () => {
     try {
-      await signIn(form.get('email').trim(), form.get('password'));
+      await withCaptcha((token) => signIn(form.get('email').trim(), form.get('password'), token));
       await redirectAfterLogin();
     } catch (error) {
       toastError(friendlyAuthError(error));
@@ -75,13 +86,14 @@ $('#signup-form').addEventListener('submit', async (e) => {
   const email = form.get('email').trim();
   await withBusy(e.submitter, async () => {
     try {
-      const { needsEmailConfirm } = await signUp({
+      const { needsEmailConfirm } = await withCaptcha((captchaToken) => signUp({
         email,
         password: form.get('password'),
         fullName: form.get('fullName').trim(),
         phone: form.get('phone').trim(),
         role: form.get('role'),
-      });
+        captchaToken,
+      }));
       if (needsEmailConfirm) {
         switchTab('signin');
         $('#signin-form [name=email]').value = email;
@@ -107,7 +119,7 @@ $('#forgot-password').addEventListener('click', async () => {
                value="${$('#signin-form [name=email]').value}"></label>`,
     onConfirm: async (form) => {
       try {
-        await requestPasswordReset(form.get('email').trim());
+        await withCaptcha((token) => requestPasswordReset(form.get('email').trim(), token));
       } catch (error) {
         throw friendlyAuthError(error);
       }

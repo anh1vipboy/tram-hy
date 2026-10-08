@@ -59,6 +59,7 @@ exe202/
 │   ├── 13_vendor_logo.sql    Ảnh đại diện (logo) của tiệm
 │   ├── 14_rsvp_realtime.sql  Phản hồi thiệp cưới tự hiện (realtime)
 │   ├── 15_demo_data.sql      Dữ liệu demo: ảnh bìa, ảnh thực tế, mẫu váy, đánh giá có bình luận
+│   ├── 16_rsvp_antispam.sql  Chống spam phản hồi thiệp (trùng tên, giới hạn theo IP, chặn link)
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -339,6 +340,17 @@ Các mục dùng **Edge Function** là việc bắt buộc chạy ở server (c�
 ---
 
 ## 9. Ghi chú bảo mật
+
+### Chống bot & spam
+- **CAPTCHA (Cloudflare Turnstile)** cho đăng nhập / đăng ký / quên mật khẩu bằng email (Google không cần).
+  Code: `components/captcha.js`, site key ở `TURNSTILE_SITE_KEY` trong `config.js` (trống = tắt).
+  Bật theo đúng thứ tự: (1) tạo widget Turnstile ở Cloudflare (hostname `tram-hy-alpha.vercel.app`, `localhost`) →
+  (2) điền **site key** vào `config.js`, push, chờ Vercel deploy → (3) Supabase → Authentication → Attack Protection →
+  bật CAPTCHA, chọn Turnstile, dán **secret key**. Làm ngược thứ tự thì đăng nhập email sẽ lỗi cho tới khi web có site key.
+  Database test không bật CAPTCHA nên Playwright không bị ảnh hưởng.
+- **Phản hồi thiệp (SQL 16)**: trigger trong database làm sạch dữ liệu, mỗi tên chỉ phản hồi 1 lần / thiệp,
+  tối đa 10 phản hồi / thiệp / giờ và 30 / ngày theo IP (chỉ lưu IP đã băm ở bảng `rsvp_meta`, API không đọc được),
+  chặn link trong lời chúc, tối đa 1.000 phản hồi / thiệp. Web thêm ô bẫy bot ẩn và nhớ máy đã gửi phản hồi.
 - `frontend/js/config.js` chứa **publishable key** – được phép công khai, commit lên GitHub không sao.
 - **Không bao giờ** đưa vào code: mật khẩu database, `service_role` / secret key, API key của AI hay cổng thanh toán. Những key đó chỉ đặt trong *Edge Function Secrets* của Supabase.
 - Vai trò `admin` chỉ đổi được bằng SQL trong Supabase – người dùng không tự nâng quyền được.

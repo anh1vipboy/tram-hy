@@ -47,17 +47,19 @@ export async function requireAuth(roles) {
   return profile;
 }
 
-export async function signIn(email, password) {
-  unwrap(await sb.auth.signInWithPassword({ email, password }));
+// captchaToken: token Cloudflare Turnstile (khi Supabase bật CAPTCHA), undefined nếu chưa bật
+export async function signIn(email, password, captchaToken) {
+  unwrap(await sb.auth.signInWithPassword({ email, password, options: { captchaToken } }));
 }
 
 // role: 'bride' hoặc 'vendor' (database không cho tự đăng ký làm admin)
-export async function signUp({ email, password, fullName, phone, role }) {
+export async function signUp({ email, password, fullName, phone, role, captchaToken }) {
   const data = unwrap(await sb.auth.signUp({
     email,
     password,
     options: {
       data: { full_name: fullName, phone, role },
+      captchaToken,
       // Link xác nhận trong email quay về đúng web nơi người dùng đăng ký (localhost hoặc tên miền thật).
       // Địa chỉ này phải nằm trong Authentication → URL Configuration → Redirect URLs của Supabase.
       emailRedirectTo: new URL('login.html?confirmed=1', location.href).href,
@@ -77,6 +79,7 @@ export async function signInWithGoogle(next) {
 // Lỗi Supabase Auth (tiếng Anh) → câu tiếng Việt. Khớp theo đầu câu vì một số lỗi có số giây thay đổi.
 const AUTH_ERRORS = [
   ['Invalid login credentials', 'Sai email hoặc mật khẩu'],
+  ['captcha', 'Xác minh chống bot không thành công – vui lòng thử lại'],
   ['Email not confirmed', 'Email chưa được xác nhận – hãy bấm link trong email Trạm Hỷ gửi bạn'],
   ['User already registered', 'Email này đã có tài khoản – hãy đăng nhập'],
   ['email rate limit exceeded', 'Hệ thống đang gửi quá nhiều email, vui lòng thử lại sau ít phút'],
@@ -94,8 +97,9 @@ export function friendlyAuthError(error) {
 
 // Quên mật khẩu: Supabase gửi email có link về trang reset-password.html (phải nằm trong Redirect URLs).
 // Supabase không báo email có tồn tại hay không – tránh lộ danh sách tài khoản.
-export async function requestPasswordReset(email) {
+export async function requestPasswordReset(email, captchaToken) {
   unwrap(await sb.auth.resetPasswordForEmail(email, {
+    captchaToken,
     redirectTo: new URL('reset-password.html', location.href).href,
   }));
 }
