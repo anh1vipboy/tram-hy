@@ -30,6 +30,8 @@
       <form id="signin-form" class="stack" method="post">
         <label class="field"><span>Email</span><input class="input" type="email" name="email" required autocomplete="email"></label>
         <label class="field"><span>Mật khẩu</span><input class="input" type="password" name="password" required minlength="6" autocomplete="current-password"></label>
+        <!-- Xác minh chống bot (Cloudflare Turnstile) ngay trên nút gửi -->
+        <div class="captcha-box" id="captcha-signin"></div>
         <button class="btn btn-primary btn-block" type="submit" disabled>Đăng nhập</button>
         <button class="btn btn-link" type="button" id="forgot-password">Quên mật khẩu?</button>
       </form>
@@ -45,11 +47,10 @@
         <label class="field"><span>Số điện thoại</span><input class="input" type="tel" name="phone" pattern="[0-9+ ]{9,15}" autocomplete="tel"></label>
         <label class="field"><span>Email</span><input class="input" type="email" name="email" required autocomplete="email"></label>
         <label class="field"><span>Mật khẩu (ít nhất 6 ký tự)</span><input class="input" type="password" name="password" required minlength="6" autocomplete="new-password"></label>
+        <div class="captcha-box" id="captcha-signup"></div>
         <button class="btn btn-primary btn-block" type="submit" disabled>Tạo tài khoản</button>
         <p class="small muted">Tài khoản đối tác cần Trạm Hỷ xác minh và gắn với tiệm trước khi nhận đơn.</p>
       </form>
-      <!-- Ô xác minh chống bot (Cloudflare Turnstile) – chỉ hiện khi cần bấm xác minh -->
-      <div id="captcha" class="captcha-box"></div>
     </div>
   </main>
 

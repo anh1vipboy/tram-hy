@@ -17,6 +17,7 @@ function switchTab(name) {
   for (const tab of $$('[data-tab]')) tab.classList.toggle('active', tab.dataset.tab === name);
   $('#signin-form').hidden = name !== 'signin';
   $('#signup-form').hidden = name !== 'signup';
+  captchas[name]?.show().catch(toastError);     // vẽ ô xác minh khi form hiện ra
 }
 
 async function redirectAfterLogin() {
@@ -53,15 +54,19 @@ async function handleEmailConfirmation(profile) {
 }
 
 // ---------- SỰ KIỆN ----------
-// Một ô CAPTCHA dùng chung cho đăng nhập / đăng ký / quên mật khẩu; token dùng 1 lần → reset sau mỗi lần gửi
-const captcha = mountCaptcha($('#captcha'));
-async function withCaptcha(task) {
+// Ô CAPTCHA riêng cho từng form (quên mật khẩu dùng ô của form đăng nhập); token dùng 1 lần → reset sau mỗi lần gửi
+const captchas = {
+  signin: mountCaptcha($('#captcha-signin')),
+  signup: mountCaptcha($('#captcha-signup')),
+};
+async function withCaptcha(form, task) {
   try {
-    return await task(await captcha.getToken());
+    return await task(await captchas[form].getToken());
   } finally {
-    captcha.reset();
+    captchas[form].reset();
   }
 }
+captchas.signin.show().catch(() => {});      // form đăng nhập hiện sẵn → vẽ ngay (lỗi đã hiện trong ô)
 
 for (const tab of $$('[data-tab]')) {
   tab.addEventListener('click', () => switchTab(tab.dataset.tab));
@@ -72,7 +77,7 @@ $('#signin-form').addEventListener('submit', async (e) => {
   const form = new FormData(e.target);
   await withBusy(e.submitter, async () => {
     try {
-      await withCaptcha((token) => signIn(form.get('email').trim(), form.get('password'), token));
+      await withCaptcha('signin', (token) => signIn(form.get('email').trim(), form.get('password'), token));
       await redirectAfterLogin();
     } catch (error) {
       toastError(friendlyAuthError(error));
@@ -86,7 +91,7 @@ $('#signup-form').addEventListener('submit', async (e) => {
   const email = form.get('email').trim();
   await withBusy(e.submitter, async () => {
     try {
-      const { needsEmailConfirm } = await withCaptcha((captchaToken) => signUp({
+      const { needsEmailConfirm } = await withCaptcha('signup', (captchaToken) => signUp({
         email,
         password: form.get('password'),
         fullName: form.get('fullName').trim(),
@@ -119,7 +124,7 @@ $('#forgot-password').addEventListener('click', async () => {
                value="${$('#signin-form [name=email]').value}"></label>`,
     onConfirm: async (form) => {
       try {
-        await withCaptcha((token) => requestPasswordReset(form.get('email').trim(), token));
+        await withCaptcha('signin', (token) => requestPasswordReset(form.get('email').trim(), token));
       } catch (error) {
         throw friendlyAuthError(error);
       }
