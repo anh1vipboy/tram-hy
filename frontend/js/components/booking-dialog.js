@@ -15,7 +15,7 @@ function tomorrowISODate() {
 }
 
 /**
- * booking: { vendorId, vendorName, type, dressId?, title, price, details?, customPrice? }
+ * booking: { vendorId, vendorName, type, dressId?, packageId?, title, price, details?, customPrice? }
  * Chưa đăng nhập → chuyển sang trang đăng nhập rồi quay lại `returnTo`.
  * Thành công → chuyển sang trang Đơn của tôi.
  */
@@ -57,6 +57,7 @@ export async function openBookingDialog(booking, returnTo) {
       vendorId: booking.vendorId,
       type: booking.type,
       dressId: booking.dressId,
+      packageId: booking.packageId,
       appointmentAt: new Date(`${form.get('date')}T${form.get('time')}`).toISOString(),
       contactName: form.get('name').trim(),
       contactPhone: form.get('phone').trim(),

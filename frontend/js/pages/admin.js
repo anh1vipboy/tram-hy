@@ -214,7 +214,7 @@ function renderBookings() {
               <td>${b.code}</td>
               <td>${b.contact_name}<div class="small muted">${b.contact_phone}</div></td>
               <td>${b.vendor.name}</td>
-              <td>${BOOKING_TYPE[b.type]}</td>
+              <td>${BOOKING_TYPE[b.type]}${b.details?.package?.name ? html`<div class="small muted">${b.details.package.name}</div>` : ''}</td>
               <td class="price">${money(b.total_price)}</td>
               <td>${statusBadge(BOOKING_STATUS, b.status)}</td>
               <td class="small">${dateTime(b.created_at)}</td>

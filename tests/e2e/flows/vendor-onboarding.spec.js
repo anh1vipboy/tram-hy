@@ -80,4 +80,40 @@ test('đối tác mới đăng ký → mở tiệm → bị từ chối → gử
   await guest.reload();
   await guest.locator('#search').fill(shopName);
   await expect(guest.locator('#vendor-grid h3')).toHaveText(shopName);
+
+  // ---- Gói dịch vụ (SQL 19): tiệm Trang trí thêm "mẫu rạp" có ảnh + giá giảm ----
+  const pkgName = `Rạp hoa trắng E2E ${stamp}`;
+  await expect(vendor.locator('#tab-dresses')).toHaveText('Mẫu rạp & trang trí');
+  await vendor.locator('#tab-dresses').click();
+  await vendor.getByRole('button', { name: '+ Thêm mẫu rạp' }).first().click();
+  const dialog = vendor.locator('dialog.modal');
+  await dialog.getByLabel('Tên mẫu').fill(pkgName);
+  await dialog.getByLabel('Giá (VNĐ)').fill('35000000');
+  await dialog.getByLabel(/Giá gốc/).fill('40000000');
+  await dialog.getByLabel(/Mô tả/).fill('Cổng hoa 3m, 8 trụ hoa lối đi, backdrop sân khấu.');
+  await dialog.locator('input[name=image]').setInputFiles(require('node:path').resolve(__dirname, '../../../frontend/assets/images/bride_1_tryon_royal.jpg'));
+  await dialog.getByRole('button', { name: 'Thêm mẫu' }).click();
+  await expect(vendor.locator('.toast-success', { hasText: 'Đã thêm mẫu.' })).toBeVisible({ timeout: 30_000 });
+  await expect(vendor.locator('#panel-dresses [data-package]')).toHaveCount(1);
+
+  // Khách thấy mục "Mẫu rạp & trang trí" trên trang tiệm, có nhãn giảm giá
+  await guest.locator('#vendor-grid article', { hasText: shopName }).getByRole('link', { name: 'Xem chi tiết' }).click();
+  const shopUrl = guest.url().replace(/^https?:\/\/[^/]+/, '');
+  await expect(guest.getByRole('heading', { name: 'Mẫu rạp & trang trí' })).toBeVisible();
+  const pkgCard = guest.locator('#packages article', { hasText: pkgName });
+  await expect(pkgCard).toContainText('-13%');
+  await expect(guest.locator('aside')).toContainText('1 mẫu · từ 35.000.000đ');
+
+  // Cô dâu đặt đúng mẫu → đơn mang tên mẫu và giá của mẫu (giá lấy ở server, không tin giá gửi lên)
+  const bride = await openAs(browser, 'bride');
+  await bride.goto(shopUrl);
+  await bride.locator('#packages article', { hasText: pkgName }).getByRole('button', { name: 'Đặt mẫu này' }).click();
+  const booking = bride.locator('dialog.modal');
+  await expect(booking).toContainText(pkgName);
+  await expect(booking).toContainText('35.000.000đ');
+  await booking.getByLabel('Số điện thoại').fill('0900000000');
+  await booking.getByRole('button', { name: 'Xác nhận đặt lịch' }).click();
+  await expect(bride).toHaveURL(/bookings\.html\?new=BK/);
+  const order = bride.locator('article[data-booking]', { hasText: pkgName });
+  await expect(order).toContainText('35.000.000đ');
 });

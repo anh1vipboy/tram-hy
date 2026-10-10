@@ -45,6 +45,20 @@ export async function listVendorPhotos(vendorId) {
 }
 
 // Ảnh các góc của một mẫu váy (ảnh chính nằm ở dresses.image_url)
+// Gói dịch vụ đang bán của tiệm (SQL 19). Chưa chạy SQL → trả danh sách rỗng, trang tiệm vẫn hiện bình thường.
+export async function listPackages(vendorId) {
+  const { data, error } = await sb.from('vendor_packages')
+    .select('id, vendor_id, name, price, original_price, description, image_url, photos:package_photos(count)')
+    .eq('vendor_id', vendorId).eq('is_active', true).order('price');
+  if (error) return [];
+  return data;
+}
+
+export async function listPackagePhotos(packageId) {
+  return unwrap(await sb.from('package_photos').select('id, url, created_at')
+    .eq('package_id', packageId).order('created_at'));
+}
+
 export async function listDressPhotos(dressId) {
   return unwrap(await sb.from('dress_photos').select('id, url, created_at')
     .eq('dress_id', dressId).order('created_at'));

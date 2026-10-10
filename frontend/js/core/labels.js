@@ -35,6 +35,15 @@ export const VENDOR_CATEGORY = {
   venue:  'Nhà hàng tiệc',
 };
 
+// "Gói dịch vụ" của tiệm không bán váy – tên gọi theo loại tiệm (tab Kênh đối tác, mục trên trang tiệm)
+export const PACKAGE_LABEL = {
+  decor:  { section: 'Mẫu rạp & trang trí', item: 'mẫu', add: '+ Thêm mẫu rạp', hint: 'VD: Rạp hoa trắng cổ điển, Cổng hoa pastel…' },
+  studio: { section: 'Gói chụp ảnh cưới', item: 'gói', add: '+ Thêm gói chụp', hint: 'VD: Pre-wedding studio, Phóng sự ngày cưới…' },
+  makeup: { section: 'Gói trang điểm', item: 'gói', add: '+ Thêm gói trang điểm', hint: 'VD: Makeup cô dâu + làm tóc, Trang điểm mẹ…' },
+  venue:  { section: 'Sảnh & thực đơn', item: 'gói', add: '+ Thêm sảnh / thực đơn', hint: 'VD: Sảnh Ruby 30 bàn, Thực đơn Á 8 món…' },
+};
+export const packageLabel = (category) => PACKAGE_LABEL[category] ?? PACKAGE_LABEL.decor;
+
 export const VENDOR_STATUS = {
   pending:  { label: 'Chờ duyệt', tone: 'gold' },
   approved: { label: 'Đang hoạt động', tone: 'green' },

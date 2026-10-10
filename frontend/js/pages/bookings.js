@@ -34,7 +34,7 @@ function renderList() {
   render(container, bookings.map((b) => html`
     <article class="card stack" data-booking="${b.id}" data-code="${b.code}" ${b.code === highlight ? html`style="border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)"` : ''}>
       <div class="row">
-        <strong>${b.dress?.name || BOOKING_TYPE[b.type]}</strong>
+        <strong>${b.dress?.name || b.details?.package?.name || BOOKING_TYPE[b.type]}</strong>
         ${statusBadge(BOOKING_STATUS, b.status)}
         <span class="spacer"></span>
         <span class="muted small">Mã ${b.code}</span>

@@ -116,6 +116,67 @@ export async function deletePortfolioPhoto(photo) {
   await sb.storage.from('vendor-portfolio').remove([photo.path]);
 }
 
+// ---------- GÓI DỊCH VỤ (tiệm không bán váy – SQL 19) ----------
+export const MAX_PACKAGE_PHOTOS = 10;
+
+// Gồm cả gói đã ẩn, kèm ảnh chi tiết
+export async function listShopPackages(vendorId) {
+  const packages = unwrap(await sb.from('vendor_packages')
+    .select('id, vendor_id, name, price, original_price, description, image_url, is_active, created_at, photos:package_photos(id, path, url, created_at)')
+    .eq('vendor_id', vendorId).order('created_at', { ascending: false }));
+  for (const p of packages) p.photos.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  return packages;
+}
+
+/** pkg = null → thêm mới. values: { name, price, originalPrice, description, imageFile, photoFiles, removePhotoIds } */
+export async function savePackage(vendorId, pkg, values) {
+  const keptCount = (pkg?.photos.length ?? 0) - values.removePhotoIds.length;
+  if (keptCount + values.photoFiles.length > MAX_PACKAGE_PHOTOS) {
+    throw new Error(`Mỗi gói tối đa ${MAX_PACKAGE_PHOTOS} ảnh chi tiết`);
+  }
+  const row = {
+    name: values.name,
+    price: values.price,
+    original_price: values.originalPrice || null,
+    description: values.description || null,
+  };
+  const hasNewCover = values.imageFile?.size > 0;
+  if (hasNewCover) row.image_url = (await uploadImage('vendor-portfolio', vendorId, values.imageFile, 'pkg')).url;
+
+  let packageId = pkg?.id;
+  if (pkg) {
+    unwrap(await sb.from('vendor_packages').update(row).eq('id', pkg.id));
+  } else {
+    packageId = unwrap(await sb.from('vendor_packages').insert({ ...row, vendor_id: vendorId }).select('id').single()).id;
+  }
+
+  for (const file of values.photoFiles) {
+    const { path, url } = await uploadImage('vendor-portfolio', vendorId, file, 'pkg-photo');
+    const { error } = await sb.from('package_photos').insert({ package_id: packageId, path, url });
+    if (error) {
+      await sb.storage.from('vendor-portfolio').remove([path]);
+      throw new Error(error.message);
+    }
+  }
+
+  const removed = pkg?.photos.filter((p) => values.removePhotoIds.includes(p.id)) ?? [];
+  if (removed.length) {
+    unwrap(await sb.from('package_photos').delete().in('id', removed.map((p) => p.id)));
+    await sb.storage.from('vendor-portfolio').remove(removed.map((p) => p.path));
+  }
+  if (hasNewCover && pkg?.image_url) await removeImage('vendor-portfolio', pkg.image_url);
+}
+
+export async function setPackageActive(packageId, active) {
+  unwrap(await sb.from('vendor_packages').update({ is_active: active }).eq('id', packageId));
+}
+
+export async function deletePackage(pkg) {
+  unwrap(await sb.from('vendor_packages').delete().eq('id', pkg.id));   // đơn đã đặt vẫn giữ tên gói (lưu trong đơn)
+  const paths = [pathFromUrl('vendor-portfolio', pkg.image_url), ...pkg.photos.map((p) => p.path)].filter(Boolean);
+  if (paths.length) await sb.storage.from('vendor-portfolio').remove(paths);
+}
+
 // ---------- MẪU VÁY ----------
 
 // Gồm cả mẫu đã ẩn (chủ tiệm được xem hết)

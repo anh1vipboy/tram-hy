@@ -1,7 +1,7 @@
 import { initLayout } from '../core/layout.js';
 import { requireAuth } from '../core/auth.js';
 import { $, $$, html, render, money, date, dateTime, debounce } from '../core/utils.js';
-import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_STATUS, statusBadge } from '../core/labels.js';
+import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_STATUS, statusBadge, packageLabel } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy, focusFromUrl } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
 import { subscribeVendorChanges } from '../services/catalog.js';
@@ -12,6 +12,7 @@ import { shopFields, readShopForm } from '../components/shop-form.js';
 import { mountDressManager } from '../components/dress-manager.js';
 import { mountShopMedia } from '../components/shop-media.js';
 import { mountShopWizard } from '../components/shop-wizard.js';
+import { mountPackageManager } from '../components/package-manager.js';
 import { mountPartnerChecklist } from '../components/partner-checklist.js';
 
 const COLUMNS = [
@@ -79,7 +80,7 @@ function card(b) {
     <article class="kanban-card" data-booking="${b.id}" data-code="${b.code}">
       <div class="row"><strong>${b.contact_name || 'Khách hàng'}</strong><span class="spacer"></span>${statusBadge(BOOKING_STATUS, b.status)}</div>
       <div class="small muted">${b.code} · ${b.contact_phone || ''}</div>
-      <div class="small">${b.dress?.name || BOOKING_TYPE[b.type]}</div>
+      <div class="small">${b.dress?.name || b.details?.package?.name || BOOKING_TYPE[b.type]}</div>
       <div class="small">Hẹn: <strong>${dateTime(b.appointment_at)}</strong></div>
       <div class="small">Tổng: <span class="price">${money(b.total_price)}</span></div>
       ${b.note ? html`<div class="small muted">Ghi chú: ${b.note}</div>` : ''}
@@ -189,9 +190,9 @@ function renderWorkspace() {
   select.hidden = approved.length < 2;
   render(select, approved.map((s) => html`<option value="${s.id}" ${s.id === managedShopId ? 'selected' : ''}>${s.name}</option>`));
 
-  // Chỉ tiệm váy cưới mới đăng mẫu váy
-  $('#tab-dresses').hidden = managedShop().category !== 'bridal';
-  if (activePanel === 'dresses' && $('#tab-dresses').hidden) activePanel = 'orders';
+  // Tab thứ 2: tiệm váy → "Mẫu váy"; tiệm khác → gói dịch vụ ("Mẫu rạp", "Gói chụp"…)
+  const isBridal = managedShop().category === 'bridal';
+  $('#tab-dresses').textContent = isBridal ? 'Mẫu váy' : packageLabel(managedShop().category).section;
   showPanel(activePanel);
   checklist = null;
   mountPartnerChecklist($('#checklist'), managedShop(), { goTo: showPanel })
@@ -209,7 +210,8 @@ function showPanel(name) {
   const shop = managedShop();
   if (name === 'dresses' && mountedPanels.dresses !== shop.id) {
     mountedPanels.dresses = shop.id;
-    mountDressManager($('#panel-dresses'), shop);
+    if (shop.category === 'bridal') mountDressManager($('#panel-dresses'), shop);
+    else mountPackageManager($('#panel-dresses'), shop);
   }
   if (name === 'media' && mountedPanels.media !== shop.id) {
     mountedPanels.media = shop.id;

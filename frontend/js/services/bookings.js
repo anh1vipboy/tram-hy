@@ -30,6 +30,7 @@ export async function createBooking(params) {
     p_note: params.note ?? null,
     p_details: params.details ?? {},
     p_custom_price: params.customPrice ?? null,
+    ...(params.packageId ? { p_package_id: params.packageId } : {}),   // gói dịch vụ (SQL 19)
   }));
 }
 

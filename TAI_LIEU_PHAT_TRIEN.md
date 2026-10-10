@@ -62,6 +62,7 @@ exe202/
 │   ├── 16_rsvp_antispam.sql  Chống spam phản hồi thiệp (trùng tên, giới hạn theo IP, chặn link)
 │   ├── 17_become_partner.sql Cô dâu tự mở tiệm (Trở thành đối tác) + tài khoản nhận tiền riêng tư
 │   ├── 18_notifications.sql  Chuông thông báo: bảng notifications + trigger tự tạo thông báo
+│   ├── 19_vendor_packages.sql Gói dịch vụ (mẫu rạp, gói chụp, gói trang điểm, sảnh) + đặt lịch theo gói
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -280,6 +281,15 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - Chưa có đơn: Supabase → Authentication → Users → ⋯ → Delete user.
 - Đã có đơn (báo *Database error deleting user*): chạy [`backend/supabase/tools/xoa_tai_khoan_test.sql`](backend/supabase/tools/xoa_tai_khoan_test.sql) sau khi sửa danh sách email.
 - Mẹo: dùng `ten+test1@gmail.com`, `ten+test2@gmail.com`… – mỗi địa chỉ là 1 tài khoản riêng nhưng thư về cùng hộp Gmail.
+
+### Gói dịch vụ cho tiệm không bán váy (SQL 19)
+- Tiệm Trang trí / Chụp ảnh / Trang điểm / Nhà hàng có nhiều **gói**, tên gọi theo loại (`PACKAGE_LABEL` trong `core/labels.js`):
+  "Mẫu rạp & trang trí", "Gói chụp ảnh cưới", "Gói trang điểm", "Sảnh & thực đơn". Mỗi gói: tên, giá, giá gốc (hiện "Giảm X%"),
+  mô tả, ảnh chính + tối đa 10 ảnh chi tiết; tối đa 30 gói / tiệm. Ảnh nằm ở bucket `vendor-portfolio/<vendor_id>/pkg-…`.
+- Kênh đối tác: tab thứ 2 đổi tên theo loại tiệm (`components/package-manager.js`) – thêm / sửa / ẩn / xóa giống Mẫu váy.
+- Trang tiệm: mục gói (thẻ + trình xem ảnh) với nút **"Đặt … này"**; khung bên phải hiện "N mẫu · từ <giá rẻ nhất>".
+  `create_booking` nhận thêm `p_package_id`: **giá lấy từ gói ở server** và tên gói được lưu vào `bookings.details.package`
+  (tiệm đổi tên / xóa gói thì đơn cũ vẫn đúng). Đơn hiện tên gói ở Đơn của tôi, Kênh đối tác, Quản trị.
 
 ### Chuông thông báo (SQL 18)
 - Chuông 🔔 cạnh avatar (máy tính: thả xuống · điện thoại: tấm trượt từ dưới lên), số chưa đọc trên chuông và

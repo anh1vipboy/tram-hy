@@ -1,8 +1,10 @@
 import { initLayout } from '../core/layout.js';
 import { $, html, render, money, param, date } from '../core/utils.js';
-import { badge, priceTag, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
+import { badge, priceTag, packageLabel, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
-import { getVendorBySlug, listDresses, listReviews, listVendorPhotos } from '../services/catalog.js';
+import { getVendorBySlug, listDresses, listPackages, listReviews, listVendorPhotos } from '../services/catalog.js';
+import { packageThumbButton, bindPackageGalleries } from '../components/package-card.js';
+import { CATEGORY_CHOICES } from '../components/shop-form.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
 import { vendorLogo } from '../components/vendor-logo.js';
@@ -18,20 +20,30 @@ try {
     render(page, html`<div class="empty">Không tìm thấy đối tác. <a href="marketplace.html">Quay lại danh sách</a></div>`);
   } else {
     document.title = `${vendor.name} – Trạm Hỷ`;
-    const [dresses, reviews, photos] = await Promise.all([
+    const [dresses, reviews, photos, packages] = await Promise.all([
       vendor.category === 'bridal' ? listDresses({ vendorId: vendor.id }) : [],
       listReviews(vendor.id),
       listVendorPhotos(vendor.id),
+      vendor.category === 'bridal' ? [] : listPackages(vendor.id),
     ]);
-    renderPage(vendor, dresses, reviews, photos);
+    renderPage(vendor, dresses, reviews, photos, packages);
   }
 } catch (error) {
   render(page, html`<div class="empty">Không tải được thông tin đối tác.</div>`);
   toastError(error);
 }
 
-function renderPage(vendor, dresses, reviews, photos) {
+function renderPage(vendor, dresses, reviews, photos, packages) {
   const isBridal = vendor.category === 'bridal';
+  const label = packageLabel(vendor.category);
+  const bookPackage = (pkg) => openBookingDialog({
+    vendorId: vendor.id,
+    vendorName: vendor.name,
+    type: 'service',
+    packageId: pkg.id,
+    title: pkg.name,
+    price: pkg.price,
+  }, `vendor.html?slug=${vendor.slug}`).catch(toastError);
   render(page, html`
     <a href="marketplace.html" class="small">← Dịch vụ cưới</a>
     ${vendor.status !== 'approved' ? html`<div class="notice" style="margin-top:12px"><strong>Bản xem trước – tiệm chưa hiện với khách</strong>
@@ -47,8 +59,17 @@ function renderPage(vendor, dresses, reviews, photos) {
           ${vendor.description ? html`<p>${vendor.description}</p>` : ''}
         </div>
       </div>
-      ${vendor.status !== 'approved' ? '' : isBridal ? bridalBox(vendor) : serviceBox(vendor)}
+      ${vendor.status !== 'approved' ? '' : isBridal ? bridalBox(vendor) : serviceBox(vendor, packages, label)}
     </div>
+
+    ${!isBridal && packages.length ? html`
+      <section class="section" id="packages" style="margin-top:32px">
+        <div class="section-head"><div>
+          <h2 style="margin:0">${label.section}</h2>
+          <p>${packages.length} ${label.item} · bấm ảnh để xem chi tiết, giá đã gồm trong thanh toán 3 đợt qua Trạm Hỷ.</p>
+        </div></div>
+        <div class="grid packages-grid">${packages.map((p) => packageCard(p, label, CATEGORY_CHOICES[vendor.category]?.icon))}</div>
+      </section>` : ''}
 
     ${photos.length ? html`
       <section class="section" style="margin-top:32px">
@@ -74,6 +95,14 @@ function renderPage(vendor, dresses, reviews, photos) {
     </section>`);
 
   bindDressGalleries(page, dresses);
+  bindPackageGalleries(page, packages, (pkg) => ({
+    subtitle: vendor.name,
+    action: vendor.status === 'approved' ? { label: `Đặt ${label.item} này`, onClick: () => bookPackage(pkg) } : null,
+  }));
+  page.querySelectorAll('[data-book-package]').forEach((btn) => {
+    btn.addEventListener('click', () => bookPackage(packages.find((p) => p.id === btn.dataset.bookPackage)));
+  });
+  $('#see-packages')?.addEventListener('click', () => $('#packages').scrollIntoView({ behavior: 'smooth', block: 'start' }));
 
   $('#book-service')?.addEventListener('click', () => {
     openBookingDialog({
@@ -86,20 +115,38 @@ function renderPage(vendor, dresses, reviews, photos) {
   });
 }
 
-function serviceBox(vendor) {
+function serviceBox(vendor, packages, label) {
   const split = [30, 50, 20];
   const labels = ['Cọc giữ lịch', 'Sau buổi thực hiện', 'Nghiệm thu'];
+  // Có gói → giá từ gói rẻ nhất, nút chính dẫn tới danh sách gói; vẫn cho đặt lịch tư vấn theo giá khởi điểm
+  const from = packages.length ? Math.min(...packages.map((p) => p.price)) : vendor.base_price;
   return html`
     <aside class="card stack">
       <div class="eyebrow">Thanh toán bảo chứng</div>
-      <div>Gói từ <span class="price" style="font-size:22px">${money(vendor.base_price)}</span></div>
+      <div>${packages.length ? `${packages.length} ${label.item} · từ ` : 'Gói từ '}<span class="price" style="font-size:22px">${money(from)}</span></div>
       <table>
         ${split.map((p, i) => html`<tr><td>Đợt ${i + 1}: ${labels[i]} (${p}%)</td>
-          <td class="price">${money(Math.round(vendor.base_price * p / 100))}</td></tr>`)}
+          <td class="price">${money(Math.round(from * p / 100))}</td></tr>`)}
       </table>
-      <button class="btn btn-primary btn-block" id="book-service" type="button">Đặt lịch qua Trạm Hỷ</button>
+      ${packages.length
+        ? html`<button class="btn btn-primary btn-block" id="see-packages" type="button">Chọn ${label.item} & đặt lịch</button>
+               <button class="btn btn-link btn-sm" id="book-service" type="button">Hoặc đặt lịch tư vấn chung (từ ${money(vendor.base_price)})</button>`
+        : html`<button class="btn btn-primary btn-block" id="book-service" type="button">Đặt lịch qua Trạm Hỷ</button>`}
       <p class="small muted">Tiền cọc được Trạm Hỷ giữ. Đối tác sai cam kết → hoàn 100%.</p>
     </aside>`;
+}
+
+function packageCard(pkg, label, icon) {
+  return html`
+    <article class="card item-card">
+      ${packageThumbButton(pkg, icon)}
+      <div class="body">
+        <h3>${pkg.name}</h3>
+        <div>${priceTag(pkg)}</div>
+        ${pkg.description ? html`<div class="small muted package-desc">${pkg.description}</div>` : ''}
+        <button class="btn btn-primary btn-sm" type="button" data-book-package="${pkg.id}">Đặt ${label.item} này</button>
+      </div>
+    </article>`;
 }
 
 function bridalBox(vendor) {
