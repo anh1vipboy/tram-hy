@@ -28,7 +28,7 @@ test('đối tác mới đăng ký → mở tiệm → bị từ chối → gử
   await expect(vendor, 'Project test phải tắt "Confirm email" để đăng ký xong vào thẳng').toHaveURL(/vendor-dashboard\.html/);
 
   // ---- Mở tiệm từng bước ----
-  await vendor.getByRole('radio', { name: /Trang trí/ }).check();                // ① loại dịch vụ
+  await vendor.locator('.category-option', { hasText: 'Trang trí' }).click();   // ① loại dịch vụ (bấm cả thẻ)
   await vendor.getByRole('button', { name: 'Tiếp tục →' }).click();
   await vendor.getByLabel('Tên tiệm / thương hiệu').fill(shopName);            // ② thông tin tiệm
   await vendor.getByLabel('Số điện thoại liên hệ').fill('0911222333');

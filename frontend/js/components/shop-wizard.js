@@ -13,7 +13,8 @@ export function mountShopWizard(container, { userId, onSubmitted }) {
   const draftKey = `tramhy-shop-draft-${userId}`;
   let draft = {};
   try { draft = JSON.parse(localStorage.getItem(draftKey)) ?? {}; } catch { draft = {}; }
-  let step = draft.category ? (draft.name ? 2 : 1) : 0;
+  // Quay lại đúng bước đang làm; bước ③ chỉ khi bước ② đã qua kiểm tra (có giá đã xử lý)
+  let step = Math.min(draft.step ?? 0, draft.basePrice ? 2 : draft.category ? 1 : 0);
 
   const saveDraft = () => { try { localStorage.setItem(draftKey, JSON.stringify(draft)); } catch { /* bỏ qua */ } };
   // Lưu nháp các ô đang gõ ở bước 2 (chưa kiểm tra – kiểm tra khi bấm Tiếp tục)
@@ -83,7 +84,7 @@ export function mountShopWizard(container, { userId, onSubmitted }) {
     form.addEventListener('change', (e) => {
       if (e.target.name === 'category') { draft.category = e.target.value; saveDraft(); }
     });
-    container.querySelector('[data-back]')?.addEventListener('click', () => { step -= 1; draw(); });
+    container.querySelector('[data-back]')?.addEventListener('click', () => { step -= 1; draft.step = step; saveDraft(); draw(); });
     form.addEventListener('submit', (e) => next(e, form));
     container.querySelector('.wizard').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -109,8 +110,9 @@ export function mountShopWizard(container, { userId, onSubmitted }) {
       toastError(error);
       return;
     }
-    saveDraft();
     step += 1;
+    draft.step = step;
+    saveDraft();
     draw();
   }
 
