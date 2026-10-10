@@ -2,6 +2,7 @@
 import { getProfile, signOut } from './auth.js';
 import { $, html, render, initials } from './utils.js';
 import { sb } from './supabase.js';
+import { mountNotificationBell } from '../components/notification-bell.js';
 
 // roles: undefined = ai cũng thấy; 'any' = đã đăng nhập; mảng = chỉ các vai trò đó
 const NAV_ITEMS = [
@@ -68,14 +69,16 @@ function accountMenu(profile, activePage) {
     </div>`;
 }
 
-// Mở/đóng menu tài khoản: bấm avatar (header) hoặc ô Tài khoản (thanh tab); bấm ra ngoài / Esc để đóng
-function bindAccountMenu() {
+// Mở/đóng menu tài khoản: bấm avatar (header) hoặc ô Tài khoản (thanh tab); bấm ra ngoài / Esc để đóng.
+// onOpen: đóng chuông thông báo khi menu mở (không mở chồng 2 bảng). Trả về hàm close().
+function bindAccountMenu({ onOpen } = {}) {
   const menu = $('#account-menu');
-  if (!menu) return;
+  if (!menu) return () => {};
   // Đưa ra ngoài header: header có backdrop-filter làm menu "fixed" bị định vị theo header thay vì màn hình
   document.body.append(menu);
   const triggers = [...document.querySelectorAll('[data-account]')];
   const setOpen = (open) => {
+    if (open) onOpen?.();
     menu.hidden = !open;
     document.body.classList.toggle('account-open', open);
     triggers.forEach((t) => t.setAttribute('aria-expanded', String(open)));
@@ -87,6 +90,7 @@ function bindAccountMenu() {
   document.addEventListener('click', (e) => { if (!menu.hidden && !menu.contains(e.target)) setOpen(false); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
   menu.querySelector('[data-signout]').addEventListener('click', signOut);
+  return () => setOpen(false);
 }
 
 /** Vẽ header/footer và trả về hồ sơ người dùng (hoặc null) để trang dùng tiếp. */
@@ -107,7 +111,11 @@ export async function initLayout(activePage) {
       </nav>
       <div class="user-area">
         ${profile
-          ? html`<button type="button" class="account-button" data-account aria-haspopup="menu" aria-expanded="false"
+          ? html`<button type="button" class="notif-button" data-notif aria-haspopup="dialog" aria-expanded="false" aria-label="Thông báo">
+                   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-1.7 1.7A1 1 0 0 0 4 19.4h16a1 1 0 0 0 .7-1.7L19 16Z"/></svg>
+                   <span class="notif-badge" hidden>0</span>
+                 </button>
+                 <button type="button" class="account-button" data-account aria-haspopup="menu" aria-expanded="false"
                          title="${displayName(profile)}">
                    ${avatar(profile)}<span class="user-name">${displayName(profile)}</span>
                  </button>
@@ -135,7 +143,13 @@ export async function initLayout(activePage) {
                ${avatar(profile, 'sm')}Tài khoản</button>`
       : html`<a href="login.html" class="${accountActive ? 'active' : ''}"><span aria-hidden="true">👤</span>Đăng nhập</a>`}`);
 
-  bindAccountMenu();
+  // Chuông thông báo + menu tài khoản: mở cái này thì đóng cái kia
+  let closeBell = () => {};
+  const closeAccount = bindAccountMenu({ onOpen: () => closeBell() });
+  const bellButton = header.querySelector('[data-notif]');
+  if (profile && bellButton) {
+    closeBell = mountNotificationBell(bellButton, profile, { onOpen: closeAccount }).close;
+  }
   if (activePage !== 'login') watchAccountSwitch(profile);
 
   const footer = $('#app-footer');

@@ -61,6 +61,7 @@ exe202/
 │   ├── 15_demo_data.sql      Dữ liệu demo: ảnh bìa, ảnh thực tế, mẫu váy, đánh giá có bình luận
 │   ├── 16_rsvp_antispam.sql  Chống spam phản hồi thiệp (trùng tên, giới hạn theo IP, chặn link)
 │   ├── 17_become_partner.sql Cô dâu tự mở tiệm (Trở thành đối tác) + tài khoản nhận tiền riêng tư
+│   ├── 18_notifications.sql  Chuông thông báo: bảng notifications + trigger tự tạo thông báo
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -279,6 +280,21 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - Chưa có đơn: Supabase → Authentication → Users → ⋯ → Delete user.
 - Đã có đơn (báo *Database error deleting user*): chạy [`backend/supabase/tools/xoa_tai_khoan_test.sql`](backend/supabase/tools/xoa_tai_khoan_test.sql) sau khi sửa danh sách email.
 - Mẹo: dùng `ten+test1@gmail.com`, `ten+test2@gmail.com`… – mỗi địa chỉ là 1 tài khoản riêng nhưng thư về cùng hộp Gmail.
+
+### Chuông thông báo (SQL 18)
+- Chuông 🔔 cạnh avatar (máy tính: thả xuống · điện thoại: tấm trượt từ dưới lên), số chưa đọc trên chuông và
+  trên tiêu đề tab "(3) …". Thông báo mới (realtime): chuông rung + toast. Bấm thông báo → đánh dấu đã đọc và
+  đi thẳng tới đúng đơn (`?focus=MÃ` – đơn được cuộn tới và nháy sáng) / đúng tab Quản trị (`admin.html?tab=…`).
+- **Database tự tạo** thông báo bằng trigger (`notif_*` trong `18_notifications.sql`), không phụ thuộc trang đang mở:
+
+  | Ai | Sự kiện |
+  |---|---|
+  | Admin | Hồ sơ mở tiệm mới / gửi lại · Khiếu nại mới · Đối tác báo khách không đến |
+  | Đối tác | Đơn mới · Khách trả cọc từng đợt · Giải ngân · Khách yêu cầu hoàn cọc · Kết quả phân xử · Hồ sơ được duyệt / cần sửa · Tích Xanh · Đánh giá mới · Đơn hoàn tất |
+  | Cô dâu | Tiệm bắt đầu thực hiện · Tiệm báo xong (chờ nghiệm thu) · Đơn hoàn tất (mời đánh giá) · Tiệm hủy đơn chưa cọc · Bị báo không đến · Kết quả khiếu nại · Khách phản hồi thiệp |
+- Mỗi người chỉ đọc / đánh dấu đã đọc thông báo của mình (RLS, chỉ được sửa cột `read_at`). Đơn demo (SQL 15)
+  không tạo thông báo; thông báo cũ hơn 90 ngày tự dọn. Chưa chạy SQL 18 thì chuông tự ẩn.
+- Giai đoạn 2 (chưa làm): email cho sự kiện quan trọng (Brevo), thông báo đẩy về điện thoại khi đã tắt web (PWA).
 
 ### Trở thành đối tác (như "Bán hàng cùng Shopee")
 - **Một tài khoản cho cả mua lẫn bán.** Form đăng ký chung không còn ô chọn vai trò – ai cũng đăng ký như nhau.

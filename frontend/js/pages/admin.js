@@ -235,6 +235,8 @@ function initTabs() {
 
 // ---------- KHỞI CHẠY TRANG ----------
 initTabs();                    // gắn sự kiện tab ngay, không chờ kiểm tra đăng nhập (bấm sớm vẫn ăn)
+// Đến từ chuông thông báo (admin.html?tab=disputes) → mở đúng tab
+document.querySelector(`[data-tab="${new URLSearchParams(location.search).get('tab')}"]`)?.click();
 await initLayout('admin');
 await requireAuth(['admin']);
 await load();

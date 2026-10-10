@@ -2,7 +2,7 @@ import { initLayout } from '../core/layout.js';
 import { requireAuth } from '../core/auth.js';
 import { $, $$, html, render, money, date, dateTime, debounce } from '../core/utils.js';
 import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_STATUS, statusBadge } from '../core/labels.js';
-import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
+import { openDialog, toast, toastError, withBusy, focusFromUrl } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
 import { subscribeVendorChanges } from '../services/catalog.js';
 import { listMyShops, updateMyShop, resubmitVendor } from '../services/shop.js';
@@ -34,6 +34,7 @@ async function load() {
     bookings = await listVendorBookings(shops.filter((s) => s.status === 'approved').map((s) => s.id));
     renderStats();
     renderBoard();
+    focusFromUrl($('#board'));                    // đến từ chuông thông báo → cuộn tới đúng đơn
   } catch (error) {
     toastError(error);
   }
@@ -75,7 +76,7 @@ function renderBoard() {
 
 function card(b) {
   return html`
-    <article class="kanban-card" data-booking="${b.id}">
+    <article class="kanban-card" data-booking="${b.id}" data-code="${b.code}">
       <div class="row"><strong>${b.contact_name || 'Khách hàng'}</strong><span class="spacer"></span>${statusBadge(BOOKING_STATUS, b.status)}</div>
       <div class="small muted">${b.code} · ${b.contact_phone || ''}</div>
       <div class="small">${b.dress?.name || BOOKING_TYPE[b.type]}</div>

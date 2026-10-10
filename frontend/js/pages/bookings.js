@@ -2,7 +2,7 @@ import { initLayout } from '../core/layout.js';
 import { requireAuth } from '../core/auth.js';
 import { $, html, render, money, param, dateTime, debounce } from '../core/utils.js';
 import { BOOKING_STATUS, BOOKING_TYPE, statusBadge } from '../core/labels.js';
-import { openDialog, toast, toastError } from '../core/ui.js';
+import { openDialog, toast, toastError, focusFromUrl } from '../core/ui.js';
 import { ESCROW_BANK } from '../config.js';
 import {
   listMyBookings, payMilestone, releaseMilestone, openDispute, addReview, subscribeBookingChanges,
@@ -32,7 +32,7 @@ function renderList() {
   }
   const highlight = param('new');
   render(container, bookings.map((b) => html`
-    <article class="card stack" data-booking="${b.id}" ${b.code === highlight ? html`style="border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)"` : ''}>
+    <article class="card stack" data-booking="${b.id}" data-code="${b.code}" ${b.code === highlight ? html`style="border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)"` : ''}>
       <div class="row">
         <strong>${b.dress?.name || BOOKING_TYPE[b.type]}</strong>
         ${statusBadge(BOOKING_STATUS, b.status)}
@@ -56,6 +56,7 @@ function renderList() {
     const booking = bookings.find((b) => b.id === btn.closest('[data-booking]').dataset.booking);
     btn.addEventListener('click', () => ACTIONS[btn.dataset.action](booking, Number(btn.dataset.stage)));
   });
+  focusFromUrl(container);                     // đến từ chuông thông báo → cuộn tới đúng đơn
 }
 
 // Nút cho từng đợt: đợt "chưa trả" đầu tiên → Thanh toán; đợt đang giữ → Nghiệm thu

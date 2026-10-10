@@ -97,6 +97,18 @@ export function openDialog({ title, content, confirmText = 'Xác nhận', cancel
   });
 }
 
+// Link từ chuông thông báo (?focus=MÃ ĐƠN): cuộn tới phần tử [data-code="MÃ"] và nháy sáng – chỉ lần đầu vẽ trang
+let focusDone = false;
+export function focusFromUrl(root = document) {
+  const code = new URLSearchParams(location.search).get('focus');
+  if (!code || focusDone) return;
+  const el = root.querySelector(`[data-code="${CSS.escape(code)}"]`);
+  if (!el) return;
+  focusDone = true;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.add('flash');
+}
+
 // Khóa nút trong lúc chờ xử lý để tránh bấm 2 lần
 export async function withBusy(button, task) {
   button.disabled = true;

@@ -101,6 +101,53 @@ main.container { padding-block: 28px 56px; flex: 1 0 auto; }
 .account-menu a:hover, .account-menu a.active { background: var(--brand-soft); color: var(--brand-dark); }
 .account-signout { margin-top: 4px; border-top: 1px solid var(--line); border-radius: 0 0 10px 10px; color: var(--red); }
 .account-signout:hover { background: var(--red-soft); }
+/* ---------- Chuông thông báo ---------- */
+.notif-button { position: relative; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; transition: border-color .2s, background .2s; }
+.notif-button:hover, .notif-button[aria-expanded="true"] { border-color: var(--brand); background: var(--brand-soft); color: var(--brand-dark); }
+.notif-button.ring svg { animation: bell-ring .9s ease-in-out; transform-origin: 50% 8%; }
+.notif-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+  background: #d0312d; color: #fff; font: 700 11px/18px var(--font-body); text-align: center; border: 2px solid #fff;
+  animation: badge-pop .35s cubic-bezier(.2, 1.6, .4, 1); }
+.notif-badge[hidden] { display: none; }
+.notif-panel { position: fixed; right: max(16px, calc((100vw - 1180px) / 2 + 16px)); top: calc(64px + env(safe-area-inset-top, 0px)); z-index: 61;
+  width: 380px; max-height: min(560px, calc(100dvh - 90px)); display: flex; flex-direction: column; border: 1px solid var(--line);
+  border-radius: 16px; background: var(--card); box-shadow: 0 16px 40px rgba(42, 36, 33, .18); overflow: hidden;
+  animation: panel-in .22s cubic-bezier(.2, .8, .2, 1); }
+.notif-panel[hidden] { display: none; }
+.notif-head { display: flex; align-items: center; gap: 6px; padding: 12px 12px 10px 16px; border-bottom: 1px solid var(--line); }
+.notif-head strong { font-size: 16px; }
+.notif-close { display: none; width: 32px; height: 32px; border: 0; border-radius: 50%; background: #f5ebe6; cursor: pointer; font-size: 14px; }
+.notif-list { overflow-y: auto; overscroll-behavior: contain; padding: 6px; }
+.notif-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px; border-radius: 12px; color: var(--ink); text-decoration: none; transition: background .15s; }
+.notif-item:hover { background: #f8f1ec; }
+.notif-item.unread { background: var(--brand-soft); }
+.notif-item.unread:hover { background: #f3dcd7; }
+.notif-icon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 1px solid var(--line); font-size: 19px; }
+.notif-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 14px; line-height: 1.35; }
+.notif-item:not(.unread) .notif-text strong { font-weight: 600; color: #4a403b; }
+.notif-body { color: var(--muted); font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.notif-time { color: var(--brand); font-size: 12px; font-weight: 600; }
+.notif-item:not(.unread) .notif-time { color: var(--muted); font-weight: 500; }
+.notif-dot { flex: none; width: 10px; height: 10px; margin-top: 15px; border-radius: 50%; background: var(--brand); }
+.notif-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 36px 20px; text-align: center; }
+.notif-empty-icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--brand-soft); font-size: 30px; margin-bottom: 4px; }
+.notif-skeleton { display: flex; gap: 12px; padding: 10px; }
+.notif-skeleton span { flex: none; width: 40px; height: 40px; border-radius: 50%; }
+.notif-skeleton div { flex: 1; display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+.notif-skeleton i { display: block; height: 10px; border-radius: 6px; }
+.notif-skeleton i:last-child { width: 60%; }
+.notif-skeleton span, .notif-skeleton i { background: linear-gradient(90deg, #f3e8e2 25%, #faf3ef 50%, #f3e8e2 75%); background-size: 200% 100%; animation: skeleton 1.2s linear infinite; }
+/* Đến từ thông báo: đơn được cuộn tới sẽ nháy sáng */
+.flash { animation: flash-focus 2.4s ease-out; }
+@keyframes bell-ring { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(16deg); } 30% { transform: rotate(-14deg); } 45% { transform: rotate(10deg); } 60% { transform: rotate(-6deg); } 75% { transform: rotate(3deg); } }
+@keyframes badge-pop { from { transform: scale(.3); } to { transform: scale(1); } }
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes panel-in { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes skeleton { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes flash-focus { 0%, 30% { box-shadow: 0 0 0 4px var(--brand); } 100% { box-shadow: 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .notif-button.ring svg, .notif-badge, .notif-panel, .flash { animation: none !important; } }
+
 /* Thanh tab dưới đáy – chỉ điện thoại */
 .tabbar { display: none; }
 .site-footer { border-top: 1px solid var(--line); padding: 24px 0 calc(24px + env(safe-area-inset-bottom, 0px)); color: var(--muted); font-size: 13px; text-align: center; background: var(--card); }
@@ -502,7 +549,13 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
   body.has-tabbar .toast-host { bottom: calc(74px + env(safe-area-inset-bottom, 0px)); }
   /* Menu tài khoản thành tấm trượt từ dưới lên, nằm trên thanh tab */
   .account-menu { position: fixed; left: 8px; right: 8px; top: auto; width: auto; bottom: calc(66px + env(safe-area-inset-bottom, 0px)); z-index: 46; }
-  body.account-open::after { content: ""; position: fixed; inset: 0; z-index: 44; background: rgba(30, 24, 20, .35); }
+  body.account-open::after, body.notif-open::after { content: ""; position: fixed; inset: 0; z-index: 44; background: rgba(30, 24, 20, .35); }
+  /* Thông báo trên điện thoại: tấm trượt từ dưới lên, cao tối đa 80% màn hình */
+  .notif-panel { left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 82dvh; border-radius: 20px 20px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px); animation: sheet-up .28s cubic-bezier(.2, .8, .2, 1); }
+  .notif-panel::before { content: ""; display: block; width: 40px; height: 4px; margin: 8px auto 0; border-radius: 999px; background: var(--line); }
+  .notif-close { display: grid; place-items: center; }
+  .notif-button { width: 36px; height: 36px; }
   /* Thanh "Đặt lịch" ở Phòng thử nằm ngay trên thanh tab */
   .sticky-cta { bottom: calc(58px + env(safe-area-inset-bottom, 0px)); padding-bottom: 10px; }
   body.has-sticky-cta.has-tabbar { padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)); }
