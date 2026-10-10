@@ -1,16 +1,18 @@
 import { initLayout } from '../core/layout.js';
 import { requireAuth } from '../core/auth.js';
-import { $, $$, html, render, money, dateTime, debounce } from '../core/utils.js';
+import { $, $$, html, render, money, date, dateTime, debounce } from '../core/utils.js';
 import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_STATUS, statusBadge } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
 import { subscribeVendorChanges } from '../services/catalog.js';
-import { listMyShops, registerVendor, updateMyShop, resubmitVendor } from '../services/shop.js';
+import { listMyShops, updateMyShop, resubmitVendor } from '../services/shop.js';
 import { listVendorBookings, vendorSetStatus, openDispute, subscribeBookingChanges } from '../services/bookings.js';
 import { milestonesView, detailsView, openDisputeView } from '../components/booking-card.js';
 import { shopFields, readShopForm } from '../components/shop-form.js';
 import { mountDressManager } from '../components/dress-manager.js';
 import { mountShopMedia } from '../components/shop-media.js';
+import { mountShopWizard } from '../components/shop-wizard.js';
+import { mountPartnerChecklist } from '../components/partner-checklist.js';
 
 const COLUMNS = [
   { title: 'Chờ khách đặt cọc', statuses: ['pending'] },
@@ -190,9 +192,15 @@ function renderWorkspace() {
   $('#tab-dresses').hidden = managedShop().category !== 'bridal';
   if (activePanel === 'dresses' && $('#tab-dresses').hidden) activePanel = 'orders';
   showPanel(activePanel);
+  checklist = null;
+  mountPartnerChecklist($('#checklist'), managedShop(), { goTo: showPanel })
+    .then((c) => { checklist = c; }).catch(toastError);
 }
 
+let checklist = null;   // "Hoàn thiện hồ sơ" của tiệm đang quản lý – cập nhật khi quay về tab Đơn hàng
+
 function showPanel(name) {
+  if (name === 'orders' && activePanel !== 'orders') checklist?.refresh();   // vừa thêm ảnh / mẫu váy xong
   activePanel = name;
   $$('[data-panel]').forEach((t) => t.classList.toggle('active', t.dataset.panel === name));
   for (const panel of ['orders', 'dresses', 'media']) $(`#panel-${panel}`).hidden = panel !== name;
@@ -211,30 +219,31 @@ function showPanel(name) {
 function renderShopStatus() {
   const container = $('#shop-status');
   if (!shops.length) {
-    render(container, html`
-      <form class="card stack" id="register-form">
-        <div>
-          <h2 style="margin:0">Đăng ký mở tiệm</h2>
-          <p class="muted">Điền thông tin tiệm. Trạm Hỷ kiểm tra và duyệt trong 1–2 ngày làm việc; trong lúc chờ, tiệm chưa hiện với khách.</p>
-        </div>
-        ${shopFields()}
-        <button class="btn btn-primary" type="submit">Gửi hồ sơ cho Trạm Hỷ</button>
-      </form>`);
-    $('#register-form').addEventListener('submit', (e) => submitShop(e, (shop) => registerVendor(shop),
-      'Đã gửi hồ sơ! Trạm Hỷ sẽ duyệt sớm.'));
+    // Cô dâu / đối tác chưa có tiệm → đăng ký từng bước. Gửi xong tải lại để header đổi sang vai trò đối tác.
+    mountShopWizard(container, {
+      userId: profile.id,
+      onSubmitted: async () => {
+        sessionStorage.setItem('tramhy-flash', 'Đã gửi hồ sơ! Trạm Hỷ sẽ duyệt trong 1–2 ngày làm việc.');
+        location.reload();
+      },
+    });
     return;
   }
 
   render(container, shops.map((shop) => {
     if (shop.status === 'pending') {
-      return html`<div class="notice"><strong>Hồ sơ "${shop.name}" đang chờ Trạm Hỷ duyệt</strong>
-        Bạn sẽ thấy kết quả ngay tại đây khi được duyệt – không cần tải lại trang.</div>`;
+      return html`<section class="card stack">
+        <h3 style="margin:0">Hồ sơ "${shop.name}" đang chờ Trạm Hỷ duyệt</h3>
+        ${reviewTimeline(shop)}
+        <p class="small muted" style="margin:0">Kết quả hiện ngay tại đây khi có – không cần tải lại trang.</p>
+      </section>`;
     }
     if (shop.status === 'rejected') {
       return html`
         <form class="card stack" data-resubmit="${shop.id}">
-          <div class="notice notice-error"><strong>Hồ sơ "${shop.name}" chưa được duyệt</strong>
-            Lý do: ${shop.review_note || 'Không ghi rõ'}. Hãy sửa thông tin bên dưới rồi gửi lại.</div>
+          <h3 style="margin:0">Hồ sơ "${shop.name}" chưa được duyệt</h3>
+          ${reviewTimeline(shop)}
+          <div class="notice notice-error">Lý do: ${shop.review_note || 'Không ghi rõ'}. Hãy sửa thông tin bên dưới rồi gửi lại.</div>
           ${shopFields(shop, { withCategory: false })}
           <button class="btn btn-primary" type="submit">Sửa & gửi duyệt lại</button>
         </form>`;
@@ -254,6 +263,20 @@ function renderShopStatus() {
   container.querySelectorAll('[data-edit-shop]').forEach((btn) => {
     btn.addEventListener('click', () => editShop(shops.find((s) => s.id === btn.dataset.editShop)));
   });
+}
+
+// Dòng thời gian duyệt hồ sơ: Đã gửi → Đang xét duyệt → Kết quả
+function reviewTimeline(shop) {
+  const rejected = shop.status === 'rejected';
+  const steps = [
+    { state: 'done', title: 'Đã gửi hồ sơ', note: date(shop.created_at) },
+    { state: rejected ? 'done' : 'active', title: 'Trạm Hỷ đang xét duyệt', note: 'Thường trong 1–2 ngày làm việc' },
+    { state: rejected ? 'failed' : '', title: rejected ? 'Chưa được duyệt' : 'Kết quả',
+      note: rejected ? 'Sửa thông tin và gửi lại bên dưới' : 'Được duyệt là tiệm lên sàn ngay' },
+  ];
+  return html`<ol class="timeline">
+    ${steps.map((s) => html`<li class="${s.state}"><strong>${s.title}</strong><span class="small muted">${s.note}</span></li>`)}
+  </ol>`;
 }
 
 async function submitShop(e, save, successMessage) {
@@ -281,7 +304,9 @@ async function editShop(shop) {
 
 // ---------- KHỞI CHẠY TRANG ----------
 await initLayout('vendor');
-profile = await requireAuth(['vendor']);
+profile = await requireAuth(['bride', 'vendor']);     // cô dâu vào đây để mở tiệm (Trở thành đối tác)
+const flash = sessionStorage.getItem('tramhy-flash');
+if (flash) { sessionStorage.removeItem('tramhy-flash'); toast(flash, 'success'); }
 initWorkspace();
 await refreshShops();
 subscribeVendorChanges('vendor-shops', debounce(refreshShops, 300));

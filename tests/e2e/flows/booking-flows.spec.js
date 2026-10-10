@@ -129,3 +129,32 @@ test('menu tài khoản: hiện tên, vai trò và nút Đăng xuất', async ({
   await bride.keyboard.press('Escape');
   await expect(menu).toBeHidden();
 });
+
+test('cô dâu thấy lối "Trở thành đối tác" và vào được form mở tiệm bằng tài khoản đang dùng', async ({ browser }) => {
+  requireAccounts('bride');
+  const bride = await openAs(browser, 'bride');
+  await bride.goto('/index.html');
+  await bride.locator('.site-header [data-account]').click();
+  await bride.locator('#account-menu').getByRole('menuitem', { name: /Trở thành đối tác/ }).click();
+  await expect(bride).toHaveURL(/doi-tac/);
+  await bride.getByRole('link', { name: 'Mở tiệm ngay' }).first().click();
+  await expect(bride).toHaveURL(/vendor-dashboard/);
+  await expect(bride.getByRole('heading', { name: 'Mở tiệm trên Trạm Hỷ', level: 2 })).toBeVisible();
+  await expect(bride.locator('.wizard-steps li.active')).toContainText('Loại dịch vụ');   // chưa gửi gì – không đổi vai trò
+});
+
+test('đối tác đã được duyệt: thanh hoàn thiện hồ sơ + lưu tài khoản nhận tiền (SQL 17)', async ({ browser }) => {
+  requireAccounts('vendor');
+  const vendor = await openAs(browser, 'vendor');
+  await vendor.goto('/vendor-dashboard.html');
+  const checklist = vendor.locator('.checklist');
+  await expect(checklist).toBeVisible({ timeout: 30_000 });
+  await checklist.getByRole('button', { name: /Thêm tài khoản|Sửa/ }).click();
+  const dialog = vendor.locator('dialog.modal');
+  await dialog.getByLabel('Ngân hàng').selectOption('VCB');
+  await dialog.getByLabel('Số tài khoản').fill('0123 456 789');
+  await dialog.getByLabel('Tên chủ tài khoản').fill('nguyen van test');
+  await dialog.getByRole('button', { name: 'Lưu tài khoản' }).click();
+  await expect(checklist).toContainText('Vietcombank · •••• 6789 · NGUYEN VAN TEST');
+});
+

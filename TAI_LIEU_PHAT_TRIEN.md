@@ -60,6 +60,7 @@ exe202/
 │   ├── 14_rsvp_realtime.sql  Phản hồi thiệp cưới tự hiện (realtime)
 │   ├── 15_demo_data.sql      Dữ liệu demo: ảnh bìa, ảnh thực tế, mẫu váy, đánh giá có bình luận
 │   ├── 16_rsvp_antispam.sql  Chống spam phản hồi thiệp (trùng tên, giới hạn theo IP, chặn link)
+│   ├── 17_become_partner.sql Cô dâu tự mở tiệm (Trở thành đối tác) + tài khoản nhận tiền riêng tư
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -278,6 +279,19 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - Chưa có đơn: Supabase → Authentication → Users → ⋯ → Delete user.
 - Đã có đơn (báo *Database error deleting user*): chạy [`backend/supabase/tools/xoa_tai_khoan_test.sql`](backend/supabase/tools/xoa_tai_khoan_test.sql) sau khi sửa danh sách email.
 - Mẹo: dùng `ten+test1@gmail.com`, `ten+test2@gmail.com`… – mỗi địa chỉ là 1 tài khoản riêng nhưng thư về cùng hộp Gmail.
+
+### Trở thành đối tác (như "Bán hàng cùng Shopee")
+- **Một tài khoản cho cả mua lẫn bán.** Form đăng ký chung không còn ô chọn vai trò – ai cũng đăng ký như nhau.
+  Muốn bán hàng: bấm **🏪 Trở thành đối tác** (menu tài khoản, chân trang, cuối trang chủ) → trang `/doi-tac`
+  (lợi ích, quy trình 4 bước, câu hỏi thường gặp) → **Bắt đầu đăng ký**:
+  chưa đăng nhập → `login?tab=signup&next=vendor-dashboard.html` (đăng ký email/Google xong vào thẳng form mở tiệm,
+  kể cả khi phải bấm link xác nhận email); đã đăng nhập → vào thẳng Kênh đối tác.
+- **Mở tiệm từng bước** (`components/shop-wizard.js`): ① loại dịch vụ ② thông tin tiệm ③ xem lại + đồng ý điều khoản
+  (phí 10%, Escrow). Tự lưu nháp trên máy. Gửi xong (SQL 17: `register_vendor` cho phép cô dâu) tài khoản tự thành
+  đối tác, vẫn đặt dịch vụ như khách.
+- **Chờ duyệt**: dòng thời gian Đã gửi → Đang xét duyệt → Kết quả (realtime); bị từ chối thì hiện lý do + sửa gửi lại.
+- **Sau khi duyệt**: thanh "Hoàn thiện hồ sơ" (`components/partner-checklist.js`): logo + ảnh bìa, ≥ 3 mẫu váy / ảnh thực tế,
+  **tài khoản nhận tiền giải ngân** (bảng riêng tư `vendor_payouts` – chỉ chủ tiệm và admin xem), xem trước trang tiệm.
 
 ### Đối tác mới mở tiệm
 1. Đối tác: Tạo tài khoản, chọn "Đối tác" → vào **Kênh đối tác** → điền form **Đăng ký mở tiệm** → Gửi.

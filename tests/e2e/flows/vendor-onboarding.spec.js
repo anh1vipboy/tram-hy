@@ -1,4 +1,5 @@
-// Đối tác MỚI: đăng ký tài khoản → gửi hồ sơ mở tiệm → admin từ chối → sửa & gửi lại → admin duyệt → tiệm lên sàn.
+// Đối tác MỚI: trang "Trở thành đối tác" → tạo tài khoản → mở tiệm từng bước → admin từ chối → sửa & gửi lại
+// → admin duyệt → tiệm lên sàn. (Cần SQL 17: cô dâu tự mở tiệm.)
 // Mỗi lần chạy tạo 1 tài khoản + 1 tiệm mới trong database TEST (project test phải TẮT "Confirm email").
 const { test, expect, openAs, requireAccounts, account } = require('../helpers');
 const { adminTab } = require('./flow-helpers');
@@ -11,27 +12,39 @@ test('đối tác mới đăng ký → mở tiệm → bị từ chối → gử
   const [user, domain] = account('admin').email.split('@');
   const email = `${user.split('+')[0]}+e2e-shop-${stamp}@${domain}`;   // mẹo dấu + : thư về cùng hộp Gmail
 
-  // ---- Đăng ký tài khoản đối tác ----
+  // ---- Trang "Trở thành đối tác" → tạo tài khoản (không còn chọn vai trò) ----
   const vendor = await openAs(browser, null);
-  await vendor.goto('/login.html');
-  await vendor.locator('[data-tab="signup"]').click();
+  await vendor.goto('/doi-tac.html');
+  await vendor.locator('#partner-cta').click();
+  await expect(vendor).toHaveURL(/login\.html\?tab=signup&next=vendor-dashboard/);
+  await expect(vendor.locator('#auth-notice')).toContainText('Bước 1/2');
   const signup = vendor.locator('#signup-form');
-  await signup.getByLabel('Bạn là').selectOption('vendor');
+  await expect(signup).toBeVisible();                                  // mở sẵn tab Tạo tài khoản
+  await expect(signup.getByLabel('Bạn là')).toHaveCount(0);
   await signup.getByLabel('Họ tên').fill('Chủ tiệm E2E');
   await signup.getByLabel('Email').fill(email);
   await signup.getByLabel('Mật khẩu (ít nhất 6 ký tự)').fill('E2e-matkhau-123');
   await signup.getByRole('button', { name: 'Tạo tài khoản' }).click();
   await expect(vendor, 'Project test phải tắt "Confirm email" để đăng ký xong vào thẳng').toHaveURL(/vendor-dashboard\.html/);
 
-  // ---- Gửi hồ sơ mở tiệm ----
-  await vendor.getByLabel('Tên tiệm / thương hiệu').fill(shopName);
-  await vendor.getByRole('radio', { name: /Trang trí/ }).check();
+  // ---- Mở tiệm từng bước ----
+  await vendor.getByRole('radio', { name: /Trang trí/ }).check();                // ① loại dịch vụ
+  await vendor.getByRole('button', { name: 'Tiếp tục →' }).click();
+  await vendor.getByLabel('Tên tiệm / thương hiệu').fill(shopName);            // ② thông tin tiệm
   await vendor.getByLabel('Số điện thoại liên hệ').fill('0911222333');
   await vendor.getByLabel('Quận / khu vực').fill('Cầu Giấy, Hà Nội');
   await vendor.getByLabel('Giá khởi điểm (VNĐ)').fill('15000000');
   await vendor.getByLabel('Địa chỉ cụ thể').fill('Số 1 Đường Kiểm Thử');
+  await vendor.reload();                                                        // nháp được giữ khi tải lại
+  await expect(vendor.getByLabel('Tên tiệm / thương hiệu')).toHaveValue(shopName);
+  await vendor.getByRole('button', { name: 'Tiếp tục →' }).click();
+  await expect(vendor.locator('.review-box')).toContainText('15.000.000đ');    // ③ xem lại
+  await vendor.getByRole('button', { name: 'Gửi hồ sơ cho Trạm Hỷ' }).click();
+  await expect(vendor.locator('.review-box')).toBeVisible();                     // chưa tick đồng ý → chưa gửi
+  await vendor.getByLabel(/Tôi đồng ý/).check();
   await vendor.getByRole('button', { name: 'Gửi hồ sơ cho Trạm Hỷ' }).click();
   await expect(vendor.locator('#shop-status')).toContainText('đang chờ Trạm Hỷ duyệt');
+  await expect(vendor.locator('.timeline li.active')).toContainText('đang xét duyệt');
 
   // Khách chưa thấy tiệm chờ duyệt
   const guest = await openAs(browser, null);

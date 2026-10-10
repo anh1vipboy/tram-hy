@@ -5,6 +5,7 @@ import { initLayout } from '../core/layout.js';
 import { requireAuth } from '../core/auth.js';
 import { $, $$, html, render, param, dateTime } from '../core/utils.js';
 import { toast, toastError, withBusy } from '../core/ui.js';
+import { BANKS } from '../data/banks.js';
 import { getMyInvitation, getInvitationBySlug, saveInvitation, listRsvps, submitRsvp, subscribeRsvps } from '../services/invitations.js';
 
 const THEMES = [
@@ -13,7 +14,6 @@ const THEMES = [
   { key: 'green', label: 'Xanh lục bảo', color: '#1f4d3a' },
   { key: 'pink', label: 'Hồng phấn', color: '#f6d5dc' },
 ];
-const BANKS = [['MB', 'MB Bank'], ['VCB', 'Vietcombank'], ['TCB', 'Techcombank'], ['ACB', 'ACB'], ['BIDV', 'BIDV'], ['VPB', 'VPBank'], ['ICB', 'VietinBank']];
 
 const page = $('#invitation-page');
 

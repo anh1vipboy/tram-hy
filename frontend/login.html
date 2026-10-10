@@ -37,19 +37,13 @@
       </form>
 
       <form id="signup-form" class="stack" method="post" hidden>
-        <label class="field"><span>Bạn là</span>
-          <select class="input" name="role">
-            <option value="bride">Cô dâu / chú rể</option>
-            <option value="vendor">Đối tác (tiệm váy, studio, decor…)</option>
-          </select>
-        </label>
         <label class="field"><span>Họ tên</span><input class="input" name="fullName" required maxlength="100" autocomplete="name"></label>
         <label class="field"><span>Số điện thoại</span><input class="input" type="tel" name="phone" pattern="[0-9+ ]{9,15}" autocomplete="tel"></label>
         <label class="field"><span>Email</span><input class="input" type="email" name="email" required autocomplete="email"></label>
         <label class="field"><span>Mật khẩu (ít nhất 6 ký tự)</span><input class="input" type="password" name="password" required minlength="6" autocomplete="new-password"></label>
         <div class="captcha-box" id="captcha-signup"></div>
         <button class="btn btn-primary btn-block" type="submit" disabled>Tạo tài khoản</button>
-        <p class="small muted">Tài khoản đối tác cần Trạm Hỷ xác minh và gắn với tiệm trước khi nhận đơn.</p>
+        <p class="small muted" id="signup-hint">Là tiệm váy, studio, decor…? Tạo tài khoản rồi bấm <a href="doi-tac.html">Trở thành đối tác</a> để mở tiệm.</p>
       </form>
     </div>
   </main>

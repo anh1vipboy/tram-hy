@@ -40,6 +40,19 @@ export async function resubmitVendor(vendorId) {
   return unwrap(await sb.rpc('resubmit_vendor', { p_vendor_id: vendorId }));
 }
 
+// ---------- TÀI KHOẢN NHẬN TIỀN GIẢI NGÂN (bảng riêng tư vendor_payouts – SQL 17) ----------
+
+export async function getPayout(vendorId) {
+  return unwrap(await sb.from('vendor_payouts').select('bank_code, account_no, account_name, updated_at')
+    .eq('vendor_id', vendorId).maybeSingle());
+}
+
+export async function savePayout(vendorId, { bankCode, accountNo, accountName }) {
+  return unwrap(await sb.from('vendor_payouts').upsert({
+    vendor_id: vendorId, bank_code: bankCode, account_no: accountNo, account_name: accountName,
+  }).select().single());
+}
+
 // ---------- ẢNH (dùng chung) ----------
 
 /** Nén rồi tải ảnh lên bucket công khai, trả về { path, url }. */

@@ -47,7 +47,7 @@ async function handleEmailConfirmation(profile) {
   if (profile) {
     showNotice('success', 'Xác nhận tài khoản thành công!', `Chào ${profile.full_name || profile.email}, đang chuyển bạn vào Trạm Hỷ…`);
     await sleep(2500);
-    location.href = homeForRole(profile.role);
+    await redirectAfterLogin();                    // về đúng trang đang dở (vd mở tiệm) hoặc trang chủ
   } else {
     showNotice('success', 'Xác nhận tài khoản thành công!', 'Hãy đăng nhập bằng email và mật khẩu bạn vừa đăng ký.');
   }
@@ -96,7 +96,7 @@ $('#signup-form').addEventListener('submit', async (e) => {
         password: form.get('password'),
         fullName: form.get('fullName').trim(),
         phone: form.get('phone').trim(),
-        role: form.get('role'),
+        next: param('next'),
         captchaToken,
       }));
       if (needsEmailConfirm) {
@@ -149,8 +149,15 @@ $('#google-signin').addEventListener('click', (e) => withBusy(e.currentTarget, a
 $$('#signin-form [type=submit], #signup-form [type=submit]').forEach((b) => { b.disabled = false; });   // xử lý đã gắn → mở nút
 const profile = await initLayout('login');
 const oauthError = !param('confirmed') && (authRedirectParams.get('error') || param('error'));
+// Đến từ "Trở thành đối tác" (?tab=signup&next=vendor-dashboard.html): mở sẵn tab Tạo tài khoản + nói rõ bước tiếp theo
+if (param('tab') === 'signup') switchTab('signup');
+if (!param('confirmed') && param('next')?.startsWith('vendor-dashboard')) {
+  showNotice('info', 'Bước 1/2: Đăng nhập hoặc tạo tài khoản',
+    'Xong bước này bạn được đưa thẳng tới form mở tiệm. Đăng ký bằng Google cũng được.');
+}
 if (param('confirmed')) {
-  history.replaceState(null, '', 'login.html');   // bấm F5 không hiện lại thông báo
+  const keepNext = param('next') ? `?next=${encodeURIComponent(param('next'))}` : '';
+  history.replaceState(null, '', `login.html${keepNext}`);   // F5 không hiện lại thông báo, vẫn nhớ trang cần quay về
   await handleEmailConfirmation(profile);
 } else if (oauthError) {
   // Quay về từ Google nhưng không thành công (vd bấm Hủy)

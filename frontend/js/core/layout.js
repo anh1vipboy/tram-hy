@@ -52,6 +52,7 @@ function accountMenu(profile, activePage) {
     { page: 'invitation', href: 'invitation.html', label: '💌 Thiệp cưới' },
     ...(profile.role === 'vendor' ? [{ page: 'vendor', href: 'vendor-dashboard.html', label: '🏪 Kênh đối tác' }] : []),
     ...(profile.role === 'admin' ? [{ page: 'admin', href: 'admin.html', label: '🛡️ Quản trị' }] : []),
+    ...(profile.role === 'bride' ? [{ page: 'partner', href: 'doi-tac.html', label: '🏪 Trở thành đối tác' }] : []),
   ];
   return html`
     <div class="account-menu" id="account-menu" role="menu" hidden>
@@ -140,7 +141,10 @@ export async function initLayout(activePage) {
   const footer = $('#app-footer');
   footer.className = 'site-footer';
   render(footer, html`
-    <div class="container">© 2026 Trạm Hỷ – Kết duyên cát hỷ, trọn vẹn niềm tin · Dự án EXE – Group 5</div>`);
+    <div class="container footer-row">
+      <span>© 2026 Trạm Hỷ – Kết duyên cát hỷ, trọn vẹn niềm tin · Dự án EXE – Group 5</span>
+      ${profile?.role === 'admin' ? '' : html`<a href="doi-tac.html">🏪 Trở thành đối tác bán hàng</a>`}
+    </div>`);
 
   return profile;
 }

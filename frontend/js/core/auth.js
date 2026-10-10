@@ -52,17 +52,18 @@ export async function signIn(email, password, captchaToken) {
   unwrap(await sb.auth.signInWithPassword({ email, password, options: { captchaToken } }));
 }
 
-// role: 'bride' hoặc 'vendor' (database không cho tự đăng ký làm admin)
-export async function signUp({ email, password, fullName, phone, role, captchaToken }) {
+// Mọi người đăng ký như nhau (vai trò cô dâu); muốn bán hàng thì mở tiệm ở Kênh đối tác → tự thành đối tác.
+// next: trang quay về sau khi bấm link xác nhận email (vd vendor-dashboard.html khi đăng ký từ trang Trở thành đối tác)
+export async function signUp({ email, password, fullName, phone, next, captchaToken }) {
   const data = unwrap(await sb.auth.signUp({
     email,
     password,
     options: {
-      data: { full_name: fullName, phone, role },
+      data: { full_name: fullName, phone, role: 'bride' },
       captchaToken,
       // Link xác nhận trong email quay về đúng web nơi người dùng đăng ký (localhost hoặc tên miền thật).
       // Địa chỉ này phải nằm trong Authentication → URL Configuration → Redirect URLs của Supabase.
-      emailRedirectTo: new URL('login.html?confirmed=1', location.href).href,
+      emailRedirectTo: new URL(`login.html?confirmed=1${next ? `&next=${encodeURIComponent(next)}` : ''}`, location.href).href,
     },
   }));
   return { needsEmailConfirm: !data.session };
