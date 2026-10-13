@@ -104,7 +104,7 @@ export async function initLayout(activePage) {
   render(header, html`
     <div class="container">
       <a class="brand" href="index.html">
-        <img src="assets/images/logo.jpg" alt="">
+        <img src="assets/images/logo.webp" alt="">
         <strong>Trạm Hỷ</strong>
       </a>
       <nav class="nav" aria-label="Điều hướng chính">

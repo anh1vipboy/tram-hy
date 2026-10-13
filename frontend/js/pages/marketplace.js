@@ -1,5 +1,5 @@
 import { initLayout } from '../core/layout.js';
-import { $, $$, html, render, money, param, initials } from '../core/utils.js';
+import { $, $$, html, render, money, param, initials, sizedImage } from '../core/utils.js';
 import { badge, VENDOR_CATEGORY } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
 import { listVendors } from '../services/catalog.js';
@@ -114,7 +114,7 @@ function renderVendors() {
   render($('#vendor-grid'), list.map((v) => html`
     <article class="card item-card">
       ${v.cover_url
-        ? html`<img class="thumb" src="${v.cover_url}" alt="" loading="lazy">`
+        ? html`<img class="thumb" src="${sizedImage(v.cover_url, 720)}" alt="" loading="lazy">`
         : html`<div class="thumb-placeholder">${initials(v.name)}</div>`}
       <div class="body">
         <div class="row">${badge(VENDOR_CATEGORY[v.category], 'gold')}

@@ -66,6 +66,7 @@ exe202/
 │   ├── 20_wedding_planner.sql Kế hoạch cưới: ngân sách theo nghi lễ + checklist chuẩn bị
 │   ├── 21_ai_planner.sql     Đếm lượt Trợ lý AI trong Kế hoạch cưới (20 câu / người / ngày)
 │   ├── 22_invitation_templates.sql Thiệp cưới: mẫu thiệp, thông tin hai họ (details), ảnh cưới (bucket invitation-photos)
+│   ├── 23_image_webp.sql     Ảnh demo trỏ về ảnh của web đổi sang .webp (nhẹ hơn ~10 lần)
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -308,6 +309,20 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
   đang lưu dở mà đóng / tải lại trang thì trình duyệt hỏi lại). Kéo thả bằng `components/sortable.js` (chạy cả cảm ứng).
 - Giới hạn chống lạm dụng ở server: 40 danh mục, 400 mục chi tiêu, 300 việc / kế hoạch.
 - Kiểm thử: `tests/e2e/flows/planner.spec.js`.
+
+### Tốc độ tải trang
+- **Ảnh**: web dùng bản `.webp` trong `assets/images/` (ảnh gốc .jpg/.png vẫn giữ cho email, Edge Function thử váy và dữ liệu
+  cũ). Thêm ảnh mới: tạo cả bản .webp (cạnh dài ≤ 1400px, chất lượng ~80). Ảnh Unsplash xin đúng cỡ khi hiển thị qua
+  `sizedImage(url, width)` trong `core/utils.js` (thẻ nhỏ không tải ảnh 1200px).
+- **Thư viện Supabase tự lưu**: `js/vendor/supabase-<phiên bản>.js` (1 file đóng gói bằng esbuild, không phụ thuộc CDN).
+  Nâng cấp: trong thư mục tạm `npm i @supabase/supabase-js@<bản mới> esbuild`, tạo `entry.js` gồm
+  `export { createClient } from '@supabase/supabase-js';` rồi
+  `npx esbuild entry.js --bundle --format=esm --minify --platform=browser --outfile=<repo>/frontend/js/vendor/supabase-<bản mới>.js`;
+  đổi đường dẫn import trong `core/supabase.js` và dòng `modulepreload` ở các trang .html (đổi tên file = trình duyệt tải bản mới).
+- **Kết nối sớm**: mỗi trang có `preconnect` tới Google Fonts + Supabase và `modulepreload` thư viện Supabase;
+  CSS Google Fonts tải không chặn (`media="print" onload`) nên code trang chạy ngay, chữ đổi sang font đẹp khi tải xong.
+- **Cache** (`frontend/vercel.json`): `js/vendor/*` nhớ 1 năm (tên file có phiên bản), `assets/*` nhớ 7 ngày;
+  JS/CSS của web luôn hỏi lại server (304 nếu không đổi) để sau mỗi lần deploy không bị trộn code cũ và mới.
 
 ### Thiệp cưới – mẫu thiệp, phong bì (SQL 22)
 - Thiệp vuông 3 trang: **bìa** (tên viết tay, ảnh tròn / chữ lồng, "Trân trọng kính mời" + tên khách) · **gia đình & hôn lễ**

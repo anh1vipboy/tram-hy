@@ -1,4 +1,5 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+// Thư viện Supabase đóng gói sẵn trong web (1 file, không phụ thuộc CDN) – cách cập nhật: TAI_LIEU_PHAT_TRIEN.md
+import { createClient } from '../vendor/supabase-2.117.3.js';
 import { SUPABASE_URL, SUPABASE_KEY } from '../config.js';
 
 // Phần "#..." của URL khi quay về từ link xác nhận email (chứa phiên đăng nhập hoặc lỗi).

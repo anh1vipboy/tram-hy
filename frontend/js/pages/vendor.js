@@ -1,5 +1,5 @@
 import { initLayout } from '../core/layout.js';
-import { $, html, render, money, param, date } from '../core/utils.js';
+import { $, html, render, money, param, date, sizedImage } from '../core/utils.js';
 import { badge, priceTag, packageLabel, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
 import { getVendorBySlug, listDresses, listPackages, listReviews, listVendorPhotos } from '../services/catalog.js';
@@ -77,7 +77,7 @@ function renderPage(vendor, dresses, reviews, photos, packages) {
         <h2>Ảnh thực tế</h2>
         <p class="muted small">Ảnh do tiệm chụp và đăng – bấm để xem ảnh lớn.</p>
         <div class="photo-grid">${photos.map((p) => html`
-          <a class="photo" href="${p.url}" target="_blank" rel="noopener"><img src="${p.url}" alt="" loading="lazy"></a>`)}</div>
+          <a class="photo" href="${p.url}" target="_blank" rel="noopener"><img src="${sizedImage(p.url, 560)}" alt="" loading="lazy"></a>`)}</div>
       </section>` : ''}
 
     ${isBridal ? html`

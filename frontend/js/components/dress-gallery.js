@@ -1,5 +1,5 @@
 // Trình xem ảnh mẫu váy: ảnh chính + ảnh các góc. Bấm mũi tên, phím ← →, hoặc vuốt trên điện thoại.
-import { html, render, money } from '../core/utils.js';
+import { html, render, money, sizedImage } from '../core/utils.js';
 import { toastError } from '../core/ui.js';
 import { listDressPhotos, listPackagePhotos } from '../services/catalog.js';
 import { dressThumb } from '../data/tryon-data.js';
@@ -16,7 +16,7 @@ export function dressThumbButton(dress) {
   const count = realPhotoCount(dress);
   return html`
     <button class="thumb-button" type="button" data-gallery="${dress.id}" aria-label="Xem ảnh ${dress.name}">
-      <img class="thumb" src="${dressThumb(dress)}" alt="${dress.name}" loading="lazy">
+      <img class="thumb" src="${sizedImage(dressThumb(dress), 640)}" alt="${dress.name}" loading="lazy">
       ${count > 1 ? html`<span class="photo-count">${count} ảnh</span>` : ''}
       ${discountPercent(dress) ? html`<span class="sale-ribbon">Giảm ${discountPercent(dress)}%</span>` : ''}
     </button>`;

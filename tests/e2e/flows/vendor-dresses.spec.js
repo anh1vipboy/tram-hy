@@ -12,7 +12,7 @@ test('thêm mẫu váy có nhiều ảnh, khách xem được, rồi xóa', asyn
 
   // ---- Đối tác thêm mẫu ----
   await vendor.goto('/vendor-dashboard.html');
-  await vendor.getByRole('button', { name: 'Mẫu váy' }).click();
+  await vendor.getByRole('button', { name: 'Mẫu váy', exact: true }).click();
   await vendor.getByRole('button', { name: '+ Thêm mẫu váy' }).click();
   const dialog = vendor.locator('dialog.modal');
   await dialog.getByLabel('Tên mẫu váy').fill(name);
@@ -50,7 +50,7 @@ test('hộp thoại thêm váy: giá tự thêm dấu chấm, lỡ đóng khi đ
   requireAccounts('vendor');
   const vendor = await openAs(browser, 'vendor');
   await vendor.goto('/vendor-dashboard.html');
-  await vendor.getByRole('button', { name: 'Mẫu váy' }).click();
+  await vendor.getByRole('button', { name: 'Mẫu váy', exact: true }).click();
   await vendor.getByRole('button', { name: '+ Thêm mẫu váy' }).click();
   const dialog = vendor.locator('dialog.modal');
 

@@ -1,5 +1,5 @@
 // Thẻ "gói dịch vụ" (mẫu rạp, gói chụp, gói trang điểm, sảnh & thực đơn) – dùng ở trang tiệm và Kênh đối tác
-import { html } from '../core/utils.js';
+import { html, sizedImage } from '../core/utils.js';
 import { discountPercent } from '../core/labels.js';
 import { openPackageGallery } from './dress-gallery.js';
 
@@ -16,7 +16,7 @@ export function packageThumbButton(pkg, placeholder = '✨') {
   return pkg.image_url
     ? html`
       <button class="thumb-button" type="button" data-package-gallery="${pkg.id}" aria-label="Xem ảnh ${pkg.name}">
-        <img class="thumb" src="${pkg.image_url}" alt="${pkg.name}" loading="lazy">
+        <img class="thumb" src="${sizedImage(pkg.image_url, 640)}" alt="${pkg.name}" loading="lazy">
         ${count > 1 ? html`<span class="photo-count">${count} ảnh</span>` : ''}
         ${off ? html`<span class="sale-ribbon">Giảm ${off}%</span>` : ''}
       </button>`

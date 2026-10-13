@@ -39,6 +39,17 @@ export function render(element, content) {
   element.innerHTML = renderValue(content);
 }
 
+// Ảnh Unsplash (dữ liệu demo) cho phép xin đúng bề rộng cần hiển thị → thẻ nhỏ không phải tải ảnh 1200px.
+// Ảnh khác (ảnh người dùng tải lên – đã nén khi tải) giữ nguyên.
+export function sizedImage(url, width) {
+  if (!url || !String(url).startsWith('https://images.unsplash.com/')) return url;
+  const u = new URL(url);
+  u.searchParams.set('w', String(width));
+  u.searchParams.set('q', '72');
+  u.searchParams.set('auto', 'format');
+  return u.toString();
+}
+
 // ---------- ĐỊNH DẠNG ----------
 export const money = (n) => `${Number(n || 0).toLocaleString('vi-VN')}đ`;
 

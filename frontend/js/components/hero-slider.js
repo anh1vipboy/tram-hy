@@ -3,11 +3,11 @@
 import { html, render } from '../core/utils.js';
 
 const SLIDES = [
-  { src: 'assets/images/user_tryon_mermaid.jpg',     label: 'Váy đuôi cá' },
-  { src: 'assets/images/user_tryon_white_royal.jpg', label: 'Váy công chúa' },
-  { src: 'assets/images/user_tryon_satin.jpg',       label: 'Váy satin tối giản' },
-  { src: 'assets/images/user_tryon_aodai.jpg',       label: 'Áo dài cưới' },
-  { src: 'assets/images/user_tryon_blue_royal.jpg',  label: 'Váy công chúa xanh' },
+  { src: 'assets/images/user_tryon_mermaid.webp',     label: 'Váy đuôi cá' },
+  { src: 'assets/images/user_tryon_white_royal.webp', label: 'Váy công chúa' },
+  { src: 'assets/images/user_tryon_satin.webp',       label: 'Váy satin tối giản' },
+  { src: 'assets/images/user_tryon_aodai.webp',       label: 'Áo dài cưới' },
+  { src: 'assets/images/user_tryon_blue_royal.webp',  label: 'Váy công chúa xanh' },
 ];
 const INTERVAL_MS = 5000;
 
