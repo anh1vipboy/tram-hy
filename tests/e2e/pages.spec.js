@@ -6,7 +6,7 @@ const PUBLIC_PAGES = [
   { path: '/tryon.html', heading: 'Xem váy lên dáng của bạn' },
   { path: '/marketplace.html', heading: 'Đối tác được Trạm Hỷ bảo chứng' },
   { path: '/vendor.html?slug=tuart', heading: 'TuArt Wedding' },
-  { path: '/login.html', heading: 'Chào mừng đến Trạm Hỷ' },
+  { path: '/login.html', heading: 'Chào mừng trở lại' },
 ];
 
 for (const { path, heading } of PUBLIC_PAGES) {

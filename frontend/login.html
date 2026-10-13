@@ -9,43 +9,91 @@
   <link rel="stylesheet" href="css/styles.css">
   <script type="module" src="js/pages/login.js"></script>
 </head>
-<body>
+<body class="auth-page">
   <header id="app-header"></header>
 
-  <main class="container" style="max-width:480px">
-    <div class="notice" id="auth-notice" role="status" hidden style="margin-bottom:16px"></div>
-    <div class="card stack">
-      <h1 style="font-size:28px">Chào mừng đến Trạm Hỷ</h1>
-      <div class="tabs" role="tablist">
-        <button class="tab active" data-tab="signin" type="button">Đăng nhập</button>
-        <button class="tab" data-tab="signup" type="button">Tạo tài khoản</button>
+  <main class="container auth-shell">
+    <!-- TRÁI: hình ảnh thương hiệu (ẩn bớt trên điện thoại) -->
+    <aside class="auth-visual" aria-hidden="true">
+      <img src="assets/images/user_tryon_white_royal.jpg" alt="">
+      <div class="auth-visual-overlay"></div>
+      <div class="petals"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="auth-visual-content">
+        <img class="auth-logo" src="assets/images/logo.jpg" alt="">
+        <p class="auth-quote">Kết duyên cát hỷ,<br>trọn vẹn niềm tin.</p>
+        <ul class="auth-perks">
+          <li><span>✨</span>Thử váy lên chính dáng bạn bằng AI</li>
+          <li><span>🛡️</span>Tiền cọc giữ an toàn qua Escrow 3 đợt</li>
+          <li><span>✓</span>Đối tác Tích Xanh, đánh giá xác thực</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- PHẢI: đăng nhập / tạo tài khoản -->
+    <section class="auth-card card" aria-labelledby="auth-title">
+      <div class="notice" id="auth-notice" role="status" hidden></div>
+      <div>
+        <h1 id="auth-title" class="auth-title">Chào mừng trở lại</h1>
+        <p class="muted auth-subtitle" id="auth-subtitle">Đăng nhập để tiếp tục chuẩn bị đám cưới của bạn.</p>
       </div>
 
-      <button class="btn btn-outline btn-block" type="button" id="google-signin">
+      <div class="auth-tabs" role="tablist" data-active="signin">
+        <span class="auth-tab-indicator" aria-hidden="true"></span>
+        <button class="tab active" data-tab="signin" type="button" role="tab" aria-selected="true" disabled>Đăng nhập</button>
+        <button class="tab" data-tab="signup" type="button" role="tab" aria-selected="false" disabled>Tạo tài khoản</button>
+      </div>
+
+      <button class="btn btn-outline btn-block google-btn" type="button" id="google-signin">
         <img src="assets/images/google.svg" alt="" width="18" height="18"> Tiếp tục với Google
       </button>
       <div class="divider">hoặc dùng email</div>
 
       <!-- method="post" + nút khóa đến khi JS tải xong: bấm sớm không làm lộ mật khẩu lên thanh địa chỉ -->
-      <form id="signin-form" class="stack" method="post">
-        <label class="field"><span>Email</span><input class="input" type="email" name="email" required autocomplete="email"></label>
-        <label class="field"><span>Mật khẩu</span><input class="input" type="password" name="password" required minlength="6" autocomplete="current-password"></label>
+      <form id="signin-form" class="stack auth-form" method="post" novalidate>
+        <label class="field"><span>Email</span>
+          <span class="input-wrap" data-icon="mail">
+            <input class="input" type="email" name="email" required autocomplete="email" inputmode="email"
+                   placeholder="ten@gmail.com" data-validate="email"></span></label>
+        <label class="field"><span>Mật khẩu</span>
+          <span class="input-wrap" data-icon="lock">
+            <input class="input" type="password" name="password" required autocomplete="current-password"
+                   placeholder="Nhập mật khẩu" data-validate="password"></span></label>
+        <div class="auth-row">
+          <span></span>
+          <button class="btn btn-link btn-sm" type="button" id="forgot-password">Quên mật khẩu?</button>
+        </div>
         <!-- Xác minh chống bot (Cloudflare Turnstile) ngay trên nút gửi -->
         <div class="captcha-box" id="captcha-signin"></div>
-        <button class="btn btn-primary btn-block" type="submit" disabled>Đăng nhập</button>
-        <button class="btn btn-link" type="button" id="forgot-password">Quên mật khẩu?</button>
+        <button class="btn btn-primary btn-block btn-lg" type="submit" disabled>Đăng nhập</button>
       </form>
 
-      <form id="signup-form" class="stack" method="post" hidden>
-        <label class="field"><span>Họ tên</span><input class="input" name="fullName" required maxlength="100" autocomplete="name"></label>
-        <label class="field"><span>Số điện thoại</span><input class="input" type="tel" name="phone" pattern="[0-9+ ]{9,15}" autocomplete="tel"></label>
-        <label class="field"><span>Email</span><input class="input" type="email" name="email" required autocomplete="email"></label>
-        <label class="field"><span>Mật khẩu (ít nhất 6 ký tự)</span><input class="input" type="password" name="password" required minlength="6" autocomplete="new-password"></label>
+      <form id="signup-form" class="stack auth-form" method="post" novalidate hidden>
+        <label class="field"><span>Họ tên</span>
+          <span class="input-wrap" data-icon="user">
+            <input class="input" name="fullName" required maxlength="100" autocomplete="name" placeholder="Nguyễn Thu Trang"
+                   data-validate="fullName"></span></label>
+        <label class="field"><span>Số điện thoại <em class="muted">(không bắt buộc)</em></span>
+          <span class="input-wrap" data-icon="phone">
+            <input class="input" type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="09xx xxx xxx"
+                   data-validate="phone"></span></label>
+        <label class="field"><span>Email</span>
+          <span class="input-wrap" data-icon="mail">
+            <input class="input" type="email" name="email" required autocomplete="email" inputmode="email"
+                   placeholder="ten@gmail.com" data-validate="email"></span></label>
+        <label class="field"><span>Mật khẩu</span>
+          <span class="input-wrap" data-icon="lock">
+            <input class="input" type="password" name="password" required autocomplete="new-password"
+                   placeholder="Tối thiểu 8 ký tự, có chữ và số" data-validate="newPassword" id="signup-password"></span></label>
+        <div id="password-meter"></div>
+        <label class="field"><span>Nhập lại mật khẩu</span>
+          <span class="input-wrap" data-icon="lock">
+            <input class="input" type="password" name="confirm" required autocomplete="new-password"
+                   placeholder="Nhập lại đúng mật khẩu trên" data-validate="confirm"></span></label>
         <div class="captcha-box" id="captcha-signup"></div>
-        <button class="btn btn-primary btn-block" type="submit" disabled>Tạo tài khoản</button>
+        <button class="btn btn-primary btn-block btn-lg" type="submit" disabled>Tạo tài khoản</button>
         <p class="small muted" id="signup-hint">Là tiệm váy, studio, decor…?<br>Tạo tài khoản rồi bấm <a href="doi-tac.html">Trở thành đối tác</a> để mở tiệm.</p>
       </form>
-    </div>
+    </section>
   </main>
 
   <footer id="app-footer"></footer>

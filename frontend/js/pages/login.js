@@ -4,6 +4,83 @@ import { authRedirectParams } from '../core/supabase.js';
 import { $, $$, html, render, param, sleep } from '../core/utils.js';
 import { openDialog, toastError, withBusy } from '../core/ui.js';
 import { mountCaptcha } from '../components/captcha.js';
+import { enhancePasswordInputs, bindPasswordMeter, passwordProblem } from '../components/password-field.js';
+
+// ---------- KIỂM TRA TỪNG Ô (báo lỗi ngay dưới ô, không dùng bong bóng mặc định của trình duyệt) ----------
+const VALIDATORS = {
+  email: (v) => (!v ? 'Vui lòng nhập email'
+    : !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? 'Email chưa đúng định dạng (vd: ten@gmail.com)' : ''),
+  password: (v) => (!v ? 'Vui lòng nhập mật khẩu' : ''),
+  fullName: (v) => (v.length < 2 ? 'Vui lòng nhập họ tên (ít nhất 2 ký tự)' : ''),
+  phone: (v) => (v && !/^(\+?84|0)\d{8,10}$/.test(v.replace(/[\s.-]/g, '')) ? 'Số điện thoại chưa đúng (vd: 0912 345 678)' : ''),
+  newPassword: (v) => passwordProblem(v),
+  confirm: (v, form) => (!v ? 'Vui lòng nhập lại mật khẩu'
+    : v !== form.elements.password.value ? 'Mật khẩu nhập lại chưa khớp' : ''),
+};
+
+function errorBox(input) {
+  const field = input.closest('.field');
+  let box = field.nextElementSibling?.classList.contains('field-error') ? field.nextElementSibling : null;
+  if (!box) {
+    box = document.createElement('p');
+    box.className = 'field-error';
+    box.id = `${input.form.id}-${input.name}-error`;
+    box.hidden = true;
+    field.after(box);
+    input.setAttribute('aria-describedby', box.id);
+  }
+  return box;
+}
+
+/** Kiểm tra 1 ô → hiện / ẩn lỗi, đổi viền đỏ / xanh. Trả về true nếu hợp lệ. */
+function validateInput(input) {
+  const rule = VALIDATORS[input.dataset.validate];
+  if (!rule) return true;
+  // mật khẩu giữ nguyên khoảng trắng (đúng như người dùng gõ), ô khác bỏ khoảng trắng 2 đầu
+  const raw = ['password', 'newPassword', 'confirm'].includes(input.dataset.validate) ? input.value : input.value.trim();
+  const message = rule(raw, input.form);
+  const box = errorBox(input);
+  box.textContent = message;
+  box.hidden = !message;
+  input.setAttribute('aria-invalid', String(Boolean(message)));
+  input.closest('.input-wrap')?.classList.toggle('is-valid', !message && Boolean(input.value));
+  return !message;
+}
+
+/** Kiểm tra cả form; sai thì rung form + đưa con trỏ tới ô lỗi đầu tiên */
+function validateForm(form) {
+  const inputs = [...form.querySelectorAll('[data-validate]')];
+  const invalid = inputs.filter((input) => !validateInput(input));
+  if (invalid.length) {
+    shake(form);
+    invalid[0].focus();
+  }
+  return !invalid.length;
+}
+
+function shake(el) {
+  el.classList.remove('shake');
+  void el.offsetWidth;            // chạy lại hiệu ứng
+  el.classList.add('shake');
+}
+
+// Lỗi chỉ hiện sau khi người dùng rời ô (hoặc bấm gửi); đã báo lỗi rồi thì kiểm tra lại ngay khi gõ
+for (const input of $$('[data-validate]')) {
+  input.addEventListener('blur', (e) => {
+    // Rời ô vì đang bấm nút gửi → để lúc gửi kiểm tra cả form. Báo lỗi ngay lúc này sẽ đẩy nút tụt xuống
+    // giữa lúc nhấn và nhả chuột → lần bấm bị mất.
+    if (e.relatedTarget?.type === 'submit' && e.relatedTarget.form === input.form) return;
+    if (input.value || input.dataset.touched) validateInput(input);
+    input.dataset.touched = '1';
+  });
+  input.addEventListener('input', () => {
+    if (input.getAttribute('aria-invalid') === 'true' || input.closest('.input-wrap')?.classList.contains('is-valid')) validateInput(input);
+    // gõ lại mật khẩu → kiểm tra lại ô "Nhập lại mật khẩu" nếu đã nhập
+    if (input.name === 'password' && input.form.elements.confirm?.value) validateInput(input.form.elements.confirm);
+  });
+}
+enhancePasswordInputs($('main'));
+bindPasswordMeter($('#signup-password'), $('#password-meter'));
 
 function showNotice(type, title, message) {
   const box = $('#auth-notice');
@@ -13,10 +90,24 @@ function showNotice(type, title, message) {
   box.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
+const TAB_TEXT = {
+  signin: ['Chào mừng trở lại', 'Đăng nhập để tiếp tục chuẩn bị đám cưới của bạn.'],
+  signup: ['Tạo tài khoản Trạm Hỷ', 'Miễn phí – thử váy AI, đặt lịch và giữ cọc an toàn trong vài phút.'],
+};
+
 function switchTab(name) {
-  for (const tab of $$('[data-tab]')) tab.classList.toggle('active', tab.dataset.tab === name);
-  $('#signin-form').hidden = name !== 'signin';
-  $('#signup-form').hidden = name !== 'signup';
+  $('.auth-tabs').dataset.active = name;                     // thanh chọn trượt theo tab
+  for (const tab of $$('[data-tab]')) {
+    tab.classList.toggle('active', tab.dataset.tab === name);
+    tab.setAttribute('aria-selected', String(tab.dataset.tab === name));
+  }
+  $('#auth-title').textContent = TAB_TEXT[name][0];
+  $('#auth-subtitle').textContent = TAB_TEXT[name][1];
+  for (const id of ['signin', 'signup']) {
+    const form = $(`#${id}-form`);
+    form.hidden = id !== name;
+    if (id === name) { form.classList.remove('form-enter'); void form.offsetWidth; form.classList.add('form-enter'); }
+  }
   captchas[name]?.show().catch(toastError);     // vẽ ô xác minh khi form hiện ra
 }
 
@@ -74,12 +165,15 @@ for (const tab of $$('[data-tab]')) {
 
 $('#signin-form').addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (!validateForm(e.target)) return;
   const form = new FormData(e.target);
   await withBusy(e.submitter, async () => {
     try {
       await withCaptcha('signin', (token) => signIn(form.get('email').trim(), form.get('password'), token));
+      e.submitter.textContent = 'Đang vào Trạm Hỷ…';
       await redirectAfterLogin();
     } catch (error) {
+      shake(e.target);
       toastError(friendlyAuthError(error));
     }
   });
@@ -87,6 +181,7 @@ $('#signin-form').addEventListener('submit', async (e) => {
 
 $('#signup-form').addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (!validateForm(e.target)) return;
   const form = new FormData(e.target);
   const email = form.get('email').trim();
   await withBusy(e.submitter, async () => {
@@ -108,6 +203,7 @@ $('#signup-form').addEventListener('submit', async (e) => {
         await redirectAfterLogin();
       }
     } catch (error) {
+      shake(e.target);
       toastError(friendlyAuthError(error));
     }
   });
@@ -146,7 +242,7 @@ $('#google-signin').addEventListener('click', (e) => withBusy(e.currentTarget, a
 }));
 
 // ---------- KHỞI CHẠY TRANG ----------
-$$('#signin-form [type=submit], #signup-form [type=submit]').forEach((b) => { b.disabled = false; });   // xử lý đã gắn → mở nút
+$$('#signin-form [type=submit], #signup-form [type=submit], [data-tab]').forEach((b) => { b.disabled = false; });   // xử lý đã gắn → mở nút
 const profile = await initLayout('login');
 const oauthError = !param('confirmed') && (authRedirectParams.get('error') || param('error'));
 // Đến từ "Trở thành đối tác" (?tab=signup&next=vendor-dashboard.html): mở sẵn tab Tạo tài khoản + nói rõ bước tiếp theo

@@ -12,9 +12,65 @@ test('sai mật khẩu báo lỗi tiếng Việt', async ({ page }) => {
 
 test('chuyển qua lại tab Đăng nhập / Tạo tài khoản', async ({ page }) => {
   await page.goto('/login.html');
-  await page.getByRole('button', { name: 'Tạo tài khoản' }).first().click();
+  await page.getByRole('tab', { name: 'Tạo tài khoản' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Tạo tài khoản Trạm Hỷ');
   await expect(page.locator('#signup-form')).toBeVisible();
   await expect(page.locator('#signin-form')).toBeHidden();
+});
+
+test('đăng nhập: báo lỗi ngay dưới ô, form rung, không gửi khi email sai định dạng', async ({ page }) => {
+  await page.goto('/login.html');
+  const form = page.locator('#signin-form');
+  let requests = 0;
+  page.on('request', (r) => { if (r.url().includes('/auth/v1/token')) requests += 1; });
+  await form.getByLabel('Email').fill('ten-khong-co-a-cong');
+  await form.getByRole('button', { name: 'Đăng nhập' }).click();
+  await expect(form.locator('.field-error').first()).toHaveText('Email chưa đúng định dạng (vd: ten@gmail.com)');
+  await expect(form.getByText('Vui lòng nhập mật khẩu')).toBeVisible();
+  await expect(form).toHaveClass(/shake/);
+  await expect(form.getByLabel('Email')).toBeFocused();
+  expect(requests).toBe(0);                                         // chưa hợp lệ thì không gửi lên máy chủ
+  await form.getByLabel('Email').fill('dung@gmail.com');
+  await expect(form.getByText('Email chưa đúng định dạng')).toBeHidden();   // sửa đúng là lỗi biến mất ngay
+});
+
+test('nút 👁 hiện / ẩn mật khẩu', async ({ page }) => {
+  await page.goto('/login.html');
+  const input = page.locator('#signin-form [name=password]');
+  await input.fill('BiMat123');
+  await expect(input).toHaveAttribute('type', 'password');
+  await page.locator('#signin-form').getByRole('button', { name: 'Xem ký tự đã nhập' }).click();
+  await expect(input).toHaveAttribute('type', 'text');
+  await page.locator('#signin-form').getByRole('button', { name: 'Che ký tự đã nhập' }).click();
+  await expect(input).toHaveAttribute('type', 'password');
+});
+
+test('tạo tài khoản: thanh độ mạnh, điều kiện mật khẩu, nhập lại phải khớp', async ({ page }) => {
+  await page.goto('/login.html?tab=signup');
+  const form = page.locator('#signup-form');
+  const password = form.getByLabel('Mật khẩu', { exact: true });
+  const meter = page.locator('#password-meter');
+
+  await password.fill('abc');
+  await expect(meter).toHaveAttribute('data-level', '0');
+  await expect(meter).toContainText('Độ mạnh: Rất yếu');
+  await expect(meter.locator('[data-rule="length"]')).not.toHaveClass(/ok/);
+  await password.fill('matkhau2026');
+  await expect(meter.locator('[data-rule="length"]')).toHaveClass(/ok/);
+  await expect(meter.locator('[data-rule="mix"]')).toHaveClass(/ok/);
+  await password.fill('MatKhau@2026');
+  await expect(meter).toHaveAttribute('data-level', '4');
+  await expect(meter).toContainText('Độ mạnh: Mạnh');
+
+  await form.getByLabel('Họ tên').fill('Khách Thử');
+  await form.getByLabel('Email').fill('khach.thu.e2e@example.com');
+  await form.getByLabel('Nhập lại mật khẩu').fill('MatKhau@2025');
+  await form.getByRole('button', { name: 'Tạo tài khoản' }).click();
+  await expect(form.getByText('Mật khẩu nhập lại chưa khớp')).toBeVisible();
+
+  await password.fill('chiCoChu');                                  // thiếu số
+  await form.getByRole('button', { name: 'Tạo tài khoản' }).click();
+  await expect(form.getByText('Mật khẩu cần có cả chữ và số')).toBeVisible();
 });
 
 test('quay về từ link xác nhận đã hết hạn thì báo rõ', async ({ page }) => {

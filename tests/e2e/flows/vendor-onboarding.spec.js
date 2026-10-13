@@ -23,7 +23,8 @@ test('đối tác mới đăng ký → mở tiệm → bị từ chối → gử
   await expect(signup.getByLabel('Bạn là')).toHaveCount(0);
   await signup.getByLabel('Họ tên').fill('Chủ tiệm E2E');
   await signup.getByLabel('Email').fill(email);
-  await signup.getByLabel('Mật khẩu (ít nhất 6 ký tự)').fill('E2e-matkhau-123');
+  await signup.getByLabel('Mật khẩu', { exact: true }).fill('E2e-matkhau-123');
+  await signup.getByLabel('Nhập lại mật khẩu').fill('E2e-matkhau-123');
   await signup.getByRole('button', { name: 'Tạo tài khoản' }).click();
   await expect(vendor, 'Project test phải tắt "Confirm email" để đăng ký xong vào thẳng').toHaveURL(/vendor-dashboard\.html/);
 

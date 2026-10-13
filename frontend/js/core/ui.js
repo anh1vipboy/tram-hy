@@ -112,9 +112,11 @@ export function focusFromUrl(root = document) {
 // Khóa nút trong lúc chờ xử lý để tránh bấm 2 lần
 export async function withBusy(button, task) {
   button.disabled = true;
+  button.setAttribute('aria-busy', 'true');       // CSS hiện vòng xoay trên nút
   try {
     return await task();
   } finally {
     button.disabled = false;
+    button.removeAttribute('aria-busy');
   }
 }
