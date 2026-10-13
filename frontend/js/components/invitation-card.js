@@ -141,20 +141,22 @@ function ornamentSvg(kind, slot, id) {
 }
 
 // ---------- ẢNH / CHỮ LỒNG ----------
-function photo(inv, cls) {
+// url: ảnh cần hiện (bìa dùng photo_url, trang tiệc dùng ảnh 2 nếu có)
+function photo(inv, cls, url = inv.photo_url) {
   const initials = `${givenName(inv.groom_name).charAt(0) || 'A'} & ${givenName(inv.bride_name).charAt(0) || 'B'}`;
   return html`<div class="inv-photo ${cls}">
-    ${inv.photo_url ? html`<img src="${inv.photo_url}" alt="Ảnh cưới ${inv.groom_name} và ${inv.bride_name}" loading="lazy">`
+    ${url ? html`<img src="${url}" alt="Ảnh cưới ${inv.groom_name} và ${inv.bride_name}" loading="lazy">`
       : html`<span class="inv-monogram">${initials}</span>`}
   </div>`;
 }
 
+// Ảnh tròn + dòng chữ uốn theo nửa vòng trên. textLength ép chữ vừa khít cung tròn (không bị cắt 2 đầu).
 function arcPhoto(inv, id) {
   return html`<div class="inv-arc">
-    <svg viewBox="0 0 200 200" aria-hidden="true"><defs><path id="${id}-arc" d="M22 104A78 78 0 0 1 178 104"/></defs>
-      <text font-size="8.6" letter-spacing=".4" fill="var(--inv-ink)"><textPath href="#${id}-arc" startOffset="50%" text-anchor="middle">
-        Sự hiện diện của quý khách là niềm vinh hạnh của gia đình chúng tôi</textPath></text></svg>
-    ${photo(inv, 'inv-photo-arc')}
+    <svg viewBox="0 0 200 200" aria-hidden="true"><defs><path id="${id}-arc" d="M13 100A87 87 0 0 1 187 100"/></defs>
+      <text font-size="9" fill="var(--inv-ink)"><textPath href="#${id}-arc" startOffset="50%" text-anchor="middle"
+        textLength="262" lengthAdjust="spacingAndGlyphs">Sự hiện diện của quý khách là niềm vinh hạnh của gia đình chúng tôi</textPath></text></svg>
+    ${photo(inv, 'inv-photo-arc', inv.details?.photo2_url || inv.photo_url)}
   </div>`;
 }
 
@@ -213,7 +215,7 @@ export function invitationPages(inv, { guestName = '', pages = [1, 2, 3], uid = 
       <span class="inv-caps">Trân trọng kính mời</span>${guestLine}
       <span class="inv-note">Đến dự bữa tiệc thân mật chung vui cùng gia đình chúng tôi tại</span>
       <span class="inv-caps">${d.venue_label || 'Nhà hàng tiệc cưới'}</span>
-      <span class="inv-script inv-venue ${venue.length > 22 ? 'is-long' : ''}">${venue}</span>
+      <span class="inv-script inv-venue ${venue.length > 28 ? 'is-xlong' : venue.length > 18 ? 'is-long' : ''}">${venue}</span>
       ${d.venue_address ? html`<span class="inv-tiny">${d.venue_address}</span>` : ''}
       <span class="inv-caps inv-light">Tiệc được tổ chức vào lúc</span>
       <span class="inv-when">${whenText(inv.event_at)}</span>

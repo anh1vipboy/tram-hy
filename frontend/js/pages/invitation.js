@@ -319,6 +319,7 @@ function renderGallery(profile) {
 
 // ---------- CHỦ THIỆP ----------
 const ALBUM_MAX = 12;
+const PHOTO_SLOTS = [['photo_url', 'Ảnh trang bìa (trang 1)'], ['photo2_url', 'Ảnh trang tiệc cưới (trang 3)']];
 const STORY_MAX = 6;
 const DETAIL_FIELDS = ['groom_father', 'groom_mother', 'groom_address', 'bride_father', 'bride_mother', 'bride_address', 'venue_address'];
 
@@ -329,6 +330,7 @@ async function renderEditor(profile) {
     template: param('template') && INVITATION_TEMPLATES.some((t) => t.key === param('template'))
       ? param('template') : invitation ? invitationTemplateKey(invitation) : 'la-tim',
     photo_url: invitation?.photo_url ?? null,
+    photo2_url: d.photo2_url ?? null,
     album: Array.isArray(d.album) ? [...d.album] : [],
     story: Array.isArray(d.story) ? d.story.map((s) => ({ ...s })) : [],
   };
@@ -361,15 +363,20 @@ async function renderEditor(profile) {
             ${field('groom_name', 'Họ tên chú rể', invitation?.groom_name, { required: true, max: 60, placeholder: 'VD: Nguyễn Minh Khang' })}
             ${field('bride_name', 'Họ tên cô dâu', invitation?.bride_name, { required: true, max: 60, placeholder: 'VD: Trần Thu Hà' })}
           </div>
-          <div class="photo-picker">
-            <span id="photo-thumb"></span>
-            <div class="stack" style="gap:6px">
-              <label class="btn btn-outline btn-sm" style="cursor:pointer">📷 Chọn ảnh cưới
-                <input type="file" accept="image/*" id="photo-input" hidden></label>
-              <button type="button" class="btn btn-link btn-sm" id="photo-remove">Bỏ ảnh</button>
-              <span class="small muted">Ảnh hiện trong khung tròn trên thiệp. Không có ảnh thì thiệp dùng chữ lồng tên hai bạn.</span>
+          ${PHOTO_SLOTS.map(([slot, label]) => html`
+            <div class="photo-picker" data-slot="${slot}" ${slot === 'photo2_url' && !d.photo2_url ? 'hidden' : ''}>
+              <span class="photo-thumb"></span>
+              <div class="stack" style="gap:6px">
+                <strong class="small">${label}</strong>
+                <label class="btn btn-outline btn-sm" style="cursor:pointer">📷 Chọn ảnh
+                  <input type="file" accept="image/*" data-photo-input hidden aria-label="Chọn ${label.toLowerCase()}"></label>
+                <button type="button" class="btn btn-link btn-sm" data-photo-remove>Bỏ ảnh</button>
+              </div>
             </div>
-          </div>
+            ${slot === 'photo_url' ? html`
+              <label class="same-photo"><input type="checkbox" id="same-photo" ${d.photo2_url ? '' : 'checked'}>
+                Dùng ảnh bìa cho cả trang tiệc cưới (trang 3)</label>` : ''}`)}
+          <span class="small muted">Ảnh hiện trong khung tròn trên thiệp. Không có ảnh thì thiệp dùng chữ lồng tên hai bạn.</span>
         </section>
         <section class="inv-form-section">
           <h3>3. Gia đình hai bên</h3>
@@ -455,6 +462,7 @@ async function renderEditor(profile) {
     const details = Object.fromEntries(DETAIL_FIELDS.map((k) => [k, (data[k] || '').trim()]).filter(([, v]) => v));
     details.host = data.host === 'gai' ? 'gai' : 'trai';
     if (data.ceremony_at) details.ceremony_at = new Date(data.ceremony_at).toISOString();
+    if (draft.photo2_url && !$('#same-photo')?.checked) details.photo2_url = draft.photo2_url;
     if (draft.album.length) details.album = draft.album;
     const story = draft.story.map((s) => ({ when: (s.when || '').trim(), title: (s.title || '').trim(), text: (s.text || '').trim() }))
       .filter((s) => s.title || s.text);
@@ -475,8 +483,13 @@ async function renderEditor(profile) {
   };
   const stage = () => $('#preview').style.setProperty('--stage', templateOf(draft.template).colors.backdrop);
   const refreshPreview = () => { stage(); render($('#preview'), invitationPages(readForm(), { uid: 'pv', guestName: 'Tên khách mời' })); };
-  const refreshPhoto = () => render($('#photo-thumb'), draft.photo_url
-    ? html`<img src="${draft.photo_url}" alt="Ảnh cưới đã chọn">` : html`<span class="photo-empty">💑</span>`);
+  const refreshPhoto = () => {
+    $$('.photo-picker').forEach((picker) => {
+      const url = draft[picker.dataset.slot];
+      render(picker.querySelector('.photo-thumb'), url ? html`<img src="${url}" alt="Ảnh đã chọn">` : html`<span class="photo-empty">💑</span>`);
+    });
+    $('[data-slot="photo2_url"]').hidden = $('#same-photo').checked;
+  };
 
   form.addEventListener('input', refreshPreview);
   $$('[data-template]').forEach((btn) => btn.addEventListener('click', () => {
@@ -485,31 +498,38 @@ async function renderEditor(profile) {
     refreshPreview();
   }));
 
-  $('#photo-input').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    e.target.value = '';
-    if (!file) return;
-    const label = e.target.closest('label');
-    label.setAttribute('aria-busy', 'true');
-    try {
-      const url = await uploadInvitationPhoto(profile.id, await compressImage(file, { maxSize: 1400 }));
-      if (draft.photo_url && draft.photo_url !== invitation?.photo_url) removeInvitationPhoto(draft.photo_url);   // ảnh chọn trước đó chưa lưu
-      draft.photo_url = url;
+  // Ảnh bìa (photo_url) và ảnh trang tiệc (details.photo2_url). Ảnh đã lưu chỉ bị xóa file sau khi bấm Lưu.
+  const savedPhotos = { photo_url: invitation?.photo_url ?? null, photo2_url: d.photo2_url ?? null };
+  const dropUnsaved = (slot) => { if (draft[slot] && draft[slot] !== savedPhotos[slot]) removeInvitationPhoto(draft[slot]); };
+  $$('.photo-picker').forEach((picker) => {
+    const slot = picker.dataset.slot;
+    picker.querySelector('[data-photo-input]').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      const label = e.target.closest('label');
+      label.setAttribute('aria-busy', 'true');
+      try {
+        const url = await uploadInvitationPhoto(profile.id, await compressImage(file, { maxSize: 1400 }));
+        dropUnsaved(slot);                                   // ảnh chọn trước đó chưa lưu
+        draft[slot] = url;
+        refreshPhoto();
+        refreshPreview();
+        toast('Đã tải ảnh lên – bấm Lưu thiệp để cập nhật cho khách mời.', 'success');
+      } catch (error) {
+        toastError(error);
+      } finally {
+        label.removeAttribute('aria-busy');
+      }
+    });
+    picker.querySelector('[data-photo-remove]').addEventListener('click', () => {
+      dropUnsaved(slot);
+      draft[slot] = null;
       refreshPhoto();
       refreshPreview();
-      toast('Đã tải ảnh lên – bấm Lưu thiệp để cập nhật cho khách mời.', 'success');
-    } catch (error) {
-      toastError(error);
-    } finally {
-      label.removeAttribute('aria-busy');
-    }
+    });
   });
-  $('#photo-remove').addEventListener('click', () => {
-    if (draft.photo_url && draft.photo_url !== invitation?.photo_url) removeInvitationPhoto(draft.photo_url);
-    draft.photo_url = null;
-    refreshPhoto();
-    refreshPreview();
-  });
+  $('#same-photo').addEventListener('change', () => { refreshPhoto(); refreshPreview(); });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -532,12 +552,19 @@ async function renderEditor(profile) {
       toastError(new Error('Số tài khoản chỉ gồm 6–20 chữ số'));
       return;
     }
+    // Đã tải ảnh 2 nhưng lại chọn dùng chung ảnh bìa → bỏ file ảnh 2 chưa lưu
+    if ($('#same-photo').checked) { dropUnsaved('photo2_url'); draft.photo2_url = savedPhotos.photo2_url; }
     await withBusy(e.submitter, async () => {
       try {
         const isNew = !invitation;
-        const oldPhoto = invitation?.photo_url;
         invitation = await saveInvitation(profile.id, invitation, values);
-        if (oldPhoto && oldPhoto !== invitation.photo_url) removeInvitationPhoto(oldPhoto);
+        // Ảnh cũ không còn dùng (đổi ảnh / bỏ ảnh / chuyển sang dùng chung ảnh bìa) → xóa file
+        const now = { photo_url: invitation.photo_url ?? null, photo2_url: invitation.details?.photo2_url ?? null };
+        for (const slot of ['photo_url', 'photo2_url']) {
+          if (savedPhotos[slot] && savedPhotos[slot] !== now[slot]) removeInvitationPhoto(savedPhotos[slot]);
+          savedPhotos[slot] = now[slot];
+        }
+        if (!now.photo2_url) draft.photo2_url = null;
         saved.album.filter((url) => !draft.album.includes(url)).forEach(removeInvitationPhoto);   // ảnh đã bỏ khỏi album
         saved.album = [...draft.album];
         e.submitter.textContent = 'Lưu thiệp';

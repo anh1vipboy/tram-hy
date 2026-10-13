@@ -337,7 +337,9 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
   `?i=<slug>&to=<tên>` → khách mời: phong bì ghi "Kính gửi <tên>", chạm con dấu để mở → 3 trang thiệp, đếm ngược,
   chỉ đường (Google Maps), lưu vào Google Calendar, xác nhận tham dự, QR mừng cưới; thanh nút dưới đáy.
 - Trình soạn có ô "Mời riêng từng người" → sao chép link kèm `&to=`.
-- Ảnh cưới: nén trên trình duyệt rồi tải lên `invitation-photos/<user_id>/…` (công khai); đổi / bỏ ảnh thì xóa ảnh cũ.
+- Ảnh cưới: ảnh bìa (`photo_url`) + ảnh trang tiệc (`details.photo2_url`, mặc định dùng chung ảnh bìa). Nén trên trình duyệt rồi
+  tải lên `invitation-photos/<user_id>/…` (công khai); đổi / bỏ ảnh thì xóa file cũ sau khi bấm Lưu.
+- Trang 3: ảnh tròn + chữ cong nằm trong luồng flex, tự co theo chỗ còn lại (tên nhà hàng dài vẫn không bị cắt).
 - **Album** (≤ 12 ảnh, kéo đổi thứ tự), **chuyện tình yêu** (≤ 6 cột mốc) và **nhạc nền** lưu trong `invitations.details`
   (`album`, `story`, `music`). Khách xem album bằng trình xem ảnh chung `openPhotoGallery` (components/dress-gallery.js).
 - **Nhạc nền** (`components/wedding-music.js`): 3 bản "hộp nhạc" – Canon in D, Here Comes the Bride, Ode to Joy (giai điệu

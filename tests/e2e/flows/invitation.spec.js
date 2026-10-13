@@ -14,6 +14,13 @@ test('chọn mẫu, tạo thiệp → khách mở link riêng, mở phong bì, g
   await bride.goto('/invitation.html');
 
   await bride.getByRole('radio', { name: /Đỏ hỷ truyền thống/ }).click();
+  // Ảnh trang 3: mặc định dùng chung ảnh bìa; bỏ chọn thì hiện ô chọn ảnh thứ 2
+  const photo2 = bride.locator('[data-slot="photo2_url"]');
+  await bride.getByLabel(/Dùng ảnh bìa cho cả trang tiệc cưới/).uncheck();
+  await expect(photo2).toBeVisible();
+  await expect(photo2).toContainText('Ảnh trang tiệc cưới (trang 3)');
+  await bride.getByLabel(/Dùng ảnh bìa cho cả trang tiệc cưới/).check();
+  await expect(photo2).toBeHidden();
   await bride.getByLabel('Họ tên chú rể').fill('Minh Quân');
   await bride.getByLabel('Họ tên cô dâu').fill('Khánh Linh');
   await bride.getByLabel('Bố chú rể').fill('Nguyễn Văn Bình');

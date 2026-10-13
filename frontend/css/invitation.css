@@ -54,14 +54,17 @@
 .inv-fullnames .inv-amp { font-size: 5cqi; margin: -.5cqi 0 -.5cqi 4cqi; }
 
 /* Trang 3 – tiệc cưới */
-.inv-orn-corner { top: -2cqi; left: -2cqi; width: 40cqi; }
+.inv-orn-corner { top: -2cqi; left: -2cqi; width: 34cqi; }
 .inv-mirror { position: absolute !important; inset: 0; transform: scaleX(-1); pointer-events: none; }
-.inv-p3-body { padding: 11cqi 17cqi 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5cqi; }
-.inv-p3-body .inv-guest { width: 62cqi; margin-bottom: 1.5cqi; }
-.inv-p3-body .inv-note { max-width: 46cqi; margin-bottom: 1.5cqi; }
-.inv-venue { font-size: 10.5cqi; margin: -.5cqi 0; }
+.inv-p3 { display: flex; flex-direction: column; align-items: center; }
+.inv-p3-body { flex: none; padding: 10cqi 15cqi 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.2cqi; }
+.inv-p3-body .inv-guest { width: 62cqi; margin-bottom: 1cqi; }
+.inv-p3-body .inv-note { max-width: 50cqi; margin-bottom: 1cqi; }
+.inv-venue { font-size: 10.5cqi; margin: -.5cqi 0; text-wrap: balance; }
 .inv-venue.is-long { font-size: 7cqi; }
-.inv-arc { position: absolute !important; left: 50%; bottom: -17cqi; width: 46cqi; aspect-ratio: 1; transform: translateX(-50%); }
+.inv-venue.is-xlong { font-size: 5.8cqi; }
+/* Ảnh tròn chiếm phần còn lại của trang (co lại khi chữ phía trên dài) – luôn nằm trọn trong trang */
+.inv-arc { flex: 1 1 0; min-height: 18cqi; max-height: 40cqi; aspect-ratio: 1; margin: 3cqi 0 4.5cqi; }
 .inv-arc svg { position: absolute; inset: -8%; width: 116%; height: 116%; }
 .inv-photo-arc { position: absolute !important; inset: 14%; }
 
