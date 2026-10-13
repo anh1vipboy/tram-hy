@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Đăng nhập – Trạm Hỷ</title>
   <link rel="icon" href="assets/images/logo.jpg">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="css/styles.css">
   <script type="module" src="js/pages/login.js"></script>
 </head>
+
 <body class="auth-page">
   <header id="app-header"></header>
 
@@ -37,8 +40,10 @@
 
       <div class="auth-tabs" role="tablist" data-active="signin">
         <span class="auth-tab-indicator" aria-hidden="true"></span>
-        <button class="tab active" data-tab="signin" type="button" role="tab" aria-selected="true" disabled>Đăng nhập</button>
-        <button class="tab" data-tab="signup" type="button" role="tab" aria-selected="false" disabled>Tạo tài khoản</button>
+        <button class="tab active" data-tab="signin" type="button" role="tab" aria-selected="true" disabled>Đăng
+          nhập</button>
+        <button class="tab" data-tab="signup" type="button" role="tab" aria-selected="false" disabled>Tạo tài
+          khoản</button>
       </div>
 
       <button class="btn btn-outline btn-block google-btn" type="button" id="google-signin">
@@ -51,11 +56,11 @@
         <label class="field"><span>Email</span>
           <span class="input-wrap" data-icon="mail">
             <input class="input" type="email" name="email" required autocomplete="email" inputmode="email"
-                   placeholder="ten@gmail.com" data-validate="email"></span></label>
+              placeholder="ten@gmail.com" data-validate="email"></span></label>
         <label class="field"><span>Mật khẩu</span>
           <span class="input-wrap" data-icon="lock">
             <input class="input" type="password" name="password" required autocomplete="current-password"
-                   placeholder="Nhập mật khẩu" data-validate="password"></span></label>
+              placeholder="Nhập mật khẩu" data-validate="password"></span></label>
         <div class="auth-row">
           <span></span>
           <button class="btn btn-link btn-sm" type="button" id="forgot-password">Quên mật khẩu?</button>
@@ -68,32 +73,35 @@
       <form id="signup-form" class="stack auth-form" method="post" novalidate hidden>
         <label class="field"><span>Họ tên</span>
           <span class="input-wrap" data-icon="user">
-            <input class="input" name="fullName" required maxlength="100" autocomplete="name" placeholder="Nguyễn Thu Trang"
-                   data-validate="fullName"></span></label>
+            <input class="input" name="fullName" required maxlength="100" autocomplete="name"
+              placeholder="Phùng Đức Anh" data-validate="fullName"></span></label>
         <label class="field"><span>Số điện thoại <em class="muted">(không bắt buộc)</em></span>
           <span class="input-wrap" data-icon="phone">
             <input class="input" type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="09xx xxx xxx"
-                   data-validate="phone"></span></label>
+              data-validate="phone"></span></label>
         <label class="field"><span>Email</span>
           <span class="input-wrap" data-icon="mail">
             <input class="input" type="email" name="email" required autocomplete="email" inputmode="email"
-                   placeholder="ten@gmail.com" data-validate="email"></span></label>
+              placeholder="ten@gmail.com" data-validate="email"></span></label>
         <label class="field"><span>Mật khẩu</span>
           <span class="input-wrap" data-icon="lock">
             <input class="input" type="password" name="password" required autocomplete="new-password"
-                   placeholder="Tối thiểu 8 ký tự, có chữ và số" data-validate="newPassword" id="signup-password"></span></label>
+              placeholder="Tối thiểu 8 ký tự, có chữ và số" data-validate="newPassword"
+              id="signup-password"></span></label>
         <div id="password-meter"></div>
         <label class="field"><span>Nhập lại mật khẩu</span>
           <span class="input-wrap" data-icon="lock">
             <input class="input" type="password" name="confirm" required autocomplete="new-password"
-                   placeholder="Nhập lại đúng mật khẩu trên" data-validate="confirm"></span></label>
+              placeholder="Nhập lại đúng mật khẩu trên" data-validate="confirm"></span></label>
         <div class="captcha-box" id="captcha-signup"></div>
         <button class="btn btn-primary btn-block btn-lg" type="submit" disabled>Tạo tài khoản</button>
-        <p class="small muted" id="signup-hint">Là tiệm váy, studio, decor…?<br>Tạo tài khoản rồi bấm <a href="doi-tac.html">Trở thành đối tác</a> để mở tiệm.</p>
+        <p class="small muted" id="signup-hint">Là tiệm váy, studio, decor…?<br>Tạo tài khoản rồi bấm <a
+            href="doi-tac.html">Trở thành đối tác</a> để mở tiệm.</p>
       </form>
     </section>
   </main>
 
   <footer id="app-footer"></footer>
 </body>
+
 </html>
