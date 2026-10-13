@@ -39,10 +39,12 @@ test('tạo kế hoạch cưới, sửa ngân sách, đánh dấu đã trả, ch
   await expect(trap.locator('.cell-act')).toHaveClass(/over/);
   await expect(anHoi.locator('.budget-cat-foot b').last()).toContainText('15.000.000đ');
 
-  // Đánh dấu đã trả → vòng "Đã thanh toán" tăng
+  // Đánh dấu đã trả → vòng "Đã thanh toán" tăng thêm 1 mục (đơn Trạm Hỷ đã cọc cũng được tính sẵn)
+  const paidCount = async () => Number((await board.locator('.budget-summary').innerText()).match(/Đã thanh toán: (\d+) mục/)[1]);
+  const paidBefore = await paidCount();
   await trap.getByRole('button', { name: 'Chưa trả' }).click();
   await expect(trap.getByRole('button', { name: '✓ Đã trả' })).toBeVisible();
-  await expect(board.locator('.budget-summary')).toContainText('Đã thanh toán: 1 mục');
+  await expect(board.locator('.budget-summary')).toContainText(`Đã thanh toán: ${paidBefore + 1} mục`);
 
   // Thêm mục mới, đổi tên, rồi xóa
   await anHoi.getByRole('button', { name: '+ Thêm mục chi tiêu' }).click();
@@ -50,7 +52,8 @@ test('tạo kế hoạch cưới, sửa ngân sách, đánh dấu đã trả, ch
   await expect(newName).toBeFocused();
   await newName.fill('Thuê áo dài đội bê tráp');
   await newName.press('Tab');
-  await bride.reload();                                                            // đã lưu vào database
+  await expect(bride.locator('#save-status')).toHaveAttribute('data-state', /saved|idle/);   // chờ "✓ Đã lưu tự động"
+  await bride.reload();                                                           // đã lưu vào database
   await expect(bride.locator('#panel-budget input[value="Thuê áo dài đội bê tráp"]')).toBeVisible({ timeout: 20_000 });
   await bride.locator('#panel-budget .budget-row', { has: bride.locator('input[value="Thuê áo dài đội bê tráp"]') })
     .getByRole('button', { name: 'Xóa mục' }).click();

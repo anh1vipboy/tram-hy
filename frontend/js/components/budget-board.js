@@ -5,6 +5,7 @@ import { openDialog, toast, toastError } from '../core/ui.js';
 import { BOOKING_TYPE } from '../core/labels.js';
 import { moneyValue, parseMoney } from './money-input.js';
 import { makeSortable } from './sortable.js';
+import { trackSave } from './save-status.js';
 import {
   listBudget, addCategory, updateCategory, deleteCategory, addItem, updateItem, deleteItem, savePositions,
 } from '../services/planner.js';
@@ -164,7 +165,7 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
 
   async function save(task, rollback) {
     try {
-      await task();
+      await trackSave(task);
     } catch (error) {
       toastError(error);
       rollback?.();
@@ -248,7 +249,7 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
 
   async function addNewItem(category) {
     try {
-      const item = await addItem(plan.id, category.id, 'Mục mới', category.items.length);
+      const item = await trackSave(() => addItem(plan.id, category.id, 'Mục mới', category.items.length));
       category.items.push(item);
       collapsed.delete(category.id);
       draw();

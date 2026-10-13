@@ -192,6 +192,11 @@ body.auth-page { background: radial-gradient(1100px 520px at 50% -120px, var(--b
 .btn-light { background: rgba(255, 255, 255, .92); color: var(--brand-dark); }
 .planner-tabs { margin-bottom: 18px; width: fit-content; max-width: 100%; overflow-x: auto; }
 .planner-tabs a.tab { text-decoration: none; }
+.save-status { font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 999px; transition: opacity .3s; }
+.save-status[data-state="idle"] { opacity: 0; }
+.save-status[data-state="saving"] { color: var(--muted); background: var(--bg); }
+.save-status[data-state="saved"] { color: #1f7a4d; background: #e7f6ee; }
+.save-status[data-state="error"] { color: var(--red); background: #fdecec; }
 .planner-intro { display: flex; flex-direction: column; gap: 20px; align-items: center; padding: 28px; }
 .planner-intro-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; width: 100%; }
 .planner-feature { display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 14px; background: var(--bg); }

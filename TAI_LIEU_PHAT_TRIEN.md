@@ -63,6 +63,7 @@ exe202/
 │   ├── 17_become_partner.sql Cô dâu tự mở tiệm (Trở thành đối tác) + tài khoản nhận tiền riêng tư
 │   ├── 18_notifications.sql  Chuông thông báo: bảng notifications + trigger tự tạo thông báo
 │   ├── 19_vendor_packages.sql Gói dịch vụ (mẫu rạp, gói chụp, gói trang điểm, sảnh) + đặt lịch theo gói
+│   ├── 20_wedding_planner.sql Kế hoạch cưới: ngân sách theo nghi lễ + checklist chuẩn bị
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -114,6 +115,7 @@ exe202/
 | `disputes` | Khiếu nại: hoàn cọc / khách không đến | Như `bookings` |
 | `reviews` | Đánh giá – chỉ đơn **đã hoàn tất** mới được viết | Mọi người |
 | `invitations`, `rsvps` | Thiệp cưới và phản hồi khách mời | Thiệp: mọi người · RSVP: chủ thiệp |
+| `wedding_plans`, `budget_categories`, `budget_items`, `checklist_items` | Kế hoạch cưới (1 kế hoạch / tài khoản): danh mục, mục chi tiêu, việc cần làm | Chính chủ |
 
 ### 4.2 Escrow 3 chặng
 
@@ -180,6 +182,7 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 |---|---|---|
 | Trang chủ, Thử váy, Dịch vụ, Chi tiết đối tác | Không | Đặt lịch thì mới yêu cầu đăng nhập |
 | Đơn của tôi | Có | |
+| Kế hoạch cưới (`ke-hoach.html`) | Có (khách chưa đăng nhập thấy trang giới thiệu) | |
 | Thiệp cưới | Có (soạn) · Không (khách mời xem qua link) | |
 | Kênh đối tác | Vai trò `vendor` + được gắn với tiệm | |
 | Quản trị | Vai trò `admin` | |
@@ -291,6 +294,18 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
   `create_booking` nhận thêm `p_package_id`: **giá lấy từ gói ở server** và tên gói được lưu vào `bookings.details.package`
   (tiệm đổi tên / xóa gói thì đơn cũ vẫn đúng). Đơn hiện tên gói ở Đơn của tôi, Kênh đối tác, Quản trị.
 
+### Kế hoạch cưới (SQL 20)
+- Trang `ke-hoach.html` (`pages/planner.js`), 3 tab: **Tổng quan** (đếm ngược, 3 thẻ số liệu, việc sắp tới), **Ngân sách**
+  (`components/budget-board.js`), **Checklist** (`components/checklist-board.js`). Mở thẳng tab bằng `?tab=budget|checklist`.
+- Tạo kế hoạch từ mẫu `data/planner-templates.js`: phong tục **Bắc** (dạm ngõ, ăn hỏi) hoặc **Nam** (đám hỏi, rước dâu);
+  nhập tổng ngân sách thì số dự kiến điền sẵn theo tỷ lệ (làm tròn 100.000đ). 25 việc checklist, hạn = ngày cưới − `days_before`.
+- **Đơn đặt qua Trạm Hỷ không lưu trong kế hoạch**: lúc hiển thị, mỗi đơn (trừ đã hủy / hoàn tiền) được gắn vào danh mục đầu tiên
+  có `vendor_category` trùng loại tiệm; số "đã trả" = các chặng `paid` + `released`. Nhờ vậy luôn khớp đơn thật.
+- Sửa ngay trên bảng, **tự lưu khi rời ô** (`components/save-status.js` hiện "Đang lưu… / ✓ Đã lưu tự động";
+  đang lưu dở mà đóng / tải lại trang thì trình duyệt hỏi lại). Kéo thả bằng `components/sortable.js` (chạy cả cảm ứng).
+- Giới hạn chống lạm dụng ở server: 40 danh mục, 400 mục chi tiêu, 300 việc / kế hoạch.
+- Kiểm thử: `tests/e2e/flows/planner.spec.js`.
+
 ### Chuông thông báo (SQL 18)
 - Chuông 🔔 cạnh avatar (máy tính: thả xuống · điện thoại: tấm trượt từ dưới lên), số chưa đọc trên chuông và
   trên tiêu đề tab "(3) …". Thông báo mới (realtime): chuông rung + toast. Bấm thông báo → đánh dấu đã đọc và
@@ -369,6 +384,8 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 | 4 | **Thanh toán thật** (PayOS): webhook xác nhận chuyển khoản → gọi `pay_milestone` | Edge Function |
 | ✅ | AI thử váy thật (Gemini, sẵn chỗ cắm FASHN), 5 lượt/người/ngày | Đã xong (SQL 11 + function thu-vay-ai) |
 | ✅ | AI tư vấn chia ngân sách cưới theo số khách, thành phố, ưu tiên | Đã xong (function tu-van-ngan-sach) |
+| ✅ | Kế hoạch cưới: ngân sách theo nghi lễ, checklist, tổng quan | Đã xong (SQL 20) |
+| 5 | **AI trong Kế hoạch cưới**: lưu gợi ý AI thành kế hoạch, AI chia chi tiết, hỏi AI về kế hoạch, giới hạn lượt / ngày | Edge Function + `frontend/` |
 | 6 | **Tự xóa ảnh cô dâu sau 24 giờ** (cam kết bảo mật trong báo cáo) | Scheduled Edge Function |
 | 7 | Đo lường hành vi (Vercel Analytics) để có số liệu cho báo cáo | `frontend/` |
 | 8 | Ảnh xem trước khi chia sẻ link thiệp / tiệm qua Zalo, Facebook | `frontend/` |

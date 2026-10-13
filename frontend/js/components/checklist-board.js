@@ -3,6 +3,7 @@ import { html, render } from '../core/utils.js';
 import { toast, toastError, withBusy } from '../core/ui.js';
 import { CHECKLIST_STAGES } from '../data/planner-templates.js';
 import { listChecklist, addTask, updateTask, deleteTask } from '../services/planner.js';
+import { trackSave } from './save-status.js';
 
 const DAY = 86_400_000;
 const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
@@ -110,7 +111,7 @@ export async function mountChecklistBoard(container, plan, { onChange } = {}) {
       if (!title) { e.target.elements.title.focus(); return; }
       withBusy(e.submitter, async () => {
         try {
-          tasks.push(await addTask(plan.id, title, Number(form.get('days'))));
+          tasks.push(await trackSave(() => addTask(plan.id, title, Number(form.get('days')))));
           tasks.sort((a, b) => b.days_before - a.days_before);
           filter = filter === 'done' ? 'all' : filter;
           draw();
@@ -129,7 +130,7 @@ export async function mountChecklistBoard(container, plan, { onChange } = {}) {
         row.classList.add('just-toggled');
         setTimeout(draw, 350);                               // để hiệu ứng tick chạy xong rồi mới vẽ lại
         try {
-          await updateTask(task.id, { done: task.done, done_at: task.done ? new Date().toISOString() : null });
+          await trackSave(() => updateTask(task.id, { done: task.done, done_at: task.done ? new Date().toISOString() : null }));
           if (task.done && checklistProgress(tasks).done === tasks.length) toast('🎉 Bạn đã hoàn thành mọi việc chuẩn bị!', 'success');
         } catch (error) {
           task.done = !task.done;
@@ -140,7 +141,7 @@ export async function mountChecklistBoard(container, plan, { onChange } = {}) {
       row.querySelector('[data-delete]').addEventListener('click', async () => {
         tasks = tasks.filter((t) => t.id !== task.id);
         draw();
-        try { await deleteTask(task.id); } catch (error) { toastError(error); reload(); }
+        try { await trackSave(() => deleteTask(task.id)); } catch (error) { toastError(error); reload(); }
       });
     });
   }

@@ -24,7 +24,8 @@ try {
       vendor.category === 'bridal' ? listDresses({ vendorId: vendor.id }) : [],
       listReviews(vendor.id),
       listVendorPhotos(vendor.id),
-      vendor.category === 'bridal' ? [] : listPackages(vendor.id),
+      // Gói lỗi (vd database chưa chạy SQL 19) thì trang tiệm vẫn hiện, chỉ thiếu mục gói
+      vendor.category === 'bridal' ? [] : listPackages(vendor.id).catch((error) => { console.warn(error); return []; }),
     ]);
     renderPage(vendor, dresses, reviews, photos, packages);
   }
