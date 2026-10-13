@@ -13,24 +13,22 @@
   <header id="app-header"></header>
 
   <main class="container auth-shell">
-    <!-- TRÁI: hình ảnh thương hiệu (ẩn bớt trên điện thoại) -->
-    <aside class="auth-visual" aria-hidden="true">
-      <img src="assets/images/user_tryon_white_royal.jpg" alt="">
-      <div class="auth-visual-overlay"></div>
-      <div class="petals"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="auth-visual-content">
-        <img class="auth-logo" src="assets/images/logo.jpg" alt="">
-        <p class="auth-quote">Kết duyên cát hỷ,<br>trọn vẹn niềm tin.</p>
-        <ul class="auth-perks">
-          <li><span>✨</span>Thử váy lên chính dáng bạn bằng AI</li>
-          <li><span>🛡️</span>Tiền cọc giữ an toàn qua Escrow 3 đợt</li>
-          <li><span>✓</span>Đối tác Tích Xanh, đánh giá xác thực</li>
-        </ul>
-      </div>
-    </aside>
-
-    <!-- PHẢI: đăng nhập / tạo tài khoản -->
+    <!-- Một thẻ ở giữa: đầu thẻ là thương hiệu Trạm Hỷ, bên dưới là đăng nhập / tạo tài khoản -->
     <section class="auth-card card" aria-labelledby="auth-title">
+      <div class="auth-brand">
+        <img src="assets/images/logo.jpg" alt="" class="auth-brand-logo">
+        <div>
+          <strong class="auth-brand-name">Trạm Hỷ</strong>
+          <span class="auth-brand-tagline">Sàn dịch vụ cưới trọn gói · giữ cọc an toàn</span>
+        </div>
+      </div>
+      <ul class="auth-services" aria-label="Dịch vụ trên Trạm Hỷ">
+        <li><span aria-hidden="true">👗</span>Váy cưới</li>
+        <li><span aria-hidden="true">📸</span>Chụp ảnh</li>
+        <li><span aria-hidden="true">💐</span>Trang trí</li>
+        <li><span aria-hidden="true">💄</span>Trang điểm</li>
+        <li><span aria-hidden="true">🍽️</span>Nhà hàng</li>
+      </ul>
       <div class="notice" id="auth-notice" role="status" hidden></div>
       <div>
         <h1 id="auth-title" class="auth-title">Chào mừng trở lại</h1>
