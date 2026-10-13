@@ -15,7 +15,23 @@ export async function saveInvitation(userId, invitation, values) {
   const query = invitation
     ? sb.from('invitations').update(row).eq('id', invitation.id)
     : sb.from('invitations').insert(row);
-  return unwrap(await query.select().single());
+  const result = await query.select().single();
+  // Database chưa chạy SQL 22 (chưa có cột template / details / photo_url)
+  if (result.error?.code === 'PGRST204') throw new Error('Trạm Hỷ đang cập nhật mẫu thiệp mới, bạn thử lưu lại sau ít phút nhé.');
+  return unwrap(result);
+}
+
+// Ảnh cưới trên thiệp: invitation-photos/<user_id>/anh-<thời gian>.jpg (bucket công khai – khách mời xem được)
+export async function uploadInvitationPhoto(userId, blob) {
+  const path = `${userId}/anh-${Date.now()}.jpg`;
+  unwrap(await sb.storage.from('invitation-photos').upload(path, blob, { contentType: 'image/jpeg', upsert: false }));
+  return sb.storage.from('invitation-photos').getPublicUrl(path).data.publicUrl;
+}
+
+// Xóa ảnh cũ khi đổi ảnh (bỏ qua lỗi – ảnh thừa không ảnh hưởng thiệp)
+export async function removeInvitationPhoto(url) {
+  const path = String(url || '').split('/invitation-photos/')[1];
+  if (path) await sb.storage.from('invitation-photos').remove([decodeURIComponent(path)]).catch(() => {});
 }
 
 export async function listRsvps(invitationId) {

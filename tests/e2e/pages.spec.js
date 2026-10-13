@@ -21,7 +21,7 @@ for (const { path, heading } of PUBLIC_PAGES) {
   });
 }
 
-const PROTECTED_PAGES = ['/bookings.html', '/vendor-dashboard.html', '/admin.html', '/invitation.html'];
+const PROTECTED_PAGES = ['/bookings.html', '/vendor-dashboard.html', '/admin.html'];
 
 for (const path of PROTECTED_PAGES) {
   test(`${path} yêu cầu đăng nhập`, async ({ page }) => {
@@ -29,6 +29,15 @@ for (const path of PROTECTED_PAGES) {
     await expect(page).toHaveURL(new RegExp(`login\\.html\\?next=${path.slice(1).replace('.', '\\.')}`));
   });
 }
+
+test('chưa đăng nhập: trang Thiệp cưới là thư viện mẫu, Dùng mẫu này dẫn tới đăng nhập', async ({ page }) => {
+  await page.goto('/invitation.html');
+  await expect(page.locator('.tpl-card')).toHaveCount(6);
+  await expect(page.locator('.tpl-card').first().getByRole('link', { name: 'Dùng mẫu này' }))
+    .toHaveAttribute('href', /login\.html\?next=invitation\.html%3Ftemplate%3Dla-tim/);
+  await page.locator('.tpl-card').nth(2).getByRole('button', { name: 'Xem thiệp' }).click();
+  await expect(page.locator('dialog.modal .inv-page')).toHaveCount(3);
+});
 
 test('khách mời mở link thiệp không tồn tại', async ({ page }) => {
   await page.goto('/invitation.html?i=khong-co-thiep-nay');

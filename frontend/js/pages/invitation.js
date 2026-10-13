@@ -1,79 +1,156 @@
-// Hai chế độ:
-//  - invitation.html?i=<slug> : khách mời xem thiệp + gửi phản hồi (không cần đăng nhập)
-//  - invitation.html          : cô dâu chú rể soạn thiệp, lấy link chia sẻ, xem danh sách phản hồi
+// Ba chế độ:
+//  - invitation.html?i=<slug>[&to=Tên khách] : khách mời mở phong bì → xem thiệp 3 trang → xác nhận tham dự (không cần đăng nhập)
+//  - invitation.html (chưa đăng nhập) / ?mau  : thư viện mẫu thiệp
+//  - invitation.html (đã đăng nhập)           : cô dâu chú rể soạn thiệp, lấy link, xem phản hồi
 import { initLayout } from '../core/layout.js';
-import { requireAuth } from '../core/auth.js';
-import { $, $$, html, render, param, dateTime } from '../core/utils.js';
-import { toast, toastError, withBusy } from '../core/ui.js';
+import { loginUrl } from '../core/auth.js';
+import { $, $$, html, render, param } from '../core/utils.js';
+import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
+import { compressImage } from '../core/image.js';
 import { BANKS } from '../data/banks.js';
-import { getMyInvitation, getInvitationBySlug, saveInvitation, listRsvps, submitRsvp, subscribeRsvps } from '../services/invitations.js';
-
-const THEMES = [
-  { key: 'gold', label: 'Champagne', color: '#f3e3c3' },
-  { key: 'red', label: 'Đỏ hỷ', color: '#8f1d1d' },
-  { key: 'green', label: 'Xanh lục bảo', color: '#1f4d3a' },
-  { key: 'pink', label: 'Hồng phấn', color: '#f6d5dc' },
-];
+import { INVITATION_TEMPLATES, INVITATION_FONTS_URL, SAMPLE_INVITATION, templateOf } from '../data/invitation-templates.js';
+import { invitationPages, invitationEnvelope, invitationTemplateKey } from '../components/invitation-card.js';
+import {
+  getMyInvitation, getInvitationBySlug, saveInvitation, listRsvps, submitRsvp, subscribeRsvps,
+  uploadInvitationPhoto, removeInvitationPhoto,
+} from '../services/invitations.js';
 
 const page = $('#invitation-page');
 
-// ---------- THIỆP (dùng chung cho xem trước và khách mời) ----------
+// Font viết tay của các mẫu thiệp – chỉ tải ở trang này
+const fonts = document.createElement('link');
+fonts.rel = 'stylesheet';
+fonts.href = INVITATION_FONTS_URL;
+document.head.append(fonts);
+
 function giftQrUrl(inv) {
   if (!inv.bank_code || !inv.bank_account) return null;
   const note = `Mung cuoi ${inv.groom_name} ${inv.bride_name}`;
   return `https://img.vietqr.io/image/${inv.bank_code}-${inv.bank_account}-compact.png?addInfo=${encodeURIComponent(note)}`;
 }
 
-function invitationCard(inv) {
-  const qr = giftQrUrl(inv);
-  return html`
-    <div class="invite-card theme-${inv.theme || 'gold'}">
-      <div class="small" style="letter-spacing:.2em;text-transform:uppercase">Trân trọng kính mời</div>
-      <div class="names">${inv.groom_name || 'Chú rể'} & ${inv.bride_name || 'Cô dâu'}</div>
-      <div>Đến dự lễ thành hôn vào lúc</div>
-      <div style="font-size:20px;font-weight:700;margin:6px 0">${inv.event_at ? dateTime(inv.event_at) : 'Ngày giờ…'}</div>
-      <div>${inv.venue || 'Địa điểm tổ chức'}</div>
-      ${qr ? html`<img class="qr" src="${qr}" alt="Mã QR mừng cưới"><div class="small">Quét mã để gửi lời chúc & quà mừng</div>` : ''}
-    </div>`;
+const mapsUrl = (inv) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([inv.venue, inv.details?.venue_address].filter(Boolean).join(', '))}`;
+
+function calendarUrl(inv) {
+  const start = new Date(inv.event_at);
+  const end = new Date(start.getTime() + 3 * 3600e3);
+  const stamp = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const text = `Đám cưới ${inv.groom_name} & ${inv.bride_name}`;
+  const location = [inv.venue, inv.details?.venue_address].filter(Boolean).join(', ');
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(text)}&dates=${stamp(start)}/${stamp(end)}&location=${encodeURIComponent(location)}`;
 }
 
 // ---------- KHÁCH MỜI ----------
 let guestWantsForm = false;   // khách bấm "Gửi phản hồi cho người khác" → luôn hiện form
+
 async function renderGuestView(slug) {
   const inv = await getInvitationBySlug(slug);
   if (!inv) {
-    render(page, html`<div class="empty">Thiệp không tồn tại hoặc đã bị xóa.</div>`);
+    render(page, html`<div class="container"><div class="empty">Thiệp không tồn tại hoặc đã bị xóa.</div></div>`);
     return;
   }
+  const guestName = (param('to') || '').trim().slice(0, 60);
+  const tpl = templateOf(invitationTemplateKey(inv));
   document.title = `Thiệp cưới ${inv.groom_name} & ${inv.bride_name}`;
+  document.body.classList.add('invite-mode');
+
   render(page, html`
-    <div style="max-width:520px;margin:0 auto" class="stack">
-      ${invitationCard(inv)}
-      <form class="card stack" id="rsvp-form">
-        <h3>Bạn sẽ đến chung vui chứ?</h3>
-        <label class="field"><span>Tên của bạn</span><input class="input" name="guestName" required maxlength="100"></label>
+    <div class="inv-stage" style="--stage:${tpl.colors.backdrop}">
+      <div class="inv-stage-inner" id="inv-stage-inner">
+        <div class="inv-intro">
+          ${invitationEnvelope(inv, guestName)}
+          <p class="inv-intro-hint">Chạm vào con dấu để mở thiệp</p>
+        </div>
+      </div>
+    </div>`);
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const open = () => {
+    $('.envelope').classList.add('is-open');
+    $('.inv-intro').classList.add('is-leaving');
+    setTimeout(() => showInvitation(inv, guestName, slug), reduced ? 50 : 2000);
+  };
+  $('[data-open-envelope]').addEventListener('click', open, { once: true });
+  $('[data-open-envelope]').focus({ preventScroll: true });
+}
+
+function showInvitation(inv, guestName, slug) {
+  const qr = giftQrUrl(inv);
+  render($('#inv-stage-inner'), html`
+    <div class="inv-guest-pages">${invitationPages(inv, { guestName, uid: 'guest' })}</div>
+    ${inv.event_at ? html`
+      <section class="inv-countdown">
+        <p class="inv-countdown-title">Cùng đếm ngược tới ngày vui</p>
+        <div class="countdown" id="countdown"></div>
+      </section>` : ''}
+    <div class="inv-info-row">
+      ${inv.venue ? html`<a class="btn" href="${mapsUrl(inv)}" target="_blank" rel="noopener">📍 Chỉ đường đến tiệc</a>` : ''}
+      ${inv.event_at ? html`<a class="btn" href="${calendarUrl(inv)}" target="_blank" rel="noopener">📅 Lưu vào lịch</a>` : ''}
+    </div>
+    <section class="inv-section" id="rsvp-section">
+      <form class="stack" id="rsvp-form">
+        <div><h2>Bạn sẽ đến chung vui chứ?</h2><p class="muted" style="margin:0">Phản hồi giúp gia đình chuẩn bị chu đáo hơn.</p></div>
+        <label class="field"><span>Tên của bạn</span><input class="input" name="guestName" required maxlength="100" value="${guestName}"></label>
         <div class="row">
           <label class="row"><input type="radio" name="attending" value="yes" checked> Sẽ tham dự</label>
           <label class="row"><input type="radio" name="attending" value="no"> Rất tiếc không thể đến</label>
         </div>
         <label class="field"><span>Số người đi cùng (tính cả bạn)</span>
           <input class="input" type="number" name="guestCount" min="1" max="10" value="1"></label>
-        <label class="field"><span>Lời chúc</span><textarea class="input" name="message" maxlength="500"></textarea></label>
+        <label class="field"><span>Lời chúc gửi cô dâu chú rể</span><textarea class="input" name="message" maxlength="500" placeholder="Chúc hai bạn trăm năm hạnh phúc…"></textarea></label>
         <!-- Bẫy bot: người thật không thấy ô này, bot tự điền mọi ô sẽ điền vào → bỏ qua -->
         <label class="hp-field" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
         <button class="btn btn-primary" type="submit">Gửi phản hồi</button>
       </form>
-    </div>`);
+    </section>
+    ${qr ? html`
+      <section class="inv-section center" id="gift-section">
+        <h2>Hộp mừng cưới</h2>
+        <p class="muted" style="margin:0">Quét mã bằng ứng dụng ngân hàng để gửi quà mừng tới cô dâu chú rể.</p>
+        <img class="gift-qr" src="${qr}" alt="Mã QR mừng cưới" loading="lazy">
+      </section>` : ''}
+    <nav class="inv-actions" aria-label="Phản hồi thiệp">
+      <button type="button" class="btn" data-go="rsvp">💌 Xác nhận tham dự</button>
+      <button type="button" class="btn" data-go="wish">💬 Gửi lời chúc</button>
+    </nav>`);
 
+  $$('[data-go]').forEach((btn) => btn.addEventListener('click', () => {
+    $('#rsvp-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const target = btn.dataset.go === 'wish' ? $('#rsvp-form [name=message]') : $('#rsvp-form [name=guestName]');
+    setTimeout(() => target?.focus({ preventScroll: true }), 500);
+  }));
+  if (inv.event_at) startCountdown(new Date(inv.event_at));
+  bindRsvp(inv, slug);
+}
+
+function startCountdown(target) {
+  const box = $('#countdown');
+  const tick = () => {
+    const ms = target - Date.now();
+    if (ms <= 0) {
+      render(box, html`<p style="grid-column:1/-1;margin:0">Đám cưới đã diễn ra – cảm ơn bạn đã ghé thăm 💕</p>`);
+      return false;
+    }
+    const parts = [[Math.floor(ms / 864e5), 'Ngày'], [Math.floor(ms / 36e5) % 24, 'Giờ'], [Math.floor(ms / 6e4) % 60, 'Phút'], [Math.floor(ms / 1e3) % 60, 'Giây']];
+    render(box, html`${parts.map(([n, label]) => html`<div><strong>${n}</strong><span>${label}</span></div>`)}`);
+    return true;
+  };
+  if (tick()) {
+    const timer = setInterval(() => { if (!document.body.contains(box) || !tick()) clearInterval(timer); }, 1000);
+  }
+}
+
+function bindRsvp(inv, slug) {
   // Máy này đã gửi phản hồi cho thiệp này → hiện lời cảm ơn, vẫn cho gửi thêm cho người khác (vd người nhà)
   const sentKey = `tramhy-rsvp-${inv.id}`;
   const thanks = (form, name) => {
-    render(form, html`<div class="center stack" style="gap:6px"><h3>Cảm ơn ${name || 'bạn'}!</h3>
+    render(form, html`<div class="center stack" style="gap:6px"><h2>Cảm ơn ${name || 'bạn'}!</h2>
       <p class="muted" style="margin:0">Phản hồi đã được gửi tới cô dâu chú rể.</p>
       <button class="btn btn-link" type="button" data-again>Gửi phản hồi cho người khác</button></div>`);
     form.querySelector('[data-again]').addEventListener('click', () => {
       guestWantsForm = true;
-      renderGuestView(slug);
+      showInvitation(inv, '', slug);
+      $('#rsvp-section').scrollIntoView({ block: 'center' });
     });
   };
   const alreadySent = (() => { try { return localStorage.getItem(sentKey); } catch { return null; } })();
@@ -107,35 +184,141 @@ async function renderGuestView(slug) {
   });
 }
 
+// ---------- THƯ VIỆN MẪU ----------
+function useTemplateUrl(key, profile) {
+  const target = `invitation.html?template=${key}`;
+  return profile ? target : loginUrl(target);
+}
+
+function previewTemplate(key, profile) {
+  const tpl = templateOf(key);
+  openDialog({
+    title: `Mẫu “${tpl.name}”`,
+    confirmText: 'Dùng mẫu này',
+    cancelText: 'Đóng',
+    content: html`<div class="tpl-preview-stage" style="--stage:${tpl.colors.backdrop}">
+      ${invitationPages({ ...SAMPLE_INVITATION, template: key }, { guestName: 'Gia đình bạn Lan', uid: 'dlg' })}</div>`,
+    onConfirm: () => { location.href = useTemplateUrl(key, profile); return true; },
+  });
+}
+
+function renderGallery(profile) {
+  render(page, html`
+    <div class="tpl-hero">
+      <div class="eyebrow">Thiệp cưới online · miễn phí</div>
+      <h1>Mẫu thiệp cưới “chuẩn gu” 2026</h1>
+      <p class="muted">Chọn mẫu, điền tên hai bạn và gia đình, gửi link qua Zalo / Messenger. Khách mở phong bì, xem thiệp,
+        xác nhận tham dự và gửi lời chúc – bạn nhận ngay trên Trạm Hỷ.</p>
+    </div>
+    <div class="tpl-grid">
+      ${INVITATION_TEMPLATES.map((t) => html`
+        <article class="tpl-card" data-template="${t.key}">
+          <button type="button" class="tpl-thumb" style="--stage:${t.colors.backdrop}" data-preview="${t.key}" aria-label="Xem trước mẫu ${t.name}">
+            ${invitationPages({ ...SAMPLE_INVITATION, template: t.key }, { pages: [1], uid: `g-${t.key}` })}
+          </button>
+          <div class="tpl-meta"><strong>${t.name}</strong><span class="badge">${t.tag}</span></div>
+          <div class="tpl-actions">
+            <button type="button" class="btn btn-outline btn-sm" data-preview="${t.key}">Xem thiệp</button>
+            <a class="btn btn-primary btn-sm" href="${useTemplateUrl(t.key, profile)}">Dùng mẫu này</a>
+          </div>
+        </article>`)}
+    </div>
+    ${profile ? html`<p class="center" style="margin-top:20px"><a href="invitation.html">← Quay lại soạn thiệp của bạn</a></p>` : ''}`);
+  $$('[data-preview]').forEach((btn) => btn.addEventListener('click', () => previewTemplate(btn.dataset.preview, profile)));
+}
+
 // ---------- CHỦ THIỆP ----------
+const DETAIL_FIELDS = ['groom_father', 'groom_mother', 'groom_address', 'bride_father', 'bride_mother', 'bride_address', 'venue_address'];
+
 async function renderEditor(profile) {
   let invitation = await getMyInvitation(profile.id);
-  const draft = invitation ?? { groom_name: '', bride_name: '', event_at: null, venue: '', theme: 'gold', bank_code: 'MB', bank_account: '' };
+  const d = invitation?.details ?? {};
+  const draft = {
+    template: param('template') && INVITATION_TEMPLATES.some((t) => t.key === param('template'))
+      ? param('template') : invitation ? invitationTemplateKey(invitation) : 'la-tim',
+    photo_url: invitation?.photo_url ?? null,
+  };
+  const field = (name, label, value, attrs = {}) => html`
+    <label class="field ${attrs.full ? 'full' : ''}"><span>${label}</span>
+      <input class="input" name="${name}" value="${value ?? ''}" maxlength="${attrs.max ?? 80}" placeholder="${attrs.placeholder ?? ''}" ${attrs.required ? 'required' : ''}></label>`;
 
   render(page, html`
-    <div class="section-head"><div><div class="eyebrow">Thiệp cưới online</div><h1>Tạo thiệp & nhận phản hồi khách mời</h1></div></div>
-    <div class="grid-2" style="align-items:start">
-      <form class="card stack" id="editor">
-        <div class="field"><span>Màu thiệp</span>
-          <div class="row" id="themes">${THEMES.map((t) => html`
-            <button type="button" class="swatch ${t.key === draft.theme ? 'active' : ''}" data-theme="${t.key}"
-                    title="${t.label}" style="background:${t.color}"></button>`)}</div></div>
-        <div class="form-grid">
-          <label class="field"><span>Tên chú rể</span><input class="input" name="groom_name" value="${draft.groom_name}" required maxlength="60"></label>
-          <label class="field"><span>Tên cô dâu</span><input class="input" name="bride_name" value="${draft.bride_name}" required maxlength="60"></label>
-          <label class="field full"><span>Thời gian</span>
-            <input class="input" type="datetime-local" name="event_at" value="${toLocalInput(draft.event_at)}" required></label>
-          <label class="field full"><span>Địa điểm</span><input class="input" name="venue" value="${draft.venue || ''}" required maxlength="200"></label>
-          <label class="field"><span>Ngân hàng nhận mừng cưới</span>
-            <select class="input" name="bank_code">${BANKS.map(([code, name]) => html`
-              <option value="${code}" ${code === draft.bank_code ? 'selected' : ''}>${name}</option>`)}</select></label>
-          <label class="field"><span>Số tài khoản</span><input class="input" name="bank_account" value="${draft.bank_account || ''}" pattern="[0-9]{6,20}" inputmode="numeric"></label>
-        </div>
-        <button class="btn btn-primary" type="submit">${invitation ? 'Lưu thay đổi' : 'Tạo thiệp'}</button>
+    <div class="section-head">
+      <div><div class="eyebrow">Thiệp cưới online</div><h1>Soạn thiệp & nhận phản hồi khách mời</h1></div>
+      <a class="btn btn-outline btn-sm" href="invitation.html?mau=1">Xem thư viện mẫu</a>
+    </div>
+    <div class="inv-editor">
+      <form class="card stack" id="editor" novalidate>
+        <section class="inv-form-section">
+          <h3>1. Chọn mẫu thiệp</h3>
+          <div class="tpl-strip" role="radiogroup" aria-label="Mẫu thiệp">
+            ${INVITATION_TEMPLATES.map((t) => html`
+              <button type="button" class="tpl-pick ${t.key === draft.template ? 'active' : ''}" style="--stage:${t.colors.backdrop}"
+                      role="radio" aria-checked="${t.key === draft.template ? 'true' : 'false'}" data-template="${t.key}">
+                ${invitationPages({ ...SAMPLE_INVITATION, template: t.key }, { pages: [1], uid: `p-${t.key}` })}
+                <span>${t.name}</span>
+              </button>`)}
+          </div>
+        </section>
+        <section class="inv-form-section">
+          <h3>2. Cô dâu & chú rể</h3>
+          <div class="form-grid">
+            ${field('groom_name', 'Họ tên chú rể', invitation?.groom_name, { required: true, max: 60, placeholder: 'VD: Nguyễn Minh Khang' })}
+            ${field('bride_name', 'Họ tên cô dâu', invitation?.bride_name, { required: true, max: 60, placeholder: 'VD: Trần Thu Hà' })}
+          </div>
+          <div class="photo-picker">
+            <span id="photo-thumb"></span>
+            <div class="stack" style="gap:6px">
+              <label class="btn btn-outline btn-sm" style="cursor:pointer">📷 Chọn ảnh cưới
+                <input type="file" accept="image/*" id="photo-input" hidden></label>
+              <button type="button" class="btn btn-link btn-sm" id="photo-remove">Bỏ ảnh</button>
+              <span class="small muted">Ảnh hiện trong khung tròn trên thiệp. Không có ảnh thì thiệp dùng chữ lồng tên hai bạn.</span>
+            </div>
+          </div>
+        </section>
+        <section class="inv-form-section">
+          <h3>3. Gia đình hai bên</h3>
+          <div class="form-grid">
+            ${field('groom_father', 'Bố chú rể', d.groom_father)}
+            ${field('groom_mother', 'Mẹ chú rể', d.groom_mother)}
+            ${field('groom_address', 'Địa chỉ nhà trai', d.groom_address, { full: true, max: 160 })}
+            ${field('bride_father', 'Bố cô dâu', d.bride_father)}
+            ${field('bride_mother', 'Mẹ cô dâu', d.bride_mother)}
+            ${field('bride_address', 'Địa chỉ nhà gái', d.bride_address, { full: true, max: 160 })}
+          </div>
+        </section>
+        <section class="inv-form-section">
+          <h3>4. Lễ thành hôn</h3>
+          <div class="host-picker" role="radiogroup" aria-label="Thiệp của nhà nào">
+            <label><input type="radio" name="host" value="trai" ${d.host !== 'gai' ? 'checked' : ''}> Thiệp nhà trai – Lễ thành hôn</label>
+            <label><input type="radio" name="host" value="gai" ${d.host === 'gai' ? 'checked' : ''}> Thiệp nhà gái – Lễ vu quy</label>
+          </div>
+          <label class="field"><span>Giờ làm lễ tại tư gia</span>
+            <input class="input" type="datetime-local" name="ceremony_at" value="${toLocalInput(d.ceremony_at)}"></label>
+        </section>
+        <section class="inv-form-section">
+          <h3>5. Tiệc cưới</h3>
+          <div class="form-grid">
+            <label class="field full"><span>Giờ đãi tiệc</span>
+              <input class="input" type="datetime-local" name="event_at" value="${toLocalInput(invitation?.event_at)}" required></label>
+            ${field('venue', 'Nhà hàng / nơi đãi tiệc', invitation?.venue, { required: true, max: 120, full: true, placeholder: 'VD: Trung tâm tiệc cưới Hoa Sen' })}
+            ${field('venue_address', 'Địa chỉ nhà hàng', d.venue_address, { full: true, max: 160, placeholder: 'Số nhà, đường, quận, thành phố' })}
+          </div>
+        </section>
+        <section class="inv-form-section">
+          <h3>6. Mừng cưới qua chuyển khoản <span class="small muted">(không bắt buộc)</span></h3>
+          <div class="form-grid">
+            <label class="field"><span>Ngân hàng</span>
+              <select class="input" name="bank_code">${BANKS.map(([code, name]) => html`
+                <option value="${code}" ${code === (invitation?.bank_code ?? 'MB') ? 'selected' : ''}>${name}</option>`)}</select></label>
+            <label class="field"><span>Số tài khoản</span><input class="input" name="bank_account" value="${invitation?.bank_account || ''}" pattern="[0-9]{6,20}" inputmode="numeric"></label>
+          </div>
+        </section>
+        <button class="btn btn-primary btn-lg" type="submit">${invitation ? 'Lưu thiệp' : 'Tạo thiệp'}</button>
         <div id="share"></div>
       </form>
       <div class="stack">
-        <div id="preview"></div>
+        <div class="inv-editor-preview" id="preview" aria-label="Xem trước thiệp"></div>
         <div class="card" id="rsvps"></div>
       </div>
     </div>`);
@@ -143,24 +326,82 @@ async function renderEditor(profile) {
   const form = $('#editor');
   const readForm = () => {
     const data = Object.fromEntries(new FormData(form));
-    return { ...data, theme: draft.theme, event_at: data.event_at ? new Date(data.event_at).toISOString() : null };
+    const details = Object.fromEntries(DETAIL_FIELDS.map((k) => [k, (data[k] || '').trim()]).filter(([, v]) => v));
+    details.host = data.host === 'gai' ? 'gai' : 'trai';
+    if (data.ceremony_at) details.ceremony_at = new Date(data.ceremony_at).toISOString();
+    return {
+      groom_name: data.groom_name.trim(),
+      bride_name: data.bride_name.trim(),
+      event_at: data.event_at ? new Date(data.event_at).toISOString() : null,
+      venue: data.venue.trim(),
+      bank_code: data.bank_code,
+      bank_account: data.bank_account.trim() || null,
+      template: draft.template,
+      photo_url: draft.photo_url,
+      details,
+    };
   };
-  const refreshPreview = () => render($('#preview'), invitationCard(readForm()));
+  const stage = () => $('#preview').style.setProperty('--stage', templateOf(draft.template).colors.backdrop);
+  const refreshPreview = () => { stage(); render($('#preview'), invitationPages(readForm(), { uid: 'pv', guestName: 'Tên khách mời' })); };
+  const refreshPhoto = () => render($('#photo-thumb'), draft.photo_url
+    ? html`<img src="${draft.photo_url}" alt="Ảnh cưới đã chọn">` : html`<span class="photo-empty">💑</span>`);
 
   form.addEventListener('input', refreshPreview);
-  $$('[data-theme]').forEach((btn) => btn.addEventListener('click', () => {
-    draft.theme = btn.dataset.theme;
-    $$('[data-theme]').forEach((b) => b.classList.toggle('active', b === btn));
+  $$('[data-template]').forEach((btn) => btn.addEventListener('click', () => {
+    draft.template = btn.dataset.template;
+    $$('[data-template]').forEach((b) => { b.classList.toggle('active', b === btn); b.setAttribute('aria-checked', String(b === btn)); });
     refreshPreview();
   }));
 
+  $('#photo-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const label = e.target.closest('label');
+    label.setAttribute('aria-busy', 'true');
+    try {
+      const url = await uploadInvitationPhoto(profile.id, await compressImage(file, { maxSize: 1400 }));
+      if (draft.photo_url && draft.photo_url !== invitation?.photo_url) removeInvitationPhoto(draft.photo_url);   // ảnh chọn trước đó chưa lưu
+      draft.photo_url = url;
+      refreshPhoto();
+      refreshPreview();
+      toast('Đã tải ảnh lên – bấm Lưu thiệp để cập nhật cho khách mời.', 'success');
+    } catch (error) {
+      toastError(error);
+    } finally {
+      label.removeAttribute('aria-busy');
+    }
+  });
+  $('#photo-remove').addEventListener('click', () => {
+    if (draft.photo_url && draft.photo_url !== invitation?.photo_url) removeInvitationPhoto(draft.photo_url);
+    draft.photo_url = null;
+    refreshPhoto();
+    refreshPreview();
+  });
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const values = readForm();
+    const missing = [['groom_name', values.groom_name], ['bride_name', values.bride_name], ['event_at', values.event_at], ['venue', values.venue]]
+      .find(([, v]) => !v);
+    if (missing) {
+      const input = form.elements[missing[0]];
+      input.focus();
+      toastError(new Error(`Vui lòng điền “${input.closest('label').querySelector('span').textContent}”`));
+      return;
+    }
+    if (values.bank_account && !/^[0-9]{6,20}$/.test(values.bank_account)) {
+      form.elements.bank_account.focus();
+      toastError(new Error('Số tài khoản chỉ gồm 6–20 chữ số'));
+      return;
+    }
     await withBusy(e.submitter, async () => {
       try {
         const isNew = !invitation;
-        invitation = await saveInvitation(profile.id, invitation, readForm());
-        e.submitter.textContent = 'Lưu thay đổi';
+        const oldPhoto = invitation?.photo_url;
+        invitation = await saveInvitation(profile.id, invitation, values);
+        if (oldPhoto && oldPhoto !== invitation.photo_url) removeInvitationPhoto(oldPhoto);
+        e.submitter.textContent = 'Lưu thiệp';
         toast('Đã lưu thiệp.', 'success');
         renderShare(invitation);
         if (isNew) await showRsvps(invitation);       // thiệp vừa tạo → bắt đầu nhận phản hồi
@@ -170,6 +411,7 @@ async function renderEditor(profile) {
     });
   });
 
+  refreshPhoto();
   refreshPreview();
   if (invitation) {
     renderShare(invitation);
@@ -182,19 +424,30 @@ async function renderEditor(profile) {
 function renderShare(invitation) {
   const link = new URL(`invitation.html?i=${invitation.slug}`, location.href).href;
   render($('#share'), html`
-    <div class="card stack" style="background:var(--brand-soft);padding:12px">
+    <div class="card stack" style="background:var(--brand-soft);padding:14px">
       <strong>Link gửi khách mời</strong>
-      <div class="row"><input class="input" value="${link}" readonly style="flex:1">
-        <button class="btn btn-dark btn-sm" type="button" id="copy-link">Sao chép</button></div>
+      <div class="row"><input class="input" value="${link}" readonly style="flex:1" aria-label="Link thiệp">
+        <button class="btn btn-dark btn-sm" type="button" data-copy="${link}">Sao chép</button></div>
       <a class="small" href="${link}" target="_blank" rel="noopener">Mở thử như khách mời →</a>
+      <div class="stack" style="gap:6px">
+        <span class="small"><strong>Mời riêng từng người</strong> – tên khách hiện trên phong bì và thiệp:</span>
+        <div class="row"><input class="input" id="guest-link-name" maxlength="60" placeholder="VD: Anh Tuấn & chị Linh" style="flex:1" aria-label="Tên khách mời">
+          <button class="btn btn-outline btn-sm" type="button" id="guest-link-copy">Sao chép link riêng</button></div>
+      </div>
     </div>`);
-  $('#copy-link').addEventListener('click', async () => {
+  const copy = async (text) => {
     try {
-      await navigator.clipboard.writeText(link);
+      await navigator.clipboard.writeText(text);
       toast('Đã sao chép link.', 'success');
     } catch {
       toast('Không sao chép được – hãy chọn và copy thủ công.');
     }
+  };
+  $('[data-copy]').addEventListener('click', (e) => copy(e.currentTarget.dataset.copy));
+  $('#guest-link-copy').addEventListener('click', () => {
+    const name = $('#guest-link-name').value.trim();
+    if (!name) { $('#guest-link-name').focus(); return; }
+    copy(`${link}&to=${encodeURIComponent(name)}`);
   });
 }
 
@@ -245,9 +498,10 @@ function toLocalInput(iso) {
 // ---------- KHỞI CHẠY TRANG ----------
 try {
   const slug = param('i');
-  await initLayout(slug ? null : 'invitation');
+  const profile = await initLayout(slug ? null : 'invitation');
   if (slug) await renderGuestView(slug);
-  else await renderEditor(await requireAuth());
+  else if (!profile || param('mau') !== null) renderGallery(profile);
+  else await renderEditor(profile);
 } catch (error) {
   toastError(error);
 }

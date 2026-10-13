@@ -65,6 +65,7 @@ exe202/
 │   ├── 19_vendor_packages.sql Gói dịch vụ (mẫu rạp, gói chụp, gói trang điểm, sảnh) + đặt lịch theo gói
 │   ├── 20_wedding_planner.sql Kế hoạch cưới: ngân sách theo nghi lễ + checklist chuẩn bị
 │   ├── 21_ai_planner.sql     Đếm lượt Trợ lý AI trong Kế hoạch cưới (20 câu / người / ngày)
+│   ├── 22_invitation_templates.sql Thiệp cưới: mẫu thiệp, thông tin hai họ (details), ảnh cưới (bucket invitation-photos)
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -184,7 +185,7 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 | Trang chủ, Thử váy, Dịch vụ, Chi tiết đối tác | Không | Đặt lịch thì mới yêu cầu đăng nhập |
 | Đơn của tôi | Có | |
 | Kế hoạch cưới (`ke-hoach.html`) | Có (khách chưa đăng nhập thấy trang giới thiệu) | |
-| Thiệp cưới | Có (soạn) · Không (khách mời xem qua link) | |
+| Thiệp cưới | Không (thư viện mẫu) · Có (soạn) · Không (khách mời xem qua link) | |
 | Kênh đối tác | Vai trò `vendor` + được gắn với tiệm | |
 | Quản trị | Vai trò `admin` | |
 
@@ -308,6 +309,20 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - Giới hạn chống lạm dụng ở server: 40 danh mục, 400 mục chi tiêu, 300 việc / kế hoạch.
 - Kiểm thử: `tests/e2e/flows/planner.spec.js`.
 
+### Thiệp cưới – mẫu thiệp, phong bì (SQL 22)
+- Thiệp vuông 3 trang: **bìa** (tên viết tay, ảnh tròn / chữ lồng, "Trân trọng kính mời" + tên khách) · **gia đình & hôn lễ**
+  (nhà trai, nhà gái, Lễ thành hôn / Lễ vu quy theo bên tổ chức, giờ lễ + **ngày âm lịch**) · **tiệc cưới** (nhà hàng,
+  địa chỉ, giờ tiệc, ảnh với dòng chữ uốn cong). Vẽ bởi `components/invitation-card.js`, CSS riêng `css/invitation.css`
+  (cỡ chữ theo bề rộng trang – container query – nên cùng một thiệp dùng cho ảnh nhỏ, xem trước và trang khách).
+- 6 mẫu tự thiết kế trong `data/invitation-templates.js` (màu + loại họa tiết SVG + font viết tay có tiếng Việt).
+  **Không sao chép mẫu / hình của web khác** – thêm mẫu mới = thêm 1 dòng (và họa tiết nếu cần).
+- Âm lịch: `core/lunar.js` (thuật toán Hồ Ngọc Đức, múi giờ +7, có tháng nhuận, năm can chi).
+- `invitation.html`: chưa đăng nhập (hoặc `?mau=1`) → thư viện mẫu; đăng nhập → trình soạn (`?template=` chọn sẵn);
+  `?i=<slug>&to=<tên>` → khách mời: phong bì ghi "Kính gửi <tên>", chạm con dấu để mở → 3 trang thiệp, đếm ngược,
+  chỉ đường (Google Maps), lưu vào Google Calendar, xác nhận tham dự, QR mừng cưới; thanh nút dưới đáy.
+- Trình soạn có ô "Mời riêng từng người" → sao chép link kèm `&to=`.
+- Ảnh cưới: nén trên trình duyệt rồi tải lên `invitation-photos/<user_id>/…` (công khai); đổi / bỏ ảnh thì xóa ảnh cũ.
+
 ### AI trong Kế hoạch cưới (SQL 21 + function tu-van-ngan-sach chế độ `plan`)
 - **Lưu thành kế hoạch** (trang chủ): cách chia đang xem được giữ trong `localStorage` (`savePlanDraft`, hết hạn 1 ngày) rồi mở
   `ke-hoach.html?from=ai` – chưa đăng nhập thì đăng nhập xong quay lại đúng trang. Chưa có kế hoạch → form tạo điền sẵn và
@@ -404,7 +419,8 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 | ✅ | AI tư vấn chia ngân sách cưới theo số khách, thành phố, ưu tiên | Đã xong (function tu-van-ngan-sach) |
 | ✅ | Kế hoạch cưới: ngân sách theo nghi lễ, checklist, tổng quan | Đã xong (SQL 20) |
 | ✅ | AI trong Kế hoạch cưới: lưu gợi ý AI thành kế hoạch, trợ lý đề xuất sửa từng mục (Áp dụng / Hoàn tác), 20 câu / ngày | Đã xong (SQL 21) |
-| 5 | **Thiệp cưới nâng cấp**: phong bì mở thiệp, mẫu thiệp, album, chuyện tình yêu, sổ lời chúc (cô dâu duyệt), nhạc | SQL + `frontend/` |
+| ✅ | Thiệp cưới: 6 mẫu thiệp 3 trang, phong bì mở thiệp, hai họ, âm lịch, ảnh cưới, link mời riêng | Đã xong (SQL 22) |
+| 5 | **Thiệp cưới (tiếp)**: album, chuyện tình yêu, sổ lời chúc (cô dâu duyệt), nhạc | SQL + `frontend/` |
 | 6 | **Tự xóa ảnh cô dâu sau 24 giờ** (cam kết bảo mật trong báo cáo) | Scheduled Edge Function |
 | 7 | Đo lường hành vi (Vercel Analytics) để có số liệu cho báo cáo | `frontend/` |
 | 8 | Ảnh xem trước khi chia sẻ link thiệp / tiệm qua Zalo, Facebook | `frontend/` |
