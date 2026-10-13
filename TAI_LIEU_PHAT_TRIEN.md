@@ -345,7 +345,9 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - **Nhạc nền** (`components/wedding-music.js`): 3 bản "hộp nhạc" – Canon in D, Here Comes the Bride, Ode to Joy (giai điệu
   đã hết bản quyền, trình duyệt tự chơi bằng Web Audio, không có file âm thanh) hoặc link YouTube cô dâu tự dán (phát qua
   youtube-nocookie, điều khiển bằng postMessage). Phát khi khách chạm con dấu mở phong bì; nút ♪ bật / tắt.
-  Lưu ý: Safari trên iPhone có thể chặn YouTube tự phát → khách bấm nút ♪.
+  Điện thoại chỉ cho phát tiếng ngay trong lúc chạm: khung YouTube được tải sẵn khi khách mở link (`prepare()`),
+  lúc chạm con dấu chỉ gửi lệnh `playVideo`; hộp nhạc "mở khóa" âm thanh bằng 1 mẫu âm câm. Nút ♪ hiện trạng thái THẬT
+  (trình phát báo về qua `onState`) → nếu máy vẫn chặn, nút hiện "tắt" và khách bấm 1 lần là nghe.
 - **Sổ lời chúc** (SQL 24, bảng `guestbook_entries`): khách gửi → "chờ duyệt", chỉ lời chúc đã duyệt mới hiện cho mọi người
   (RLS). Chủ thiệp duyệt / ẩn / xóa ở trang soạn (mục Sổ lời chúc, có realtime + thông báo chuông). Chủ thiệp chỉ được đổi
   cột `status` (quyền theo cột), không sửa được lời của khách. Chống spam giống phản hồi: chặn link, ≤ 3 lời / tên / thiệp,

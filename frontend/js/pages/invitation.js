@@ -67,13 +67,16 @@ async function renderGuestView(slug) {
       </div>
     </div>`);
 
+  // Tải sẵn trình phát nhạc ngay khi khách mở link (YouTube cần vài giây để sẵn sàng)
+  guestMusic = createWeddingMusic(inv.details?.music, { onState: showMusicState });
+  guestMusic?.prepare();
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const open = () => {
     $('.envelope').classList.add('is-open');
     $('.inv-intro').classList.add('is-leaving');
-    // Trình duyệt chỉ cho phát tiếng ngay trong lúc khách chạm → bật nhạc ở đây
-    guestMusic = createWeddingMusic(inv.details?.music);
-    guestMusic?.play().catch(() => {});
+    // Điện thoại chỉ cho phát tiếng NGAY trong lúc khách chạm → gọi play() đồng bộ ở đây (không await trước)
+    musicPlaying = Boolean(guestMusic);
+    guestMusic?.play().catch(() => showMusicState(false));
     setTimeout(() => showInvitation(inv, guestName, slug), reduced ? 50 : 2000);
   };
   $('[data-open-envelope]').addEventListener('click', open, { once: true });
@@ -81,7 +84,17 @@ async function renderGuestView(slug) {
 }
 
 let guestMusic = null;
-let musicOn = true;
+let musicPlaying = false;   // trạng thái THẬT do trình phát báo về (điện thoại có thể chặn tự phát)
+
+function showMusicState(playing) {
+  musicPlaying = playing;
+  const btn = $('[data-music]');
+  if (!btn) return;
+  btn.classList.toggle('is-playing', playing);
+  btn.setAttribute('aria-pressed', String(playing));
+  btn.setAttribute('aria-label', playing ? 'Tắt nhạc nền' : 'Bật nhạc nền');
+  btn.title = playing ? 'Tắt nhạc' : 'Bấm để nghe nhạc';
+}
 
 function showInvitation(inv, guestName, slug) {
   const qr = giftQrUrl(inv);
@@ -154,8 +167,8 @@ function showInvitation(inv, guestName, slug) {
       <button type="button" class="btn" data-go="rsvp">💌 Xác nhận tham dự</button>
       <button type="button" class="btn" data-go="wish">💬 Gửi lời chúc</button>
     </nav>
-    ${guestMusic ? html`<button type="button" class="music-toggle ${musicOn ? 'is-playing' : ''}" data-music
-        aria-pressed="${musicOn ? 'true' : 'false'}" aria-label="${musicOn ? 'Tắt nhạc nền' : 'Bật nhạc nền'}">♪</button>` : ''}`);
+    ${guestMusic ? html`<button type="button" class="music-toggle" data-music>♪</button>` : ''}`);
+  showMusicState(musicPlaying);
 
   $$('[data-go]').forEach((btn) => btn.addEventListener('click', () => {
     const wish = btn.dataset.go === 'wish';
@@ -163,12 +176,14 @@ function showInvitation(inv, guestName, slug) {
     const target = wish ? ($('#wish-form [name=message]') ?? $('#wish-form')) : $('#rsvp-form [name=guestName]');
     setTimeout(() => target?.focus({ preventScroll: true }), 500);
   }));
-  $('[data-music]')?.addEventListener('click', (e) => {
-    musicOn = !musicOn;
-    if (musicOn) guestMusic.play().catch(() => {}); else guestMusic.pause();
-    e.currentTarget.classList.toggle('is-playing', musicOn);
-    e.currentTarget.setAttribute('aria-pressed', String(musicOn));
-    e.currentTarget.setAttribute('aria-label', musicOn ? 'Tắt nhạc nền' : 'Bật nhạc nền');
+  // 1 lần bấm: đang phát → tắt; đang tắt (hoặc bị điện thoại chặn) → phát
+  $('[data-music]')?.addEventListener('click', () => {
+    if (musicPlaying) {
+      guestMusic.pause();
+    } else {
+      showMusicState(true);
+      guestMusic.play().catch(() => showMusicState(false));
+    }
   });
   $$('[data-photo]').forEach((btn) => btn.addEventListener('click', () => openPhotoGallery({
     title: 'Album ảnh cưới', subtitle: `${inv.groom_name} & ${inv.bride_name}`, images: album, start: Number(btn.dataset.photo),

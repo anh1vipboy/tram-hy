@@ -61,7 +61,7 @@ export const MUSIC_TRACKS = [
 export const trackOf = (key) => MUSIC_TRACKS.find((t) => t.key === key) ?? MUSIC_TRACKS[0];
 
 // ---------- HỘP NHẠC (Web Audio) ----------
-function musicBox(track) {
+function musicBox(track, onState) {
   const spb = 60 / track.bpm;   // giây mỗi phách
   const events = [
     ...parse(track.melody).filter((e) => e.note !== 'r').map((e) => ({ ...e, vol: 0.2, decay: 1.7, bell: true })),
@@ -126,20 +126,40 @@ function musicBox(track) {
     }
   }
 
+  let wanted = false;   // người xem muốn nghe (để báo đúng trạng thái khi trình duyệt tự tạm dừng âm thanh)
+  const report = () => onState?.(wanted && ctx?.state === 'running');
+
   return {
-    async play() {
-      if (!ctx) setup();
-      await ctx.resume();
-      // tiếp tục từ nốt đang dở
-      base = ctx.currentTime + 0.12 - (loop * loopBeats + events[idx].beat) * spb;
-      master.gain.cancelScheduledValues(ctx.currentTime);
-      master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-      master.gain.linearRampToValueAtTime(0.9, ctx.currentTime + 1.2);
-      clearInterval(timer);
-      schedule();
-      timer = setInterval(schedule, 60);
+    prepare() {},
+    // Gọi NGAY trong lúc người dùng chạm (không await trước) – iPhone chỉ mở tiếng trong lúc chạm
+    play() {
+      wanted = true;
+      if (!ctx) {
+        setup();
+        ctx.onstatechange = report;
+      }
+      // "Mở khóa" âm thanh trên iPhone: phát 1 mẫu âm câm ngay trong lúc chạm
+      const silent = ctx.createBufferSource();
+      silent.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+      silent.connect(ctx.destination);
+      silent.start(0);
+      const resumed = ctx.resume();
+      const start = () => {
+        if (!wanted) return;
+        base = ctx.currentTime + 0.12 - (loop * loopBeats + events[idx].beat) * spb;   // tiếp tục từ nốt đang dở
+        master.gain.cancelScheduledValues(ctx.currentTime);
+        master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
+        master.gain.linearRampToValueAtTime(0.9, ctx.currentTime + 1.2);
+        clearInterval(timer);
+        schedule();
+        timer = setInterval(schedule, 60);
+        report();
+      };
+      return resumed.then(start, () => report());
     },
     pause() {
+      wanted = false;
+      report();
       if (!ctx) return;
       clearInterval(timer);
       timer = null;
@@ -160,26 +180,71 @@ export function youtubeIdFrom(input) {
   return m ? m[1] : null;
 }
 
-function youtubePlayer(id) {
+// Trình phát YouTube ẩn, điều khiển qua postMessage (API nhúng chính thức của YouTube).
+// Điện thoại chặn tự phát nếu khung YouTube được tạo đúng lúc chạm (tải xong thì "lần chạm" đã hết hiệu lực)
+// → prepare() tải sẵn khung khi khách vừa mở link; lúc chạm con dấu chỉ việc gửi lệnh playVideo.
+function youtubePlayer(id, onState) {
+  const ORIGIN = 'https://www.youtube-nocookie.com';
   let frame = null;
-  const command = (func) => frame?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func, args: [] }), '*');
+  let ready = false;
+  let wanted = false;
+  let checkTimer = null;
+  const send = (data) => frame?.contentWindow?.postMessage(JSON.stringify(data), ORIGIN);
+  const command = (func, args = []) => send({ event: 'command', func, args, id: 'tramhy-music', channel: 'widget' });
+
+  window.addEventListener('message', (e) => {
+    if (!frame || e.source !== frame.contentWindow) return;
+    let data;
+    try { data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch { return; }
+    if (data?.event === 'onReady' && !ready) {
+      ready = true;
+      if (wanted) { command('unMute'); command('playVideo'); }
+    }
+    // playerState: 1 đang phát, 2 tạm dừng, 0 hết bài, 3 đang tải, -1 / 5 chưa phát
+    const state = data?.event === 'onStateChange' ? data.info : data?.info?.playerState;
+    if (state === 1) { clearTimeout(checkTimer); onState?.(true); }
+    if (state === 2 || state === 0) onState?.(false);
+  });
+
+  const prepare = () => {
+    if (frame) return;
+    frame = document.createElement('iframe');
+    frame.className = 'music-frame';
+    frame.title = 'Nhạc nền thiệp cưới';
+    frame.allow = 'autoplay; encrypted-media';
+    frame.src = `${ORIGIN}/embed/${id}?enablejsapi=1&loop=1&playlist=${id}&controls=0&playsinline=1&rel=0`
+      + `&origin=${encodeURIComponent(location.origin)}`;
+    frame.addEventListener('load', () => send({ event: 'listening', id: 'tramhy-music', channel: 'widget' }));
+    document.body.append(frame);
+  };
+
   return {
-    async play() {
-      if (frame) { command('playVideo'); return; }
-      frame = document.createElement('iframe');
-      frame.className = 'music-frame';
-      frame.title = 'Nhạc nền thiệp cưới';
-      frame.allow = 'autoplay; encrypted-media';
-      frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=0&playsinline=1&rel=0&enablejsapi=1`;
-      document.body.append(frame);
+    prepare,
+    play() {
+      wanted = true;
+      prepare();
+      if (ready) { command('unMute'); command('playVideo'); }
+      // Không thấy "đang phát" sau vài giây (điện thoại chặn) → nút ♪ hiện "tắt", khách bấm 1 lần là phát
+      clearTimeout(checkTimer);
+      checkTimer = setTimeout(() => onState?.(false), 4000);
+      return Promise.resolve();
     },
-    pause() { command('pauseVideo'); },
+    pause() {
+      wanted = false;
+      clearTimeout(checkTimer);
+      command('pauseVideo');
+      onState?.(false);
+    },
   };
 }
 
-/** music: { kind: 'box', track } | { kind: 'youtube', id } | null → trình phát { play, pause } hoặc null */
-export function createWeddingMusic(music) {
-  if (music?.kind === 'youtube' && youtubeIdFrom(music.id)) return youtubePlayer(youtubeIdFrom(music.id));
-  if (music?.kind === 'box') return musicBox(trackOf(music.track));
+/**
+ * music: { kind: 'box', track } | { kind: 'youtube', id } | null → trình phát { prepare, play, pause } hoặc null
+ * onState(playing): báo trạng thái THẬT (đang phát hay không) để nút bật / tắt hiển thị đúng.
+ * play() phải được gọi ngay trong sự kiện chạm / bấm của người dùng.
+ */
+export function createWeddingMusic(music, { onState } = {}) {
+  if (music?.kind === 'youtube' && youtubeIdFrom(music.id)) return youtubePlayer(youtubeIdFrom(music.id), onState);
+  if (music?.kind === 'box') return musicBox(trackOf(music.track), onState);
   return null;
 }
