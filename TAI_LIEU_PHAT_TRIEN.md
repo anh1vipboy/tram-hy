@@ -64,6 +64,7 @@ exe202/
 │   ├── 18_notifications.sql  Chuông thông báo: bảng notifications + trigger tự tạo thông báo
 │   ├── 19_vendor_packages.sql Gói dịch vụ (mẫu rạp, gói chụp, gói trang điểm, sảnh) + đặt lịch theo gói
 │   ├── 20_wedding_planner.sql Kế hoạch cưới: ngân sách theo nghi lễ + checklist chuẩn bị
+│   ├── 21_ai_planner.sql     Đếm lượt Trợ lý AI trong Kế hoạch cưới (20 câu / người / ngày)
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -261,6 +262,7 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - Model hay bị Google báo **quá tải (503)** → function thử lại 1 lần rồi chuyển lần lượt `gemini-3.8-flash` → `gemini-3.1-flash-lite` → `gemini-3.7-flash` → `gemini-3-flash-preview`. Tất cả đều bận → web báo "AI đang quá tải" và tự hiện cách chia cố định, người dùng không bị kẹt. Muốn ưu tiên model khác: secret `GEMINI_TEXT_MODEL`.
 - Khách chưa đăng nhập cũng dùng được (deploy `--no-verify-jwt`): trong `backend/` chạy `npx supabase functions deploy tu-van-ngan-sach --project-ref vsjdijmuvuetmhmszcrl --no-verify-jwt`.
 - Test Playwright giả lập phản hồi của function (`page.route`) nên không tốn lượt gọi Gemini.
+- Dưới bảng chia có nút **💾 Lưu thành kế hoạch cưới** → mang cách chia sang trang Kế hoạch (xem mục SQL 20–21).
 
 ### Quên mật khẩu
 - Trang Đăng nhập → **Quên mật khẩu?** → nhập email → Supabase gửi link về `reset-password.html` → nhập mật khẩu mới 2 lần → tự đăng nhập và vào đúng trang theo vai trò.
@@ -305,6 +307,22 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
   đang lưu dở mà đóng / tải lại trang thì trình duyệt hỏi lại). Kéo thả bằng `components/sortable.js` (chạy cả cảm ứng).
 - Giới hạn chống lạm dụng ở server: 40 danh mục, 400 mục chi tiêu, 300 việc / kế hoạch.
 - Kiểm thử: `tests/e2e/flows/planner.spec.js`.
+
+### AI trong Kế hoạch cưới (SQL 21 + function tu-van-ngan-sach chế độ `plan`)
+- **Lưu thành kế hoạch** (trang chủ): cách chia đang xem được giữ trong `localStorage` (`savePlanDraft`, hết hạn 1 ngày) rồi mở
+  `ke-hoach.html?from=ai` – chưa đăng nhập thì đăng nhập xong quay lại đúng trang. Chưa có kế hoạch → form tạo điền sẵn và
+  số "Dự kiến" lấy theo cách chia AI (`spreadAllocations`: danh mục có loại tiệm nhận tiền hạng mục đó, danh mục lễ hỏi / nhẫn /
+  thiệp chia nhau hạng mục "other", trong nhóm chia theo tỷ trọng mẫu). Đã có kế hoạch → hộp thoại hỏi có áp vào không
+  (chỉ đổi mục chưa trả; thực tế và đơn Trạm Hỷ giữ nguyên). Cách chia nhanh (không AI) chỉ mang sang tổng tiền.
+- **Tab ✨ Hỏi AI** (`components/plan-assistant.js`): Edge Function **tự đọc kế hoạch + đơn đặt của người hỏi ở server**
+  (không tin số trình duyệt gửi), mỗi mục có mã ngắn i1, i2… AI trả `changes` → web hiện thẻ đề xuất: tick chọn từng mục,
+  tổng trước → sau (còn vượt hay đã trong ngân sách), **Áp dụng** rồi **Hoàn tác** được. Không bấm thì không đổi gì.
+  Server bỏ đề xuất cho mục đã trả / mã lạ, làm tròn 100.000đ. Nút **✨ Hỏi AI về ngân sách** và **Hỏi AI cách cân đối**
+  (khi vượt ngân sách) ở tab Ngân sách mở thẳng tab này.
+- **Giới hạn 20 câu / người / ngày** (giờ Việt Nam) đếm ở server bằng bảng `ai_usage`; chỉ câu trả lời thành công mới bị tính.
+- Deploy lại function sau khi chạy SQL 21: trong `backend/` chạy
+  `npx supabase functions deploy tu-van-ngan-sach --project-ref vsjdijmuvuetmhmszcrl --no-verify-jwt`
+  (chế độ `plan` tự kiểm tra đăng nhập bằng token gửi lên).
 
 ### Chuông thông báo (SQL 18)
 - Chuông 🔔 cạnh avatar (máy tính: thả xuống · điện thoại: tấm trượt từ dưới lên), số chưa đọc trên chuông và
@@ -385,7 +403,8 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 | ✅ | AI thử váy thật (Gemini, sẵn chỗ cắm FASHN), 5 lượt/người/ngày | Đã xong (SQL 11 + function thu-vay-ai) |
 | ✅ | AI tư vấn chia ngân sách cưới theo số khách, thành phố, ưu tiên | Đã xong (function tu-van-ngan-sach) |
 | ✅ | Kế hoạch cưới: ngân sách theo nghi lễ, checklist, tổng quan | Đã xong (SQL 20) |
-| 5 | **AI trong Kế hoạch cưới**: lưu gợi ý AI thành kế hoạch, AI chia chi tiết, hỏi AI về kế hoạch, giới hạn lượt / ngày | Edge Function + `frontend/` |
+| ✅ | AI trong Kế hoạch cưới: lưu gợi ý AI thành kế hoạch, trợ lý đề xuất sửa từng mục (Áp dụng / Hoàn tác), 20 câu / ngày | Đã xong (SQL 21) |
+| 5 | **Thiệp cưới nâng cấp**: phong bì mở thiệp, mẫu thiệp, album, chuyện tình yêu, sổ lời chúc (cô dâu duyệt), nhạc | SQL + `frontend/` |
 | 6 | **Tự xóa ảnh cô dâu sau 24 giờ** (cam kết bảo mật trong báo cáo) | Scheduled Edge Function |
 | 7 | Đo lường hành vi (Vercel Analytics) để có số liệu cho báo cáo | `frontend/` |
 | 8 | Ảnh xem trước khi chia sẻ link thiệp / tiệm qua Zalo, Facebook | `frontend/` |

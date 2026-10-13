@@ -6,10 +6,11 @@ test('tạo kế hoạch cưới, sửa ngân sách, đánh dấu đã trả, ch
   test.setTimeout(120_000);
   const bride = await openAs(browser, 'bride');
   await bride.goto('/ke-hoach.html');
-  await expect(bride.locator('#planner-root .empty')).toHaveCount(0, { timeout: 20_000 });
+  const reset = bride.getByRole('button', { name: 'Làm lại kế hoạch từ đầu' });
+  await expect(bride.locator('.planner-create').or(reset)).toBeVisible({ timeout: 30_000 });
 
   // Có kế hoạch từ lần chạy trước → làm lại từ đầu
-  if (await bride.getByRole('button', { name: 'Làm lại kế hoạch từ đầu' }).isVisible().catch(() => false)) {
+  if (await reset.isVisible()) {
     await bride.getByRole('button', { name: 'Làm lại kế hoạch từ đầu' }).click();
     await bride.locator('dialog.modal').getByRole('button', { name: 'Xóa & làm lại' }).click();
   }
@@ -84,4 +85,107 @@ test('chưa đăng nhập: trang Kế hoạch cưới giới thiệu tính năng
   await guest.goto('/ke-hoach.html');
   await expect(guest.getByText('Ngân sách theo nghi lễ')).toBeVisible();
   await expect(guest.getByRole('link', { name: /Đăng nhập để lập kế hoạch/ })).toHaveAttribute('href', /login\.html\?next=ke-hoach\.html/);
+});
+
+// Có sẵn kế hoạch (test trên để lại) – chạy riêng thì tự tạo
+async function ensurePlan(page) {
+  await page.goto('/ke-hoach.html?tab=budget');
+  const create = page.locator('.planner-create');
+  await expect(page.locator('.planner-create, #panel-budget .budget-category').first()).toBeVisible({ timeout: 20_000 });
+  if (await create.isVisible()) {
+    await create.getByLabel('Tổng ngân sách').fill('300000000');
+    await create.getByRole('button', { name: 'Tạo kế hoạch cưới' }).click();
+    await expect(page.locator('#panel-budget .budget-category').first()).toBeVisible({ timeout: 20_000 });
+  }
+}
+
+test('trợ lý AI: đề xuất sửa từng mục → bỏ chọn 1 mục → áp dụng → tab Ngân sách đổi số → hoàn tác', async ({ browser }) => {
+  requireAccounts('bride');
+  test.setTimeout(120_000);
+  const bride = await openAs(browser, 'bride');
+  await ensurePlan(bride);
+
+  const rowOf = (name) => bride.locator('#panel-budget .budget-row', { has: bride.locator(`input[value^="${name}"]`) });
+  const firstId = await rowOf('Váy cưới').getAttribute('data-item');
+  const secondId = await rowOf('Đồ uống').getAttribute('data-item');
+  const before = await rowOf('Váy cưới').locator('[data-field="estimated"]').inputValue();
+
+  // Giả lập Edge Function (không tốn lượt Gemini); kiểm tra web gửi đúng chế độ plan
+  let sent;
+  await bride.route('**/functions/v1/tu-van-ngan-sach', (route) => {
+    sent = route.request().postDataJSON();
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+      source: 'ai',
+      reply: 'Bạn có thể giảm tiền váy và đồ uống để cân đối.',
+      remaining: 17,
+      changes: [
+        { id: firstId, name: 'Váy cưới', category: 'Trang phục', from: 12_000_000, to: 9_900_000, reason: 'Thuê thay vì may' },
+        { id: secondId, name: 'Đồ uống', category: 'Tiệc cưới', from: 12_000_000, to: 8_000_000, reason: 'Bia nội' },
+      ],
+    }) });
+  });
+
+  // Nút ở tab Ngân sách mở tab Trợ lý AI
+  await bride.locator('#panel-budget [data-ask-ai=""]').click();
+  const ai = bride.locator('#panel-ai');
+  await expect(bride.getByRole('tab', { name: '✨ Hỏi AI' })).toHaveClass(/active/);
+  await expect(ai.getByPlaceholder(/Hỏi về kế hoạch cưới/)).toBeFocused();
+  await ai.getByPlaceholder(/Hỏi về kế hoạch cưới/).fill('Giúp mình cân đối ngân sách');
+  await ai.getByRole('button', { name: 'Gửi' }).click();
+
+  await expect(ai.locator('.msg.ai').last()).toContainText('giảm tiền váy');
+  expect(sent).toMatchObject({ mode: 'plan', question: 'Giúp mình cân đối ngân sách' });
+  await expect(ai.locator('[data-remaining]')).toHaveText('Còn 17/20 câu hôm nay');
+
+  const card = ai.locator('.ai-proposal');
+  await expect(card).toContainText('Đề xuất điều chỉnh · 2 mục');
+  await expect(card.getByRole('button', { name: 'Áp dụng 2 thay đổi' })).toBeVisible();
+  await card.getByRole('checkbox').nth(1).uncheck();                         // chỉ lấy đề xuất váy
+  await card.getByRole('button', { name: 'Áp dụng 1 thay đổi' }).click();
+  await expect(card).toContainText('✓ Đã áp dụng 1 thay đổi');
+
+  await bride.getByRole('tab', { name: 'Ngân sách' }).click();
+  await expect(rowOf('Váy cưới').locator('[data-field="estimated"]')).toHaveValue('9.900.000');
+  await expect(rowOf('Đồ uống').locator('[data-field="estimated"]')).not.toHaveValue('8.000.000');
+
+  // Hoàn tác → trở lại số cũ
+  await bride.getByRole('tab', { name: '✨ Hỏi AI' }).click();
+  await card.getByRole('button', { name: '↶ Hoàn tác' }).click();
+  await expect(card).toContainText('Đã hoàn tác');
+  await bride.getByRole('tab', { name: 'Ngân sách' }).click();
+  await expect(rowOf('Váy cưới').locator('[data-field="estimated"]')).toHaveValue(before);
+});
+
+test('trang chủ: "Lưu thành kế hoạch cưới" mang cách chia AI sang kế hoạch đang có', async ({ browser }) => {
+  requireAccounts('bride');
+  test.setTimeout(120_000);
+  const bride = await openAs(browser, 'bride');
+  await ensurePlan(bride);
+  await bride.route('**/functions/v1/tu-van-ngan-sach', (route) => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify({
+      source: 'ai', tips: [], warning: '',
+      allocations: [
+        { category: 'venue', label: 'Nhà hàng tiệc', amount: 200_000_000, percent: 50, reason: '' },
+        { category: 'studio', label: 'Chụp ảnh cưới', amount: 40_000_000, percent: 10, reason: '' },
+        { category: 'bridal', label: 'Váy cưới', amount: 40_000_000, percent: 10, reason: '' },
+        { category: 'decor', label: 'Trang trí', amount: 40_000_000, percent: 10, reason: '' },
+        { category: 'makeup', label: 'Trang điểm', amount: 20_000_000, percent: 5, reason: '' },
+        { category: 'other', label: 'Chi phí khác & dự phòng', amount: 60_000_000, percent: 15, reason: '' },
+      ],
+    }),
+  }));
+
+  await bride.goto('/index.html');
+  await bride.locator('#budget-input').fill('400000000');
+  await bride.locator('#ai-budget-btn').click();
+  await expect(bride.locator('#budget-source')).toContainText('Gợi ý bởi AI');
+  await bride.getByRole('button', { name: '💾 Lưu thành kế hoạch cưới' }).click();
+
+  await expect(bride).toHaveURL(/ke-hoach\.html/);
+  const dialog = bride.locator('dialog.modal');
+  await expect(dialog).toContainText('Áp dụng cách chia AI vào kế hoạch?');
+  await expect(dialog).toContainText('Tiệc 200.000.000đ');
+  await dialog.getByRole('button', { name: /^Áp dụng/ }).click();
+  await expect(bride.locator('.toast-success', { hasText: 'Đã áp dụng cách chia AI' })).toBeVisible({ timeout: 20_000 });
+  await expect(bride.locator('#panel-budget .budget-total')).toContainText('400.000.000đ');
 });

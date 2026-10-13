@@ -1,23 +1,28 @@
-// Trang "Đám cưới của tôi" (ke-hoach.html): Tổng quan · Ngân sách · Checklist
+// Trang "Đám cưới của tôi" (ke-hoach.html): Tổng quan · Ngân sách · Checklist · Trợ lý AI
 import { initLayout } from '../core/layout.js';
 import { loginUrl } from '../core/auth.js';
 import { $, $$, html, render, money } from '../core/utils.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
-import { getPlan, createPlan, updatePlan, deletePlan } from '../services/planner.js';
+import { getPlan, createPlan, updatePlan, deletePlan, readPlanDraft, spreadAllocations, applyEstimates } from '../services/planner.js';
 import { listMyBookings } from '../services/bookings.js';
 import { REGION_LABEL } from '../data/planner-templates.js';
 import { moneyValue, readMoneyField } from '../components/money-input.js';
 import { mountBudgetBoard, budgetTotals } from '../components/budget-board.js';
 import { mountChecklistBoard, checklistProgress, nextTasks, dueLabel } from '../components/checklist-board.js';
 import { listBudget, listChecklist } from '../services/planner.js';
+import { mountPlanAssistant } from '../components/plan-assistant.js';
+import { trackSave } from '../components/save-status.js';
 
 const root = $('#planner-root');
-const TABS = [['overview', 'Tổng quan'], ['budget', 'Ngân sách'], ['checklist', 'Checklist']];
+const TABS = [['overview', 'Tổng quan'], ['budget', 'Ngân sách'], ['checklist', 'Checklist'], ['ai', '✨ Hỏi AI']];
 let profile = null;
 let plan = null;
 let bookings = [];
 let tab = new URLSearchParams(location.search).get('tab') || 'overview';
 let mounted = {};
+let budgetBoard = null;   // Promise<{ reload }>
+let assistant = null;     // { ask }
+const fromAi = new URLSearchParams(location.search).get('from') === 'ai';
 
 // ---------- CHƯA ĐĂNG NHẬP ----------
 function renderGuest() {
@@ -30,22 +35,31 @@ function renderGuest() {
            ['📊', 'Theo dõi trực quan', 'Biết ngay đã dự kiến bao nhiêu, đã trả bao nhiêu, còn bao nhiêu ngày.']]
           .map(([icon, title, text]) => html`<div class="planner-feature"><span>${icon}</span><strong>${title}</strong><p class="small muted">${text}</p></div>`)}
       </div>
-      <a class="btn btn-primary btn-lg" href="${loginUrl('ke-hoach.html')}">Đăng nhập để lập kế hoạch – miễn phí</a>
+      ${readPlanDraft() ? html`<div class="notice small">✨ Cách chia ngân sách bạn vừa xem đã được giữ lại – đăng nhập là lưu ngay vào kế hoạch.</div>` : ''}
+      <a class="btn btn-primary btn-lg" href="${loginUrl(`ke-hoach.html${fromAi ? '?from=ai' : ''}`)}">Đăng nhập để lập kế hoạch – miễn phí</a>
     </section>`);
 }
 
+const AI_GROUP_LABEL = { venue: 'Tiệc', studio: 'Ảnh', bridal: 'Váy', decor: 'Trang trí', makeup: 'Trang điểm', other: 'Lễ hỏi, nhẫn, thiệp & khác' };
+const draftSummary = (draft) => draft.allocations.map((a) => `${AI_GROUP_LABEL[a.category] ?? a.category} ${money(a.amount)}`).join(' · ');
+
 // ---------- CHƯA CÓ KẾ HOẠCH: tạo nhanh ----------
 function renderCreate() {
+  const draft = readPlanDraft();   // mang sang từ "Gợi ý chia ngân sách" ở trang chủ
   render(root, html`
     <form class="card stack planner-create" novalidate>
       <div><h2 style="margin:0">Bắt đầu kế hoạch cưới</h2>
         <p class="muted" style="margin:4px 0 0">Mất 30 giây – Trạm Hỷ tạo sẵn danh mục chi tiêu và việc cần làm, bạn chỉ việc chỉnh theo ý mình.</p></div>
+      ${draft ? html`<div class="notice small planner-draft">
+        <strong>${draft.allocations.length ? '✨ Dùng cách chia AI bạn vừa xem ở trang chủ' : '✨ Đã điền sẵn thông tin bạn vừa nhập ở trang chủ'}</strong>
+        ${draft.allocations.length ? html`<span class="muted">${draftSummary(draft)}</span>` : ''}
+      </div>` : ''}
       <div class="form-grid">
         <label class="field"><span>Ngày cưới (dự kiến)</span><input class="input" type="date" name="weddingDate"></label>
         <label class="field"><span>Tổng ngân sách</span>
-          <input class="input" name="totalBudget" data-money inputmode="numeric" placeholder="VD: 300.000.000"></label>
-        <label class="field"><span>Số khách mời dự kiến</span><input class="input" type="number" name="guests" min="10" max="5000" step="10" placeholder="VD: 300"></label>
-        <label class="field"><span>Thành phố</span><input class="input" name="city" maxlength="60" placeholder="VD: Hà Nội"></label>
+          <input class="input" name="totalBudget" data-money inputmode="numeric" placeholder="VD: 300.000.000" value="${draft ? moneyValue(draft.total) : ''}"></label>
+        <label class="field"><span>Số khách mời dự kiến</span><input class="input" type="number" name="guests" min="10" max="5000" step="10" placeholder="VD: 300" value="${draft?.guests ?? ''}"></label>
+        <label class="field"><span>Thành phố</span><input class="input" name="city" maxlength="60" placeholder="VD: Hà Nội" value="${draft?.city ?? ''}"></label>
       </div>
       <fieldset class="field region-picker"><legend>Phong tục cưới hỏi</legend>
         <div class="row">
@@ -63,13 +77,19 @@ function renderCreate() {
     withBusy(e.submitter, async () => {
       try {
         const totalBudget = readMoneyField(form.get('totalBudget'), 'Tổng ngân sách', { min: 10_000_000, required: false }) ?? 0;
+        // Đổi tổng ngân sách so với lúc AI chia → co giãn cách chia theo tỷ lệ
+        const allocations = draft?.allocations.length && totalBudget
+          ? draft.allocations.map((a) => ({ ...a, amount: Math.round((a.amount * totalBudget) / draft.total) }))
+          : undefined;
         plan = await createPlan(profile.id, {
           weddingDate: form.get('weddingDate') || null,
           region: form.get('region'),
           totalBudget,
           guests: Number(form.get('guests')) || null,
           city: form.get('city').trim(),
+          allocations,
         });
+        readPlanDraft({ remove: true });
         toast('Đã tạo kế hoạch cưới! Hãy chỉnh từng mục cho đúng với đám cưới của bạn.', 'success');
         tab = 'budget';
         renderPlan();
@@ -90,8 +110,52 @@ function renderPlan() {
     </div>
     ${TABS.map(([key]) => html`<section class="planner-panel" id="panel-${key}" ${key === tab ? '' : 'hidden'}></section>`)}`);
   mounted = {};
+  budgetBoard = null;
+  assistant = null;
   $$('[data-tab]').forEach((btn) => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
   showTab(tab);
+}
+
+const currentTotals = async () => budgetTotals(await listBudget(plan.id), bookings, plan);
+
+function mountAssistant() {
+  assistant = mountPlanAssistant($('#panel-ai'), {
+    profile,
+    plan,
+    getTotals: currentTotals,
+    onApplied: () => budgetBoard?.then((board) => board.reload()),   // tab Ngân sách cập nhật số mới
+  });
+}
+
+// Đã có kế hoạch mà vừa bấm "Lưu thành kế hoạch" ở trang chủ → hỏi có áp cách chia AI vào kế hoạch hiện tại không
+async function offerDraft() {
+  const draft = readPlanDraft({ remove: true });
+  if (!draft) return;
+  if (!draft.allocations.length) { toast('Bạn đã có kế hoạch cưới – tiếp tục chỉnh ở đây nhé.'); return; }
+  const categories = await listBudget(plan.id);
+  const rows = categories.flatMap((c) => c.items.filter((i) => !i.paid)
+    .map((i) => ({ key: i.id, group: c.vendor_category, weight: i.estimated || 1, item: i })));
+  const amounts = spreadAllocations(rows, draft.allocations);
+  const changes = rows.filter((r) => amounts.has(r.key) && amounts.get(r.key) !== r.item.estimated)
+    .map((r) => ({ id: r.key, to: amounts.get(r.key) }));
+  const ok = await openDialog({
+    title: 'Áp dụng cách chia AI vào kế hoạch?',
+    confirmText: `Áp dụng (${changes.length} mục)`,
+    content: html`
+      <p>Bạn đã có kế hoạch cưới. Trạm Hỷ sẽ chia lại số <strong>Dự kiến</strong> của các mục chưa trả theo cách chia AI vừa xem:</p>
+      <p class="small muted">${draftSummary(draft)}</p>
+      <p class="small">Tổng ngân sách sẽ là <strong>${money(draft.total)}</strong>. Số thực tế, mục đã trả và đơn Trạm Hỷ giữ nguyên.</p>`,
+    onConfirm: async () => {
+      await trackSave(() => applyEstimates(changes));
+      plan = await updatePlan(plan.id, { total_budget: draft.total, ...(draft.guests ? { guests: draft.guests } : {}) });
+      return true;
+    },
+  });
+  if (ok) {
+    toast('Đã áp dụng cách chia AI vào kế hoạch.', 'success');
+    tab = 'budget';
+    renderPlan();
+  }
 }
 
 function showTab(name) {
@@ -102,8 +166,11 @@ function showTab(name) {
   const panel = $(`#panel-${name}`);
   panel.classList.remove('form-enter'); void panel.offsetWidth; panel.classList.add('form-enter');
   if (name === 'overview') renderOverview();          // tổng quan luôn tính lại số mới nhất
-  if (name === 'budget' && !mounted.budget) { mounted.budget = true; mountBudgetBoard(panel, plan, { bookings }); }
+  if (name === 'budget' && !mounted.budget) { mounted.budget = true; budgetBoard = mountBudgetBoard(panel, plan, { bookings }); }
   if (name === 'checklist' && !mounted.checklist) { mounted.checklist = true; mountChecklistBoard(panel, plan); }
+  if (name === 'ai') {
+    if (!mounted.ai) { mounted.ai = true; mountAssistant(); } else assistant.refreshSuggestions();   // gợi ý theo số mới nhất
+  }
 }
 
 async function renderOverview() {
@@ -229,6 +296,13 @@ async function resetPlan() {
 
 // Bảng ngân sách / checklist gửi sự kiện này khi bấm "Ngân sách: …" hoặc "Đặt ngày cưới"
 root.addEventListener('edit-plan', editPlan);
+// Nút "✨ Hỏi AI" ở tab Ngân sách → mở tab Trợ lý AI (có câu hỏi sẵn thì hỏi luôn)
+root.addEventListener('ask-ai', (e) => {
+  showTab('ai');
+  const question = e.detail?.question;
+  if (question) assistant.ask(question);
+  else $('#panel-ai input[name=question]')?.focus();
+});
 
 // ---------- KHỞI CHẠY TRANG ----------
 profile = await initLayout('planner');
@@ -237,7 +311,12 @@ if (!profile) {
 } else {
   try {
     [plan, bookings] = await Promise.all([getPlan(profile.id), listMyBookings(profile.id).catch(() => [])]);
-    if (plan) renderPlan(); else renderCreate();
+    if (plan) {
+      renderPlan();
+      if (fromAi) offerDraft().catch(toastError);
+    } else {
+      renderCreate();
+    }
   } catch (error) {
     render(root, html`<div class="empty">Chưa mở được Kế hoạch cưới – Trạm Hỷ đang cập nhật hệ thống, vui lòng thử lại sau.</div>`);
     console.warn(error);

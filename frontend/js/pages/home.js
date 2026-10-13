@@ -8,6 +8,7 @@ import { bindMoneyInput } from '../components/money-input.js';
 import { vendorLogo } from '../components/vendor-logo.js';
 import { mountHeroSlider } from '../components/hero-slider.js';
 import { adviseBudget } from '../services/budget-ai.js';
+import { savePlanDraft } from '../services/planner.js';
 
 // Tỷ lệ chia ngân sách cưới phổ biến (category khớp bảng vendors)
 const BUDGET_SPLIT = [
@@ -137,8 +138,28 @@ function showPlan(plan, extra = {}) {
       </div>`)}
     ${extra.tips?.length ? html`
       <div class="notice small"><strong>Mẹo cho bạn</strong>
-        <ul style="margin:4px 0 0;padding-left:18px">${extra.tips.map((t) => html`<li>${t}</li>`)}</ul></div>` : ''}`);
+        <ul style="margin:4px 0 0;padding-left:18px">${extra.tips.map((t) => html`<li>${t}</li>`)}</ul></div>` : ''}
+    <div class="save-plan-cta">
+      <button type="button" class="btn btn-primary" data-save-plan>💾 Lưu thành kế hoạch cưới</button>
+      <span class="small muted">Chia sẵn từng khoản theo nghi lễ, kèm checklist chuẩn bị – miễn phí</span>
+    </div>`);
 }
+
+// Mang cách chia đang xem sang trang Kế hoạch cưới (chưa đăng nhập thì trang đó mời đăng nhập rồi quay lại)
+$('#budget-result').addEventListener('click', (e) => {
+  if (!e.target.closest('[data-save-plan]') || !budget.plan) return;
+  const wedding = readWedding();
+  if (!wedding) return;
+  savePlanDraft({
+    total: wedding.total,
+    guests: wedding.guests,
+    city: wedding.city,
+    ai: Boolean(budget.extra.ai),
+    // Chỉ cách chia của AI mới mang sang (đủ 6 hạng mục); chia nhanh thì để mẫu kế hoạch tự chia chi tiết hơn
+    allocations: budget.extra.ai ? budget.plan.map(({ category, amount }) => ({ category, amount })) : [],
+  });
+  location.href = 'ke-hoach.html?from=ai';
+});
 
 function resetChat() {
   budget.history = [];

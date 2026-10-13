@@ -4,12 +4,37 @@ import { BUDGET_TEMPLATES, CHECKLIST_TEMPLATE } from '../data/planner-templates.
 
 const round100k = (n) => Math.round(n / 100_000) * 100_000;
 
+/**
+ * Cách chia 6 hạng mục của AI ở trang chủ ({ category, amount }) → số "Dự kiến" cho từng mục kế hoạch.
+ * Danh mục có loại tiệm (venue, studio…) nhận tiền của hạng mục đó; danh mục không có loại tiệm (lễ hỏi, nhẫn, thiệp…)
+ * chia nhau hạng mục "other". Trong một nhóm, tiền chia theo tỷ trọng hiện có (weight) – mục cuối nhận phần lẻ.
+ * rows: [{ key, group, weight }] → Map key → số tiền
+ */
+export function spreadAllocations(rows, allocations) {
+  const result = new Map();
+  for (const { category, amount } of allocations) {
+    const group = rows.filter((r) => (r.group || 'other') === category);
+    if (!group.length) continue;
+    const weights = group.map((r) => Math.max(0, Number(r.weight) || 0));
+    const sum = weights.reduce((a, b) => a + b, 0);
+    let given = 0;
+    group.forEach((r, i) => {
+      const value = i === group.length - 1
+        ? Math.max(0, amount - given)
+        : round100k(amount * (sum ? weights[i] / sum : 1 / group.length));
+      given += value;
+      result.set(r.key, value);
+    });
+  }
+  return result;
+}
+
 export async function getPlan(userId) {
   return unwrap(await sb.from('wedding_plans').select('*').eq('owner_id', userId).maybeSingle());
 }
 
 /** Tạo kế hoạch từ mẫu Bắc / Nam. Có tổng ngân sách → điền sẵn "Dự kiến" theo tỷ lệ mẫu. */
-export async function createPlan(userId, { weddingDate, region, totalBudget, guests, city }) {
+export async function createPlan(userId, { weddingDate, region, totalBudget, guests, city, allocations }) {
   const plan = unwrap(await sb.from('wedding_plans').insert({
     owner_id: userId, wedding_date: weddingDate || null, region, total_budget: totalBudget || 0, guests: guests || null, city: city || null,
   }).select().single());
@@ -20,9 +45,13 @@ export async function createPlan(userId, { weddingDate, region, totalBudget, gue
   }))).select('id, position'));
   const byPosition = Object.fromEntries(categories.map((c) => [c.position, c.id]));
 
+  // Có cách chia từ AI trang chủ → dùng số của AI; không thì chia theo tỷ lệ mẫu
+  const fromAi = allocations?.length ? spreadAllocations(template.flatMap((c, ci) => c.items.map(([, share], ii) => ({
+    key: `${ci}-${ii}`, group: c.vendor, weight: share,
+  }))), allocations) : null;
   const items = template.flatMap((c, ci) => c.items.map(([name, share], ii) => ({
     plan_id: plan.id, category_id: byPosition[ci], name, position: ii,
-    estimated: totalBudget ? round100k((totalBudget * share) / 100) : 0,
+    estimated: fromAi?.get(`${ci}-${ii}`) ?? (totalBudget ? round100k((totalBudget * share) / 100) : 0),
   })));
   unwrap(await sb.from('budget_items').insert(items));
 
@@ -66,6 +95,13 @@ export async function addItem(planId, categoryId, name, position) {
 export async function updateItem(id, patch) {
   unwrap(await sb.from('budget_items').update(patch).eq('id', id));
 }
+/** Áp dụng nhiều số "Dự kiến" mới cùng lúc (đề xuất của trợ lý AI): [{ id, to }] */
+export async function applyEstimates(changes) {
+  const results = await Promise.all(changes.map(({ id, to }) => sb.from('budget_items').update({ estimated: to }).eq('id', id)));
+  const failed = results.find((r) => r.error);
+  if (failed) unwrap(failed);
+}
+
 export async function deleteItem(id) {
   unwrap(await sb.from('budget_items').delete().eq('id', id));
 }
@@ -88,4 +124,22 @@ export async function updateTask(id, patch) {
 }
 export async function deleteTask(id) {
   unwrap(await sb.from('checklist_items').delete().eq('id', id));
+}
+
+// ---------- Cách chia AI ở trang chủ → mang sang trang Kế hoạch (qua cả bước đăng nhập) ----------
+const DRAFT_KEY = 'tramhy:plan-from-ai';
+
+export function savePlanDraft(draft) {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...draft, savedAt: Date.now() })); } catch { /* trình duyệt chặn lưu */ }
+}
+
+/** Đọc bản nháp (hết hạn sau 1 ngày); remove = true thì xóa luôn */
+export function readPlanDraft({ remove = false } = {}) {
+  try {
+    const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+    if (remove) localStorage.removeItem(DRAFT_KEY);
+    return draft && Date.now() - draft.savedAt < 86_400_000 && Array.isArray(draft.allocations) ? draft : null;
+  } catch {
+    return null;
+  }
 }

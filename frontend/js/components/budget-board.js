@@ -76,10 +76,14 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
             <strong class="ring-label" style="color:var(--green)">Đã thanh toán</strong>
             <span class="ring-value">${money(t.paid)}</span></div>
         </div>
-        <button type="button" class="budget-total" data-edit-budget>
-          Ngân sách: <strong>${t.budget ? money(t.budget) : 'chưa đặt'}</strong> <span aria-hidden="true">✎</span></button>
+        <div class="budget-summary-actions">
+          <button type="button" class="budget-total" data-edit-budget>
+            Ngân sách: <strong>${t.budget ? money(t.budget) : 'chưa đặt'}</strong> <span aria-hidden="true">✎</span></button>
+          <button type="button" class="btn btn-outline btn-sm budget-ai-btn" data-ask-ai="">✨ Hỏi AI về ngân sách</button>
+        </div>
         ${t.over ? html`<div class="notice notice-error small budget-warning">
-          ⚠️ Dự kiến đang vượt ngân sách <strong>${money(t.estimated - t.budget)}</strong> – cân nhắc giảm bớt mục chưa đặt cọc.</div>` : ''}
+          <span>⚠️ Dự kiến đang vượt ngân sách <b>${money(t.estimated - t.budget)}</b> – cân nhắc giảm bớt mục chưa đặt cọc.</span>
+          <button type="button" class="btn btn-sm budget-warning-ai" data-ask-ai="Cân đối lại để không vượt ngân sách">✨ Hỏi AI cách cân đối</button></div>` : ''}
       </section>`;
   }
 
@@ -171,6 +175,15 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
       rollback?.();
       draw();
     }
+  }
+
+  // Nút "Hỏi AI" nằm trong khung tổng (bị vẽ lại khi sửa số) → bắt sự kiện ở container, gắn 1 lần
+  if (!container.dataset.askAiBound) {   // bảng có thể được mount lại trên cùng container
+    container.dataset.askAiBound = '1';
+    container.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-ask-ai]');
+      if (btn) container.dispatchEvent(new CustomEvent('ask-ai', { bubbles: true, detail: { question: btn.dataset.askAi } }));
+    });
   }
 
   function bind() {
