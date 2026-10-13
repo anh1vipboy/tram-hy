@@ -67,6 +67,7 @@ exe202/
 │   ├── 21_ai_planner.sql     Đếm lượt Trợ lý AI trong Kế hoạch cưới (20 câu / người / ngày)
 │   ├── 22_invitation_templates.sql Thiệp cưới: mẫu thiệp, thông tin hai họ (details), ảnh cưới (bucket invitation-photos)
 │   ├── 23_image_webp.sql     Ảnh demo trỏ về ảnh của web đổi sang .webp (nhẹ hơn ~10 lần)
+│   ├── 24_guestbook.sql      Sổ lời chúc có duyệt (chống spam theo IP, thông báo, realtime); nới dung lượng details
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -337,6 +338,16 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
   chỉ đường (Google Maps), lưu vào Google Calendar, xác nhận tham dự, QR mừng cưới; thanh nút dưới đáy.
 - Trình soạn có ô "Mời riêng từng người" → sao chép link kèm `&to=`.
 - Ảnh cưới: nén trên trình duyệt rồi tải lên `invitation-photos/<user_id>/…` (công khai); đổi / bỏ ảnh thì xóa ảnh cũ.
+- **Album** (≤ 12 ảnh, kéo đổi thứ tự), **chuyện tình yêu** (≤ 6 cột mốc) và **nhạc nền** lưu trong `invitations.details`
+  (`album`, `story`, `music`). Khách xem album bằng trình xem ảnh chung `openPhotoGallery` (components/dress-gallery.js).
+- **Nhạc nền** (`components/wedding-music.js`): 3 bản "hộp nhạc" – Canon in D, Here Comes the Bride, Ode to Joy (giai điệu
+  đã hết bản quyền, trình duyệt tự chơi bằng Web Audio, không có file âm thanh) hoặc link YouTube cô dâu tự dán (phát qua
+  youtube-nocookie, điều khiển bằng postMessage). Phát khi khách chạm con dấu mở phong bì; nút ♪ bật / tắt.
+  Lưu ý: Safari trên iPhone có thể chặn YouTube tự phát → khách bấm nút ♪.
+- **Sổ lời chúc** (SQL 24, bảng `guestbook_entries`): khách gửi → "chờ duyệt", chỉ lời chúc đã duyệt mới hiện cho mọi người
+  (RLS). Chủ thiệp duyệt / ẩn / xóa ở trang soạn (mục Sổ lời chúc, có realtime + thông báo chuông). Chủ thiệp chỉ được đổi
+  cột `status` (quyền theo cột), không sửa được lời của khách. Chống spam giống phản hồi: chặn link, ≤ 3 lời / tên / thiệp,
+  ≤ 6 lời / IP / thiệp / giờ, IP lưu dạng băm ở `guestbook_meta`. Form "Xác nhận tham dự" vẫn có ô lời nhắn riêng (chỉ cô dâu thấy).
 
 ### AI trong Kế hoạch cưới (SQL 21 + function tu-van-ngan-sach chế độ `plan`)
 - **Lưu thành kế hoạch** (trang chủ): cách chia đang xem được giữ trong `localStorage` (`savePlanDraft`, hết hạn 1 ngày) rồi mở
@@ -435,7 +446,8 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 | ✅ | Kế hoạch cưới: ngân sách theo nghi lễ, checklist, tổng quan | Đã xong (SQL 20) |
 | ✅ | AI trong Kế hoạch cưới: lưu gợi ý AI thành kế hoạch, trợ lý đề xuất sửa từng mục (Áp dụng / Hoàn tác), 20 câu / ngày | Đã xong (SQL 21) |
 | ✅ | Thiệp cưới: 6 mẫu thiệp 3 trang, phong bì mở thiệp, hai họ, âm lịch, ảnh cưới, link mời riêng | Đã xong (SQL 22) |
-| 5 | **Thiệp cưới (tiếp)**: album, chuyện tình yêu, sổ lời chúc (cô dâu duyệt), nhạc | SQL + `frontend/` |
+| ✅ | Thiệp cưới: album, chuyện tình yêu, sổ lời chúc có duyệt, nhạc nền | Đã xong (SQL 24) |
+| 5 | **Quản lý khách mời**: danh sách khách, link riêng hàng loạt, gửi Zalo, theo dõi đã mở / đã xác nhận | SQL + `frontend/` |
 | 6 | **Tự xóa ảnh cô dâu sau 24 giờ** (cam kết bảo mật trong báo cáo) | Scheduled Edge Function |
 | 7 | Đo lường hành vi (Vercel Analytics) để có số liệu cho báo cáo | `frontend/` |
 | 8 | Ảnh xem trước khi chia sẻ link thiệp / tiệm qua Zalo, Facebook | `frontend/` |

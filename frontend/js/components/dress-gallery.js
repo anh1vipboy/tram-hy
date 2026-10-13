@@ -63,9 +63,10 @@ export async function openPackageGallery(pkg, { subtitle = '', action = null } =
   openPhotoGallery({ title: pkg.name, subtitle, price: pkg.price, images, note: pkg.description || '', action });
 }
 
-/** Trình xem ảnh dùng chung. action: { label, href } hoặc { label, onClick } */
-function openPhotoGallery({ title, subtitle, price, images, note, action }) {
-  let index = 0;
+/** Trình xem ảnh dùng chung (váy, gói dịch vụ, album thiệp cưới). price / action không bắt buộc; start = ảnh mở đầu tiên.
+ *  action: { label, href } hoặc { label, onClick } */
+export function openPhotoGallery({ title, subtitle, price, images, note, action, start = 0 }) {
+  let index = start;
 
   const dialog = document.createElement('dialog');
   dialog.className = 'modal lightbox';
@@ -89,7 +90,7 @@ function openPhotoGallery({ title, subtitle, price, images, note, action }) {
       <div class="lightbox-info">
         <div style="min-width:0">
           <strong>${title}</strong>
-          <div class="small muted">${subtitle ? `${subtitle} · ` : ''}<span class="price">${money(price)}</span></div>
+          <div class="small muted">${subtitle || ''}${subtitle && price ? ' · ' : ''}${price ? html`<span class="price">${money(price)}</span>` : ''}</div>
           ${note ? html`<div class="small muted lightbox-note">${note}</div>` : ''}
         </div>
         ${action?.href ? html`<a class="btn btn-primary btn-sm" href="${action.href}">${action.label}</a>` : ''}

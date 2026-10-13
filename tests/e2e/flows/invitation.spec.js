@@ -44,12 +44,11 @@ test('chọn mẫu, tạo thiệp → khách mở link riêng, mở phong bì, g
   await expect(guest.locator('.inv-p1 .inv-cover-names')).toContainText('Quân');
   await expect(guest.locator('.inv-p1 .inv-guest')).toHaveText(guestName);
   await expect(guest.getByRole('link', { name: /Chỉ đường đến tiệc/ })).toHaveAttribute('href', /maps\/search.*Tr%C3%A0ng%20Ti%E1%BB%81n/);
-  await expect(guest.getByLabel('Tên của bạn')).toHaveValue(guestName);
-  await guest.getByLabel('Số người đi cùng (tính cả bạn)').fill('2');
-  await guest.getByRole('button', { name: '💬 Gửi lời chúc' }).click();
-  await expect(guest.getByLabel('Lời chúc')).toBeFocused();
-  await guest.getByLabel('Lời chúc').fill('Chúc hai bạn trăm năm hạnh phúc!');
-  await guest.getByRole('button', { name: 'Gửi phản hồi' }).click();
+  const rsvp = guest.locator('#rsvp-form');
+  await expect(rsvp.getByLabel('Tên của bạn')).toHaveValue(guestName);
+  await rsvp.getByLabel('Số người đi cùng (tính cả bạn)').fill('2');
+  await rsvp.getByLabel(/Lời nhắn riêng/).fill('Mình đi cùng vợ nhé');
+  await rsvp.getByRole('button', { name: 'Gửi phản hồi' }).click();
   await expect(guest.getByText(`Cảm ơn ${guestName}!`)).toBeVisible();
 
   // Cô dâu thấy phản hồi ngay, KHÔNG tải lại trang (realtime – SQL 14)
@@ -66,10 +65,11 @@ test('chống spam phản hồi thiệp: trùng tên bị chặn, bot điền ô
   const path = link.replace(/^https?:\/\/[^/]+/, '');
   const guest = await openAs(browser, null);
   const name = `Khách chống spam ${Date.now()}`;
+  const rsvp = guest.locator('#rsvp-form');
   const send = async (guestName, message = '') => {
-    await guest.getByLabel('Tên của bạn').fill(guestName);
-    await guest.getByLabel('Lời chúc').fill(message);
-    await guest.getByRole('button', { name: 'Gửi phản hồi' }).click();
+    await rsvp.getByLabel('Tên của bạn').fill(guestName);
+    await rsvp.getByLabel(/Lời nhắn riêng/).fill(message);
+    await rsvp.getByRole('button', { name: 'Gửi phản hồi' }).click();
   };
 
   await guest.goto(path);
@@ -91,9 +91,65 @@ test('chống spam phản hồi thiệp: trùng tên bị chặn, bot điền ô
 
   let requests = 0;
   guest.on('request', (r) => { if (r.url().includes('/rest/v1/rsvps') && r.method() === 'POST') requests += 1; });
-  await guest.locator('[name=website]').fill('http://bot.example', { force: true });   // bot điền ô bẫy
+  await rsvp.locator('[name=website]').fill('http://bot.example', { force: true });   // bot điền ô bẫy
   await send(`${name} bot`);
   await expect(guest.getByText('Cảm ơn bạn!')).toBeVisible();
   expect(requests).toBe(0);                                          // không gửi gì lên server
 });
 
+
+test('sổ lời chúc: khách gửi → chờ duyệt (khách khác chưa thấy) → cô dâu duyệt → hiện trên thiệp; album, chuyện tình yêu, nhạc', async ({ browser }) => {
+  requireAccounts('bride');
+  test.setTimeout(120_000);
+  const bride = await openAs(browser, 'bride');
+  await bride.goto('/invitation.html');
+  await expect(bride.locator('#share input').first()).toBeVisible({ timeout: 20_000 });
+
+  // Thêm chuyện tình yêu + chọn nhạc hộp nhạc rồi lưu
+  const editor = bride.locator('#editor');
+  while (await editor.getByRole('button', { name: 'Xóa cột mốc' }).count()) await editor.getByRole('button', { name: 'Xóa cột mốc' }).first().click();
+  await editor.getByRole('button', { name: '＋ Thêm cột mốc' }).click();
+  await editor.getByLabel('Thời gian').fill('Mùa thu 2020');
+  await editor.getByLabel('Tiêu đề').fill('Lần đầu gặp nhau');
+  await editor.getByLabel('Kể ngắn').fill('Ở quán cà phê nhỏ gần trường.');
+  await editor.getByRole('radio', { name: /Canon in D/ }).check();
+  await editor.getByRole('button', { name: /Lưu thiệp/ }).click();
+  await expect(bride.locator('.toast-success', { hasText: 'Đã lưu thiệp.' })).toBeVisible();
+  const link = (await bride.locator('#share input').first().inputValue()).replace(/^https?:\/\/[^/]+/, '');
+
+  const wish = `Chúc hai bạn hạnh phúc E2E ${Date.now()}`;
+  const guest = await openAs(browser, null);
+  await guest.goto(link);
+  await openEnvelope(guest);
+  await expect(guest.getByRole('button', { name: 'Tắt nhạc nền' })).toBeVisible();            // nhạc bật khi mở phong bì
+  await expect(guest.locator('.story-timeline')).toContainText('Lần đầu gặp nhau');
+  await guest.getByRole('button', { name: '💬 Gửi lời chúc' }).click();
+  const form = guest.locator('#wish-form');
+  await expect(form.getByLabel('Lời chúc')).toBeFocused();
+  await form.getByLabel('Tên của bạn').fill('Bạn thân E2E');
+  await form.getByLabel('Lời chúc').fill(wish);
+  await form.getByRole('button', { name: 'Gửi lời chúc' }).click();
+  await expect(guest.getByText('Cảm ơn lời chúc của bạn!')).toBeVisible();
+
+  // Chưa duyệt → khách khác chưa thấy
+  const other = await openAs(browser, null);
+  await other.goto(link);
+  await openEnvelope(other);
+  await expect(other.locator('#wish-list')).not.toContainText(wish);
+
+  // Cô dâu: lời chúc mới tự hiện ở "Chờ duyệt" → duyệt
+  const book = bride.locator('#guestbook');
+  const item = book.locator('.wish-item', { hasText: wish });
+  await expect(item).toBeVisible({ timeout: 15_000 });
+  await item.getByRole('button', { name: '✓ Duyệt' }).click();
+  await expect(bride.locator('.toast-success', { hasText: 'Đã duyệt' })).toBeVisible();
+
+  await other.reload();
+  await openEnvelope(other);
+  await expect(other.locator('#wish-list')).toContainText(wish);
+
+  // Dọn: xóa lời chúc vừa tạo
+  await book.getByRole('button', { name: /Đã duyệt/ }).click();
+  await book.locator('.wish-item', { hasText: wish }).getByRole('button', { name: 'Xóa' }).click();
+  await expect(book.locator('.wish-item', { hasText: wish })).toHaveCount(0);
+});

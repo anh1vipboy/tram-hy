@@ -60,3 +60,32 @@ export async function submitRsvp(invitationId, { guestName, attending, guestCoun
     message,
   }));
 }
+
+// ---------- SỔ LỜI CHÚC (SQL 24) ----------
+// Khách: chỉ đọc được lời chúc đã duyệt (RLS). Chủ thiệp: đọc hết, duyệt / ẩn / xóa.
+export async function listWishes(invitationId) {
+  return unwrap(await sb.from('guestbook_entries').select('id, guest_name, message, status, created_at')
+    .eq('invitation_id', invitationId).order('created_at', { ascending: false }).limit(300));
+}
+
+export async function submitWish(invitationId, { guestName, message }) {
+  unwrap(await sb.from('guestbook_entries').insert({ invitation_id: invitationId, guest_name: guestName, message }));
+}
+
+export async function setWishStatus(id, status) {
+  unwrap(await sb.from('guestbook_entries').update({ status }).eq('id', id));
+}
+
+export async function deleteWish(id) {
+  unwrap(await sb.from('guestbook_entries').delete().eq('id', id));
+}
+
+// Lời chúc mới cho thiệp của mình (realtime). Trả về hàm hủy.
+export function subscribeWishes(invitationId, onInsert) {
+  const channel = sb.channel(`guestbook-${invitationId}`)
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'guestbook_entries', filter: `invitation_id=eq.${invitationId}` },
+      (payload) => onInsert(payload.new))
+    .subscribe();
+  return () => sb.removeChannel(channel);
+}
