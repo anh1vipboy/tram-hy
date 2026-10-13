@@ -295,7 +295,17 @@ span.cell-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 .budget-cat-foot b { text-align: right; padding: 0 8px; }
 /* Checklist */
 .checklist-head { margin-bottom: 16px; }
-.task-add { display: grid; grid-template-columns: minmax(0, 1fr) 160px auto; gap: 8px; }
+.task-add-slot { display: flex; justify-content: center; margin-top: 8px; }
+.task-add-btn { border: 1px dashed #e3cfc6; background: transparent; color: var(--brand-dark); font: 600 14px var(--font-body); padding: 9px 18px; border-radius: 12px; cursor: pointer; transition: background .2s, border-color .2s; }
+.task-add-btn:hover { background: var(--brand-soft); border-color: var(--brand); }
+.task-add-inline { display: flex; gap: 8px; width: 100%; padding: 10px; border: 1px solid var(--brand); border-radius: 14px; background: var(--card); animation: task-add-in .2s ease; }
+.task-add-inline .input { flex: 1; min-width: 0; }
+.task-group-count { margin-left: 6px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+.task-title[contenteditable] { outline: none; border-radius: 6px; padding: 1px 4px; margin: -1px -4px; cursor: text; transition: background .15s, box-shadow .15s; }
+.task-title[contenteditable]:hover { background: #f6efeb; }
+.task-title[contenteditable]:focus { background: #fff; box-shadow: 0 0 0 2px var(--brand-soft), 0 0 0 1px var(--brand) inset; text-decoration: none; }
+.task-more { flex: none; width: 32px; height: 32px; border: 0; border-radius: 50%; background: #f1e8e3; color: var(--ink); font-size: 18px; line-height: 1; cursor: pointer; }
+.task-more:hover { background: var(--brand-soft); color: var(--brand-dark); }
 .task-group { margin-bottom: 18px; }
 .task-group h4 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--brand-dark); }
 .task-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -315,6 +325,7 @@ span.cell-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 .task.just-toggled .task-check { animation: badge-pop .35s; }
 @keyframes ring-in { from { opacity: 0; transform: scale(.7) rotate(-40deg); } to { opacity: 1; transform: none; } }
 @keyframes drop-flash { 0% { box-shadow: 0 0 0 3px var(--brand); } 100% { box-shadow: 0 0 0 0 transparent; } }
+@keyframes task-add-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
 /* ---------- Chuông thông báo ---------- */
 .notif-button { position: relative; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
@@ -759,10 +770,11 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
   .budget-cat-foot { grid-template-columns: 1fr auto auto; }
   .budget-cat-foot span { grid-column: auto; }
   .cat-find { display: none; }
-  .task-add { grid-template-columns: 1fr auto; }
-  .task-add input { grid-column: 1 / -1; }
-  .task { flex-wrap: wrap; }
-  .task .btn { margin-left: 38px; }
+  .task-add-inline { flex-wrap: wrap; }
+  .task-add-inline .input { flex-basis: 100%; }
+  .task { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto auto; grid-template-areas: "check text more del" ". link link link"; column-gap: 10px; row-gap: 8px; }
+  .task .task-check { grid-area: check; } .task .task-text { grid-area: text; } .task .task-more { grid-area: more; } .task .row-delete { grid-area: del; }
+  .task .btn { grid-area: link; justify-self: start; }
   /* Đăng nhập trên điện thoại: thẻ rộng hết màn hình */
   .auth-shell { padding-block: 16px 32px; }
   .auth-card { padding: 20px 18px; }

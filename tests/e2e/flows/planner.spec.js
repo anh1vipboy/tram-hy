@@ -68,9 +68,34 @@ test('tạo kế hoạch cưới, sửa ngân sách, đánh dấu đã trả, ch
   await expect(firstTask.locator('.task-due')).toContainText('20/03/2026');      // 365 ngày trước 20/03/2027
   await firstTask.locator('.task-check').click();
   await expect(checklist.locator('.checklist-head')).toContainText('1/25 việc đã xong');
-  await checklist.getByPlaceholder(/Thêm việc của riêng bạn/).fill('Đặt bánh cưới E2E');
-  await checklist.getByRole('button', { name: 'Thêm', exact: true }).click();
-  await expect(checklist.locator('.task', { hasText: 'Đặt bánh cưới E2E' })).toBeVisible();
+  // Thêm việc ngay dưới một mốc thời gian
+  const month = checklist.locator('.task-group', { has: bride.getByRole('heading', { name: /Trước 2 tuần – 2 tháng/ }) });
+  await month.getByRole('button', { name: '＋ Thêm công việc' }).click();
+  await month.getByPlaceholder(/Tên công việc/).fill('Đặt bánh cưới E2E');
+  await month.getByPlaceholder(/Tên công việc/).press('Enter');
+  const cake = month.locator('.task', { hasText: 'Đặt bánh cưới E2E' });
+  await expect(cake).toBeVisible();
+  await expect(cake.locator('.task-due')).toContainText('18/02/2027');            // mặc định trước 1 tháng
+  await expect(month.getByPlaceholder(/Tên công việc/)).toBeFocused();           // ô vẫn mở để thêm tiếp
+  await month.getByPlaceholder(/Tên công việc/).press('Escape');
+
+  // Sửa tên ngay trên dòng
+  await cake.locator('[data-title]').click();
+  await bride.keyboard.press('Control+A');
+  await bride.keyboard.type('Đặt bánh cưới 3 tầng E2E');
+  await bride.keyboard.press('Enter');
+  await expect(bride.locator('#save-status')).toHaveAttribute('data-state', /saved|idle/);
+
+  // Sửa hạn bằng nút ⋯ → việc chuyển sang mốc "Tuần cuối"
+  await checklist.locator('.task', { hasText: 'Đặt bánh cưới 3 tầng E2E' }).getByRole('button', { name: /Sửa việc/ }).click();
+  const editor = bride.locator('dialog.modal');
+  await expect(editor.getByLabel('Tên công việc')).toHaveValue('Đặt bánh cưới 3 tầng E2E');
+  await editor.getByLabel('Hạn hoàn thành').fill('2027-03-15');
+  await editor.getByRole('button', { name: 'Lưu' }).click();
+  const lastWeek = checklist.locator('.task-group', { has: bride.getByRole('heading', { name: /Tuần cuối/ }) });
+  await expect(lastWeek.locator('.task', { hasText: 'Đặt bánh cưới 3 tầng E2E' })).toContainText('15/03/2027');
+  await bride.reload();                                                            // đã lưu vào database
+  await expect(bride.locator('#panel-checklist .task', { hasText: 'Đặt bánh cưới 3 tầng E2E' })).toContainText('15/03/2027', { timeout: 20_000 });
 
   // ---- Tổng quan ----
   await bride.getByRole('tab', { name: 'Tổng quan' }).click();

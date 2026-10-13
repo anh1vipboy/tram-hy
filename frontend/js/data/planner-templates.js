@@ -63,15 +63,15 @@ export const CHECKLIST_TEMPLATE = [
   { days: -14, title: 'Gửi lời cảm ơn khách mời' },
 ];
 
-// Nhóm hiển thị checklist theo mốc thời gian (days ≥ from)
+// Nhóm hiển thị checklist theo mốc thời gian (days ≥ from). days = hạn mặc định khi thêm việc vào mốc đó.
 export const CHECKLIST_STAGES = [
-  { from: 240, label: 'Trước 8–12 tháng' },
-  { from: 150, label: 'Trước 5–8 tháng' },
-  { from: 60, label: 'Trước 2–5 tháng' },
-  { from: 14, label: 'Trước 2 tuần – 2 tháng' },
-  { from: 1, label: 'Tuần cuối' },
-  { from: 0, label: 'Ngày cưới' },
-  { from: -Infinity, label: 'Sau ngày cưới' },
+  { from: 240, days: 300, label: 'Trước 8–12 tháng' },
+  { from: 150, days: 180, label: 'Trước 5–8 tháng' },
+  { from: 60, days: 90, label: 'Trước 2–5 tháng' },
+  { from: 14, days: 30, label: 'Trước 2 tuần – 2 tháng' },
+  { from: 1, days: 3, label: 'Tuần cuối' },
+  { from: 0, days: 0, label: 'Ngày cưới' },
+  { from: -Infinity, days: -7, label: 'Sau ngày cưới' },
 ];
 
 export const REGION_LABEL = { bac: 'Miền Bắc (dạm ngõ, ăn hỏi)', nam: 'Miền Nam (đám hỏi, rước dâu)' };
