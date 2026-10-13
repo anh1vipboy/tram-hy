@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { page: 'tryon',       href: 'tryon.html',            label: 'Thử váy AI' },
   { page: 'marketplace', href: 'marketplace.html',      label: 'Dịch vụ cưới' },
   { page: 'invitation',  href: 'invitation.html',       label: 'Thiệp cưới' },
+  { page: 'planner',     href: 'ke-hoach.html',         label: 'Kế hoạch cưới' },
   { page: 'bookings',    href: 'bookings.html',         label: 'Đơn của tôi', roles: ['bride', 'vendor'] },   // admin xem đơn ở Quản trị
   { page: 'vendor',      href: 'vendor-dashboard.html', label: 'Kênh đối tác', roles: ['vendor'] },
   { page: 'admin',       href: 'admin.html',            label: 'Quản trị', roles: ['admin'] },
@@ -49,6 +50,7 @@ const avatar = (profile, size = '') => html`
 
 function accountMenu(profile, activePage) {
   const links = [
+    ...(profile.role !== 'admin' ? [{ page: 'planner', href: 'ke-hoach.html', label: '📒 Kế hoạch cưới' }] : []),
     ...(profile.role !== 'admin' ? [{ page: 'bookings', href: 'bookings.html', label: '📋 Đơn của tôi' }] : []),
     { page: 'invitation', href: 'invitation.html', label: '💌 Thiệp cưới' },
     ...(profile.role === 'vendor' ? [{ page: 'vendor', href: 'vendor-dashboard.html', label: '🏪 Kênh đối tác' }] : []),

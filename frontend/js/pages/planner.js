@@ -1,0 +1,245 @@
+// Trang "Đám cưới của tôi" (ke-hoach.html): Tổng quan · Ngân sách · Checklist
+import { initLayout } from '../core/layout.js';
+import { loginUrl } from '../core/auth.js';
+import { $, $$, html, render, money } from '../core/utils.js';
+import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
+import { getPlan, createPlan, updatePlan, deletePlan } from '../services/planner.js';
+import { listMyBookings } from '../services/bookings.js';
+import { REGION_LABEL } from '../data/planner-templates.js';
+import { moneyValue, readMoneyField } from '../components/money-input.js';
+import { mountBudgetBoard, budgetTotals } from '../components/budget-board.js';
+import { mountChecklistBoard, checklistProgress, nextTasks, dueLabel } from '../components/checklist-board.js';
+import { listBudget, listChecklist } from '../services/planner.js';
+
+const root = $('#planner-root');
+const TABS = [['overview', 'Tổng quan'], ['budget', 'Ngân sách'], ['checklist', 'Checklist']];
+let profile = null;
+let plan = null;
+let bookings = [];
+let tab = new URLSearchParams(location.search).get('tab') || 'overview';
+let mounted = {};
+
+// ---------- CHƯA ĐĂNG NHẬP ----------
+function renderGuest() {
+  render(root, html`
+    <section class="card planner-intro">
+      <div class="planner-intro-grid">
+        ${[['💰', 'Ngân sách theo nghi lễ', 'Dạm ngõ, ăn hỏi, cưới, tiệc… có sẵn hơn 30 mục, tự chia theo tổng ngân sách.'],
+           ['✅', 'Checklist chuẩn bị', 'Việc cần làm theo mốc thời gian, tự tính hạn từ ngày cưới.'],
+           ['🔗', 'Gắn với đơn Trạm Hỷ', 'Đặt dịch vụ trên Trạm Hỷ là số tiền tự vào ngân sách.'],
+           ['📊', 'Theo dõi trực quan', 'Biết ngay đã dự kiến bao nhiêu, đã trả bao nhiêu, còn bao nhiêu ngày.']]
+          .map(([icon, title, text]) => html`<div class="planner-feature"><span>${icon}</span><strong>${title}</strong><p class="small muted">${text}</p></div>`)}
+      </div>
+      <a class="btn btn-primary btn-lg" href="${loginUrl('ke-hoach.html')}">Đăng nhập để lập kế hoạch – miễn phí</a>
+    </section>`);
+}
+
+// ---------- CHƯA CÓ KẾ HOẠCH: tạo nhanh ----------
+function renderCreate() {
+  render(root, html`
+    <form class="card stack planner-create" novalidate>
+      <div><h2 style="margin:0">Bắt đầu kế hoạch cưới</h2>
+        <p class="muted" style="margin:4px 0 0">Mất 30 giây – Trạm Hỷ tạo sẵn danh mục chi tiêu và việc cần làm, bạn chỉ việc chỉnh theo ý mình.</p></div>
+      <div class="form-grid">
+        <label class="field"><span>Ngày cưới (dự kiến)</span><input class="input" type="date" name="weddingDate"></label>
+        <label class="field"><span>Tổng ngân sách</span>
+          <input class="input" name="totalBudget" data-money inputmode="numeric" placeholder="VD: 300.000.000"></label>
+        <label class="field"><span>Số khách mời dự kiến</span><input class="input" type="number" name="guests" min="10" max="5000" step="10" placeholder="VD: 300"></label>
+        <label class="field"><span>Thành phố</span><input class="input" name="city" maxlength="60" placeholder="VD: Hà Nội"></label>
+      </div>
+      <fieldset class="field region-picker"><legend>Phong tục cưới hỏi</legend>
+        <div class="row">
+          ${Object.entries(REGION_LABEL).map(([key, label], i) => html`
+            <label class="region-option"><input type="radio" name="region" value="${key}" ${i === 0 ? 'checked' : ''}><span>${label}</span></label>`)}
+        </div>
+      </fieldset>
+      <button class="btn btn-primary btn-lg" type="submit">Tạo kế hoạch cưới</button>
+      <p class="small muted" style="margin:0">Có tổng ngân sách thì Trạm Hỷ điền sẵn số dự kiến cho từng mục theo tỷ lệ phổ biến.</p>
+    </form>`);
+
+  root.querySelector('form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    withBusy(e.submitter, async () => {
+      try {
+        const totalBudget = readMoneyField(form.get('totalBudget'), 'Tổng ngân sách', { min: 10_000_000, required: false }) ?? 0;
+        plan = await createPlan(profile.id, {
+          weddingDate: form.get('weddingDate') || null,
+          region: form.get('region'),
+          totalBudget,
+          guests: Number(form.get('guests')) || null,
+          city: form.get('city').trim(),
+        });
+        toast('Đã tạo kế hoạch cưới! Hãy chỉnh từng mục cho đúng với đám cưới của bạn.', 'success');
+        tab = 'budget';
+        renderPlan();
+      } catch (error) {
+        toastError(error);
+      }
+    });
+  });
+}
+
+// ---------- CÓ KẾ HOẠCH ----------
+function renderPlan() {
+  updateHeader();
+  render(root, html`
+    <div class="tabs planner-tabs" role="tablist">
+      ${TABS.map(([key, label]) => html`<button type="button" class="tab ${key === tab ? 'active' : ''}" role="tab" data-tab="${key}">${label}</button>`)}
+      <a class="tab" href="invitation.html">Thiệp cưới ↗</a>
+    </div>
+    ${TABS.map(([key]) => html`<section class="planner-panel" id="panel-${key}" ${key === tab ? '' : 'hidden'}></section>`)}`);
+  mounted = {};
+  $$('[data-tab]').forEach((btn) => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
+  showTab(tab);
+}
+
+function showTab(name) {
+  tab = name;
+  history.replaceState(null, '', `ke-hoach.html${name === 'overview' ? '' : `?tab=${name}`}`);
+  $$('[data-tab]').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
+  TABS.forEach(([key]) => { $(`#panel-${key}`).hidden = key !== name; });
+  const panel = $(`#panel-${name}`);
+  panel.classList.remove('form-enter'); void panel.offsetWidth; panel.classList.add('form-enter');
+  if (name === 'overview') renderOverview();          // tổng quan luôn tính lại số mới nhất
+  if (name === 'budget' && !mounted.budget) { mounted.budget = true; mountBudgetBoard(panel, plan, { bookings }); }
+  if (name === 'checklist' && !mounted.checklist) { mounted.checklist = true; mountChecklistBoard(panel, plan); }
+}
+
+async function renderOverview() {
+  const panel = $('#panel-overview');
+  render(panel, html`<div class="empty">Đang tổng hợp…</div>`);
+  try {
+    const [categories, tasks] = await Promise.all([listBudget(plan.id), listChecklist(plan.id)]);
+    const t = budgetTotals(categories, bookings, plan);
+    const { done, total } = checklistProgress(tasks);
+    const days = plan.wedding_date ? Math.ceil((new Date(`${plan.wedding_date}T00:00:00`) - new Date()) / 86_400_000) : null;
+    const activeBookings = bookings.filter((b) => !['cancelled', 'refunded'].includes(b.status));
+    render(panel, html`
+      <div class="overview-grid">
+        <section class="card countdown-card">
+          ${days === null
+            ? html`<span class="small">Chưa có ngày cưới</span><button type="button" class="btn btn-light btn-sm" data-edit>Đặt ngày cưới</button>`
+            : days > 0 ? html`<span class="small">Còn</span><strong class="countdown-num">${days}</strong><span>ngày đến đám cưới</span>
+                <span class="small">${new Date(`${plan.wedding_date}T00:00:00`).toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}</span>`
+            : days === 0 ? html`<strong class="countdown-num">🎉</strong><span>Hôm nay là ngày cưới!</span>`
+            : html`<strong class="countdown-num">💍</strong><span>Đã cưới được ${-days} ngày</span>`}
+        </section>
+        <a class="card overview-stat" href="ke-hoach.html?tab=budget" data-go="budget">
+          <span class="small muted">Ngân sách</span>
+          <strong>${money(t.estimated)}</strong>
+          <span class="small ${t.over ? 'text-red' : 'muted'}">${t.budget ? `${Math.round((t.estimated / t.budget) * 100)}% của ${money(t.budget)}` : 'Chưa đặt tổng ngân sách'}</span>
+          <div class="progress"><span style="width:${t.budget ? Math.min(100, (t.estimated / t.budget) * 100) : 0}%"></span></div>
+          <span class="small muted">Đã trả ${money(t.paid)}</span>
+        </a>
+        <a class="card overview-stat" href="ke-hoach.html?tab=checklist" data-go="checklist">
+          <span class="small muted">Việc cần chuẩn bị</span>
+          <strong>${done}/${total} việc</strong>
+          <span class="small muted">${total ? Math.round((done / total) * 100) : 0}% hoàn thành</span>
+          <div class="progress"><span style="width:${total ? (done / total) * 100 : 0}%"></span></div>
+        </a>
+        <a class="card overview-stat" href="bookings.html">
+          <span class="small muted">Đơn trên Trạm Hỷ</span>
+          <strong>${activeBookings.length} đơn</strong>
+          <span class="small muted">${activeBookings.length ? `${money(activeBookings.reduce((s, b) => s + b.total_price, 0))} · tự cộng vào ngân sách` : 'Chưa đặt dịch vụ nào'}</span>
+        </a>
+      </div>
+      <div class="grid-2" style="margin-top:16px;align-items:start">
+        <section class="card stack">
+          <div class="row"><h3 style="margin:0">Việc sắp tới</h3><span class="spacer"></span>
+            <button type="button" class="btn-link btn-sm" data-go-btn="checklist">Xem tất cả →</button></div>
+          ${nextTasks(tasks).length ? html`<ul class="next-tasks">${nextTasks(tasks).map((task) => {
+            const due = dueLabel(plan, task);
+            return html`<li class="${due.tone}"><span class="dot"></span><div><strong>${task.title}</strong><span class="small muted">${due.text}</span></div>
+              ${task.link_category ? html`<a class="small" href="marketplace.html?category=${task.link_category}">Tìm đối tác →</a>` : ''}</li>`;
+          })}</ul>` : html`<p class="muted">Bạn đã xong hết việc chuẩn bị 🎉</p>`}
+        </section>
+        <section class="card stack">
+          <div class="row"><h3 style="margin:0">Thông tin đám cưới</h3><span class="spacer"></span>
+            <button type="button" class="btn btn-outline btn-sm" data-edit>Sửa</button></div>
+          <dl class="review-list">
+            <dt>Ngày cưới</dt><dd>${plan.wedding_date ? new Date(`${plan.wedding_date}T00:00:00`).toLocaleDateString('vi-VN') : 'Chưa đặt'}</dd>
+            <dt>Phong tục</dt><dd>${REGION_LABEL[plan.region]}</dd>
+            <dt>Tổng ngân sách</dt><dd>${plan.total_budget ? money(plan.total_budget) : 'Chưa đặt'}</dd>
+            <dt>Số khách</dt><dd>${plan.guests ? `${plan.guests} khách (~${Math.ceil(plan.guests / 10)} bàn)` : 'Chưa có'}</dd>
+            <dt>Thành phố</dt><dd>${plan.city || 'Chưa có'}</dd>
+          </dl>
+          <button type="button" class="btn btn-link btn-sm text-red" data-reset style="align-self:flex-start">Làm lại kế hoạch từ đầu</button>
+        </section>
+      </div>`);
+    panel.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', editPlan));
+    panel.querySelector('[data-reset]').addEventListener('click', resetPlan);
+    panel.querySelectorAll('[data-go], [data-go-btn]').forEach((el) => el.addEventListener('click', (e) => {
+      e.preventDefault();
+      showTab(el.dataset.go || el.dataset.goBtn);
+    }));
+  } catch (error) {
+    render(panel, html`<div class="empty">Không tải được kế hoạch.</div>`);
+    toastError(error);
+  }
+}
+
+function updateHeader() {
+  $('#planner-title').textContent = 'Kế hoạch cưới của bạn';
+  const days = plan.wedding_date ? Math.ceil((new Date(`${plan.wedding_date}T00:00:00`) - new Date()) / 86_400_000) : null;
+  $('#planner-subtitle').textContent = days > 0 ? `Còn ${days} ngày nữa là đến ngày cưới – cùng chuẩn bị thật chu đáo nhé!`
+    : 'Ngân sách, việc cần làm và các đơn đặt dịch vụ – tất cả ở một nơi.';
+}
+
+async function editPlan() {
+  const saved = await openDialog({
+    title: 'Thông tin đám cưới',
+    confirmText: 'Lưu',
+    content: html`
+      <div class="form-grid">
+        <label class="field"><span>Ngày cưới</span><input class="input" type="date" name="weddingDate" value="${plan.wedding_date || ''}"></label>
+        <label class="field"><span>Tổng ngân sách</span>
+          <input class="input" name="totalBudget" data-money inputmode="numeric" value="${moneyValue(plan.total_budget)}" placeholder="VD: 300.000.000"></label>
+        <label class="field"><span>Số khách mời</span><input class="input" type="number" name="guests" min="0" max="5000" step="10" value="${plan.guests || ''}"></label>
+        <label class="field"><span>Thành phố</span><input class="input" name="city" maxlength="60" value="${plan.city || ''}"></label>
+      </div>`,
+    onConfirm: (form) => updatePlan(plan.id, {
+      wedding_date: form.get('weddingDate') || null,
+      total_budget: readMoneyField(form.get('totalBudget'), 'Tổng ngân sách', { required: false }) ?? 0,
+      guests: Number(form.get('guests')) || null,
+      city: form.get('city').trim() || null,
+    }),
+  });
+  if (saved) {
+    plan = saved;
+    toast('Đã lưu thông tin đám cưới.', 'success');
+    renderPlan();
+  }
+}
+
+async function resetPlan() {
+  const ok = await openDialog({
+    title: 'Làm lại kế hoạch từ đầu?',
+    danger: true,
+    confirmText: 'Xóa & làm lại',
+    content: html`<p>Toàn bộ danh mục chi tiêu và checklist sẽ bị xóa. Đơn đặt dịch vụ trên Trạm Hỷ <strong>không bị ảnh hưởng</strong>.</p>`,
+    onConfirm: () => deletePlan(plan.id),
+  });
+  if (ok) {
+    plan = null;
+    $('#planner-title').textContent = 'Kế hoạch cưới';
+    renderCreate();
+  }
+}
+
+// Bảng ngân sách / checklist gửi sự kiện này khi bấm "Ngân sách: …" hoặc "Đặt ngày cưới"
+root.addEventListener('edit-plan', editPlan);
+
+// ---------- KHỞI CHẠY TRANG ----------
+profile = await initLayout('planner');
+if (!profile) {
+  renderGuest();
+} else {
+  try {
+    [plan, bookings] = await Promise.all([getPlan(profile.id), listMyBookings(profile.id).catch(() => [])]);
+    if (plan) renderPlan(); else renderCreate();
+  } catch (error) {
+    render(root, html`<div class="empty">Chưa mở được Kế hoạch cưới – Trạm Hỷ đang cập nhật hệ thống, vui lòng thử lại sau.</div>`);
+    console.warn(error);
+  }
+}
