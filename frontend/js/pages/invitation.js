@@ -346,8 +346,9 @@ async function renderEditor(profile) {
     </div>
     <div class="inv-editor">
       <form class="card stack" id="editor" novalidate>
-        <section class="inv-form-section">
-          <h3>1. Chọn mẫu thiệp</h3>
+        <details class="inv-form-section" data-section="1" open>
+          <summary><span class="step-num">1</span><span class="step-title">Chọn mẫu thiệp</span><span class="step-done" aria-hidden="true">✓</span></summary>
+          <div class="inv-form-body">
           <div class="tpl-strip" role="radiogroup" aria-label="Mẫu thiệp">
             ${INVITATION_TEMPLATES.map((t) => html`
               <button type="button" class="tpl-pick ${t.key === draft.template ? 'active' : ''}" style="--stage:${t.colors.backdrop}"
@@ -356,9 +357,11 @@ async function renderEditor(profile) {
                 <span>${t.name}</span>
               </button>`)}
           </div>
-        </section>
-        <section class="inv-form-section">
-          <h3>2. Cô dâu & chú rể</h3>
+          </div>
+        </details>
+        <details class="inv-form-section" data-section="2" open>
+          <summary><span class="step-num">2</span><span class="step-title">Cô dâu & chú rể</span><span class="step-done" aria-hidden="true">✓</span></summary>
+          <div class="inv-form-body">
           <div class="form-grid">
             ${field('groom_name', 'Họ tên chú rể', invitation?.groom_name, { required: true, max: 60, placeholder: 'VD: Nguyễn Minh Khang' })}
             ${field('bride_name', 'Họ tên cô dâu', invitation?.bride_name, { required: true, max: 60, placeholder: 'VD: Trần Thu Hà' })}
@@ -377,9 +380,11 @@ async function renderEditor(profile) {
               <label class="same-photo"><input type="checkbox" id="same-photo" ${d.photo2_url ? '' : 'checked'}>
                 Dùng ảnh bìa cho cả trang tiệc cưới (trang 3)</label>` : ''}`)}
           <span class="small muted">Ảnh hiện trong khung tròn trên thiệp. Không có ảnh thì thiệp dùng chữ lồng tên hai bạn.</span>
-        </section>
-        <section class="inv-form-section">
-          <h3>3. Gia đình hai bên</h3>
+          </div>
+        </details>
+        <details class="inv-form-section" data-section="3" open>
+          <summary><span class="step-num">3</span><span class="step-title">Gia đình hai bên</span><span class="step-done" aria-hidden="true">✓</span></summary>
+          <div class="inv-form-body">
           <div class="form-grid">
             ${field('groom_father', 'Bố chú rể', d.groom_father)}
             ${field('groom_mother', 'Mẹ chú rể', d.groom_mother)}
@@ -388,47 +393,59 @@ async function renderEditor(profile) {
             ${field('bride_mother', 'Mẹ cô dâu', d.bride_mother)}
             ${field('bride_address', 'Địa chỉ nhà gái', d.bride_address, { full: true, max: 160 })}
           </div>
-        </section>
-        <section class="inv-form-section">
-          <h3>4. Lễ thành hôn</h3>
+          </div>
+        </details>
+        <details class="inv-form-section" data-section="4" open>
+          <summary><span class="step-num">4</span><span class="step-title">Lễ thành hôn</span><span class="step-done" aria-hidden="true">✓</span></summary>
+          <div class="inv-form-body">
           <div class="host-picker" role="radiogroup" aria-label="Thiệp của nhà nào">
             <label><input type="radio" name="host" value="trai" ${d.host !== 'gai' ? 'checked' : ''}> Thiệp nhà trai – Lễ thành hôn</label>
             <label><input type="radio" name="host" value="gai" ${d.host === 'gai' ? 'checked' : ''}> Thiệp nhà gái – Lễ vu quy</label>
           </div>
           <label class="field"><span>Giờ làm lễ tại tư gia</span>
             <input class="input" type="datetime-local" name="ceremony_at" value="${toLocalInput(d.ceremony_at)}"></label>
-        </section>
-        <section class="inv-form-section">
-          <h3>5. Tiệc cưới</h3>
+          </div>
+        </details>
+        <details class="inv-form-section" data-section="5" open>
+          <summary><span class="step-num">5</span><span class="step-title">Tiệc cưới</span><span class="step-done" aria-hidden="true">✓</span></summary>
+          <div class="inv-form-body">
           <div class="form-grid">
             <label class="field full"><span>Giờ đãi tiệc</span>
               <input class="input" type="datetime-local" name="event_at" value="${toLocalInput(invitation?.event_at)}" required></label>
             ${field('venue', 'Nhà hàng / nơi đãi tiệc', invitation?.venue, { required: true, max: 120, full: true, placeholder: 'VD: Trung tâm tiệc cưới Hoa Sen' })}
             ${field('venue_address', 'Địa chỉ nhà hàng', d.venue_address, { full: true, max: 160, placeholder: 'Số nhà, đường, quận, thành phố' })}
           </div>
-        </section>
-        <section class="inv-form-section">
-          <h3>6. Mừng cưới qua chuyển khoản <span class="small muted">(không bắt buộc)</span></h3>
+          </div>
+        </details>
+        <details class="inv-form-section" data-section="6" open>
+          <summary><span class="step-num">6</span><span class="step-title">Mừng cưới qua chuyển khoản <span class="small muted">(không bắt buộc)</span></span><span class="step-done" aria-hidden="true">✓</span></summary>
+          <div class="inv-form-body">
           <div class="form-grid">
             <label class="field"><span>Ngân hàng</span>
               <select class="input" name="bank_code">${BANKS.map(([code, name]) => html`
                 <option value="${code}" ${code === (invitation?.bank_code ?? 'MB') ? 'selected' : ''}>${name}</option>`)}</select></label>
             <label class="field"><span>Số tài khoản</span><input class="input" name="bank_account" value="${invitation?.bank_account || ''}" pattern="[0-9]{6,20}" inputmode="numeric"></label>
           </div>
-        </section>
-        <section class="inv-form-section">
-          <h3>7. Album ảnh cưới <span class="small muted">(tối đa ${ALBUM_MAX} ảnh – kéo để đổi thứ tự)</span></h3>
+          </div>
+        </details>
+        <details class="inv-form-section" data-section="7" open>
+          <summary><span class="step-num">7</span><span class="step-title">Album ảnh cưới <span class="small muted">(tối đa ${ALBUM_MAX} ảnh – kéo để đổi thứ tự)</span></span><span class="step-done" aria-hidden="true">✓</span></summary>
+          <div class="inv-form-body">
           <div class="album-edit" id="album-edit"></div>
           <label class="btn btn-outline btn-sm" style="align-self:flex-start;cursor:pointer" id="album-add">＋ Thêm ảnh
             <input type="file" accept="image/*" multiple hidden id="album-input"></label>
-        </section>
-        <section class="inv-form-section">
-          <h3>8. Chuyện tình yêu <span class="small muted">(tối đa ${STORY_MAX} cột mốc)</span></h3>
+          </div>
+        </details>
+        <details class="inv-form-section" data-section="8" open>
+          <summary><span class="step-num">8</span><span class="step-title">Chuyện tình yêu <span class="small muted">(tối đa ${STORY_MAX} cột mốc)</span></span><span class="step-done" aria-hidden="true">✓</span></summary>
+          <div class="inv-form-body">
           <div class="stack" id="story-edit"></div>
           <button type="button" class="btn btn-outline btn-sm" style="align-self:flex-start" id="story-add">＋ Thêm cột mốc</button>
-        </section>
-        <section class="inv-form-section">
-          <h3>9. Nhạc nền</h3>
+          </div>
+        </details>
+        <details class="inv-form-section" data-section="9" open>
+          <summary><span class="step-num">9</span><span class="step-title">Nhạc nền</span><span class="step-done" aria-hidden="true">✓</span></summary>
+          <div class="inv-form-body">
           <div class="music-picker" role="radiogroup" aria-label="Nhạc nền">
             <label class="music-option"><input type="radio" name="music" value="" ${!music ? 'checked' : ''}> <span>🔇 Không phát nhạc</span></label>
             ${MUSIC_TRACKS.map((t) => html`
@@ -443,10 +460,16 @@ async function renderEditor(profile) {
           <p class="small muted" style="margin:0">Nhạc cổ điển do Trạm Hỷ chơi bằng tiếng hộp nhạc (giai điệu đã hết bản quyền).
             Bài từ YouTube phát qua trình phát của YouTube – video cần cho phép nhúng; bản quyền bài hát do bạn chọn.
             Nhạc bắt đầu khi khách mở phong bì, khách có nút bật / tắt.</p>
-        </section>
-        <button class="btn btn-primary btn-lg" type="submit">${invitation ? 'Lưu thiệp' : 'Tạo thiệp'}</button>
+          </div>
+        </details>
+        <button class="btn btn-primary btn-lg inv-save-main" type="submit">${invitation ? 'Lưu thiệp' : 'Tạo thiệp'}</button>
         <div id="share"></div>
       </form>
+      <!-- Điện thoại: thanh cố định – xem thiệp toàn màn hình + lưu, không phải kéo xuống cuối form -->
+      <div class="inv-mobile-bar">
+        <button type="button" class="btn btn-outline" data-open-preview>👁 Xem thiệp</button>
+        <button type="submit" form="editor" class="btn btn-primary">💾 ${invitation ? 'Lưu thiệp' : 'Tạo thiệp'}</button>
+      </div>
       <div class="inv-editor-side">
         <div class="inv-editor-preview" id="preview" aria-label="Xem trước thiệp"></div>
       </div>
@@ -492,6 +515,33 @@ async function renderEditor(profile) {
   };
 
   form.addEventListener('input', refreshPreview);
+
+  // ----- Mục gập / mở: dấu ✓ khi đã điền; điện thoại chỉ mở mục 1, mở mục nào cuộn tới mục đó -----
+  const isPhone = () => matchMedia('(max-width: 900px)').matches;
+  const sectionDone = () => {
+    const v = readForm();
+    const dd = v.details;
+    const done = {
+      1: true, 2: v.groom_name && v.bride_name, 3: dd.groom_father || dd.groom_mother || dd.bride_father || dd.bride_mother,
+      4: dd.ceremony_at, 5: v.event_at && v.venue, 6: v.bank_account, 7: draft.album.length, 8: dd.story, 9: dd.music,
+    };
+    $$('[data-section]').forEach((sec) => sec.classList.toggle('is-done', Boolean(done[sec.dataset.section])));
+  };
+  form.addEventListener('input', sectionDone);
+  form.addEventListener('change', sectionDone);
+  if (isPhone()) $$('[data-section]').forEach((sec, i) => { sec.open = i === 0; });
+  // Chỉ cuộn khi người dùng bấm mở (sự kiện toggle còn chạy lúc trang vừa vẽ → sẽ tự cuộn mất tiêu đề)
+  $$('[data-section] > summary').forEach((summary) => summary.addEventListener('click', () => setTimeout(() => {
+    const sec = summary.parentElement;
+    if (sec.open && isPhone()) sec.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, 60)));
+  $('[data-open-preview]').addEventListener('click', () => openDialog({
+    title: 'Xem trước thiệp',
+    confirmText: null,
+    cancelText: 'Đóng',
+    content: html`<div class="tpl-preview-stage" style="--stage:${templateOf(draft.template).colors.backdrop}">
+      ${invitationPages(readForm(), { uid: 'mpv', guestName: 'Tên khách mời' })}</div>`,
+  }));
   $$('[data-template]').forEach((btn) => btn.addEventListener('click', () => {
     draft.template = btn.dataset.template;
     $$('[data-template]').forEach((b) => { b.classList.toggle('active', b === btn); b.setAttribute('aria-checked', String(b === btn)); });
@@ -567,7 +617,8 @@ async function renderEditor(profile) {
         if (!now.photo2_url) draft.photo2_url = null;
         saved.album.filter((url) => !draft.album.includes(url)).forEach(removeInvitationPhoto);   // ảnh đã bỏ khỏi album
         saved.album = [...draft.album];
-        e.submitter.textContent = 'Lưu thiệp';
+        $('.inv-save-main').textContent = 'Lưu thiệp';
+        $('.inv-mobile-bar [type=submit]').textContent = '💾 Lưu thiệp';
         toast('Đã lưu thiệp.', 'success');
         renderShare(invitation);
         if (isNew) {                                  // thiệp vừa tạo → bắt đầu nhận phản hồi & lời chúc
@@ -589,6 +640,7 @@ async function renderEditor(profile) {
         <button type="button" class="album-remove" data-remove-photo="${i}" aria-label="Xóa ảnh ${i + 1}">✕</button>
       </div>`)}${draft.album.length ? '' : html`<p class="small muted" style="margin:0">Chưa có ảnh – khách sẽ không thấy mục Album.</p>`}`);
     $('#album-add').hidden = draft.album.length >= ALBUM_MAX;
+    sectionDone();
   };
   $('#album-edit').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-remove-photo]');
@@ -673,6 +725,7 @@ async function renderEditor(profile) {
   refreshPreview();
   drawAlbum();
   drawStory();
+  sectionDone();
   if (invitation) {
     renderShare(invitation);
     await showRsvps(invitation);

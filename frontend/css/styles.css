@@ -749,6 +749,7 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
 
 /* ---------- 8. RESPONSIVE ---------- */
 @media (max-width: 900px) {
+  .input, select.input, textarea.input { font-size: 16px; }   /* iPhone không tự phóng to khi chạm vào ô nhập */
   /* minmax(0, 1fr) thay vì 1fr: không cho nội dung bên trong (dải ảnh, chip) kéo cột rộng hơn màn hình */
   .hero, .studio, .grid-2, .grid-3, .kanban { grid-template-columns: minmax(0, 1fr); }
   .budget-tool > form { position: static; max-height: none; overflow: visible; }   /* 1 cột: không dính */
