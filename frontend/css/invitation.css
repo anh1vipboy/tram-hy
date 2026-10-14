@@ -302,3 +302,86 @@ details.inv-form-section { display: block; padding: 0; scroll-margin-top: 76px; 
   border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg);
 }
 .inv-form-section[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+
+/* ---------- Nâng cấp thiệp: nhiều sự kiện, câu hỏi, mừng cưới 2 bên, video, phù dâu phù rể, hiệu ứng, khóa ---------- */
+/* Trình soạn */
+.event-edit { border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px; background: var(--card); }
+.event-edit.is-main { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-soft); }
+.event-edit-head { display: flex; align-items: center; gap: 8px; }
+.event-badge { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-dark); }
+.gift-edit { border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px 12px; margin: 0; }
+.gift-edit legend { font-weight: 700; padding: 0 6px; }
+.effect-picker .chip { cursor: pointer; }
+.effect-picker .chip.active, .rsvp-choice.active { border-color: var(--brand); background: var(--brand-soft); color: var(--brand-dark); }
+.share-box { background: var(--brand-soft); padding: 14px; }
+.share-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.share-qr { display: flex; gap: 14px; align-items: center; padding: 10px; border-radius: 12px; background: #fff; }
+.share-qr img { width: 132px; height: auto; flex: none; image-rendering: pixelated; }
+.rsvp-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0; }
+.rsvp-stats div { background: var(--bg); border-radius: 12px; padding: 10px; text-align: center; display: flex; flex-direction: column; }
+.rsvp-stats strong { font-size: 22px; }
+.rsvp-stats span { font-size: 12px; color: var(--muted); }
+.rsvp-breakdown { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.rsvp-breakdown li { display: flex; gap: 8px; align-items: baseline; padding: 6px 10px; border-radius: 10px; background: var(--bg); }
+.rsvp-breakdown li span:first-child { flex: 1; }
+.rsvp-question { display: flex; flex-direction: column; gap: 6px; padding: 8px 0; border-top: 1px dashed var(--line); }
+.rsvp-question .chip { cursor: default; }
+.wish-reply-box { margin-top: 8px; }
+.wish-reply-box summary { cursor: pointer; color: var(--brand-dark); font-weight: 600; }
+.wish-reply-box textarea { margin: 6px 0; min-height: 60px; }
+
+/* Khách mời */
+.inv-lock { max-width: 440px; }
+.inv-lock-icon { font-size: 40px; }
+.inv-events h2, .inv-crew h2, .inv-video h2 { font-family: var(--inv-script); color: var(--inv-accent); font-weight: 400; font-size: clamp(34px, 7vw, 46px); line-height: 1.1; }
+.event-list { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.event-card { display: grid; grid-template-columns: 86px 1fr; gap: 14px; padding: 14px; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--inv-accent) 22%, transparent); background: color-mix(in srgb, var(--inv-accent) 5%, #fff); }
+.event-card.is-main { border-color: var(--inv-accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--inv-accent) 25%, transparent); }
+.event-date { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; background: var(--inv-accent); color: #fff; padding: 8px 4px; text-align: center; }
+.event-date strong { font-size: 22px; line-height: 1.1; }
+.event-date span { font-size: 13px; opacity: .9; }
+.event-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.event-kind { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--inv-accent); }
+.event-name { font-size: 17px; }
+.event-links { display: flex; gap: 14px; margin-top: 4px; font-size: 14px; font-weight: 600; }
+.event-links a { color: var(--inv-accent); }
+.crew-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 14px; }
+.crew-col { background: color-mix(in srgb, var(--inv-accent) 7%, #fff); border-radius: 14px; padding: 12px 16px; text-align: center; }
+.crew-col ul { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+.video-box { margin-top: 14px; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000; }
+.video-box iframe { width: 100%; height: 100%; border: 0; display: block; }
+.video-poster { width: 100%; height: 100%; border: 0; cursor: pointer; background: #222 center / cover no-repeat; display: grid; place-items: center; }
+.video-play { width: 68px; height: 68px; border-radius: 50%; background: rgba(0, 0, 0, .6); color: #fff; font-size: 26px; display: grid; place-items: center; padding-left: 5px; transition: transform .2s, background .2s; }
+.video-poster:hover .video-play { transform: scale(1.08); background: var(--inv-accent); }
+.gift-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
+.gift-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px; border-radius: 16px; background: color-mix(in srgb, var(--inv-accent) 6%, #fff); }
+.gift-card .gift-qr { margin: 6px auto; }
+.gift-account { font-size: 18px; font-weight: 800; letter-spacing: .04em; }
+.rsvp-events { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.rsvp-events legend { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.rsvp-event { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; }
+.rsvp-event:has(input:checked) { border-color: var(--brand); background: var(--brand-soft); }
+.rsvp-event input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--brand); flex: none; }
+.rsvp-event > span { display: flex; flex-direction: column; }
+.rsvp-q fieldset { border: 0; padding: 0; margin: 0; }
+.rsvp-q legend { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+.rsvp-choice { cursor: pointer; }
+.rsvp-choice input { position: absolute; opacity: 0; pointer-events: none; }
+.rsvp-choice:has(input:focus-visible) { outline: 2px solid var(--brand); outline-offset: 2px; }
+.wish-reply { margin-top: 8px; padding: 8px 10px; border-radius: 10px; background: #fff; font-size: 14px; border-left: 3px solid var(--inv-accent); }
+
+/* Hiệu ứng rơi */
+.wedding-effect { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 30; }
+.wedding-effect span { position: absolute; top: -40px; color: var(--fx-accent); animation-name: fx-fall; animation-timing-function: linear; animation-iteration-count: infinite; will-change: transform; }
+.effect-snow span { color: #fff; text-shadow: 0 0 6px rgba(255, 255, 255, .7); }
+.effect-sparkles span { color: #f3d27a; text-shadow: 0 0 8px rgba(243, 210, 122, .8); }
+.effect-petals span { color: #f4a7b9; }
+.effect-hearts span { animation-name: fx-rise; top: auto; bottom: -40px; }
+@keyframes fx-fall { to { transform: translate(var(--fx-drift), 110vh) rotate(var(--fx-spin)); } }
+@keyframes fx-rise { to { transform: translate(var(--fx-drift), -110vh) rotate(calc(var(--fx-spin) / 4)); } }
+
+@media (max-width: 640px) {
+  .event-card { grid-template-columns: 70px 1fr; gap: 10px; padding: 12px; }
+  .share-qr img { width: 104px; }
+  .rsvp-stats strong { font-size: 18px; }
+}

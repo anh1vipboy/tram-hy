@@ -50,6 +50,13 @@ export function sizedImage(url, width) {
   return u.toString();
 }
 
+// Ô datetime-local cần dạng YYYY-MM-DDTHH:mm theo giờ địa phương
+export function toLocalInput(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+}
+
 // ---------- ĐỊNH DẠNG ----------
 export const money = (n) => `${Number(n || 0).toLocaleString('vi-VN')}đ`;
 

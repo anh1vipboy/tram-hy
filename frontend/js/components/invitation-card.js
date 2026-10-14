@@ -20,6 +20,26 @@ export function whenText(iso) {
   return `${pad(p.h)} giờ ${pad(p.m)} | ${WEEKDAY[p.wd]} | ${pad(p.day)}.${pad(p.month)}.${p.year}`;
 }
 
+// ---------- SỰ KIỆN CƯỚI ----------
+// details.events: [{ id, name, kind: 'le' (lễ tại tư gia) | 'tiec', at, place, address, main (tiệc chính) }]
+// Thiệp tạo trước khi có danh sách sự kiện → dựng từ các ô cũ (giờ lễ, giờ tiệc, nhà hàng).
+export function weddingEvents(inv) {
+  const d = inv.details || {};
+  if (Array.isArray(d.events) && d.events.length) return d.events;
+  const bride = d.host === 'gai';
+  const list = [];
+  if (d.ceremony_at) {
+    list.push({ id: 'le', name: bride ? 'Lễ vu quy' : 'Lễ thành hôn', kind: 'le', at: d.ceremony_at,
+      place: `Tư gia nhà ${bride ? 'gái' : 'trai'}`, address: (bride ? d.bride_address : d.groom_address) || '' });
+  }
+  if (inv.event_at || inv.venue) {
+    list.push({ id: 'tiec', name: 'Tiệc cưới', kind: 'tiec', at: inv.event_at, place: inv.venue || '', address: d.venue_address || '', main: true });
+  }
+  return list;
+}
+export const mainParty = (events) => events.find((e) => e.kind === 'tiec' && e.main) || events.find((e) => e.kind === 'tiec') || null;
+export const firstCeremony = (events) => events.find((e) => e.kind === 'le') || null;
+
 export const invitationTemplateKey = (inv) => inv.template || TEMPLATE_FROM_THEME[inv.theme] || 'la-tim';
 
 // ---------- HỌA TIẾT SVG ----------
@@ -178,7 +198,13 @@ export function invitationPages(inv, { guestName = '', pages = [1, 2, 3], uid = 
     <span>Ông: ${father || '…'}</span><span>Bà: ${mother || '…'}</span>
     ${address ? html`<span class="inv-tiny">${address}</span>` : ''}</div>`;
   const guestLine = html`<div class="inv-guest">${guestName}</div>`;
-  const venue = inv.venue || 'Tên nhà hàng';
+  const events = weddingEvents(inv);
+  const ceremony = firstCeremony(events);
+  const party = mainParty(events);
+  const ceremonyAt = ceremony?.at || inv.event_at;
+  const partyAt = party?.at || inv.event_at;
+  const venue = party?.place || inv.venue || 'Tên nhà hàng';
+  const venueAddress = party ? party.address : d.venue_address;
 
   const page1 = html`<section class="inv-page inv-p1" aria-label="Bìa thiệp">
     ${ornamentSvg(tpl.ornament, 'cover', `${id}-1`)}
@@ -201,10 +227,10 @@ export function invitationPages(inv, { guestName = '', pages = [1, 2, 3], uid = 
         <span class="inv-caps">${groomFirst ? 'Lễ thành hôn' : 'Lễ vu quy'} của con chúng tôi</span></div>
       <div class="inv-fullnames"><span class="inv-script">${first || 'Họ tên'}</span><span class="inv-amp">&</span><span class="inv-script">${second || 'Họ tên'}</span></div>
       <div class="inv-block"><span class="inv-caps inv-light">Hôn lễ được cử hành vào lúc</span>
-        <span class="inv-when">${whenText(d.ceremony_at || inv.event_at)}</span>
-        ${d.ceremony_at || inv.event_at ? html`<span class="inv-tiny">(${lunarText(d.ceremony_at || inv.event_at)})</span>` : ''}</div>
-      <div class="inv-block"><span class="inv-caps">Tại tư gia nhà ${groomFirst ? 'trai' : 'gái'}</span>
-        <span class="inv-tiny">${(groomFirst ? d.groom_address : d.bride_address) || ''}</span></div>
+        <span class="inv-when">${whenText(ceremonyAt)}</span>
+        ${ceremonyAt ? html`<span class="inv-tiny">(${lunarText(ceremonyAt)})</span>` : ''}</div>
+      <div class="inv-block"><span class="inv-caps">Tại ${ceremony?.place || `tư gia nhà ${groomFirst ? 'trai' : 'gái'}`}</span>
+        <span class="inv-tiny">${ceremony?.address || (groomFirst ? d.groom_address : d.bride_address) || ''}</span></div>
     </div>
   </section>`;
 
@@ -216,10 +242,10 @@ export function invitationPages(inv, { guestName = '', pages = [1, 2, 3], uid = 
       <span class="inv-note">Đến dự bữa tiệc thân mật chung vui cùng gia đình chúng tôi tại</span>
       <span class="inv-caps">${d.venue_label || 'Nhà hàng tiệc cưới'}</span>
       <span class="inv-script inv-venue ${venue.length > 28 ? 'is-xlong' : venue.length > 18 ? 'is-long' : ''}">${venue}</span>
-      ${d.venue_address ? html`<span class="inv-tiny">${d.venue_address}</span>` : ''}
+      ${venueAddress ? html`<span class="inv-tiny">${venueAddress}</span>` : ''}
       <span class="inv-caps inv-light">Tiệc được tổ chức vào lúc</span>
-      <span class="inv-when">${whenText(inv.event_at)}</span>
-      ${inv.event_at ? html`<span class="inv-tiny">(${lunarText(inv.event_at)})</span>` : ''}
+      <span class="inv-when">${whenText(partyAt)}</span>
+      ${partyAt ? html`<span class="inv-tiny">(${lunarText(partyAt)})</span>` : ''}
     </div>
     ${arcPhoto(inv, `${id}-3`)}
   </section>`;
