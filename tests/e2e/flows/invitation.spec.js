@@ -358,14 +358,16 @@ test('video cưới tải từ máy: tải lên → xem trước → khách xem 
   await step(bride, 8);
   await bride.locator('input[name=video_kind][value=""]').check();
   await save(bride);
-  // Hỏi thẳng kho bằng phiên đăng nhập của cô dâu (link công khai có thể còn bản lưu tạm trên CDN một lúc)
+  // Kiểm tra bằng cách liệt kê thư mục trên kho (link file – kể cả link cần đăng nhập – có thể còn bản lưu tạm trên CDN)
   const token = await bride.evaluate(() => {
     const key = Object.keys(localStorage).find((k) => k.endsWith('-auth-token'));
     return JSON.parse(localStorage.getItem(key)).access_token;
   });
-  const objectPath = fileUrl.split('/invitation-media/')[1];
-  const stored = () => fetch(`${process.env.TEST_SUPABASE_URL}/storage/v1/object/authenticated/invitation-media/${objectPath}`, {
-    headers: { apikey: process.env.TEST_SUPABASE_KEY, Authorization: `Bearer ${token}` },
-  }).then((r) => r.status);
-  await expect.poll(stored, { timeout: 15_000 }).not.toBe(200);
+  const [folder, fileName] = fileUrl.split('/invitation-media/')[1].split('/');
+  const stillThere = () => fetch(`${process.env.TEST_SUPABASE_URL}/storage/v1/object/list/invitation-media`, {
+    method: 'POST',
+    headers: { apikey: process.env.TEST_SUPABASE_KEY, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prefix: folder, limit: 100 }),
+  }).then((r) => r.json()).then((list) => list.some((o) => o.name === fileName));
+  await expect.poll(stillThere, { timeout: 15_000 }).toBe(false);
 });
