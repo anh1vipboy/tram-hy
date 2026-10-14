@@ -68,6 +68,7 @@ exe202/
 │   ├── 22_invitation_templates.sql Thiệp cưới: mẫu thiệp, thông tin hai họ (details), ảnh cưới (bucket invitation-photos)
 │   ├── 23_image_webp.sql     Ảnh demo trỏ về ảnh của web đổi sang .webp (nhẹ hơn ~10 lần)
 │   ├── 24_guestbook.sql      Sổ lời chúc có duyệt (chống spam theo IP, thông báo, realtime); nới dung lượng details
+│   ├── 25_invitation_access.sql Thiệp: chỉ mở bằng link (RPC), mật khẩu tùy chọn, lượt xem, phản hồi theo sự kiện + câu hỏi, trả lời lời chúc
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -118,7 +119,8 @@ exe202/
 | `milestones` | 3 chặng thanh toán của mỗi đơn | Như `bookings` |
 | `disputes` | Khiếu nại: hoàn cọc / khách không đến | Như `bookings` |
 | `reviews` | Đánh giá – chỉ đơn **đã hoàn tất** mới được viết | Mọi người |
-| `invitations`, `rsvps` | Thiệp cưới và phản hồi khách mời | Thiệp: mọi người · RSVP: chủ thiệp |
+| `invitations`, `rsvps` | Thiệp cưới và phản hồi khách mời | Chủ thiệp (+ admin). Khách KHÔNG đọc bảng – mở thiệp qua hàm `open_invitation(slug)` |
+| `guestbook_entries` | Lời chúc (chờ duyệt / đã duyệt / ẩn) + lời đáp của cô dâu | Chủ thiệp. Khách đọc lời đã duyệt qua `list_wishes(slug)` |
 | `wedding_plans`, `budget_categories`, `budget_items`, `checklist_items` | Kế hoạch cưới (1 kế hoạch / tài khoản): danh mục, mục chi tiêu, việc cần làm | Chính chủ |
 
 ### 4.2 Escrow 3 chặng
@@ -325,6 +327,31 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - **Cache** (`frontend/vercel.json`): `js/vendor/*` nhớ 1 năm (tên file có phiên bản), `assets/*` nhớ 7 ngày;
   JS/CSS của web luôn hỏi lại server (304 nếu không đổi) để sau mỗi lần deploy không bị trộn code cũ và mới.
 
+### Thiệp cưới – quyền truy cập (SQL 25) ⚠️
+- **Có link mới mở được**: bảng `invitations` chỉ chủ thiệp / admin đọc. Khách gọi `open_invitation(slug, password)` →
+  `{ status: ok | locked | wrong_password | not_found, invitation }` (thiệp khóa chỉ trả tên cô dâu chú rể).
+- Gửi phản hồi / lời chúc / đọc lời chúc đã duyệt **chỉ qua hàm kèm slug**: `submit_rsvp`, `submit_wish`, `list_wishes`.
+  Không còn chèn thẳng vào `rsvps` / `guestbook_entries`. Trigger chống spam (16, 24) vẫn chạy bên trong.
+- `invitation_by_link` KHÔNG báo lỗi khi sai link / mật khẩu mà trả mã (`OK|NOT_FOUND|LOCKED|WRONG_PASSWORD`): báo lỗi
+  sẽ hủy luôn bản ghi lần thử sai trong `invitation_open_fails` → chống dò (20 lần / 15 phút / IP) mới có tác dụng.
+- Mật khẩu tùy chọn (`set_invitation_password`, băm bcrypt trong `invitation_secrets`); khách nhập 1 lần, lưu sessionStorage.
+- Cột `locked`, `view_count` không sửa được qua API (quyền sửa cấp theo từng cột nội dung). Lượt xem: `invitation_visits`
+  (IP băm / ngày) + `invitation_stats(id)` cho chủ thiệp; chủ thiệp tự mở không tính.
+- Test bảo mật: `tests/e2e/flows/invitation.spec.js` gọi thẳng REST bằng khóa công khai để chắc không đọc / ghi lén được.
+
+### Thiệp cưới – nhiều sự kiện, câu hỏi, mừng cưới 2 bên… (lưu trong `details`)
+- `details.events`: `[{ id, name, kind: le|tiec, at, place, address, main }]` – trang 2 in lễ đầu tiên, trang 3 in tiệc chính;
+  cột `event_at` / `venue` tự đồng bộ theo tiệc chính (đếm ngược, chỉ đường, thông báo). Thiệp cũ chưa có danh sách →
+  `weddingEvents()` (components/invitation-card.js) dựng từ giờ lễ / giờ tiệc cũ. Soạn bằng `components/invitation-lists.js`.
+- `details.rsvp_questions`: `[{ id, text, type: choice|text, options, required, event_id }]` (≤ 5). `submit_rsvp` kiểm tra
+  sự kiện có thật, câu bắt buộc, đáp án hợp lệ; lưu `rsvps.event_ids` + `rsvps.answers`. Chủ thiệp thấy khách theo từng
+  sự kiện + thống kê câu trả lời.
+- `details.gift_groom` / `gift_bride` `{ bank, account, holder }` (QR VietQR từng bên); `details.video` (mã YouTube, chỉ tải
+  khi bấm, nhạc nền tự dừng); `details.wedding_party` `{ groomsmen, bridesmaids }`; `details.effect` (hearts | petals | snow |
+  sparkles – `components/wedding-effects.js`, tắt khi máy bật giảm chuyển động).
+- Mã QR thiệp tạo ngay trên trình duyệt (`components/qr-share.js`, thư viện `js/vendor/qrcode-generator-1.4.4.js` MIT);
+  "Chia sẻ qua Zalo, Messenger…" dùng bảng chia sẻ của điện thoại (navigator.share), máy tính thì sao chép link.
+
 ### Thiệp cưới – mẫu thiệp, phong bì (SQL 22)
 - Thiệp vuông 3 trang: **bìa** (tên viết tay, ảnh tròn / chữ lồng, "Trân trọng kính mời" + tên khách) · **gia đình & hôn lễ**
   (nhà trai, nhà gái, Lễ thành hôn / Lễ vu quy theo bên tổ chức, giờ lễ + **ngày âm lịch**) · **tiệc cưới** (nhà hàng,
@@ -451,7 +478,8 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 | ✅ | AI trong Kế hoạch cưới: lưu gợi ý AI thành kế hoạch, trợ lý đề xuất sửa từng mục (Áp dụng / Hoàn tác), 20 câu / ngày | Đã xong (SQL 21) |
 | ✅ | Thiệp cưới: 6 mẫu thiệp 3 trang, phong bì mở thiệp, hai họ, âm lịch, ảnh cưới, link mời riêng | Đã xong (SQL 22) |
 | ✅ | Thiệp cưới: album, chuyện tình yêu, sổ lời chúc có duyệt, nhạc nền | Đã xong (SQL 24) |
-| 5 | **Quản lý khách mời**: danh sách khách, link riêng hàng loạt, gửi Zalo, theo dõi đã mở / đã xác nhận | SQL + `frontend/` |
+| ✅ | Thiệp: chỉ mở bằng link + mật khẩu tùy chọn, nhiều sự kiện, câu hỏi khi xác nhận, mừng cưới 2 bên, video, phù dâu phù rể, trả lời lời chúc, hiệu ứng, QR + chia sẻ, lượt xem | Đã xong (SQL 25) |
+| 5 | **Quản lý khách mời**: danh sách khách, nhập / xuất Excel, link riêng hàng loạt, theo dõi đã mở / đã xác nhận, sổ tiền mừng | SQL + `frontend/` |
 | 6 | **Tự xóa ảnh cô dâu sau 24 giờ** (cam kết bảo mật trong báo cáo) | Scheduled Edge Function |
 | 7 | Đo lường hành vi (Vercel Analytics) để có số liệu cho báo cáo | `frontend/` |
 | 8 | Ảnh xem trước khi chia sẻ link thiệp / tiệm qua Zalo, Facebook | `frontend/` |
