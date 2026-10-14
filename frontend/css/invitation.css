@@ -442,3 +442,9 @@ details.inv-form-section { display: block; padding: 0; scroll-margin-top: 76px; 
 .music-mini-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 4px 4px 10px; color: #fff; font: 600 12px var(--font-body); }
 .music-mini-close { width: 26px; height: 26px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .15); color: #fff; cursor: pointer; }
 .music-mini iframe { display: block; width: 200px; height: 113px; border: 0; }
+/* Cột trái: form + gửi thiệp + phản hồi + sổ lời chúc; cột phải: xem trước bám theo màn hình */
+.inv-editor-main { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.inv-editor-main .inv-owner-panels { grid-template-columns: 1fr; margin-top: 0; gap: 20px; }
+.inv-form-section.is-entering { animation: section-in .22s ease; }
+@keyframes section-in { from { opacity: .35; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .inv-form-section.is-entering { animation: none; } }

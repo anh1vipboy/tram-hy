@@ -594,6 +594,7 @@ async function renderEditor(profile) {
       <a class="btn btn-outline btn-sm" href="invitation.html?mau=1">Xem thư viện mẫu</a>
     </div>
     <div class="inv-editor">
+      <div class="inv-editor-main">
       <form class="card stack" id="editor" novalidate>
         <div class="inv-toolbar">
           <span class="inv-toolbar-title">Chọn mục để soạn</span>
@@ -767,13 +768,15 @@ async function renderEditor(profile) {
         <button type="button" class="btn btn-outline" data-preview-guest>👁 Xem thử</button>
         <button type="submit" form="editor" class="btn btn-primary">💾 ${invitation ? 'Lưu thiệp' : 'Tạo thiệp'}</button>
       </div>
+      <!-- Phản hồi & sổ lời chúc ngay dưới form (cùng cột) → không còn khoảng trống khi form ngắn -->
+      <div class="inv-owner-panels">
+        <div class="card" id="rsvps"></div>
+        <div class="card" id="guestbook"></div>
+      </div>
+      </div>
       <div class="inv-editor-side">
         <div class="inv-editor-preview" id="preview" aria-label="Xem trước thiệp"></div>
       </div>
-    </div>
-    <div class="inv-owner-panels">
-      <div class="card" id="rsvps"></div>
-      <div class="card" id="guestbook"></div>
     </div>`);
 
   const form = $('#editor');
@@ -860,7 +863,17 @@ async function renderEditor(profile) {
       if (on) b.parentElement.scrollTo({ left: b.offsetLeft - b.parentElement.clientWidth / 2 + b.offsetWidth / 2, behavior: 'smooth' });
     });
     try { sessionStorage.setItem('tramhy-inv-step', String(n)); } catch { /* chế độ riêng tư */ }
-    if (scroll) $('.inv-toolbar').scrollIntoView({ block: 'start', behavior: 'smooth' });
+    // Không cuộn trượt (gây giật). Chỉ khi đã cuộn quá đầu form → đặt đầu mục mới ngay dưới thanh mục, tức thì.
+    const sec = $(`[data-section="${n}"]`);
+    sec.classList.remove('is-entering'); void sec.offsetWidth; sec.classList.add('is-entering');
+    if (scroll) {
+      const toolbar = $('.inv-toolbar');
+      const stuckBottom = toolbar.getBoundingClientRect().bottom;
+      const secTop = sec.getBoundingClientRect().top;
+      if (secTop < stuckBottom || secTop > window.innerHeight * 0.6) {
+        window.scrollTo({ top: window.scrollY + secTop - stuckBottom - 8, behavior: 'auto' });
+      }
+    }
   };
   $$('[data-section]').forEach((sec) => {
     const n = Number(sec.dataset.section);
@@ -1272,6 +1285,8 @@ function renderShare(invitation) {
 // Danh sách phản hồi + tự cập nhật khi khách vừa gửi (realtime)
 // ownerInvitation luôn là bản thiệp mới nhất (sau mỗi lần Lưu) → tổng hợp theo đúng danh sách sự kiện / câu hỏi hiện tại
 let ownerInvitation = null;
+const RSVP_PREVIEW = 8;        // danh sách dài → chỉ hiện 8 phản hồi mới nhất, bấm "Xem thêm"
+let rsvpShowAll = false;
 let redrawRsvps = null;
 
 async function showRsvps(invitation) {
@@ -1332,7 +1347,7 @@ function renderRsvps(invitation, rsvps, newId = null) {
           : html`<span class="small muted">Chưa có câu trả lời.</span>`}
       </div>`)}
     <p class="small muted" style="margin:8px 0 0">● Tự cập nhật khi khách gửi phản hồi</p>
-    ${rsvps.length ? html`<div class="stack">${rsvps.map((r) => html`
+    ${rsvps.length ? html`<div class="stack">${(rsvpShowAll ? rsvps : rsvps.slice(0, RSVP_PREVIEW)).map((r) => html`
       <div class="small rsvp-item ${r.id === newId ? 'is-new' : ''}"><strong>${r.guest_name}</strong> –
         ${r.attending ? `đến (${r.guest_count} người)` : 'không đến'}
         ${r.attending && (r.event_ids || []).length && events.length > 1
@@ -1342,7 +1357,10 @@ function renderRsvps(invitation, rsvps, newId = null) {
           return q ? html`<div class="muted">${q.text} <strong>${a}</strong></div>` : '';
         })}
         ${r.message ? html`<div class="muted">“${r.message}”</div>` : ''}</div>`)}</div>`
-      : html`<p class="muted small">Chưa có phản hồi nào.</p>`}`);
+      : html`<p class="muted small">Chưa có phản hồi nào.</p>`}
+    ${rsvps.length > RSVP_PREVIEW ? html`<button type="button" class="btn btn-light btn-sm" data-rsvp-more style="margin-top:10px">
+      ${rsvpShowAll ? 'Thu gọn' : `Xem thêm ${rsvps.length - RSVP_PREVIEW} phản hồi`}</button>` : ''}`);
+  $('[data-rsvp-more]')?.addEventListener('click', () => { rsvpShowAll = !rsvpShowAll; redrawRsvps?.(); });
 }
 
 // ---------- KHỞI CHẠY TRANG ----------
