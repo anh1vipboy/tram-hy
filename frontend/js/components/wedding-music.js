@@ -180,17 +180,20 @@ export function youtubeIdFrom(input) {
   return m ? m[1] : null;
 }
 
-// Trình phát YouTube ẩn, điều khiển qua postMessage (API nhúng chính thức của YouTube).
-// Điện thoại chặn tự phát nếu khung YouTube được tạo đúng lúc chạm (tải xong thì "lần chạm" đã hết hiệu lực)
-// → prepare() tải sẵn khung khi khách vừa mở link; lúc chạm con dấu chỉ việc gửi lệnh playVideo.
+// Trình phát YouTube MINI (hiện hẳn ở góc màn hình), điều khiển qua postMessage (API nhúng chính thức của YouTube).
+// Không giấu trình phát: iPhone tự bật video toàn màn hình khi một video bị giấu (1px / ngoài màn hình) bắt đầu phát,
+// và điều khoản YouTube cũng yêu cầu trình phát phải hiện. Khung mini ~200px, có nút ✕; iPhone chặn tự phát → khách chạm ▶.
+// prepare() tải sẵn khung (ẩn mờ) khi khách vừa mở link → lúc chạm con dấu chỉ việc gửi lệnh playVideo.
 function youtubePlayer(id, onState) {
   const ORIGIN = 'https://www.youtube-nocookie.com';
+  let box = null;
   let frame = null;
   let ready = false;
   let wanted = false;
   let checkTimer = null;
   const send = (data) => frame?.contentWindow?.postMessage(JSON.stringify(data), ORIGIN);
   const command = (func, args = []) => send({ event: 'command', func, args, id: 'tramhy-music', channel: 'widget' });
+  const show = (on) => box?.classList.toggle('is-on', on);
 
   window.addEventListener('message', (e) => {
     if (!frame || e.source !== frame.contentWindow) return;
@@ -202,29 +205,37 @@ function youtubePlayer(id, onState) {
     }
     // playerState: 1 đang phát, 2 tạm dừng, 0 hết bài, 3 đang tải, -1 / 5 chưa phát
     const state = data?.event === 'onStateChange' ? data.info : data?.info?.playerState;
-    if (state === 1) { clearTimeout(checkTimer); onState?.(true); }
+    if (state === 1) { clearTimeout(checkTimer); wanted = true; show(true); onState?.(true); }
     if (state === 2 || state === 0) onState?.(false);
   });
 
   const prepare = () => {
     if (frame) return;
+    box = document.createElement('div');
+    box.className = 'music-mini';
+    box.setAttribute('role', 'region');
+    box.setAttribute('aria-label', 'Trình phát nhạc nền');
+    box.innerHTML = '<div class="music-mini-head"><span>🎵 Nhạc nền</span>'
+      + '<button type="button" class="music-mini-close" aria-label="Tắt nhạc nền">✕</button></div>';
     frame = document.createElement('iframe');
-    frame.className = 'music-frame';
     frame.title = 'Nhạc nền thiệp cưới';
     frame.allow = 'autoplay; encrypted-media';
-    frame.src = `${ORIGIN}/embed/${id}?enablejsapi=1&loop=1&playlist=${id}&controls=0&playsinline=1&rel=0`
+    frame.src = `${ORIGIN}/embed/${id}?enablejsapi=1&loop=1&playlist=${id}&controls=1&playsinline=1&rel=0&modestbranding=1`
       + `&origin=${encodeURIComponent(location.origin)}`;
     frame.addEventListener('load', () => send({ event: 'listening', id: 'tramhy-music', channel: 'widget' }));
-    document.body.append(frame);
+    box.append(frame);
+    box.querySelector('.music-mini-close').addEventListener('click', () => player.pause());
+    document.body.append(box);
   };
 
-  return {
+  const player = {
     prepare,
     play() {
       wanted = true;
       prepare();
+      show(true);
       if (ready) { command('unMute'); command('playVideo'); }
-      // Không thấy "đang phát" sau vài giây (điện thoại chặn) → nút ♪ hiện "tắt", khách bấm 1 lần là phát
+      // Không thấy "đang phát" sau vài giây (iPhone chặn tự phát) → nút ♪ hiện "tắt"; khung mini vẫn hiện để khách chạm ▶
       clearTimeout(checkTimer);
       checkTimer = setTimeout(() => onState?.(false), 4000);
       return Promise.resolve();
@@ -233,9 +244,11 @@ function youtubePlayer(id, onState) {
       wanted = false;
       clearTimeout(checkTimer);
       command('pauseVideo');
+      show(false);
       onState?.(false);
     },
   };
+  return player;
 }
 
 /**

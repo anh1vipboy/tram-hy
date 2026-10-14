@@ -431,3 +431,14 @@ details.inv-form-section { display: block; padding: 0; scroll-margin-top: 76px; 
   .inv-steps { grid-column: 1 / -1; grid-row: 2; flex-wrap: wrap; overflow: visible; gap: 6px; }
   .inv-step { padding: 4px 9px 4px 4px; font-size: 12.5px; }
 }
+
+/* Trình phát YouTube mini (nhạc nền từ link YouTube) – hiện hẳn để iPhone phát tại chỗ, không bật video toàn màn hình */
+.music-mini {
+  position: fixed; left: 12px; bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 42; width: 200px;
+  border-radius: 12px; overflow: hidden; background: #111; box-shadow: 0 10px 28px rgba(0, 0, 0, .4);
+  opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .25s, transform .25s;
+}
+.music-mini.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.music-mini-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 4px 4px 10px; color: #fff; font: 600 12px var(--font-body); }
+.music-mini-close { width: 26px; height: 26px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .15); color: #fff; cursor: pointer; }
+.music-mini iframe { display: block; width: 200px; height: 113px; border: 0; }
