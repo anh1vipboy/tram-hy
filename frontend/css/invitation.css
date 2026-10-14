@@ -385,3 +385,49 @@ details.inv-form-section { display: block; padding: 0; scroll-margin-top: 76px; 
   .share-qr img { width: 104px; }
   .rsvp-stats strong { font-size: 18px; }
 }
+
+/* ---------- Trình soạn: thanh mục cố định (mỗi lần 1 mục) + Lưu / Xem thử ---------- */
+.inv-toolbar {
+  position: sticky; top: 64px; z-index: 6; display: flex; align-items: center; gap: 10px;
+  margin: -6px -8px 4px; padding: 8px; border-radius: 14px;
+  background: color-mix(in srgb, var(--card) 92%, transparent); backdrop-filter: blur(8px); box-shadow: 0 6px 18px rgba(42, 36, 33, .06);
+}
+.inv-steps { flex: 1; min-width: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; padding: 2px; scroll-behavior: smooth; }
+.inv-step {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px 6px 6px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--card); font: 600 13px var(--font-body); color: var(--muted); cursor: pointer; white-space: nowrap;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.inv-step .step-num { width: 22px; height: 22px; font-size: 11px; }
+.inv-step .step-check { display: none; color: #1f7a4d; font-weight: 800; }
+.inv-step.is-done .step-check { display: inline; }
+.inv-step.is-done .step-num { background: #1f7a4d; color: #fff; }
+.inv-step:hover { border-color: var(--brand); color: var(--ink); }
+.inv-step.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+.inv-step.active .step-num { background: #fff; color: var(--brand-dark); }
+.inv-step.active .step-check { color: #fff; }
+.inv-toolbar-actions { flex: none; display: flex; gap: 6px; }
+.inv-save-main { display: none; }
+/* Tiêu đề mục chỉ là tiêu đề (không gập / mở) */
+#editor .inv-form-section > summary { cursor: default; padding-top: 6px; }
+#editor .inv-form-section > summary::after { display: none; }
+#editor details.inv-form-section { border-top: 0; }
+.inv-step-nav { display: flex; justify-content: space-between; gap: 8px; padding-top: 12px; margin-top: 4px; border-top: 1px dashed var(--line); }
+/* Bản xem thử */
+.preview-banner {
+  position: sticky; top: 0; z-index: 60; padding: 8px 16px; text-align: center; font: 600 13px var(--font-body);
+  background: #fff7d6; color: #6b5200; border-bottom: 1px solid #f0dc8f;
+}
+
+@media (max-width: 900px) {
+  .inv-toolbar { top: 60px; margin: -4px -4px 4px; }
+  .inv-toolbar-actions { display: none; }        /* điện thoại: Lưu / Xem thử nằm ở thanh dưới đáy */
+}
+/* Máy tính: hiện đủ 12 mục (xếp nhiều dòng), Lưu / Xem thử ở góc phải */
+.inv-toolbar-title { display: none; }
+@media (min-width: 901px) {
+  .inv-toolbar { display: grid; grid-template-columns: 1fr auto; align-items: center; row-gap: 8px; }
+  .inv-toolbar-title { display: block; font: 700 15px var(--font-title); padding-left: 4px; }
+  .inv-steps { grid-column: 1 / -1; grid-row: 2; flex-wrap: wrap; overflow: visible; gap: 6px; }
+  .inv-step { padding: 4px 9px 4px 4px; font-size: 12.5px; }
+}

@@ -13,7 +13,13 @@ async function openEnvelope(guest) {
 
 async function openEditor(bride) {
   await bride.goto('/invitation.html');
-  await expect(bride.locator('#events-edit .event-edit').first()).toBeVisible({ timeout: 30_000 });
+  await expect(bride.locator('.inv-step').first()).toBeVisible({ timeout: 30_000 });
+}
+
+// Thanh mục: mỗi lần chỉ hiện 1 mục → bấm đúng mục trước khi điền
+async function step(bride, n) {
+  await bride.locator(`.inv-step[data-step="${n}"]`).click();
+  await expect(bride.locator(`[data-section="${n}"]`)).toBeVisible();
 }
 
 async function save(bride) {
@@ -42,7 +48,9 @@ test('soạn thiệp nhiều sự kiện + mừng cưới 2 bên + câu hỏi �
   const bride = await openAs(browser, 'bride');
   await openEditor(bride);
 
+  await step(bride, 1);
   await bride.getByRole('radio', { name: /Đỏ hỷ truyền thống/ }).click();
+  await step(bride, 2);
   // Ảnh trang 3: mặc định dùng chung ảnh bìa; bỏ chọn thì hiện ô chọn ảnh thứ 2
   const photo2 = bride.locator('[data-slot="photo2_url"]');
   await bride.getByLabel(/Dùng ảnh bìa cho cả trang tiệc cưới/).uncheck();
@@ -51,22 +59,26 @@ test('soạn thiệp nhiều sự kiện + mừng cưới 2 bên + câu hỏi �
   await expect(photo2).toBeHidden();
   await bride.getByLabel('Họ tên chú rể').fill('Minh Quân');
   await bride.getByLabel('Họ tên cô dâu').fill('Khánh Linh');
+  await step(bride, 3);
   await bride.getByLabel('Bố chú rể').fill('Nguyễn Văn Bình');
   await bride.getByLabel('Mẹ chú rể').fill('Lê Thị Mai');
 
   // Lễ & tiệc: lễ vu quy (trang 2), tiệc nhà gái, tiệc nhà trai (tiệc chính – trang 3)
+  await step(bride, 4);
   await clearList(bride.locator('#events-edit'), /^Xóa /);
   await addEvent(bride, 'Lễ vu quy', { at: '2026-12-19T09:00', place: 'Tư gia nhà gái', address: 'Số 8 Bạch Đằng, Đà Nẵng' });
   await addEvent(bride, 'Tiệc nhà gái', { at: '2026-12-19T17:30', place: 'Nhà hàng Hoa Sen', address: 'Số 20 Trần Phú, Đà Nẵng' });
   await addEvent(bride, 'Tiệc nhà trai', { at: '2026-12-20T11:00', place: 'Trung tâm tiệc cưới E2E', address: 'Số 1 Tràng Tiền, Hà Nội', main: true });
 
   // Mừng cưới 2 bên
+  await step(bride, 6);
   await bride.locator('[name=gift_groom_account]').fill('19036789999');
   await bride.locator('[name=gift_groom_holder]').fill('Nguyen Minh Quan');
   await bride.locator('[name=gift_bride_account]').fill('0123456789');
   await bride.locator('[name=gift_bride_holder]').fill('Tran Khanh Linh');
 
   // Câu hỏi bắt buộc khi xác nhận
+  await step(bride, 11);
   const qs = bride.locator('#questions-edit');
   await clearList(qs, 'Xóa câu hỏi');
   await qs.getByRole('button', { name: '＋ Bạn có ăn chay không?' }).click();
@@ -165,14 +177,18 @@ test('sổ lời chúc: gửi → chờ duyệt → duyệt + cô dâu trả l�
   await openEditor(bride);
 
   const editor = bride.locator('#editor');
+  await step(bride, 9);
   await clearList(editor, 'Xóa cột mốc');
   await editor.getByRole('button', { name: '＋ Thêm cột mốc' }).click();
   await editor.getByLabel('Thời gian', { exact: true }).last().fill('Mùa thu 2020');
   await editor.getByLabel('Tiêu đề').fill('Lần đầu gặp nhau');
   await editor.getByLabel('Kể ngắn').fill('Ở quán cà phê nhỏ gần trường.');
+  await step(bride, 5);
   await editor.getByLabel(/Phù rể/).fill('Nguyễn Văn An\nTrần Văn Bảo');
   await editor.getByLabel(/Phù dâu/).fill('Lê Thị Cúc');
+  await step(bride, 8);
   await editor.getByLabel(/Link YouTube \(pre-wedding/).fill('https://youtu.be/dQw4w9WgXcQ');
+  await step(bride, 10);
   await editor.getByRole('radio', { name: /Canon in D/ }).check();
   await editor.locator('.effect-picker .chip', { hasText: 'Cánh hoa' }).click();
   await save(bride);
@@ -251,6 +267,7 @@ test('bảo mật: không đọc / ghi thẳng bảng thiệp qua API; khóa m�
   // Khóa thiệp bằng mật khẩu
   const bride = await openAs(browser, 'bride');
   await openEditor(bride);
+  await step(bride, 12);
   await bride.locator('#lock-toggle').check();
   await bride.locator('#lock-password').fill('matkhau-e2e');
   await save(bride);
@@ -281,9 +298,39 @@ test('bảo mật: không đọc / ghi thẳng bảng thiệp qua API; khóa m�
 
   // Dọn: bỏ khóa → khách mở thẳng không cần mật khẩu
   await openEditor(bride);
+  await step(bride, 12);
   await bride.locator('#lock-toggle').uncheck();
   await save(bride);
   const fresh = await openAs(browser, null);
   await fresh.goto(link);
   await expect(fresh.getByRole('button', { name: 'Mở thiệp cưới' })).toBeVisible({ timeout: 15_000 });
+});
+
+test('trình soạn: thanh mục chỉ hiện 1 mục, Trước / Tiếp; Xem thử mở thiệp y như khách thấy kể cả thay đổi chưa lưu', async ({ browser }) => {
+  requireAccounts('bride');
+  test.setTimeout(90_000);
+  const bride = await openAs(browser, 'bride');
+  await openEditor(bride);
+  await expect(bride.locator('.inv-step')).toHaveCount(12);
+  await step(bride, 1);
+  await expect(bride.locator('[data-section]:not([hidden])')).toHaveCount(1);       // mỗi lần 1 mục
+  await bride.getByRole('button', { name: 'Tiếp: Cô dâu chú rể →' }).click();
+  await expect(bride.locator('[data-section="2"]')).toBeVisible();
+  await expect(bride.locator('[data-section="1"]')).toBeHidden();
+  await expect(bride.locator('.inv-step.active')).toContainText('Cô dâu chú rể');
+
+  // Đổi tên (chưa lưu) → Xem thử thấy ngay
+  await bride.getByLabel('Họ tên chú rể').fill('Chú Rể Xem Thử');
+  const [preview] = await Promise.all([
+    bride.waitForEvent('popup'),
+    bride.locator('.inv-toolbar').getByRole('button', { name: '👁 Xem thử' }).click(),
+  ]);
+  await expect(preview.locator('.preview-banner')).toContainText('Bản xem thử');
+  await preview.getByRole('button', { name: 'Mở thiệp cưới' }).click();
+  await expect(preview.locator('.inv-p1 .inv-cover-names')).toContainText('Thử');
+  await preview.locator('#rsvp-form').getByLabel('Tên của bạn').fill('Khách thử');
+  const choice = preview.locator('#rsvp-form .rsvp-choice').first();
+  if (await choice.count()) await choice.click();
+  await preview.locator('#rsvp-form').getByRole('button', { name: 'Gửi phản hồi' }).click();
+  await expect(preview.locator('.toast')).toContainText('bản xem thử – phản hồi không được gửi');
 });

@@ -66,6 +66,29 @@ let effectStarted = false;
 const passwordKey = (slug) => `tramhy-inv-pw-${slug}`;
 const readSaved = (slug) => { try { return sessionStorage.getItem(passwordKey(slug)); } catch { return null; } };
 
+// Xem thử (invitation.html?xem-thu=1): trang soạn lưu tạm bản đang soạn vào localStorage rồi mở tab này.
+// Hiện y như khách thấy, nhưng không gửi phản hồi / lời chúc. Bấm "Xem thử" lần nữa → tab này tự tải lại bản mới.
+let previewMode = false;
+
+function renderPreviewMode() {
+  let inv = null;
+  try { inv = JSON.parse(localStorage.getItem(PREVIEW_KEY) || 'null'); } catch { /* bỏ qua */ }
+  if (!inv) {
+    render(page, html`<div class="container"><div class="empty">Chưa có bản xem thử – hãy bấm “Xem thử” trong trang soạn thiệp.</div></div>`);
+    return;
+  }
+  previewMode = true;
+  document.body.classList.add('invite-mode', 'is-preview');
+  const banner = document.createElement('div');
+  banner.className = 'preview-banner';
+  banner.setAttribute('role', 'status');
+  banner.textContent = '👁 Bản xem thử – thiệp hiện y như khách thấy (kể cả thay đổi chưa lưu). Phản hồi & lời chúc không được gửi.';
+  document.body.prepend(banner);
+  startGuest(inv.slug, inv);
+  // Trang soạn bấm "Xem thử" lần nữa → nạp bản mới
+  window.addEventListener('storage', (e) => { if (e.key === PREVIEW_KEY) location.reload(); });
+}
+
 async function renderGuestView(slug) {
   document.body.classList.add('invite-mode');
   const saved = readSaved(slug);
@@ -360,7 +383,7 @@ function showInvitation(inv, guestName, slug) {
 
 // Sổ lời chúc phía khách: các lời chúc đã duyệt (mới nhất trước) + lời đáp của cô dâu chú rể
 async function loadWishWall(slug) {
-  const wishes = await listApprovedWishes(slug, guestPassword).catch(() => []);
+  const wishes = previewMode ? [] : await listApprovedWishes(slug, guestPassword).catch(() => []);
   const box = $('#wish-list');
   if (!box) return;
   render(box, wishes.length ? html`${wishes.slice(0, 60).map((w) => html`
@@ -377,6 +400,7 @@ function bindWishForm(slug) {
     const done = () => render(form, html`<div class="center stack" style="gap:6px"><h3 style="margin:0">Cảm ơn lời chúc của bạn! 💐</h3>
       <p class="muted" style="margin:0">Lời chúc sẽ hiện trên sổ sau khi cô dâu chú rể xem.</p></div>`);
     if (data.get('website')) { done(); return; }                // bot điền ô bẫy
+    if (previewMode) { toast('Đây là bản xem thử – lời chúc không được gửi.'); return; }
     const guestName = data.get('guestName').trim();
     const message = data.get('message').trim();
     if (guestName.length < 2) { form.elements.guestName.focus(); toastError(new Error('Vui lòng nhập tên của bạn')); return; }
@@ -422,7 +446,7 @@ function bindRsvp(inv, slug, events, questions) {
       $('#rsvp-section').scrollIntoView({ block: 'center' });
     });
   };
-  const alreadySent = (() => { try { return localStorage.getItem(sentKey); } catch { return null; } })();
+  const alreadySent = previewMode ? null : (() => { try { return localStorage.getItem(sentKey); } catch { return null; } })();
   if (alreadySent && !guestWantsForm) {
     thanks($('#rsvp-form'), alreadySent);
     return;
@@ -445,6 +469,7 @@ function bindRsvp(inv, slug, events, questions) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = new FormData(form);
+    if (previewMode) { toast('Đây là bản xem thử – phản hồi không được gửi.'); return; }
     if (data.get('website')) {                       // bot điền ô bẫy → giả vờ thành công, không gửi
       thanks(form, '');
       return;
@@ -529,6 +554,10 @@ function renderGallery(profile) {
 
 // ---------- CHỦ THIỆP ----------
 const ALBUM_MAX = 12;
+// Tên ngắn trên thanh mục (đúng thứ tự data-section 1…12)
+const EDITOR_SECTIONS = ['Mẫu thiệp', 'Cô dâu chú rể', 'Gia đình', 'Lễ & tiệc', 'Phù dâu rể', 'Mừng cưới', 'Album', 'Video',
+  'Chuyện tình', 'Nhạc & hiệu ứng', 'Xác nhận', 'Bảo mật'];
+const PREVIEW_KEY = 'tramhy-inv-preview';
 const PHOTO_SLOTS = [['photo_url', 'Ảnh trang bìa (trang 1)'], ['photo2_url', 'Ảnh trang tiệc cưới (trang 3)']];
 const STORY_MAX = 6;
 const DETAIL_FIELDS = ['groom_father', 'groom_mother', 'groom_address', 'bride_father', 'bride_mother', 'bride_address'];
@@ -566,6 +595,17 @@ async function renderEditor(profile) {
     </div>
     <div class="inv-editor">
       <form class="card stack" id="editor" novalidate>
+        <div class="inv-toolbar">
+          <span class="inv-toolbar-title">Chọn mục để soạn</span>
+          <nav class="inv-steps" aria-label="Các mục của thiệp">
+            ${EDITOR_SECTIONS.map((label, i) => html`<button type="button" class="inv-step" data-step="${i + 1}" aria-current="false">
+              <span class="step-num">${i + 1}</span><span>${label}</span><span class="step-check" aria-hidden="true">✓</span></button>`)}
+          </nav>
+          <div class="inv-toolbar-actions">
+            <button type="button" class="btn btn-outline btn-sm" data-preview-guest>👁 Xem thử</button>
+            <button type="submit" class="btn btn-primary btn-sm inv-save-top">💾 ${invitation ? 'Lưu thiệp' : 'Tạo thiệp'}</button>
+          </div>
+        </div>
         <details class="inv-form-section" data-section="1" open>
           <summary><span class="step-num">1</span><span class="step-title">Chọn mẫu thiệp</span><span class="step-done" aria-hidden="true">✓</span></summary>
           <div class="inv-form-body">
@@ -724,7 +764,7 @@ async function renderEditor(profile) {
       </form>
       <!-- Điện thoại: thanh cố định – xem thiệp toàn màn hình + lưu, không phải kéo xuống cuối form -->
       <div class="inv-mobile-bar">
-        <button type="button" class="btn btn-outline" data-open-preview>👁 Xem thiệp</button>
+        <button type="button" class="btn btn-outline" data-preview-guest>👁 Xem thử</button>
         <button type="submit" form="editor" class="btn btn-primary">💾 ${invitation ? 'Lưu thiệp' : 'Tạo thiệp'}</button>
       </div>
       <div class="inv-editor-side">
@@ -806,8 +846,41 @@ async function renderEditor(profile) {
     $$('.effect-picker .chip').forEach((c) => c.classList.toggle('active', c.querySelector('input').checked));
   }));
 
-  // ----- Mục gập / mở: dấu ✓ khi đã điền; điện thoại chỉ mở mục 1, mở mục nào cuộn tới mục đó -----
-  const isPhone = () => matchMedia('(max-width: 900px)').matches;
+  // ----- Thanh mục: mỗi lần chỉ hiện 1 mục (form ngắn gọn), ✓ ở mục đã điền, nút Trước / Tiếp -----
+  const showSection = (n, { scroll = true } = {}) => {
+    $$('[data-section]').forEach((sec) => {
+      const on = sec.dataset.section === String(n);
+      sec.hidden = !on;
+      sec.open = on;
+    });
+    $$('.inv-step').forEach((b) => {
+      const on = b.dataset.step === String(n);
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-current', on ? 'step' : 'false');
+      if (on) b.parentElement.scrollTo({ left: b.offsetLeft - b.parentElement.clientWidth / 2 + b.offsetWidth / 2, behavior: 'smooth' });
+    });
+    try { sessionStorage.setItem('tramhy-inv-step', String(n)); } catch { /* chế độ riêng tư */ }
+    if (scroll) $('.inv-toolbar').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  };
+  $$('[data-section]').forEach((sec) => {
+    const n = Number(sec.dataset.section);
+    const prev = EDITOR_SECTIONS[n - 2];
+    const next = EDITOR_SECTIONS[n];
+    sec.querySelector('.inv-form-body').insertAdjacentHTML('beforeend', html`
+      <div class="inv-step-nav">
+        ${prev ? html`<button type="button" class="btn btn-light btn-sm" data-go-step="${n - 1}">← ${prev}</button>` : html`<span></span>`}
+        ${next ? html`<button type="button" class="btn btn-outline btn-sm" data-go-step="${n + 1}">Tiếp: ${next} →</button>` : ''}
+      </div>`.value);
+    // Tiêu đề mục chỉ là tiêu đề (không gập / mở nữa)
+    sec.querySelector('summary').addEventListener('click', (e) => e.preventDefault());
+  });
+  form.addEventListener('click', (e) => {
+    const go = e.target.closest('[data-go-step], .inv-step');
+    if (go) showSection(go.dataset.goStep ?? go.dataset.step);
+  });
+  const savedStep = (() => { try { return Number(sessionStorage.getItem('tramhy-inv-step')); } catch { return 0; } })();
+  showSection(savedStep >= 1 && savedStep <= EDITOR_SECTIONS.length ? savedStep : 1, { scroll: false });
+
   const sectionDone = () => {
     const v = readForm();
     const dd = v.details;
@@ -817,22 +890,25 @@ async function renderEditor(profile) {
       9: dd.story, 10: dd.music || dd.effect, 11: dd.rsvp_questions, 12: $('#lock-toggle')?.checked,
     };
     $$('[data-section]').forEach((sec) => sec.classList.toggle('is-done', Boolean(done[sec.dataset.section])));
+    $$('.inv-step').forEach((b) => b.classList.toggle('is-done', Boolean(done[b.dataset.step])));
   };
   form.addEventListener('input', sectionDone);
   form.addEventListener('change', sectionDone);
-  if (isPhone()) $$('[data-section]').forEach((sec, i) => { sec.open = i === 0; });
-  // Chỉ cuộn khi người dùng bấm mở (sự kiện toggle còn chạy lúc trang vừa vẽ → sẽ tự cuộn mất tiêu đề)
-  $$('[data-section] > summary').forEach((summary) => summary.addEventListener('click', () => setTimeout(() => {
-    const sec = summary.parentElement;
-    if (sec.open && isPhone()) sec.scrollIntoView({ block: 'start', behavior: 'smooth' });
-  }, 60)));
-  $('[data-open-preview]').addEventListener('click', () => openDialog({
-    title: 'Xem trước thiệp',
-    confirmText: null,
-    cancelText: 'Đóng',
-    content: html`<div class="tpl-preview-stage" style="--stage:${templateOf(draft.template).colors.backdrop}">
-      ${invitationPages(readForm(), { uid: 'mpv', guestName: 'Tên khách mời' })}</div>`,
-  }));
+
+  // ----- Xem thử: mở thiệp y như khách thấy (kể cả thay đổi chưa lưu) ở 1 tab riêng – bấm lại thì tab đó cập nhật -----
+  const openGuestPreview = () => {
+    const values = readForm();
+    try {
+      localStorage.setItem(PREVIEW_KEY, JSON.stringify({
+        ...values, id: invitation?.id ?? 'xem-thu', slug: invitation?.slug ?? 'xem-thu', savedAt: Date.now(),
+      }));
+    } catch {
+      toastError(new Error('Trình duyệt chặn lưu tạm – hãy bấm Lưu thiệp rồi mở link khách mời để xem.'));
+      return;
+    }
+    window.open('invitation.html?xem-thu=1', 'tramhy-xem-thu');
+  };
+  $$('[data-preview-guest]').forEach((btn) => btn.addEventListener('click', openGuestPreview));
   $$('[data-template]').forEach((btn) => btn.addEventListener('click', () => {
     draft.template = btn.dataset.template;
     $$('[data-template]').forEach((b) => { b.classList.toggle('active', b === btn); b.setAttribute('aria-checked', String(b === btn)); });
@@ -874,10 +950,9 @@ async function renderEditor(profile) {
 
   // Báo lỗi: mở đúng mục (điện thoại đang gập), đưa con trỏ vào ô cần sửa
   const fail = (section, message, input = null) => {
+    showSection(section);
     const sec = $(`[data-section="${section}"]`);
-    sec.open = true;
-    (input ?? sec.querySelector('input, select, textarea'))?.focus();
-    sec.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    setTimeout(() => (input ?? sec.querySelector('input, select, textarea'))?.focus({ preventScroll: true }), 300);
     toastError(new Error(message));
   };
 
@@ -943,6 +1018,7 @@ async function renderEditor(profile) {
         saved.album.filter((url) => !draft.album.includes(url)).forEach(removeInvitationPhoto);   // ảnh đã bỏ khỏi album
         saved.album = [...draft.album];
         $('.inv-save-main').textContent = 'Lưu thiệp';
+        $('.inv-save-top').textContent = '💾 Lưu thiệp';
         $('.inv-mobile-bar [type=submit]').textContent = '💾 Lưu thiệp';
         toast('Đã lưu thiệp.', 'success');
         renderShare(invitation);
@@ -1272,8 +1348,10 @@ function renderRsvps(invitation, rsvps, newId = null) {
 // ---------- KHỞI CHẠY TRANG ----------
 try {
   const slug = param('i');
-  const profile = await initLayout(slug ? null : 'invitation');
-  if (slug) await renderGuestView(slug);
+  const preview = param('xem-thu') !== null;
+  const profile = await initLayout(slug || preview ? null : 'invitation');
+  if (preview) renderPreviewMode();
+  else if (slug) await renderGuestView(slug);
   else if (!profile || param('mau') !== null) renderGallery(profile);
   else await renderEditor(profile);
 } catch (error) {
