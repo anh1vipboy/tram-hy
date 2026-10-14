@@ -43,6 +43,23 @@ export async function uploadInvitationPhoto(userId, blob) {
   return sb.storage.from('invitation-photos').getPublicUrl(path).data.publicUrl;
 }
 
+// Video cưới tải từ máy (SQL 26): invitation-media/<user_id>/video-<thời gian>.<đuôi>, tối đa 50MB
+export const VIDEO_MAX_MB = 50;
+export async function uploadInvitationVideo(userId, file) {
+  if (!/^video\/(mp4|quicktime|webm|x-m4v)$/.test(file.type)) throw new Error('Chỉ nhận video MP4, MOV hoặc WEBM');
+  if (file.size > VIDEO_MAX_MB * 1024 * 1024) {
+    throw new Error(`Video tối đa ${VIDEO_MAX_MB}MB (video này ${Math.round(file.size / 1048576)}MB) – hãy cắt ngắn / nén bớt, hoặc dùng link YouTube`);
+  }
+  const ext = { 'video/quicktime': 'mov', 'video/webm': 'webm', 'video/x-m4v': 'm4v' }[file.type] ?? 'mp4';
+  const path = `${userId}/video-${Date.now()}.${ext}`;
+  unwrap(await sb.storage.from('invitation-media').upload(path, file, { contentType: file.type, upsert: false }));
+  return sb.storage.from('invitation-media').getPublicUrl(path).data.publicUrl;
+}
+export async function removeInvitationVideo(url) {
+  const path = String(url || '').split('/invitation-media/')[1];
+  if (path) await sb.storage.from('invitation-media').remove([decodeURIComponent(path)]).catch(() => {});
+}
+
 // Xóa ảnh cũ khi đổi ảnh (bỏ qua lỗi – ảnh thừa không ảnh hưởng thiệp)
 export async function removeInvitationPhoto(url) {
   const path = String(url || '').split('/invitation-photos/')[1];

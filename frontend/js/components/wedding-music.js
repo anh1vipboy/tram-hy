@@ -180,10 +180,10 @@ export function youtubeIdFrom(input) {
   return m ? m[1] : null;
 }
 
-// Trình phát YouTube MINI (hiện hẳn ở góc màn hình), điều khiển qua postMessage (API nhúng chính thức của YouTube).
-// Không giấu trình phát: iPhone tự bật video toàn màn hình khi một video bị giấu (1px / ngoài màn hình) bắt đầu phát,
-// và điều khoản YouTube cũng yêu cầu trình phát phải hiện. Khung mini ~200px, có nút ✕; iPhone chặn tự phát → khách chạm ▶.
-// prepare() tải sẵn khung (ẩn mờ) khi khách vừa mở link → lúc chạm con dấu chỉ việc gửi lệnh playVideo.
+// Nhạc nền từ link YouTube – CHỈ phát tiếng: trình phát nằm trong màn hình với kích thước thật (200×113) nhưng trong suốt,
+// không bấm vào được → khách không thấy video, chỉ có nút ♪. (Không thu nhỏ 1px / đẩy ra ngoài màn hình: iPhone sẽ bật
+// video toàn màn hình.) Lưu ý: điều khoản YouTube không cho giấu trình phát – chủ dự án đã chọn chấp nhận rủi ro này.
+// prepare() tải sẵn khi khách vừa mở link → lúc chạm con dấu chỉ việc gửi lệnh playVideo (điện thoại cho phát ngay).
 function youtubePlayer(id, onState) {
   const ORIGIN = 'https://www.youtube-nocookie.com';
   let box = null;
@@ -212,19 +212,16 @@ function youtubePlayer(id, onState) {
   const prepare = () => {
     if (frame) return;
     box = document.createElement('div');
-    box.className = 'music-mini';
-    box.setAttribute('role', 'region');
-    box.setAttribute('aria-label', 'Trình phát nhạc nền');
-    box.innerHTML = '<div class="music-mini-head"><span>🎵 Nhạc nền</span>'
-      + '<button type="button" class="music-mini-close" aria-label="Tắt nhạc nền">✕</button></div>';
+    box.className = 'music-yt';
+    box.setAttribute('aria-hidden', 'true');
     frame = document.createElement('iframe');
     frame.title = 'Nhạc nền thiệp cưới';
     frame.allow = 'autoplay; encrypted-media';
     frame.src = `${ORIGIN}/embed/${id}?enablejsapi=1&loop=1&playlist=${id}&controls=1&playsinline=1&rel=0&modestbranding=1`
       + `&origin=${encodeURIComponent(location.origin)}`;
     frame.addEventListener('load', () => send({ event: 'listening', id: 'tramhy-music', channel: 'widget' }));
+    frame.tabIndex = -1;
     box.append(frame);
-    box.querySelector('.music-mini-close').addEventListener('click', () => player.pause());
     document.body.append(box);
   };
 

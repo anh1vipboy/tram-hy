@@ -20,7 +20,7 @@ import { qrCanvas, downloadCanvas, shareLink, facebookShareUrl } from '../compon
 import {
   getMyInvitation, openInvitation, saveInvitation, listRsvps, submitRsvp, subscribeRsvps,
   uploadInvitationPhoto, removeInvitationPhoto, listWishes, listApprovedWishes, submitWish, setWishStatus, deleteWish, subscribeWishes,
-  replyWish, setInvitationPassword, invitationStats,
+  replyWish, setInvitationPassword, invitationStats, uploadInvitationVideo, removeInvitationVideo, VIDEO_MAX_MB,
 } from '../services/invitations.js';
 
 const page = $('#invitation-page');
@@ -206,6 +206,7 @@ function showInvitation(inv, guestName, slug) {
   const gifts = giftsOf(inv);
   const crew = d.wedding_party || {};
   const questions = Array.isArray(d.rsvp_questions) ? d.rsvp_questions : [];
+  const video = videoOf(d)?.kind === 'youtube' && !videoOf(d).id ? null : videoOf(d);
   const tpl = templateOf(invitationTemplateKey(inv));
   $('.inv-stage').style.setProperty('--inv-accent', tpl.colors.accent);
   $('.inv-stage').style.setProperty('--inv-script', `'${tpl.script}', cursive`);
@@ -271,12 +272,14 @@ function showInvitation(inv, guestName, slug) {
               <ul>${list.map((n) => html`<li>${n}</li>`)}</ul></div>`)}
         </div>
       </section>` : ''}
-    ${d.video ? html`
+    ${video ? html`
       <section class="inv-section inv-video" aria-labelledby="video-title">
         <h2 id="video-title" class="center">Video cưới</h2>
         <div class="video-box" id="video-box">
-          <button type="button" class="video-poster" data-video="${d.video}" style="background-image:url(https://i.ytimg.com/vi/${d.video}/hqdefault.jpg)"
-                  aria-label="Phát video cưới"><span class="video-play" aria-hidden="true">▶</span></button>
+          ${video.kind === 'file'
+            ? html`<video src="${video.url}" controls playsinline preload="metadata" id="wedding-video"></video>`
+            : html`<button type="button" class="video-poster" data-video="${video.id}" style="background-image:url(https://i.ytimg.com/vi/${video.id}/hqdefault.jpg)"
+                  aria-label="Phát video cưới"><span class="video-play" aria-hidden="true">▶</span></button>`}
         </div>
       </section>` : ''}
     ${album.length ? html`
@@ -364,6 +367,8 @@ function showInvitation(inv, guestName, slug) {
     render($('#video-box'), html`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1"
       title="Video cưới" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`);
   });
+  // Video tải từ máy: phát thì tạm dừng nhạc nền
+  $('#wedding-video')?.addEventListener('play', () => { if (musicPlaying) guestMusic.pause(); });
   $$('[data-copy-account]').forEach((btn) => btn.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(btn.dataset.copyAccount);
@@ -558,6 +563,8 @@ const ALBUM_MAX = 12;
 const EDITOR_SECTIONS = ['Mẫu thiệp', 'Cô dâu chú rể', 'Gia đình', 'Lễ & tiệc', 'Phù dâu rể', 'Mừng cưới', 'Album', 'Video',
   'Chuyện tình', 'Nhạc & hiệu ứng', 'Xác nhận', 'Bảo mật'];
 const PREVIEW_KEY = 'tramhy-inv-preview';
+// details.video: thiệp cũ lưu chuỗi mã YouTube; nay { kind: 'youtube', id } | { kind: 'file', url }
+const videoOf = (d) => (typeof d?.video === 'string' ? { kind: 'youtube', id: d.video } : d?.video || null);
 const PHOTO_SLOTS = [['photo_url', 'Ảnh trang bìa (trang 1)'], ['photo2_url', 'Ảnh trang tiệc cưới (trang 3)']];
 const STORY_MAX = 6;
 const DETAIL_FIELDS = ['groom_father', 'groom_mother', 'groom_address', 'bride_father', 'bride_mother', 'bride_address'];
@@ -570,6 +577,7 @@ async function renderEditor(profile) {
       ? param('template') : invitation ? invitationTemplateKey(invitation) : 'la-tim',
     photo_url: invitation?.photo_url ?? null,
     photo2_url: d.photo2_url ?? null,
+    video_url: videoOf(d)?.kind === 'file' ? videoOf(d).url : null,
     album: Array.isArray(d.album) ? [...d.album] : [],
     story: Array.isArray(d.story) ? d.story.map((s) => ({ ...s })) : [],
     // Thiệp cũ chưa có danh sách sự kiện → dựng từ giờ lễ / giờ tiệc cũ; thiệp mới → Lễ thành hôn + Tiệc cưới
@@ -578,6 +586,7 @@ async function renderEditor(profile) {
   };
   if (!draft.events.length) draft.events = [newEvent({ name: 'Lễ thành hôn', kind: 'le' }), { ...newEvent({ name: 'Tiệc cưới', kind: 'tiec' }), main: true }];
   const music = d.music ?? null;
+  const video = videoOf(d);
   // Mừng cưới 2 bên; thiệp cũ chỉ có 1 tài khoản (cột bank_code / bank_account) → coi là nhà trai
   const GIFT_SIDES = [
     ['gift_groom', '🤵 Nhà trai', { bank: invitation?.bank_code, account: d.gift_groom || d.gift_bride ? '' : invitation?.bank_account }],
@@ -708,8 +717,18 @@ async function renderEditor(profile) {
         <details class="inv-form-section" data-section="8" open>
           <summary><span class="step-num">8</span><span class="step-title">Video cưới <span class="small muted">(không bắt buộc)</span></span><span class="step-done" aria-hidden="true">✓</span></summary>
           <div class="inv-form-body">
-          <label class="field"><span>Link YouTube (pre-wedding, phóng sự…)</span>
-            <input class="input" name="video" maxlength="200" value="${d.video ? `https://youtu.be/${d.video}` : ''}" placeholder="VD: https://youtu.be/…"></label>
+          <div class="music-picker" role="radiogroup" aria-label="Nguồn video cưới">
+            <label class="music-option"><input type="radio" name="video_kind" value="" ${video ? '' : 'checked'}> <span>Không có video</span></label>
+            <label class="music-option"><input type="radio" name="video_kind" value="youtube" ${video?.kind === 'youtube' ? 'checked' : ''}> <span>▶️ Link YouTube</span></label>
+            <input class="input" name="video" maxlength="200" value="${video?.kind === 'youtube' ? `https://youtu.be/${video.id}` : ''}"
+                   placeholder="VD: https://youtu.be/…" aria-label="Link YouTube (pre-wedding, phóng sự…)">
+            <label class="music-option"><input type="radio" name="video_kind" value="file" ${video?.kind === 'file' ? 'checked' : ''}> <span>📁 Tải video từ máy (MP4 / MOV, tối đa ${VIDEO_MAX_MB}MB)</span></label>
+            <div class="video-upload">
+              <div id="video-file-preview"></div>
+              <label class="btn btn-outline btn-sm" style="align-self:flex-start;cursor:pointer" id="video-add">📤 Chọn video từ máy
+                <input type="file" accept="video/mp4,video/quicktime,video/webm,video/x-m4v" hidden id="video-input"></label>
+            </div>
+          </div>
           <p class="small muted" style="margin:0">Video chỉ tải khi khách bấm xem (thiệp vẫn mở nhanh); nhạc nền tự tạm dừng khi video phát.</p>
           </div>
         </details>
@@ -802,7 +821,8 @@ async function renderEditor(profile) {
       const account = (data[`${side}_account`] || '').replace(/\s/g, '');
       if (account) details[side] = { bank: data[`${side}_bank`], account, holder: (data[`${side}_holder`] || '').trim().toUpperCase() };
     }
-    if (data.video?.trim()) details.video = youtubeIdFrom(data.video);
+    if (data.video_kind === 'youtube') details.video = { kind: 'youtube', id: youtubeIdFrom(data.video) };
+    if (data.video_kind === 'file' && draft.video_url) details.video = { kind: 'file', url: draft.video_url };
     if (data.effect && data.effect !== 'none') details.effect = data.effect;
     if (draft.photo2_url && !$('#same-photo')?.checked) details.photo2_url = draft.photo2_url;
     if (draft.album.length) details.album = draft.album;
@@ -929,6 +949,34 @@ async function renderEditor(profile) {
   }));
 
   // Ảnh bìa (photo_url) và ảnh trang tiệc (details.photo2_url). Ảnh đã lưu chỉ bị xóa file sau khi bấm Lưu.
+  // ----- Video tải từ máy: xem trước ngay; file chưa lưu bị thay thì xóa, file đã lưu chỉ xóa sau khi bấm Lưu -----
+  let savedVideo = draft.video_url;
+  const drawVideo = () => render($('#video-file-preview'), draft.video_url
+    ? html`<video src="${draft.video_url}" controls playsinline preload="metadata" class="video-preview"></video>` : '');
+  $('#video-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const label = $('#video-add');
+    label.setAttribute('aria-busy', 'true');
+    toast('Đang tải video lên – video lớn có thể mất vài phút, bạn cứ soạn tiếp các mục khác.');
+    try {
+      const url = await uploadInvitationVideo(profile.id, file);
+      if (draft.video_url && draft.video_url !== savedVideo) removeInvitationVideo(draft.video_url);
+      draft.video_url = url;
+      form.querySelector('input[name=video_kind][value=file]').checked = true;
+      drawVideo();
+      sectionDone();
+      toast('Đã tải video lên – bấm Lưu thiệp để khách mời xem được.', 'success');
+    } catch (error) {
+      toastError(error);
+    } finally {
+      label.removeAttribute('aria-busy');
+    }
+  });
+  form.elements.video.addEventListener('input', () => { form.querySelector('input[name=video_kind][value=youtube]').checked = true; });
+  drawVideo();
+
   const savedPhotos = { photo_url: invitation?.photo_url ?? null, photo2_url: d.photo2_url ?? null };
   const dropUnsaved = (slot) => { if (draft[slot] && draft[slot] !== savedPhotos[slot]) removeInvitationPhoto(draft[slot]); };
   $$('.photo-picker').forEach((picker) => {
@@ -986,7 +1034,11 @@ async function renderEditor(profile) {
       fail(10, 'Link nhạc YouTube chưa đúng – hãy dán link dạng https://youtu.be/… hoặc https://www.youtube.com/watch?v=…', form.elements.music_youtube);
       return;
     }
-    if (form.elements.video.value.trim() && !values.details.video) {
+    if (form.elements.video_kind.value === 'file' && !draft.video_url) {
+      fail(8, 'Bạn chưa chọn file video – bấm "Chọn video từ máy" hoặc chọn "Không có video"', $('#video-input').closest('label'));
+      return;
+    }
+    if (form.elements.video_kind.value === 'youtube' && !values.details.video?.id) {
       fail(8, 'Link video YouTube chưa đúng – hãy dán link dạng https://youtu.be/…', form.elements.video);
       return;
     }
@@ -1023,6 +1075,9 @@ async function renderEditor(profile) {
         $('#lock-field span').textContent = invitation.locked ? 'Mật khẩu mới (để trống = giữ mật khẩu cũ)' : 'Mật khẩu (4–40 ký tự)';
         // Ảnh cũ không còn dùng (đổi ảnh / bỏ ảnh / chuyển sang dùng chung ảnh bìa) → xóa file
         const now = { photo_url: invitation.photo_url ?? null, photo2_url: invitation.details?.photo2_url ?? null };
+        const nowVideo = videoOf(invitation.details || {})?.kind === 'file' ? videoOf(invitation.details).url : null;
+        if (savedVideo && savedVideo !== nowVideo) removeInvitationVideo(savedVideo);      // video cũ không còn dùng
+        savedVideo = nowVideo;
         for (const slot of ['photo_url', 'photo2_url']) {
           if (savedPhotos[slot] && savedPhotos[slot] !== now[slot]) removeInvitationPhoto(savedPhotos[slot]);
           savedPhotos[slot] = now[slot];
