@@ -334,3 +334,38 @@ test('trình soạn: thanh mục chỉ hiện 1 mục, Trước / Tiếp; Xem th
   await preview.locator('#rsvp-form').getByRole('button', { name: 'Gửi phản hồi' }).click();
   await expect(preview.locator('.toast')).toContainText('bản xem thử – phản hồi không được gửi');
 });
+
+test('video cưới tải từ máy: tải lên → xem trước → khách xem được → bỏ video thì xóa file (SQL 26)', async ({ browser }) => {
+  requireAccounts('bride');
+  test.setTimeout(120_000);
+  const bride = await openAs(browser, 'bride');
+  await openEditor(bride);
+  await step(bride, 8);
+  await bride.locator('#video-input').setInputFiles({ name: 'video-cuoi-e2e.mp4', mimeType: 'video/mp4', buffer: Buffer.alloc(64 * 1024, 1) });
+  await expect(bride.locator('.toast-success', { hasText: 'Đã tải video lên' })).toBeVisible({ timeout: 60_000 });
+  await expect(bride.locator('#video-file-preview video')).toHaveAttribute('src', /invitation-media\/.+\/video-\d+\.mp4$/);
+  await expect(bride.locator('input[name=video_kind][value=file]')).toBeChecked();
+  const fileUrl = await bride.locator('#video-file-preview video').getAttribute('src');
+  await save(bride);
+  const link = pathOf(await bride.locator('#share input').first().inputValue());
+
+  const guest = await openAs(browser, null);
+  await guest.goto(link);
+  await openEnvelope(guest);
+  await expect(guest.locator('#wedding-video')).toHaveAttribute('src', fileUrl);
+
+  // Bỏ video → lưu → file trên kho bị xóa
+  await step(bride, 8);
+  await bride.locator('input[name=video_kind][value=""]').check();
+  await save(bride);
+  // Hỏi thẳng kho bằng phiên đăng nhập của cô dâu (link công khai có thể còn bản lưu tạm trên CDN một lúc)
+  const token = await bride.evaluate(() => {
+    const key = Object.keys(localStorage).find((k) => k.endsWith('-auth-token'));
+    return JSON.parse(localStorage.getItem(key)).access_token;
+  });
+  const objectPath = fileUrl.split('/invitation-media/')[1];
+  const stored = () => fetch(`${process.env.TEST_SUPABASE_URL}/storage/v1/object/authenticated/invitation-media/${objectPath}`, {
+    headers: { apikey: process.env.TEST_SUPABASE_KEY, Authorization: `Bearer ${token}` },
+  }).then((r) => r.status);
+  await expect.poll(stored, { timeout: 15_000 }).not.toBe(200);
+});
