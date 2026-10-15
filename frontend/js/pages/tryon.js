@@ -10,12 +10,34 @@ import {
 } from '../services/profile.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
 import { openDressGallery, realPhotoCount } from '../components/dress-gallery.js';
-import { aiTryOn, remainingAiTries, listAiResults, AI_DAILY_LIMIT } from '../services/tryon-ai.js';
+import { aiTryOn, creditsUsedToday, getTryonSettings, listAiResults, tryonCost } from '../services/tryon-ai.js';
 import { loginUrl } from '../core/auth.js';
 import {
   MODELS, BODY_SHAPES, BESPOKE_OPTIONS, BESPOKE_EXTRAS,
   renderImageFor, dressThumb, fitScore, bmiInfo, bespokePrice, bespokeTheme, bespokeLabel,
 } from '../data/tryon-data.js';
+
+// ---------- TÙY CHỈNH ƯỚM THỬ AI ----------
+// Chỉ ướm váy lên người – không đổi nền / khung. Giá trị phải khớp readOptions() của Edge Function thu-vay-ai.
+const AI_OPTION_DEFAULTS = {
+  model: 'standard', quality: 'quality', samples: 1, category: 'one-pieces', photoType: 'auto', cleanOriginal: false,
+};
+const AI_OPTIONS_KEY = 'tramhy.tryon-options';
+
+function loadAiOptions() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(AI_OPTIONS_KEY) ?? '{}');
+    return { ...AI_OPTION_DEFAULTS, ...saved };
+  } catch {
+    return { ...AI_OPTION_DEFAULTS };
+  }
+}
+
+function saveAiOptions() {
+  try {
+    localStorage.setItem(AI_OPTIONS_KEY, JSON.stringify(state.aiOptions));
+  } catch { /* trình duyệt chặn lưu → lần sau dùng mặc định */ }
+}
 
 // ---------- TRẠNG THÁI TRANG ----------
 const state = {
@@ -32,10 +54,13 @@ const state = {
   garment: null,                // ảnh váy đang chọn ở chế độ 'own': { path, url } (path null = chưa lưu)
   aiHistory: [],                // ảnh đã thử bằng AI: [{ id, url, createdAt }]
   historyView: null,            // đang xem lại ảnh AI cũ nào trên gương (url)
-  aiResults: new Map(),         // ảnh AI đã ghép: "người mẫu|váy" → link (tránh gọi AI lại, tốn tiền)
-  aiRemaining: null,            // số lượt AI còn lại hôm nay (null = chưa biết)
+  aiResults: new Map(),         // ảnh AI đã ghép: "người mẫu|váy" → { urls, index } (tránh gọi AI lại, tốn tiền)
+  aiRemaining: null,            // số credit AI còn lại hôm nay (null = chưa biết)
+  aiSettings: { maxEnabled: false, dailyCredits: 6 },   // admin chỉnh ở trang Quản trị (SQL 28)
+  aiOptions: loadAiOptions(),   // tùy chỉnh ướm thử (nhớ trên máy cho lần sau)
   aiBusy: false,
   showOriginal: false,
+  compare: false,               // đang so sánh trước/sau trên gương
   body: { height: 160, weight: 49, heel: 7, shape: 'hourglass' },
   bespoke: { silhouette: 'aline', neckline: 'sweetheart', sleeve: 'none', fabric: 'mikado', train: 1, extras: [] },
 };
@@ -115,7 +140,16 @@ function initControls() {
   $('#photo-input').addEventListener('change', onPhotoSelected);
   $('#toggle-original').addEventListener('click', () => {
     state.showOriginal = !state.showOriginal;
+    state.compare = false;
     renderMirror();
+  });
+  $('#toggle-compare').addEventListener('click', () => {
+    state.compare = !state.compare;
+    renderMirror();
+  });
+  $('#compare-range').addEventListener('input', (e) => {
+    // Khớp tâm núm kéo: thanh cách mép 14px + nửa núm 8px mỗi bên
+    $('.mirror-frame').style.setProperty('--split', `calc(22px + (100% - 44px) * ${e.target.value / 100})`);
   });
 
   for (const tab of $$('[data-mode]')) {
@@ -246,17 +280,44 @@ const AI_FALLBACK_MESSAGES = {
   'provider-error': 'Dịch vụ AI đang bận, vui lòng thử lại sau ít phút.',
 };
 
+// Lựa chọn trong khung "Tùy chỉnh" (giá trị → nhãn)
+const AI_CHOICES = {
+  model: [['standard', '⚡ Tiêu chuẩn'], ['max', '💎 Siêu nét']],
+  quality: [['fast', 'Nhanh'], ['balanced', 'Cân bằng'], ['quality', 'Đẹp nhất']],
+  samples: [[1, '1 ảnh'], [2, '2 ảnh'], [3, '3 ảnh'], [4, '4 ảnh']],
+  category: [['one-pieces', 'Váy liền'], ['tops', 'Áo'], ['bottoms', 'Chân váy / quần'], ['auto', 'AI tự nhận']],
+  photoType: [['auto', 'AI tự nhận'], ['flat-lay', 'Váy trải phẳng'], ['model', 'Người mẫu đang mặc']],
+};
+const QUALITY_SECONDS = { fast: 6, balanced: 10, quality: 17 };     // thời gian chờ ước tính cho 1 ảnh
+const choiceLabel = (group, value) => AI_CHOICES[group].find(([v]) => v === value)?.[1] ?? '';
+
+// Tùy chọn thật sự gửi đi: admin tắt Siêu nét → Tiêu chuẩn; mẫu của tiệm luôn là váy liền
+function effectiveOptions() {
+  const o = state.aiOptions;
+  return {
+    ...o,
+    model: o.model === 'max' && state.aiSettings.maxEnabled ? 'max' : 'standard',
+    category: state.mode === 'own' ? o.category : 'one-pieces',
+  };
+}
+const aiCost = () => tryonCost(effectiveOptions());
+
 // Khóa ảnh AI theo đúng người mẫu/ảnh + đúng váy đang chọn (mẫu của tiệm hoặc ảnh váy tự tải)
 const garmentKey = () => (state.mode === 'own' ? state.garment?.path : state.dress?.id);
 const aiKey = () => `${state.model.custom ? state.model.path : state.model.key}|${garmentKey()}`;
-const currentAiImage = () => (state.mode === 'bespoke' ? null : state.aiResults.get(aiKey()));
+const currentAiEntry = () => (state.mode === 'bespoke' ? null : state.aiResults.get(aiKey()));
+const currentAiImage = () => {
+  const entry = currentAiEntry();
+  return entry ? entry.urls[entry.index] : null;
+};
 
 async function loadAiRemaining() {
+  state.aiSettings = await getTryonSettings();
   if (!state.profile) return;
   try {
-    state.aiRemaining = await remainingAiTries();
+    state.aiRemaining = Math.max(0, state.aiSettings.dailyCredits - await creditsUsedToday());
   } catch {
-    state.aiRemaining = null;        // chưa chạy SQL 11 → không biết số lượt, nút vẫn dùng được
+    state.aiRemaining = null;        // chưa chạy SQL 11 → không biết số credit, nút vẫn dùng được
   }
 }
 
@@ -268,21 +329,75 @@ function renderAiButton() {
   box.hidden = state.mode === 'bespoke' || (!own && !state.dress);
   if (box.hidden) return;
 
+  const cost = aiCost();
+  const remaining = state.aiRemaining;
+  const limit = state.aiSettings.dailyCredits;
+  const tooCostly = remaining !== null && cost > remaining;
   let reason = '';
   if (!state.profile) reason = 'Đăng nhập để ghép váy lên ảnh bằng AI thật';
   else if (own && !state.garment) reason = 'Tải ảnh váy mẫu ở bước 2 trước nhé';
   else if (own && !state.garment.path) reason = 'Đang lưu ảnh váy…';
   else if (!own && !state.dress.image_url) reason = 'Mẫu này chưa có ảnh thật từ tiệm';
   else if (state.model.custom && !state.model.path) reason = 'Đang lưu ảnh của bạn…';
-  else if (state.aiRemaining === 0) reason = `Đã dùng hết ${AI_DAILY_LIMIT} lượt AI hôm nay`;
-  else if (currentAiImage()) reason = 'Đang xem ảnh AI đã ghép';
-  else if (state.aiRemaining !== null) reason = `Còn ${state.aiRemaining}/${AI_DAILY_LIMIT} lượt hôm nay`;
+  else if (remaining === 0) reason = `Đã dùng hết ${limit} credit AI hôm nay`;
+  else if (tooCostly) reason = `Cần ${cost} credit, hôm nay còn ${remaining} – giảm số ảnh hoặc chất lượng`;
+  else if (remaining !== null) reason = `Còn ${remaining}/${limit} credit hôm nay`;
 
   const garmentReady = own ? Boolean(state.garment?.path) : Boolean(state.dress.image_url);
   // Chưa đăng nhập vẫn bấm được → đưa tới trang đăng nhập
   button.disabled = state.aiBusy || (Boolean(state.profile) && (!garmentReady
-    || (state.model.custom && !state.model.path) || state.aiRemaining === 0 || Boolean(currentAiImage())));
+    || (state.model.custom && !state.model.path) || tooCostly));
+  // Đã có ảnh AI cho cặp người–váy này → bấm lại ra kiểu khác (seed mới), ảnh cũ vẫn ở "Ảnh đã thử"
+  render(button, html`${currentAiImage() ? '🎲 Ướm kiểu khác' : '✨ Ướm thử bằng AI thật'}
+    <span class="ai-cost">${cost} credit</span>`);
   hint.textContent = reason;
+  renderAiOptions();
+}
+
+function renderAiOptions() {
+  const o = effectiveOptions();
+  const max = o.model === 'max';
+  const perImage = (quality) => tryonCost({ ...o, quality, samples: 1 });
+  const group = (title, key, choices, note = '') => html`
+    <div class="ai-opt">
+      <span class="ai-opt-label">${title}</span>
+      <div class="chips">${choices.map(([value, text]) => html`
+        <button class="chip ${o[key] === value ? 'active' : ''}" type="button"
+                data-ai-opt="${key}" data-value="${value}">${text}</button>`)}</div>
+      ${note ? html`<span class="ai-opt-note">${note}</span>` : ''}
+    </div>`;
+
+  render($('#ai-options-body'), html`
+    ${state.aiSettings.maxEnabled ? group('Mô hình AI', 'model', AI_CHOICES.model, max
+      ? 'Siêu nét: ảnh nét, chất vải tự nhiên hơn – tốn 1–3 credit mỗi ảnh.'
+      : 'Tiêu chuẩn: 1 credit mỗi ảnh.') : ''}
+    ${group('Chất lượng', 'quality', AI_CHOICES.quality.map(([value, text]) =>
+      [value, max ? `${text} · ${perImage(value)} credit` : `${text} · ~${QUALITY_SECONDS[value]} giây`]))}
+    ${group('Số ảnh mỗi lần', 'samples', AI_CHOICES.samples, 'Nhiều ảnh = nhiều kiểu để chọn ảnh ưng nhất.')}
+    ${max ? '' : html`
+      ${state.mode === 'own' ? group('Loại trang phục', 'category', AI_CHOICES.category) : ''}
+      ${group('Ảnh váy là', 'photoType', AI_CHOICES.photoType)}
+      <label class="ai-opt-check">
+        <input type="checkbox" data-ai-clean ${o.cleanOriginal ? 'checked' : ''}>
+        <span>Xóa kỹ đồ đang mặc <span class="ai-opt-note">– bật khi áo/váy cũ còn lộ ra trên ảnh</span></span>
+      </label>`}
+    <div class="ai-opt-total">Mỗi lần ướm: <strong>${aiCost()} credit</strong>${state.aiRemaining !== null
+      ? ` · hôm nay còn ${state.aiRemaining} credit` : ''}</div>`);
+
+  for (const chip of $$('#ai-options-body [data-ai-opt]')) {
+    chip.addEventListener('click', () => {
+      const key = chip.dataset.aiOpt;
+      state.aiOptions[key] = key === 'samples' ? Number(chip.dataset.value) : chip.dataset.value;
+      saveAiOptions();
+      renderAiButton();
+    });
+  }
+  $('#ai-options-body [data-ai-clean]')?.addEventListener('change', (e) => {
+    state.aiOptions.cleanOriginal = e.target.checked;
+    saveAiOptions();
+    renderAiButton();
+  });
+  $('#ai-options-sum').textContent = `${max ? 'Siêu nét' : 'Tiêu chuẩn'} · ${choiceLabel('quality', o.quality)} · ${o.samples} ảnh`;
 }
 
 async function runAiTryOn() {
@@ -291,32 +406,42 @@ async function runAiTryOn() {
     return;
   }
   const key = aiKey();
+  const options = effectiveOptions();
   const scan = $('#mirror-scan');
   const defaultScanText = scan.textContent;
+  const seconds = (QUALITY_SECONDS[options.quality] + (options.samples - 1) * 4) * (options.model === 'max' ? 2 : 1);
   state.aiBusy = true;
   renderAiButton();
-  scan.textContent = 'AI đang ghép váy lên ảnh của bạn… (khoảng 10–30 giây)';
+  scan.textContent = `AI đang ướm váy lên ảnh của bạn… (khoảng ${seconds}–${seconds * 2} giây)`;
   scan.hidden = false;
   try {
     const result = await aiTryOn({
       ...(state.mode === 'own' ? { garmentPath: state.garment.path } : { dressId: state.dress.id }),
       ...(state.model.custom ? { photoPath: state.model.path } : { sampleModel: state.model.key }),
       body: { height: state.body.height, weight: state.body.weight, heel: state.body.heel },
+      options: { ...options, seed: Math.floor(Math.random() * 2 ** 31) },   // seed mới → mỗi lần một kiểu
     });
 
     if (result.fallback) {
       toast(AI_FALLBACK_MESSAGES[result.reason] ?? AI_FALLBACK_MESSAGES['provider-error']);
     } else {
-      state.aiResults.set(key, result.imageUrl);
-      state.aiHistory.unshift({ id: crypto.randomUUID(), url: result.imageUrl, createdAt: new Date().toISOString() });
-      state.aiRemaining = result.remaining;
+      const urls = result.images?.length ? result.images : [result.imageUrl];
+      const createdAt = new Date().toISOString();
+      state.aiResults.set(key, { urls, index: 0 });
+      state.aiHistory.unshift(...urls.map((url) => ({ id: crypto.randomUUID(), url, createdAt })));
+      if (typeof result.remaining === 'number') state.aiRemaining = result.remaining;
+      if (result.limit) state.aiSettings.dailyCredits = result.limit;
       state.showOriginal = false;
+      state.compare = false;
       state.historyView = null;
       renderAiHistory();
-      toast('Đã ghép váy bằng AI! Ảnh được lưu riêng tư trong tài khoản của bạn.', 'success');
+      toast(urls.length > 1
+        ? `Đã ướm ${urls.length} ảnh! Bấm từng ảnh dưới gương để chọn ảnh ưng nhất – tất cả được lưu riêng tư.`
+        : 'Đã ghép váy bằng AI! Ảnh được lưu riêng tư trong tài khoản của bạn.', 'success');
     }
   } catch (error) {
-    if (/hết .* lượt/.test(error.message)) state.aiRemaining = 0;
+    if (typeof error.remaining === 'number') state.aiRemaining = error.remaining;
+    if (/Siêu nét đang tắt/.test(error.message)) state.aiSettings.maxEnabled = false;
     toastError(error);
   } finally {
     state.aiBusy = false;
@@ -440,6 +565,32 @@ function renderMirror() {
   }
   $('#download-img').href = img.src;
   $('#toggle-original').textContent = state.showOriginal ? 'Xem ảnh đã thử váy' : 'Xem ảnh gốc';
+
+  // 1 lần ướm ra nhiều ảnh → dải ảnh nhỏ dưới gương để chọn ảnh ưng nhất
+  const entry = currentAiEntry();
+  const viewingAi = Boolean(aiImage) && !state.historyView && !state.showOriginal;
+  const picks = $('#ai-picks');
+  picks.hidden = !viewingAi || entry.urls.length < 2;
+  if (!picks.hidden) {
+    render(picks, entry.urls.map((url, i) => html`
+      <button type="button" class="${i === entry.index ? 'active' : ''}" data-pick="${i}" aria-label="Xem ảnh ${i + 1}">
+        <img src="${url}" alt=""><span>${i + 1}</span>
+      </button>`));
+    for (const btn of $$('#ai-picks [data-pick]')) {
+      btn.addEventListener('click', () => {
+        entry.index = Number(btn.dataset.pick);
+        renderMirror();
+      });
+    }
+  }
+
+  // So sánh trước/sau: ảnh gốc phủ lên ảnh AI vừa ướm, kéo thanh để đổi chỗ chia
+  if (!viewingAi) state.compare = false;
+  $('#toggle-compare').hidden = !viewingAi;
+  $('#toggle-compare').textContent = state.compare ? 'Tắt so sánh' : 'So sánh trước/sau';
+  $('#mirror-compare').hidden = !state.compare;
+  $('#compare-range').hidden = !state.compare;
+  if (state.compare) $('#compare-img').src = state.model.photo;
 
   const note = $('#mirror-note');
   const showNote = !state.historyView && !state.showOriginal && !aiImage

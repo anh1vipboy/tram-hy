@@ -31,15 +31,31 @@
           <img id="mirror-img" alt="Ảnh thử váy">
           <span class="mirror-label" id="mirror-label"></span>
           <div class="mirror-note" id="mirror-note" hidden></div>
+          <!-- So sánh trước/sau: ảnh gốc phủ lên, kéo thanh để lộ dần ảnh đã ướm -->
+          <div class="mirror-compare" id="mirror-compare" hidden>
+            <img id="compare-img" alt="Ảnh gốc">
+            <span class="compare-tag compare-before">Trước</span>
+            <span class="compare-tag compare-after">Sau</span>
+          </div>
+          <input class="compare-range" id="compare-range" type="range" min="0" max="100" value="50" hidden
+                 aria-label="Kéo để so sánh ảnh gốc và ảnh đã ướm váy">
           <div class="mirror-scan" id="mirror-scan" hidden>AI đang ướm váy theo số đo của bạn…</div>
         </div>
+        <div class="ai-picks" id="ai-picks" hidden></div>
         <div class="mirror-actions">
           <button class="btn btn-outline btn-sm" id="toggle-original" type="button">Xem ảnh gốc</button>
+          <button class="btn btn-outline btn-sm" id="toggle-compare" type="button" hidden>So sánh trước/sau</button>
           <a class="btn btn-outline btn-sm" id="download-img" download>Tải ảnh</a>
         </div>
         <div class="ai-tryon" id="ai-tryon-box">
-          <button class="btn btn-primary btn-sm" id="ai-tryon" type="button">✨ Ướm thử bằng AI thật</button>
-          <span class="small" id="ai-hint"></span>
+          <div class="ai-tryon-row">
+            <button class="btn btn-primary btn-sm" id="ai-tryon" type="button">✨ Ướm thử bằng AI thật</button>
+            <span class="small" id="ai-hint"></span>
+          </div>
+          <details class="ai-options" id="ai-options">
+            <summary>⚙️ Tùy chỉnh <span class="ai-options-sum" id="ai-options-sum"></span></summary>
+            <div class="ai-options-body" id="ai-options-body"></div>
+          </details>
         </div>
         <div class="ai-history" id="ai-history" hidden>
           <strong class="small">Ảnh đã thử bằng AI</strong>

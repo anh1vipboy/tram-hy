@@ -1,28 +1,39 @@
 // Edge Function "thu-vay-ai": ghép váy lên ảnh cô dâu bằng AI (FASHN chuyên thử đồ, hoặc Gemini).
 // Gọi từ trình duyệt (người dùng đã đăng nhập): sb.functions.invoke('thu-vay-ai', { body }).
+// Chỉ ƯỚM váy lên người (1 ảnh người + 1 ảnh váy → ảnh thử) – không đổi nền, không đổi khung, không video.
 //
-// Body: { dressId | garmentPath, photoPath | sampleModel, body? }
+// Body: { dressId | garmentPath, photoPath | sampleModel, body?, options? }
 //   dressId     – mẫu váy của tiệm trên Trạm Hỷ (lấy ảnh thật của mẫu)
 //   garmentPath – hoặc ảnh váy mẫu người dùng tự tải lên (bride-photos/<user_id>/garment-...)
 //   photoPath   – ảnh cô dâu đã tải lên bucket riêng tư bride-photos (<user_id>/body-...)
 //   sampleModel – hoặc dùng ảnh người mẫu có sẵn của web: user | bride1..bride4
 //   body        – { height, weight, heel } số đo để AI đặt độ dài váy cho đúng (model có nhận prompt)
+//   options     – tùy chỉnh (sai/thiếu → mặc định), xem readOptions():
+//     model    standard (FASHN tryon-v1.6) | max (tryon-max – chỉ khi admin bật Siêu nét ở trang Quản trị)
+//     quality  fast | balanced | quality
+//     samples  1–4 ảnh mỗi lần
+//     category one-pieces | tops | bottoms | auto        (chỉ standard)
+//     photoType auto | flat-lay | model                  (chỉ standard)
+//     cleanOriginal true = xóa kỹ đồ đang mặc            (chỉ standard: segmentation_free = false)
+//     seed     số nguyên – đổi seed để ra "kiểu khác"
+//
+// Credit (FASHN tính): standard 1/ảnh; max 1k: fast 1 · balanced 2 · quality 3 /ảnh. Gemini: 1 ảnh = 1.
+// Hạn mức mỗi người/ngày tính theo TỔNG credit (app_settings 'tryon'.daily_credits, SQL 28).
 //
 // Trả về:
-//   { imageUrl, remaining, provider }   – thành công (link ảnh riêng tư, hết hạn sau 1 giờ)
+//   { imageUrl, images, remaining, limit, credits, provider } – thành công (link riêng tư, hết hạn sau 1 giờ)
 //   { fallback: true, reason }          – không chạy AI được → web hiện ảnh minh họa như cũ
 //        reason: not-configured | free-tier | no-credits | bad-photo | no-dress-photo | provider-error
-//   { error } kèm mã 4xx                – lỗi người dùng cần biết (hết lượt, chưa đăng nhập…)
+//   { error } kèm mã 4xx                – lỗi người dùng cần biết (hết credit, chưa đăng nhập…)
 //
 // Biến môi trường (Supabase → Edge Functions → Secrets):
-//   GEMINI_API_KEY      – key Gemini (key Free tier sẽ bị Google từ chối → tự fallback)
+//   GEMINI_API_KEY      – key Gemini; FASHN hết credit thì tự chuyển sang Gemini (nếu có key)
 //   FASHN_API_KEY       – có key này thì mặc định dùng FASHN (https://app.fashn.ai → API)
-//   FASHN_MODEL         – tryon-v1.6 (mặc định, 1 credit/ảnh) | tryon-max (nét hơn, nhận prompt số đo, 2 credit)
 //   TRYON_PROVIDER      – ép dùng fashn | gemini (không đặt = fashn nếu có FASHN_API_KEY, ngược lại gemini)
 //   GEMINI_IMAGE_MODEL  – mặc định gemini-3.1-flash-image-preview
-//   DAILY_LIMIT         – số lượt AI/người/ngày, mặc định 5
+//   DAILY_LIMIT         – hạn mức credit dự phòng khi chưa chạy SQL 28, mặc định 6
 //   SITE_URL            – địa chỉ web để lấy ảnh người mẫu có sẵn
-import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 import { decodeBase64, encodeBase64 } from 'jsr:@std/encoding@1/base64';
 
 const CORS = {
@@ -32,8 +43,7 @@ const CORS = {
 };
 const SITE_URL = Deno.env.get('SITE_URL') ?? 'https://tram-hy-alpha.vercel.app';
 const PROVIDER = Deno.env.get('TRYON_PROVIDER') ?? (Deno.env.get('FASHN_API_KEY') ? 'fashn' : 'gemini');
-const FASHN_MODEL = Deno.env.get('FASHN_MODEL') ?? 'tryon-v1.6';
-const DAILY_LIMIT = Number(Deno.env.get('DAILY_LIMIT') ?? 5);
+const DEFAULT_LIMIT = Number(Deno.env.get('DAILY_LIMIT') ?? 6);
 const SAMPLE_MODELS: Record<string, string> = {
   user: 'user_bride.png',
   bride1: 'bride_model_1.png',
@@ -44,6 +54,17 @@ const SAMPLE_MODELS: Record<string, string> = {
 
 type Img = { mimeType: string; data: string };                 // ảnh dạng base64
 type Body = { height: number; weight: number; heel: number } | null;
+type Options = {
+  model: 'standard' | 'max';
+  quality: 'fast' | 'balanced' | 'quality';
+  samples: number;
+  category: string;
+  photoType: string;
+  cleanOriginal: boolean;
+  seed: number;
+};
+type Output = { bytes: Uint8Array; mimeType: string };
+type Result = { images: Output[] } | { unavailable: string };
 
 // Số đo hợp lệ (khớp thanh trượt ở Phòng thử) → câu mô tả cho AI; sai thì bỏ qua
 function readBody(raw: Record<string, unknown> | undefined): Body {
@@ -56,13 +77,49 @@ const describeBody = (b: Body) => b
     'scale the dress to her real proportions, waistline at her natural waist, a floor-length hem just touching the floor.'
   : '';
 
+// Tùy chọn từ trình duyệt → chỉ nhận giá trị trong danh sách cho phép
+const pick = <T extends string>(value: unknown, allowed: readonly T[], fallback: T): T =>
+  allowed.includes(value as T) ? value as T : fallback;
+function readOptions(raw: Record<string, unknown> | undefined): Options {
+  const samples = Math.trunc(Number(raw?.samples));
+  const seed = Math.trunc(Number(raw?.seed));
+  return {
+    model: pick(raw?.model, ['standard', 'max'] as const, 'standard'),
+    quality: pick(raw?.quality, ['fast', 'balanced', 'quality'] as const, 'quality'),
+    samples: samples >= 1 && samples <= 4 ? samples : 1,
+    category: pick(raw?.category, ['one-pieces', 'tops', 'bottoms', 'auto'] as const, 'one-pieces'),
+    photoType: pick(raw?.photoType, ['auto', 'flat-lay', 'model'] as const, 'auto'),
+    cleanOriginal: raw?.cleanOriginal === true,
+    seed: seed >= 0 && seed < 2 ** 31 ? seed : Math.floor(Math.random() * 2 ** 31),
+  };
+}
+const MAX_CREDITS = { fast: 1, balanced: 2, quality: 3 } as const;   // tryon-max 1k, mỗi ảnh
+const creditCost = (o: Options) => o.samples * (o.model === 'max' ? MAX_CREDITS[o.quality] : 1);
+
+// Cài đặt admin (SQL 28). Chưa chạy SQL 28 → Siêu nét tắt, hạn mức theo DAILY_LIMIT.
+async function readSettings(admin: SupabaseClient) {
+  const { data } = await admin.from('app_settings').select('value').eq('key', 'tryon').maybeSingle();
+  const limit = Number(data?.value?.daily_credits);
+  return { maxEnabled: data?.value?.max_enabled === true, limit: limit >= 1 ? limit : DEFAULT_LIMIT };
+}
+
+// Credit đã dùng hôm nay (chỉ tính ảnh thành công). Chưa có cột credits → mỗi ảnh tính 1.
+async function creditsUsedToday(admin: SupabaseClient, userId: string) {
+  const since = startOfVietnamDay();
+  const { data, error } = await admin.from('tryon_jobs').select('credits')
+    .eq('user_id', userId).eq('status', 'done').gte('created_at', since);
+  if (!error) return (data ?? []).reduce((t, j) => t + (j.credits ?? 1), 0);
+  const { count } = await admin.from('tryon_jobs').select('id', { count: 'exact', head: true })
+    .eq('user_id', userId).eq('status', 'done').gte('created_at', since);
+  return count ?? 0;
+}
+
 const geminiPrompt = (b: Body) => `Image 1 is a bride. Image 2 is a wedding dress.
 Create a photorealistic full-body photo of the SAME person from image 1 wearing the wedding dress from image 2.
 Keep her face, hairstyle, skin tone, body shape, pose and background exactly as in image 1.
 Reproduce the dress faithfully: silhouette, fabric, color, neckline, sleeves, lace and embellishments.
 ${describeBody(b)}
 Natural studio lighting, no text, no watermark.`;
-type Result = { bytes: Uint8Array; mimeType: string } | { unavailable: string };
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
@@ -109,40 +166,45 @@ async function runGemini(person: Img, garment: Img, body: Body): Promise<Result>
   const reply = await res.json();
   const part = reply.candidates?.[0]?.content?.parts?.find((p: { inlineData?: Img }) => p.inlineData);
   if (!part) throw new Error(`Gemini không trả ảnh: ${JSON.stringify(reply).slice(0, 300)}`);
-  return { bytes: decodeBase64(part.inlineData.data), mimeType: part.inlineData.mimeType || 'image/png' };
+  return { images: [{ bytes: decodeBase64(part.inlineData.data), mimeType: part.inlineData.mimeType || 'image/png' }] };
 }
 
 // FASHN (chuyên thử đồ, giữ nguyên dáng người trong ảnh) – tài liệu: https://docs.fashn.ai
-//   tryon-v1.6: model_image + garment_image, category one-pieces (váy liền), 1 credit/ảnh
-//   tryon-max : model_image + product_image + prompt (gửi kèm số đo), 1k balanced = 2 credit/ảnh
-async function runFashn(person: Img, garment: Img, body: Body): Promise<Result> {
+//   tryon-v1.6: model_image + garment_image, 1 credit/ảnh (mode chỉ đổi tốc độ/độ đẹp, không đổi giá)
+//   tryon-max : model_image + product_image + prompt (gửi kèm số đo), luôn 1k, giá theo generation_mode
+async function runFashn(person: Img, garment: Img, body: Body, o: Options): Promise<Result> {
   const key = Deno.env.get('FASHN_API_KEY');
   if (!key) return { unavailable: 'not-configured' };
   const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` };
   const dataUrl = (img: Img) => `data:${img.mimeType};base64,${img.data}`;
 
-  const inputs = FASHN_MODEL === 'tryon-max'
-    ? {
+  const [modelName, inputs] = o.model === 'max'
+    ? ['tryon-max', {
       model_image: dataUrl(person),
       product_image: dataUrl(garment),
       prompt: `Wedding dress try-on. ${describeBody(body)}`.trim(),
       resolution: '1k',
-      generation_mode: 'balanced',
+      generation_mode: o.quality,
+      num_images: o.samples,
+      seed: o.seed,
       output_format: 'jpeg',
-    }
-    : {
+    }]
+    : ['tryon-v1.6', {
       model_image: dataUrl(person),
       garment_image: dataUrl(garment),
-      category: 'one-pieces',
-      garment_photo_type: 'auto',      // ảnh váy trải phẳng hay ảnh người mặc – FASHN tự nhận
-      mode: 'quality',                 // cùng 1 credit, chậm hơn vài giây nhưng đẹp hơn
+      category: o.category,
+      garment_photo_type: o.photoType,          // ảnh váy trải phẳng hay ảnh người mặc (auto = FASHN tự nhận)
+      segmentation_free: !o.cleanOriginal,      // false = xóa kỹ đồ đang mặc trước khi ướm
+      mode: { fast: 'performance', balanced: 'balanced', quality: 'quality' }[o.quality],
+      num_samples: o.samples,
+      seed: o.seed,
       output_format: 'jpeg',
-    };
+    }];
 
   const start = await fetch('https://api.fashn.ai/v1/run', {
     method: 'POST',
     headers,
-    body: JSON.stringify({ model_name: FASHN_MODEL, inputs }),
+    body: JSON.stringify({ model_name: modelName, inputs }),
   });
   if (start.status === 401) return { unavailable: 'not-configured' };           // key sai
   if (start.status === 402) return { unavailable: 'no-credits' };               // hết credit
@@ -150,14 +212,17 @@ async function runFashn(person: Img, garment: Img, body: Body): Promise<Result> 
   const { id, error } = await start.json();
   if (!id) throw new Error(`FASHN không nhận yêu cầu: ${JSON.stringify(error)}`);
 
-  for (let i = 0; i < 45; i++) {                                   // chờ tối đa ~90 giây
+  for (let i = 0; i < 60; i++) {                                   // chờ tối đa ~120 giây (4 ảnh chất lượng cao)
     await new Promise((r) => setTimeout(r, 2000));
     const res = await fetch(`https://api.fashn.ai/v1/status/${id}`, { headers });
     if (!res.ok) continue;                                         // lỗi mạng tạm thời → hỏi lại
     const status = await res.json();
     if (status.status === 'completed') {
-      const img = await fetchImg(status.output[0]);
-      return { bytes: decodeBase64(img.data), mimeType: img.mimeType };
+      const images = await Promise.all((status.output as string[]).map(async (url) => {
+        const img = await fetchImg(url);
+        return { bytes: decodeBase64(img.data), mimeType: img.mimeType };
+      }));
+      return { images };
     }
     if (status.status === 'failed') {
       // Ảnh không hợp lệ (không thấy người / không thấy váy…) → báo người dùng đổi ảnh
@@ -179,8 +244,18 @@ Deno.serve(async (req) => {
   const { data: { user } } = await admin.auth.getUser(token);
   if (!user) return json({ error: 'Bạn cần đăng nhập để thử váy bằng AI' }, 401);
 
-  const { dressId, garmentPath, photoPath, sampleModel, body: rawBody } = await req.json().catch(() => ({}));
+  const { dressId, garmentPath, photoPath, sampleModel, body: rawBody, options: rawOptions } =
+    await req.json().catch(() => ({}));
   const ownsPath = (path: unknown) => typeof path === 'string' && path.startsWith(`${user.id}/`) && !path.includes('..');
+
+  const settings = await readSettings(admin);
+  const options = readOptions(rawOptions);
+  if (options.model === 'max' && !settings.maxEnabled) {
+    return json({ error: 'Mô hình Siêu nét đang tắt – hãy chọn Tiêu chuẩn' }, 403);
+  }
+  // Gemini chỉ trả 1 ảnh, không có tùy chỉnh → tính 1 credit
+  const provider = PROVIDER;
+  const cost = provider === 'fashn' ? creditCost(options) : 1;
 
   // Váy: mẫu của tiệm (dressId) hoặc ảnh váy người dùng tự tải (garmentPath)
   let dress: { id: string; image_url: string | null } | null = null;
@@ -193,11 +268,16 @@ Deno.serve(async (req) => {
     dress = data;
   }
 
-  const { count } = await admin.from('tryon_jobs').select('id', { count: 'exact', head: true })
-    .eq('user_id', user.id).eq('status', 'done').gte('created_at', startOfVietnamDay());
-  const used = count ?? 0;
-  if (used >= DAILY_LIMIT) {
-    return json({ error: `Bạn đã dùng hết ${DAILY_LIMIT} lượt thử váy AI hôm nay. Mai quay lại nhé!`, remaining: 0 }, 429);
+  const used = await creditsUsedToday(admin, user.id);
+  const left = Math.max(0, settings.limit - used);
+  if (cost > left) {
+    return json({
+      error: left
+        ? `Hôm nay bạn còn ${left} credit, lựa chọn này cần ${cost} credit – hãy giảm số ảnh hoặc chất lượng.`
+        : `Bạn đã dùng hết ${settings.limit} credit thử váy AI hôm nay. Mai quay lại nhé!`,
+      remaining: left,
+      limit: settings.limit,
+    }, 429);
   }
 
   let person: Img;
@@ -223,28 +303,57 @@ Deno.serve(async (req) => {
 
   const body = readBody(rawBody);
   // garment_path chỉ ghi khi dùng ảnh váy tự tải (cột có từ SQL 12 – thử mẫu của tiệm không phụ thuộc file này)
-  const job = { user_id: user.id, dress_id: dress?.id ?? null, provider: PROVIDER, ...(dress ? {} : { garment_path: garmentPath }) };
+  const baseJob = { user_id: user.id, dress_id: dress?.id ?? null, ...(dress ? {} : { garment_path: garmentPath }) };
+  let usedProvider = provider;
   let result: Result;
   try {
-    result = PROVIDER === 'fashn' ? await runFashn(person, garment, body) : await runGemini(person, garment, body);
+    result = provider === 'fashn' ? await runFashn(person, garment, body, options) : await runGemini(person, garment, body);
+    // FASHN hết credit → vẫn cho người dùng ướm bằng Gemini (1 ảnh) nếu có key
+    if ('unavailable' in result && result.unavailable === 'no-credits' && Deno.env.get('GEMINI_API_KEY')) {
+      console.warn('FASHN hết credit → chuyển sang Gemini');
+      usedProvider = 'gemini';
+      const backup = await runGemini(person, garment, body);
+      if (!('unavailable' in backup)) result = backup;
+    }
   } catch (error) {
     console.error('Thử váy AI lỗi:', error);
-    await admin.from('tryon_jobs').insert({ ...job, status: 'failed', error: String(error).slice(0, 500) });
+    await admin.from('tryon_jobs').insert({ ...baseJob, provider: usedProvider, status: 'failed', error: String(error).slice(0, 500) });
     return fallback('provider-error');
   }
   if ('unavailable' in result) return fallback(result.unavailable);
 
-  const jobId = crypto.randomUUID();
-  const ext = result.mimeType.includes('jpeg') ? 'jpg' : result.mimeType.split('/')[1] ?? 'png';
-  const path = `${user.id}/${jobId}.${ext}`;
-  const upload = await admin.storage.from('tryon-results').upload(path, result.bytes, { contentType: result.mimeType });
-  if (upload.error) {
-    console.error('Lưu ảnh kết quả lỗi:', upload.error);
-    return fallback('provider-error');
+  // Credit thật của từng ảnh (Gemini = 1 cho cả lượt)
+  const perImage = usedProvider === 'fashn' ? cost / result.images.length : 1;
+  const jobOptions = usedProvider === 'fashn' ? options : { model: 'gemini' };
+  const urls: string[] = [];
+  let charged = 0;
+  for (const [i, img] of result.images.entries()) {
+    const jobId = crypto.randomUUID();
+    const ext = img.mimeType.includes('jpeg') ? 'jpg' : img.mimeType.split('/')[1] ?? 'png';
+    const path = `${user.id}/${jobId}.${ext}`;
+    const upload = await admin.storage.from('tryon-results').upload(path, img.bytes, { contentType: img.mimeType });
+    if (upload.error) {
+      console.error('Lưu ảnh kết quả lỗi:', upload.error);
+      continue;
+    }
+    // Gemini: chỉ ảnh đầu tính credit; FASHN: chia đều (làm tròn lên, tổng không vượt cost)
+    const credits = usedProvider === 'fashn' ? Math.min(Math.ceil(perImage), cost - charged) : (i === 0 ? 1 : 0);
+    charged += credits;
+    const job = { ...baseJob, id: jobId, provider: usedProvider, status: 'done', result_path: path };
+    let saved = await admin.from('tryon_jobs').insert({ ...job, credits, options: jobOptions });
+    if (saved.error) saved = await admin.from('tryon_jobs').insert(job);          // chưa chạy SQL 28
+    if (saved.error) console.error('Ghi tryon_jobs lỗi (đã chạy SQL 12 chưa?):', saved.error);
+    const { data: signed } = await admin.storage.from('tryon-results').createSignedUrl(path, 3600);
+    if (signed?.signedUrl) urls.push(signed.signedUrl);
   }
-  const saved = await admin.from('tryon_jobs').insert({ ...job, id: jobId, status: 'done', result_path: path });
-  if (saved.error) console.error('Ghi tryon_jobs lỗi (đã chạy SQL 12 chưa?):', saved.error);
-  const { data: signed } = await admin.storage.from('tryon-results').createSignedUrl(path, 3600);
+  if (!urls.length) return fallback('provider-error');
 
-  return json({ imageUrl: signed?.signedUrl, remaining: DAILY_LIMIT - used - 1, provider: PROVIDER });
+  return json({
+    imageUrl: urls[0],
+    images: urls,
+    remaining: Math.max(0, left - charged),
+    limit: settings.limit,
+    credits: charged,
+    provider: usedProvider,
+  });
 });

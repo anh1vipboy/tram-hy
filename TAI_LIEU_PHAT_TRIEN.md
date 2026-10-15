@@ -69,6 +69,9 @@ exe202/
 │   ├── 23_image_webp.sql     Ảnh demo trỏ về ảnh của web đổi sang .webp (nhẹ hơn ~10 lần)
 │   ├── 24_guestbook.sql      Sổ lời chúc có duyệt (chống spam theo IP, thông báo, realtime); nới dung lượng details
 │   ├── 25_invitation_access.sql Thiệp: chỉ mở bằng link (RPC), mật khẩu tùy chọn, lượt xem, phản hồi theo sự kiện + câu hỏi, trả lời lời chúc
+│   ├── 26_invitation_media.sql Kho video thiệp tải từ máy (bucket invitation-media, 50MB)
+│   ├── 27_invitation_storage_select.sql Chủ thiệp đọc được thư mục ảnh/video của mình → xóa file cũ mới có tác dụng
+│   ├── 28_tryon_settings.sql Thử váy AI: bảng app_settings (admin bật/tắt Siêu nét, hạn mức credit), tryon_jobs ghi credit + tùy chọn
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
@@ -255,13 +258,23 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - **Ảnh lưu riêng tư** trong bucket `bride-photos/<user_id>/`: ảnh người `body-*.jpg` (tối đa 6) và ảnh váy `garment-*.jpg` (tối đa 10) – hằng `MAX_BRIDE_PHOTOS`, `MAX_GARMENT_PHOTOS` trong `services/profile.js`. Lần sau vào hiện lại để chọn; nút **×** để xóa hẳn. Chưa đăng nhập thì ảnh chỉ dùng tạm trong trình duyệt.
 - **"Chuẩn kích thước"**: FASHN ghép váy **theo đúng dáng người trong ảnh** (giữ vai, eo, tư thế) – nên ảnh của bạn phải là ảnh toàn thân đứng thẳng. Web gửi kèm chiều cao / cân nặng / giày; model `tryon-max` và Gemini dùng số đo này trong prompt để đặt độ dài váy, eo cho đúng tỷ lệ (`tryon-v1.6` không nhận prompt, dựa hoàn toàn vào ảnh).
 - **Nhà cung cấp AI** (Edge Function `thu-vay-ai`, chọn tự động):
-  - Có secret `FASHN_API_KEY` → dùng **FASHN** (chuyên thử đồ). `FASHN_MODEL=tryon-v1.6` (mặc định, 1 credit ≈ 0,075 USD/ảnh) hoặc `tryon-max` (nét hơn, nhận prompt số đo, 2 credit/ảnh).
+  - Có secret `FASHN_API_KEY` → dùng **FASHN** (chuyên thử đồ). FASHN hết credit mà có `GEMINI_API_KEY` → tự chuyển sang Gemini (1 ảnh).
   - Không có → Gemini (`GEMINI_API_KEY`, cần bật thanh toán). Ép một bên: `TRYON_PROVIDER=fashn|gemini`.
   - AI chưa chạy được (chưa có key, hết credit, ảnh không nhận ra người/váy) → web báo rõ lý do và giữ ảnh minh họa, không trừ lượt.
+- **Tùy chỉnh ướm thử** (khung *⚙️ Tùy chỉnh* dưới nút AI, `SQL 28`). Chỉ ướm váy lên người – không đổi nền, không đổi khung, không video:
+  | Lựa chọn | Giá trị | Credit FASHN |
+  |---|---|---|
+  | Mô hình | ⚡ Tiêu chuẩn (`tryon-v1.6`) · 💎 Siêu nét (`tryon-max`, 1K – **chỉ hiện khi admin bật**) | Tiêu chuẩn 1/ảnh; Siêu nét: Nhanh 1 · Cân bằng 2 · Đẹp nhất 3 /ảnh |
+  | Chất lượng | Nhanh / Cân bằng / Đẹp nhất | Tiêu chuẩn: chỉ đổi thời gian chờ |
+  | Số ảnh mỗi lần | 1–4 → dải ảnh dưới gương để chọn ảnh ưng nhất | × số ảnh |
+  | Loại trang phục (chỉ "Váy bạn chọn"), Ảnh váy là, Xóa kỹ đồ đang mặc | chỉ Tiêu chuẩn | – |
+  - Bấm lại khi đã có ảnh → **🎲 Ướm kiểu khác** (seed mới). **So sánh trước/sau**: kéo thanh trên gương.
+  - Giá credit tính ở cả 2 nơi, phải khớp nhau: `creditCost()` trong function và `tryonCost()` trong `services/tryon-ai.js`.
+  - **Trang Quản trị → tab "Thử váy AI"**: bật/tắt Siêu nét (bật lúc review / demo rồi tắt) và hạn mức credit/người/ngày (mặc định 6). Lưu vào bảng `app_settings` (khóa `tryon`) qua RPC `set_tryon_settings` (chỉ admin); function đọc lại mỗi lần gọi, không cần deploy.
 - **Bật FASHN:** đăng ký https://app.fashn.ai → nạp credit → mục **API** tạo key → trong `backend/` chạy
   `npx supabase secrets set --project-ref vsjdijmuvuetmhmszcrl FASHN_API_KEY=<key>` (không cần deploy lại). Chạy **`12_tryon_own_garment.sql`** trên database để ghi lịch sử ảnh váy tự tải.
-- Giới hạn **5 lượt/người/ngày** (giờ Việt Nam) – secret `DAILY_LIMIT` + hằng `AI_DAILY_LIMIT` trong `frontend/js/services/tryon-ai.js`. Mỗi lần thử ghi vào `tryon_jobs` (theo dõi chi phí); ảnh kết quả ở bucket riêng tư `tryon-results`.
-- Test: `flows/own-garment-tryon.spec.js` giả lập function (không tốn credit), vẫn lưu/xóa ảnh váy thật trên Storage.
+- Hạn mức tính theo **tổng credit/người/ngày** (giờ Việt Nam, chỉ ảnh thành công). Mỗi ảnh = 1 dòng `tryon_jobs` với `credits` + `options` (SQL 28); ảnh kết quả ở bucket riêng tư `tryon-results`. Chưa chạy SQL 28 → Siêu nét tắt, hạn mức = secret `DAILY_LIMIT` (mặc định 6), mỗi ảnh tính 1.
+- Test: `flows/own-garment-tryon.spec.js`, `flows/tryon-options.spec.js` giả lập function + cài đặt (không tốn credit), vẫn lưu/xóa ảnh váy thật trên Storage; bài admin bật/tắt Siêu nét cần SQL 28 trên project test.
 - Deploy lại function: trong `backend/` chạy `npx supabase functions deploy thu-vay-ai --project-ref vsjdijmuvuetmhmszcrl`.
 
 ### AI tư vấn chia ngân sách cưới

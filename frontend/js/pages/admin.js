@@ -9,6 +9,7 @@ import { subscribeVendorChanges } from '../services/catalog.js';
 import {
   listOpenDisputes, resolveDispute, listVendorsWithOwners, setVendorVerified, linkVendorOwner, reviewVendor,
 } from '../services/admin.js';
+import { getTryonSettings, saveTryonSettings } from '../services/tryon-ai.js';
 
 const data = { bookings: [], disputes: [], vendors: [] };
 
@@ -224,11 +225,47 @@ function renderBookings() {
     </div>`);
 }
 
+// ---------- THỬ VÁY AI ----------
+// Công tắc mô hình Siêu nét (bật lúc review/demo) + hạn mức credit mỗi người mỗi ngày. Edge Function đọc lại ngay.
+async function renderAiSettings() {
+  const container = $('#tab-ai');
+  const settings = await getTryonSettings();
+  render(container, html`
+    <form class="card stack" style="max-width:640px" id="ai-settings">
+      <h3>Thử váy bằng AI (FASHN)</h3>
+      <label class="row" style="cursor:pointer">
+        <input type="checkbox" name="maxEnabled" ${settings.maxEnabled ? 'checked' : ''}>
+        <strong>Bật mô hình Siêu nét (Max) cho người dùng</strong>
+      </label>
+      <p class="small muted" style="margin:0">Ảnh nét, chất vải tự nhiên hơn nhưng tốn 1–3 credit FASHN mỗi ảnh
+        (Tiêu chuẩn luôn 1 credit). Nên chỉ bật lúc review / demo rồi tắt.</p>
+      <label class="field"><span>Hạn mức mỗi người mỗi ngày (credit)</span>
+        <input class="input" type="number" name="dailyCredits" min="1" max="50" required value="${settings.dailyCredits}"
+               style="max-width:160px"></label>
+      <p class="small muted" style="margin:0">VD 6 credit = 6 ảnh Tiêu chuẩn, hoặc 2 ảnh Siêu nét "Đẹp nhất".
+        Người dùng chọn chất lượng / số ảnh, web tự trừ đúng số credit.</p>
+      <div class="row"><button class="btn btn-primary btn-sm" type="submit">Lưu cài đặt</button></div>
+    </form>`);
+  const form = $('#ai-settings');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    withBusy(form.querySelector('[type=submit]'), async () => {
+      try {
+        const data = new FormData(form);
+        await saveTryonSettings({ maxEnabled: data.has('maxEnabled'), dailyCredits: Number(data.get('dailyCredits')) });
+        toast(data.has('maxEnabled') ? 'Đã lưu – Siêu nét đang BẬT.' : 'Đã lưu – Siêu nét đang tắt.', 'success');
+      } catch (error) {
+        toastError(error);
+      }
+    });
+  });
+}
+
 function initTabs() {
   for (const tab of $$('[data-tab]')) {
     tab.addEventListener('click', () => {
       for (const t of $$('[data-tab]')) t.classList.toggle('active', t === tab);
-      for (const name of ['approvals', 'disputes', 'vendors', 'bookings']) $(`#tab-${name}`).hidden = name !== tab.dataset.tab;
+      for (const name of ['approvals', 'disputes', 'vendors', 'bookings', 'ai']) $(`#tab-${name}`).hidden = name !== tab.dataset.tab;
     });
   }
 }
@@ -239,7 +276,7 @@ initTabs();                    // gắn sự kiện tab ngay, không chờ kiể
 document.querySelector(`[data-tab="${new URLSearchParams(location.search).get('tab')}"]`)?.click();
 await initLayout('admin');
 await requireAuth(['admin']);
-await load();
+await Promise.all([load(), renderAiSettings().catch(toastError)]);
 const reload = debounce(load, 500);
 subscribeBookingChanges('admin-bookings', reload);
 subscribeVendorChanges('admin-vendors', reload);

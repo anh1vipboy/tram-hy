@@ -539,8 +539,39 @@ dialog.modal::backdrop { background: rgba(30, 24, 20, .55); }
 .msg.typing { color: var(--muted); font-style: italic; }
 .chat-form { flex-wrap: nowrap; }
 .chat-form .input { flex: 1; min-width: 0; }
-.ai-tryon { display: flex; gap: 8px 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.ai-tryon { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.ai-tryon-row { display: flex; gap: 8px 12px; align-items: center; flex-wrap: wrap; }
 .ai-tryon .small { color: #d9cbbb; }
+.ai-cost { margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: rgba(255, 255, 255, .2); font-size: 11px; font-weight: 700; }
+/* Tùy chỉnh ướm thử AI (gập/mở dưới nút) – tông tối theo gương */
+.ai-options { border: 1px solid #3d332d; border-radius: 12px; background: #241e1b; }
+.ai-options summary { cursor: pointer; padding: 9px 12px; font-size: 13px; font-weight: 600; color: #f3ead9; list-style-position: inside; }
+.ai-options-sum { font-weight: 400; color: #a8998c; }
+.ai-options-body { display: flex; flex-direction: column; gap: 12px; padding: 4px 12px 12px; }
+.ai-opt { display: flex; flex-direction: column; gap: 6px; }
+.ai-opt-label { font-size: 12px; font-weight: 600; color: #d9cbbb; }
+.ai-opt-note { font-size: 12px; color: #a8998c; }
+.ai-options .chip { padding: 6px 12px; background: transparent; border-color: #5a4c43; color: #d9cbbb; }
+.ai-options .chip.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+.ai-opt-check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: #f3ead9; cursor: pointer; }
+.ai-opt-check input { margin-top: 3px; accent-color: var(--brand); }
+.ai-opt-total { font-size: 13px; color: #d9cbbb; padding-top: 8px; border-top: 1px solid #3d332d; }
+/* Nhiều ảnh trong 1 lần ướm: chọn ảnh ưng nhất */
+.ai-picks { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; }
+.ai-picks button { position: relative; flex: none; width: 60px; height: 80px; padding: 0; border: 2px solid transparent; border-radius: 8px; overflow: hidden; background: none; cursor: pointer; }
+.ai-picks button.active { border-color: var(--brand); }
+.ai-picks img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.ai-picks span { position: absolute; left: 4px; bottom: 4px; min-width: 18px; padding: 0 4px; border-radius: 999px; background: rgba(0, 0, 0, .65); color: #fff; font: 700 11px/18px var(--font-body); }
+/* So sánh trước/sau: ảnh gốc cắt theo --split, đường chia trắng, thanh kéo ở đáy gương */
+.mirror-frame { --split: 50%; }
+.mirror-compare { position: absolute; inset: 0; pointer-events: none; }
+.mirror-compare img { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--split)) 0 0); }
+.mirror-compare::after { content: ''; position: absolute; top: 0; bottom: 0; left: var(--split); width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 8px rgba(0, 0, 0, .5); }
+.compare-tag { position: absolute; bottom: 48px; padding: 3px 10px; border-radius: 999px; background: rgba(0, 0, 0, .6); font-size: 12px; font-weight: 600; }
+.compare-before { left: 12px; }
+.compare-after { right: 12px; }
+/* Thanh kéo cách mép 14px; núm ~16px → đường chia tính từ 22px để luôn nằm đúng tâm núm (xem tryon.js) */
+.mirror-frame .compare-range { position: absolute; left: 14px; bottom: 14px; width: calc(100% - 28px); margin: 0; cursor: ew-resize; }
 .fit-score { display: flex; gap: 12px; align-items: center; margin-top: 12px; padding: 12px; border-radius: 12px; background: #2a2421; }
 .fit-score .score { flex: none; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 18px; background: var(--brand); color: #fff; }
 .fit-score p { margin: 0; font-size: 13px; color: #d9cbbb; }
