@@ -106,9 +106,9 @@ async function runGemini(person: Img, garment: Img, body: Body): Promise<Result>
   }
   if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text()}`);
 
-  const body = await res.json();
-  const part = body.candidates?.[0]?.content?.parts?.find((p: { inlineData?: Img }) => p.inlineData);
-  if (!part) throw new Error(`Gemini không trả ảnh: ${JSON.stringify(body).slice(0, 300)}`);
+  const reply = await res.json();
+  const part = reply.candidates?.[0]?.content?.parts?.find((p: { inlineData?: Img }) => p.inlineData);
+  if (!part) throw new Error(`Gemini không trả ảnh: ${JSON.stringify(reply).slice(0, 300)}`);
   return { bytes: decodeBase64(part.inlineData.data), mimeType: part.inlineData.mimeType || 'image/png' };
 }
 

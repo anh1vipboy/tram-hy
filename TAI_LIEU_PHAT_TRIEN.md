@@ -240,6 +240,10 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 - Không nhận mail → xem Supabase → Edge Functions → Logs (403 = bí mật không khớp, 502 = Brevo từ chối) và Brevo → Transactional → Logs.
 
 ### Thử váy bằng AI thật (luồng chính)
+- ⚠️ **Trước khi deploy Edge Function**: kiểm tra biên dịch – trong `backend/supabase/functions` chạy
+  `npx esbuild <tên>/index.ts --format=esm --log-level=error > NUL` (không báo gì = ổn). Lỗi cú pháp làm function **không khởi động
+  được** (BOOT_ERROR 503) mà test Playwright không phát hiện (test giả lập function). Sau deploy gọi thử: chưa đăng nhập phải
+  trả `401 "Bạn cần đăng nhập…"`, không phải `BOOT_ERROR`.
 **Luồng:** Phòng thử → bước 1 chọn **ảnh của bạn** (hoặc người mẫu) + số đo → bước 2 chọn váy theo 1 trong 3 cách → **✨ Ướm thử bằng AI thật** → ảnh ghép hiện trên gương và được lưu vào **Ảnh đã thử bằng AI** (dưới gương, lần sau vào vẫn xem lại được).
 
 | Bước 2 – chọn váy | Ảnh váy đưa cho AI | Đặt lịch |
