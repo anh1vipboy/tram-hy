@@ -74,8 +74,7 @@ test('khách không đến → đối tác báo no-show → admin giải ngân �
 test('tự thiết kế may đo → đặt lịch → đơn chia 30/40/30 và có hồ sơ thiết kế', async ({ browser }) => {
   requireAccounts('bride');
   const bride = await openAs(browser, 'bride');
-  await bride.goto('/tryon.html');
-  await bride.getByRole('button', { name: 'Tự thiết kế may đo' }).click();
+  await bride.goto('/thiet-ke-vay.html');
   await bride.getByRole('button', { name: /Đuôi cá/ }).click();
   await bride.getByRole('button', { name: /Ren Chantilly Pháp/ }).click();
   await bride.locator('#bespoke-notes').fill('Thêu tên hai vợ chồng ở gấu váy');
@@ -97,10 +96,10 @@ test('tự thiết kế may đo → đặt lịch → đơn chia 30/40/30 và c�
   await expect(order).toContainText('Thêu tên hai vợ chồng ở gấu váy');
 });
 
-test('số đo cơ thể được lưu vào tài khoản', async ({ browser }) => {
+test('số đo cơ thể được lưu vào tài khoản (trang may đo, dùng chung với Phòng thử)', async ({ browser }) => {
   requireAccounts('bride');
   const bride = await openAs(browser, 'bride');
-  await bride.goto('/tryon.html');
+  await bride.goto('/thiet-ke-vay.html');
   await expect(bride.getByText('Số đo được tự lưu vào tài khoản của bạn.')).toBeVisible();
 
   const height = String(150 + Math.floor(Math.random() * 30));   // giá trị mới mỗi lần chạy

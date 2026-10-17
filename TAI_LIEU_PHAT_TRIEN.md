@@ -24,7 +24,8 @@
 exe202/
 ├── frontend/                 ← WEB (mở bằng trình duyệt)
 │   ├── index.html            Trang chủ
-│   ├── tryon.html            Phòng thử váy AI + may đo tự thiết kế
+│   ├── tryon.html            Phòng thử váy AI dạng trò chuyện (ướm váy lên ảnh của bạn)
+│   ├── thiet-ke-vay.html     Tự thiết kế váy may đo (Trạm Hỷ Atelier)
 │   ├── marketplace.html      Danh sách đối tác (lọc, tìm, sắp xếp)
 │   ├── vendor.html           Chi tiết đối tác (?slug=tuart)
 │   ├── bookings.html         Đơn của tôi: trả cọc, nghiệm thu, khiếu nại, đánh giá
@@ -71,9 +72,10 @@ exe202/
 │   ├── 25_invitation_access.sql Thiệp: chỉ mở bằng link (RPC), mật khẩu tùy chọn, lượt xem, phản hồi theo sự kiện + câu hỏi, trả lời lời chúc
 │   ├── 26_invitation_media.sql Kho video thiệp tải từ máy (bucket invitation-media, 50MB)
 │   ├── 27_invitation_storage_select.sql Chủ thiệp đọc được thư mục ảnh/video của mình → xóa file cũ mới có tác dụng
-│   ├── 28_tryon_settings.sql Thử váy AI: bảng app_settings (admin bật/tắt Siêu nét, hạn mức credit), tryon_jobs ghi credit + tùy chọn
+│   ├── 28_tryon_settings.sql Thử váy AI: app_settings (admin bật/tắt Siêu nét, hạn mức credit); tryon_jobs ghi credit, tùy chọn, lượt gửi, tin nhắn; ai_usage thêm tryon_chat
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
+│   ├── functions/tro-ly-thu-vay/  Edge Function trợ lý chat ở Phòng thử (Gemini model chữ)
 │   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
 │   ├── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │   └── tools/xoa_du_lieu_demo.sql    Xóa dữ liệu demo của file 15
@@ -197,7 +199,7 @@ Khiếu nại bất kỳ lúc nào ──► Quản trị phân xử (hoàn ti�
 | Quản trị | Vai trò `admin` | |
 
 ### 5.3 Những gì còn là DEMO (chưa thật)
-- **Ảnh thử váy**: là ảnh render sẵn theo người mẫu × kiểu váy, chưa ghép AI lên ảnh thật.
+- **Ảnh minh họa ở trang may đo** (`thiet-ke-vay.html`): ảnh render sẵn theo người mẫu × phom váy (váy may đo chưa có ảnh thật để AI ướm). Phòng thử dùng AI thật (FASHN).
 - **Điểm tôn dáng**: tính theo bảng quy tắc stylist (`data/tryon-data.js`), không phải mô hình AI.
 - **Thanh toán**: cô dâu bấm "Tôi đã chuyển khoản" là ghi nhận. Mã VietQR hiển thị đúng chuẩn nhưng tài khoản trong `config.js` là số giả.
 
@@ -247,35 +249,53 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
   `npx esbuild <tên>/index.ts --format=esm --log-level=error > NUL` (không báo gì = ổn). Lỗi cú pháp làm function **không khởi động
   được** (BOOT_ERROR 503) mà test Playwright không phát hiện (test giả lập function). Sau deploy gọi thử: chưa đăng nhập phải
   trả `401 "Bạn cần đăng nhập…"`, không phải `BOOT_ERROR`.
-**Luồng:** Phòng thử → bước 1 chọn **ảnh của bạn** (hoặc người mẫu) + số đo → bước 2 chọn váy theo 1 trong 3 cách → **✨ Ướm thử bằng AI thật** → ảnh ghép hiện trên gương và được lưu vào **Ảnh đã thử bằng AI** (dưới gương, lần sau vào vẫn xem lại được).
+**Giao diện trò chuyện** (`tryon.html`, giống trợ lý AI trên web FASHN). Chỉ ướm váy lên ảnh – không đổi nền, không đổi khung, không video:
+khung soạn tin ở đáy có 2 ô **Ảnh của bạn** (tải lên / ảnh đã lưu / người mẫu có sẵn) và **Váy cưới** (mẫu của các tiệm có ảnh thật / ảnh váy tự tải)
+→ bấm gửi (gõ thêm tin nhắn nếu muốn) → ảnh ướm thử hiện ngay trong khung chat: phóng to, **so sánh trước/sau**, tải ảnh, 1–4 ảnh để chọn,
+**🎲 Thử kiểu khác** (seed mới), **📅 Đặt lịch thử váy này** (mẫu của tiệm) hoặc **✂️ Đặt may theo mẫu này** (ảnh váy tự tải → `thiet-ke-vay.html?tu=anh-vay`).
+Mở lại trang: các lần ướm đã lưu hiện lại thành đoạn chat (`listTryonHistory` – bảng `tryon_jobs`, cột `batch_id`, `message`, `options.person` của SQL 28).
 
-| Bước 2 – chọn váy | Ảnh váy đưa cho AI | Đặt lịch |
-|---|---|---|
-| Mẫu có sẵn | Ảnh thật của mẫu do tiệm đăng | Thuê / may tại tiệm đó |
-| **✨ Váy bạn chọn** | Ảnh váy người dùng tự tải (trên mạng, ở tiệm…) | "Đặt may theo mẫu này" → chuyển sang may đo, ghi chú sẵn |
-| Tự thiết kế may đo | (chưa có ảnh thật → chỉ ảnh minh họa) | Trạm Hỷ Atelier |
+| Vào trang bằng | Hành vi |
+|---|---|
+| `tryon.html?dress=<slug>` ("Thử váy này" ở trang chủ / trang tiệm) | Chọn sẵn mẫu vào ô Váy cưới + thẻ mẫu (giá, độ tôn dáng, **📅 Đặt lịch thử váy**) |
+| `tryon.html?chon-vay=1` ("Xem tất cả mẫu") | Mở sẵn bảng chọn váy |
+| `tryon.html?mode=own` | Mở sẵn tab "Ảnh váy của bạn" (quay lại sau khi đăng nhập để tải ảnh váy) |
 
-- **Ảnh lưu riêng tư** trong bucket `bride-photos/<user_id>/`: ảnh người `body-*.jpg` (tối đa 6) và ảnh váy `garment-*.jpg` (tối đa 10) – hằng `MAX_BRIDE_PHOTOS`, `MAX_GARMENT_PHOTOS` trong `services/profile.js`. Lần sau vào hiện lại để chọn; nút **×** để xóa hẳn. Chưa đăng nhập thì ảnh chỉ dùng tạm trong trình duyệt.
-- **"Chuẩn kích thước"**: FASHN ghép váy **theo đúng dáng người trong ảnh** (giữ vai, eo, tư thế) – nên ảnh của bạn phải là ảnh toàn thân đứng thẳng. Web gửi kèm chiều cao / cân nặng / giày; model `tryon-max` và Gemini dùng số đo này trong prompt để đặt độ dài váy, eo cho đúng tỷ lệ (`tryon-v1.6` không nhận prompt, dựa hoàn toàn vào ảnh).
+- **Trợ lý chat** (Edge Function `tro-ly-thu-vay`, Gemini model chữ – key Free tier dùng được): chỉ gọi khi người dùng **gõ chữ**. Hiểu ý →
+  `action` "tryon" (ướm) hoặc "chat" (hỏi đáp / tư vấn / yêu cầu chưa hỗ trợ như đổi nền, video → từ chối nhẹ nhàng); dịch yêu cầu **cách mặc**
+  (tà dài chạm đất, bỏ mũ, bỏ khăn choàng…) sang tiếng Anh → `prompt` cho Siêu nét; khách xin tư vấn → `theme` → web gợi ý vài mẫu đúng kiểu để bấm chọn.
+  Giới hạn 40 tin/người/ngày (bảng `ai_usage`, kind `tryon_chat` – SQL 28). AI bận / hết lượt / lỗi mạng → trả lời theo luật đơn giản, đủ ảnh + váy thì vẫn ướm.
+- **Tự thiết kế váy may đo** tách sang trang riêng `thiet-ke-vay.html` (`pages/bespoke.js`): phom, cổ, tay, vải, đuôi, phụ kiện → giá, ảnh minh họa,
+  độ tôn dáng, đặt lịch 30/40/30 (Trạm Hỷ Atelier). Số đo dùng chung với Phòng thử (bảng `body_profiles`).
+- **Ảnh lưu riêng tư** trong bucket `bride-photos/<user_id>/`: ảnh người `body-*.jpg` (tối đa 6) và ảnh váy `garment-*.jpg` (tối đa 10) – hằng
+  `MAX_BRIDE_PHOTOS`, `MAX_GARMENT_PHOTOS` trong `services/profile.js`. Tải lên / chọn lại / xóa (nút ×) ngay trong bảng chọn. Tải ảnh cần đăng nhập.
+- **"Chuẩn kích thước"**: web gửi kèm chiều cao / cân nặng / giày (sửa trong **⚙️ Tùy chỉnh → Số đo**); Siêu nét và Gemini dùng số đo trong prompt để đặt
+  độ dài váy, eo đúng tỷ lệ (Tiêu chuẩn `tryon-v1.6` không nhận prompt, cần ảnh toàn thân đứng thẳng).
+- **Vì sao ảnh trên web FASHN đẹp hơn?** Web FASHN dùng mô hình **Try-On Max** (`tryon-max`, FASHN khuyên dùng cho chất lượng cao): ướm được ảnh selfie,
+  váy xòe phồng, giữ khung cảnh. `tryon-v1.6` (Tiêu chuẩn) rẻ và nhanh nhưng chỉ đẹp với ảnh toàn thân đứng thẳng. Muốn ảnh như FASHN → admin bật Siêu nét.
 - **Nhà cung cấp AI** (Edge Function `thu-vay-ai`, chọn tự động):
   - Có secret `FASHN_API_KEY` → dùng **FASHN** (chuyên thử đồ). FASHN hết credit mà có `GEMINI_API_KEY` → tự chuyển sang Gemini (1 ảnh).
   - Không có → Gemini (`GEMINI_API_KEY`, cần bật thanh toán). Ép một bên: `TRYON_PROVIDER=fashn|gemini`.
-  - AI chưa chạy được (chưa có key, hết credit, ảnh không nhận ra người/váy) → web báo rõ lý do và giữ ảnh minh họa, không trừ lượt.
-- **Tùy chỉnh ướm thử** (khung *⚙️ Tùy chỉnh* dưới nút AI, `SQL 28`). Chỉ ướm váy lên người – không đổi nền, không đổi khung, không video:
+  - AI chưa chạy được (chưa có key, hết credit, ảnh không nhận ra người/váy) → trợ lý báo rõ lý do trong khung chat, không trừ credit.
+- **⚙️ Tùy chỉnh** (nút trên khung soạn tin):
   | Lựa chọn | Giá trị | Credit FASHN |
   |---|---|---|
-  | Mô hình | ⚡ Tiêu chuẩn (`tryon-v1.6`) · 💎 Siêu nét (`tryon-max`, 1K – **chỉ hiện khi admin bật**) | Tiêu chuẩn 1/ảnh; Siêu nét: Nhanh 1 · Cân bằng 2 · Đẹp nhất 3 /ảnh |
-  | Chất lượng | Nhanh / Cân bằng / Đẹp nhất | Tiêu chuẩn: chỉ đổi thời gian chờ |
-  | Số ảnh mỗi lần | 1–4 → dải ảnh dưới gương để chọn ảnh ưng nhất | × số ảnh |
-  | Loại trang phục (chỉ "Váy bạn chọn"), Ảnh váy là, Xóa kỹ đồ đang mặc | chỉ Tiêu chuẩn | – |
-  - Bấm lại khi đã có ảnh → **🎲 Ướm kiểu khác** (seed mới). **So sánh trước/sau**: kéo thanh trên gương.
-  - Giá credit tính ở cả 2 nơi, phải khớp nhau: `creditCost()` trong function và `tryonCost()` trong `services/tryon-ai.js`.
-  - **Trang Quản trị → tab "Thử váy AI"**: bật/tắt Siêu nét (bật lúc review / demo rồi tắt) và hạn mức credit/người/ngày (mặc định 6). Lưu vào bảng `app_settings` (khóa `tryon`) qua RPC `set_tryon_settings` (chỉ admin); function đọc lại mỗi lần gọi, không cần deploy.
+  | Mô hình | 💎 Siêu nét (`tryon-max`, 1K – **chỉ có khi admin bật, bật thì là mặc định**) · ⚡ Tiêu chuẩn (`tryon-v1.6`) | Siêu nét: Nhanh 1 · Cân bằng 2 · Đẹp nhất 3 /ảnh; Tiêu chuẩn 1/ảnh |
+  | Chất lượng | Nhanh / Cân bằng / Đẹp nhất (nhớ riêng cho từng mô hình; mặc định Siêu nét Cân bằng, Tiêu chuẩn Đẹp nhất) | Tiêu chuẩn: chỉ đổi thời gian chờ |
+  | Số ảnh mỗi lần | 1–4 | × số ảnh |
+  | Loại trang phục (chỉ ảnh váy tự tải), Ảnh váy là, Xóa kỹ đồ đang mặc | chỉ Tiêu chuẩn | – |
+  - Tùy chọn nhớ trên máy (localStorage `tramhy.tryon-chat-options`). Giá credit tính ở cả 2 nơi, phải khớp nhau: `creditCost()` trong function và `tryonCost()` trong `services/tryon-ai.js`.
+  - **Trang Quản trị → tab "Thử váy AI"**: bật/tắt Siêu nét (bật lúc review / demo rồi tắt) và hạn mức credit/người/ngày (mặc định 6). Lưu vào bảng `app_settings`
+    (khóa `tryon`) qua RPC `set_tryon_settings` (chỉ admin); function đọc lại mỗi lần gọi, không cần deploy. Chưa chạy SQL 28 → tab báo rõ và khóa form.
 - **Bật FASHN:** đăng ký https://app.fashn.ai → nạp credit → mục **API** tạo key → trong `backend/` chạy
-  `npx supabase secrets set --project-ref vsjdijmuvuetmhmszcrl FASHN_API_KEY=<key>` (không cần deploy lại). Chạy **`12_tryon_own_garment.sql`** trên database để ghi lịch sử ảnh váy tự tải.
-- Hạn mức tính theo **tổng credit/người/ngày** (giờ Việt Nam, chỉ ảnh thành công). Mỗi ảnh = 1 dòng `tryon_jobs` với `credits` + `options` (SQL 28); ảnh kết quả ở bucket riêng tư `tryon-results`. Chưa chạy SQL 28 → Siêu nét tắt, hạn mức = secret `DAILY_LIMIT` (mặc định 6), mỗi ảnh tính 1.
-- Test: `flows/own-garment-tryon.spec.js`, `flows/tryon-options.spec.js` giả lập function + cài đặt (không tốn credit), vẫn lưu/xóa ảnh váy thật trên Storage; bài admin bật/tắt Siêu nét cần SQL 28 trên project test.
-- Deploy lại function: trong `backend/` chạy `npx supabase functions deploy thu-vay-ai --project-ref vsjdijmuvuetmhmszcrl`.
+  `npx supabase secrets set --project-ref vsjdijmuvuetmhmszcrl FASHN_API_KEY=<key>` (không cần deploy lại).
+- Hạn mức tính theo **tổng credit/người/ngày** (giờ Việt Nam, chỉ ảnh thành công). Mỗi ảnh = 1 dòng `tryon_jobs` (`credits`, `options`, `batch_id`, `message` – SQL 28);
+  ảnh kết quả ở bucket riêng tư `tryon-results`. Chưa chạy SQL 28 → Siêu nét tắt, hạn mức = secret `DAILY_LIMIT` (mặc định 6), mỗi ảnh tính 1.
+- Test (giả lập 2 Edge Function + cài đặt, không tốn credit; ảnh tải lên vẫn lưu/xóa thật trên Storage): `tryon.spec.js` (chưa đăng nhập + trang may đo),
+  `flows/own-garment-tryon.spec.js`, `flows/tryon-options.spec.js`, `flows/tryon-assistant.spec.js`, `flows/tryon-history.spec.js`, `flows/bride-photos.spec.js`.
+  Bài admin bật/tắt Siêu nét và `pages.spec.js` (trang không lỗi console) cần SQL 28 trên project test.
+- Deploy lại 2 function: trong `backend/` chạy `npx supabase functions deploy thu-vay-ai --project-ref vsjdijmuvuetmhmszcrl`
+  và `npx supabase functions deploy tro-ly-thu-vay --project-ref vsjdijmuvuetmhmszcrl`.
 
 ### AI tư vấn chia ngân sách cưới
 - Trang chủ → **Gợi ý chia ngân sách cưới** chia 2 cột. **Trái**: nhập ngân sách, số khách, nơi tổ chức, ưu tiên, ghi chú → *✨ AI tư vấn* (hoặc *Chia nhanh theo tỷ lệ phổ biến*, không cần AI). **Phải**: bảng chia 6 hạng mục (thanh %, lý do, *Tìm đối tác →* lọc sẵn loại + mức tiền), mẹo, cảnh báo nếu ngân sách không đủ cho số khách.
@@ -489,7 +509,7 @@ Hiện có 27 bài × 2 thiết bị cho **khách chưa đăng nhập**: mọi t
 | 2 | **Trang "Tài khoản của tôi"**: sửa tên/SĐT, xem số đo (xem/xóa ảnh đã tải: đã có ở Phòng thử) | `frontend/` |
 | 3 | **Thông báo email** khi có đơn mới, đã cọc, chờ nghiệm thu, khiếu nại được xử lý | Edge Function |
 | 4 | **Thanh toán thật** (PayOS): webhook xác nhận chuyển khoản → gọi `pay_milestone` | Edge Function |
-| ✅ | AI thử váy thật (Gemini, sẵn chỗ cắm FASHN), 5 lượt/người/ngày | Đã xong (SQL 11 + function thu-vay-ai) |
+| ✅ | AI thử váy thật (FASHN, dự phòng Gemini) dạng trò chuyện, trợ lý chat, hạn mức credit/người/ngày, admin bật/tắt Siêu nét | Đã xong (SQL 11, 12, 28 + function thu-vay-ai, tro-ly-thu-vay) |
 | ✅ | AI tư vấn chia ngân sách cưới theo số khách, thành phố, ưu tiên | Đã xong (function tu-van-ngan-sach) |
 | ✅ | Kế hoạch cưới: ngân sách theo nghi lễ, checklist, tổng quan | Đã xong (SQL 20) |
 | ✅ | AI trong Kế hoạch cưới: lưu gợi ý AI thành kế hoạch, trợ lý đề xuất sửa từng mục (Áp dụng / Hoàn tác), 20 câu / ngày | Đã xong (SQL 21) |

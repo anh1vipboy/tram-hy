@@ -1,9 +1,11 @@
 -- =====================================================================
 -- TRẠM HỶ – 28_TRYON_SETTINGS.SQL
--- Thử váy AI có tùy chỉnh (chất lượng, số ảnh, mô hình Siêu nét):
+-- Phòng thử váy AI dạng trò chuyện (chất lượng, số ảnh, mô hình Siêu nét, trợ lý chat):
 --   1. Bảng app_settings: cài đặt chung của web. Ai cũng đọc được (không có gì bí mật), chỉ admin đổi qua RPC.
 --      Khóa 'tryon' = { max_enabled: bật mô hình Siêu nét (FASHN tryon-max), daily_credits: credit/người/ngày }
---   2. tryon_jobs ghi thêm số credit đã tốn (credits) + tùy chọn đã dùng (options) → hạn mức tính theo credit.
+--   2. tryon_jobs ghi thêm số credit đã tốn (credits), tùy chọn đã dùng (options – gồm ảnh người đã dùng),
+--      lượt gửi (batch_id – 1 lần gửi ra 1–4 ảnh) và tin nhắn kèm theo (message) → dựng lại lịch sử trò chuyện.
+--   3. ai_usage nhận thêm loại 'tryon_chat' – đếm tin nhắn gửi trợ lý thử váy (giới hạn mỗi ngày).
 -- Chạy SAU 27. Chạy lại nhiều lần không lỗi (giữ nguyên cài đặt admin đã đổi).
 -- =====================================================================
 
@@ -47,3 +49,9 @@ grant execute on function public.set_tryon_settings(boolean, int) to authenticat
 -- Mỗi ảnh AI = 1 dòng tryon_jobs; credits = số credit FASHN của riêng ảnh đó (ảnh cũ trước SQL 28 tính 1)
 alter table public.tryon_jobs add column if not exists credits int not null default 1 check (credits between 0 and 10);
 alter table public.tryon_jobs add column if not exists options jsonb;
+alter table public.tryon_jobs add column if not exists batch_id uuid;
+alter table public.tryon_jobs add column if not exists message text check (char_length(message) <= 500);
+
+-- Tin nhắn gửi trợ lý thử váy (Edge Function tro-ly-thu-vay) – cùng bảng đếm lượt với trợ lý Kế hoạch cưới (SQL 21)
+alter table public.ai_usage drop constraint if exists ai_usage_kind_check;
+alter table public.ai_usage add constraint ai_usage_kind_check check (kind in ('plan', 'tryon_chat'));

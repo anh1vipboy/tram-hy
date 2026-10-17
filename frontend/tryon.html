@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
   <title>Phòng thử váy AI – Trạm Hỷ</title>
   <link rel="icon" href="assets/images/logo.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,146 +11,44 @@
   <link rel="modulepreload" href="js/vendor/supabase-2.117.3.js">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/tryon.css">
   <script type="module" src="js/pages/tryon.js"></script>
 </head>
-<body class="has-sticky-cta">
+<body class="page-chat">
   <header id="app-header"></header>
 
-  <main class="container">
-    <div class="section-head">
-      <div>
-        <div class="eyebrow">Phòng thử váy AI</div>
-        <h1>Xem váy lên dáng của bạn</h1>
+  <!-- Phòng thử dạng trò chuyện: chọn ảnh + váy ở khung soạn tin, gửi → AI ướm váy, kết quả hiện ngay trong khung chat -->
+  <main class="chat">
+    <div class="chat-top">
+      <img class="chat-top-logo" src="assets/images/logo.webp" alt="">
+      <div class="chat-top-text">
+        <h1>Phòng thử váy AI</h1>
+        <p>Ướm váy cưới lên chính ảnh của bạn – giữ nguyên khuôn mặt, dáng người và khung cảnh.</p>
       </div>
+      <a class="btn btn-outline btn-sm chat-top-link" href="thiet-ke-vay.html">✂️ Tự thiết kế váy</a>
     </div>
 
-    <div class="studio">
-      <!-- CỘT TRÁI: GƯƠNG THỬ -->
-      <section class="mirror" aria-label="Gương thử váy">
-        <div class="mirror-frame">
-          <img id="mirror-img" alt="Ảnh thử váy">
-          <span class="mirror-label" id="mirror-label"></span>
-          <div class="mirror-note" id="mirror-note" hidden></div>
-          <!-- So sánh trước/sau: ảnh gốc phủ lên, kéo thanh để lộ dần ảnh đã ướm -->
-          <div class="mirror-compare" id="mirror-compare" hidden>
-            <img id="compare-img" alt="Ảnh gốc">
-            <span class="compare-tag compare-before">Trước</span>
-            <span class="compare-tag compare-after">Sau</span>
-          </div>
-          <input class="compare-range" id="compare-range" type="range" min="0" max="100" value="50" hidden
-                 aria-label="Kéo để so sánh ảnh gốc và ảnh đã ướm váy">
-          <div class="mirror-scan" id="mirror-scan" hidden>AI đang ướm váy theo số đo của bạn…</div>
+    <section class="chat-thread" id="chat-thread" aria-live="polite" aria-label="Trò chuyện với trợ lý thử váy">
+      <div class="chat-loading" id="chat-loading"><span class="typing" aria-hidden="true"><i></i><i></i><i></i></span>Đang mở phòng thử…</div>
+    </section>
+
+    <form class="composer" id="composer" autocomplete="off">
+      <div class="composer-box">
+        <div class="composer-slots" id="composer-slots"></div>
+        <textarea id="composer-text" rows="1" maxlength="400" aria-label="Tin nhắn cho trợ lý thử váy"
+                  placeholder="Nhắn cho trợ lý… VD: ướm váy này cho mình, tà váy dài chạm đất"></textarea>
+        <div class="composer-bar">
+          <button type="button" class="composer-settings" id="open-settings" aria-label="Tùy chỉnh ướm thử">
+            <span aria-hidden="true">⚙️</span><span id="settings-sum">Tùy chỉnh</span>
+          </button>
+          <span class="composer-cost" id="composer-cost"></span>
+          <button type="submit" class="composer-send" id="send-btn" aria-label="Gửi" title="Gửi">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3.4 20.4 21 12 3.4 3.6l-.01 6.53L15 12 3.39 13.87z"/></svg>
+          </button>
         </div>
-        <div class="ai-picks" id="ai-picks" hidden></div>
-        <div class="mirror-actions">
-          <button class="btn btn-outline btn-sm" id="toggle-original" type="button">Xem ảnh gốc</button>
-          <button class="btn btn-outline btn-sm" id="toggle-compare" type="button" hidden>So sánh trước/sau</button>
-          <a class="btn btn-outline btn-sm" id="download-img" download>Tải ảnh</a>
-        </div>
-        <div class="ai-tryon" id="ai-tryon-box">
-          <div class="ai-tryon-row">
-            <button class="btn btn-primary btn-sm" id="ai-tryon" type="button">✨ Ướm thử bằng AI thật</button>
-            <span class="small" id="ai-hint"></span>
-          </div>
-          <details class="ai-options" id="ai-options">
-            <summary>⚙️ Tùy chỉnh <span class="ai-options-sum" id="ai-options-sum"></span></summary>
-            <div class="ai-options-body" id="ai-options-body"></div>
-          </details>
-        </div>
-        <div class="ai-history" id="ai-history" hidden>
-          <strong class="small">Ảnh đã thử bằng AI</strong>
-          <div class="ai-history-list" id="ai-history-list"></div>
-        </div>
-        <div class="fit-score">
-          <div class="score" id="fit-score">–</div>
-          <div>
-            <strong>Độ tôn dáng</strong>
-            <p id="fit-tip"></p>
-          </div>
-        </div>
-      </section>
-
-      <!-- CỘT PHẢI: ĐIỀU KHIỂN -->
-      <div class="stack">
-        <section class="card stack">
-          <h3>1. Ảnh & số đo</h3>
-          <div class="models" id="models"></div>
-          <label class="btn btn-outline btn-sm" style="width:fit-content">
-            Tải ảnh toàn thân của bạn
-            <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp" hidden>
-          </label>
-          <p class="small muted" id="photo-note" style="margin:0"></p>
-          <label class="field"><span>Chiều cao: <strong id="height-value"></strong> cm</span>
-            <input type="range" id="height" min="140" max="185" value="160"></label>
-          <label class="field"><span>Cân nặng: <strong id="weight-value"></strong> kg</span>
-            <input type="range" id="weight" min="38" max="90" value="49"></label>
-          <p class="bmi small" id="bmi" aria-live="polite"></p>
-          <label class="field"><span>Giày cưới</span>
-            <select class="input" id="heel">
-              <option value="0">Giày bệt</option>
-              <option value="5">Cao 5cm</option>
-              <option value="7" selected>Cao 7cm</option>
-              <option value="10">Cao 10cm</option>
-            </select>
-          </label>
-          <div class="field"><span>Dáng người</span><div class="chips" id="shapes"></div></div>
-          <p class="small muted" id="body-save-note"></p>
-        </section>
-
-        <section class="card stack">
-          <h3>2. Chọn váy</h3>
-          <div class="tabs">
-            <button class="tab active" data-mode="catalog" type="button">Mẫu có sẵn</button>
-            <button class="tab" data-mode="own" type="button">✨ Váy bạn chọn</button>
-            <button class="tab" data-mode="bespoke" type="button">Tự thiết kế may đo</button>
-          </div>
-
-          <div id="catalog-panel" class="stack">
-            <div class="chips" id="theme-filter"></div>
-            <div class="dress-list" id="dress-list"><div class="muted">Đang tải mẫu váy…</div></div>
-          </div>
-
-          <!-- Váy bạn chọn: tải ảnh váy bất kỳ (trên mạng, ở tiệm) → AI ướm lên ảnh của bạn -->
-          <div id="own-panel" class="stack" hidden>
-            <p class="small muted" style="margin:0">Thấy chiếc váy ưng ý trên mạng hay ở tiệm? Tải ảnh lên – AI ghép váy lên chính ảnh của bạn, giữ đúng dáng người và theo số đo ở bước 1.</p>
-            <div class="models" id="garments"></div>
-            <label class="btn btn-outline btn-sm" style="width:fit-content">
-              Tải ảnh váy mẫu
-              <input type="file" id="garment-input" accept="image/jpeg,image/png,image/webp" hidden>
-            </label>
-            <p class="small muted" id="garment-note" style="margin:0"></p>
-            <ul class="small muted tips-list">
-              <li>Ảnh của bạn: đứng thẳng, thấy toàn thân, ánh sáng đủ.</li>
-              <li>Ảnh váy: rõ nét, thấy trọn chiếc váy (trải phẳng hoặc người mẫu đang mặc).</li>
-            </ul>
-          </div>
-
-          <div id="bespoke-panel" class="stack" hidden>
-            <div id="bespoke-options" class="stack"></div>
-            <label class="field"><span>Độ dài đuôi váy: <strong id="train-value"></strong> m</span>
-              <input type="range" id="train" min="0.5" max="2.5" step="0.5" value="1"></label>
-            <div class="stack" id="bespoke-extras"></div>
-            <label class="field"><span>Mô tả thêm ý tưởng (không bắt buộc)</span>
-              <textarea class="input" id="bespoke-notes" maxlength="500" placeholder="VD: thêu tên hai vợ chồng ở gấu váy, ren hoa nhỏ ở lưng…"></textarea></label>
-          </div>
-        </section>
-
-        <section class="card stack">
-          <h3>3. Đặt lịch thử & giữ cọc</h3>
-          <div id="summary"></div>
-          <button class="btn btn-primary btn-block" id="book-btn" type="button" disabled>Đặt lịch thử váy</button>
-        </section>
       </div>
-    </div>
+    </form>
   </main>
-
-  <div class="sticky-cta">
-    <div class="stack" style="gap:0;flex:1;min-width:0">
-      <strong id="cta-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></strong>
-      <span class="price" id="cta-price"></span>
-    </div>
-    <button class="btn btn-primary" id="cta-book" type="button" disabled>Đặt lịch</button>
-  </div>
 
   <footer id="app-footer"></footer>
 </body>

@@ -1,10 +1,10 @@
 // Thao tác dùng chung cho các luồng cần đăng nhập
 const { expect } = require('../helpers');
 
-/** Cô dâu đặt lịch từ Phòng thử váy. Trả về { code, order } – order là thẻ đơn ở trang Đơn của tôi. */
+/** Cô dâu đặt lịch từ Phòng thử váy (thẻ mẫu khi mở bằng ?dress=). Trả về { code, order } – order là thẻ đơn ở trang Đơn của tôi. */
 async function bookFromTryon(bride, path = '/tryon.html?dress=royal-mermaid') {
   await bride.goto(path);
-  await bride.locator('#book-btn').click();
+  await bride.locator('.dress-card').getByRole('button', { name: '📅 Đặt lịch thử váy' }).click();
   await bride.getByLabel('Số điện thoại').fill('0900000000');   // tài khoản test chưa có SĐT
   await bride.getByRole('button', { name: 'Xác nhận đặt lịch' }).click();
   await expect(bride).toHaveURL(/bookings\.html\?new=BK/);

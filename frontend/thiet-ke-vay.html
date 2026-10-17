@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thiết kế váy may đo – Trạm Hỷ</title>
+  <link rel="icon" href="assets/images/logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://vsjdijmuvuetmhmszcrl.supabase.co" crossorigin>
+  <link rel="modulepreload" href="js/vendor/supabase-2.117.3.js">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/pages/bespoke.js"></script>
+</head>
+<body class="has-sticky-cta">
+  <header id="app-header"></header>
+
+  <main class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Trạm Hỷ Atelier</div>
+        <h1>Thiết kế váy may đo</h1>
+      </div>
+      <a class="btn btn-outline btn-sm" href="tryon.html">✨ Ướm váy bằng AI</a>
+    </div>
+
+    <div class="studio">
+      <!-- CỘT TRÁI: ẢNH MINH HỌA -->
+      <section class="mirror" aria-label="Ảnh minh họa váy may đo">
+        <div class="mirror-frame">
+          <img id="mirror-img" alt="Ảnh minh họa váy may đo">
+          <span class="mirror-label" id="mirror-label"></span>
+          <div class="mirror-scan" id="mirror-scan" hidden>Đang dựng phom váy theo thiết kế của bạn…</div>
+        </div>
+        <div class="fit-score">
+          <div class="score" id="fit-score">–</div>
+          <div>
+            <strong>Độ tôn dáng</strong>
+            <p id="fit-tip"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CỘT PHẢI: THIẾT KẾ -->
+      <div class="stack">
+        <section class="card stack">
+          <h3>1. Phom váy & chất liệu</h3>
+          <div id="bespoke-options" class="stack"></div>
+          <label class="field"><span>Độ dài đuôi váy: <strong id="train-value"></strong> m</span>
+            <input type="range" id="train" min="0.5" max="2.5" step="0.5" value="1"></label>
+          <div class="stack" id="bespoke-extras"></div>
+          <label class="field"><span>Mô tả thêm ý tưởng (không bắt buộc)</span>
+            <textarea class="input" id="bespoke-notes" maxlength="500" placeholder="VD: thêu tên hai vợ chồng ở gấu váy, ren hoa nhỏ ở lưng…"></textarea></label>
+        </section>
+
+        <section class="card stack">
+          <h3>2. Người mẫu & số đo</h3>
+          <div class="models" id="models"></div>
+          <label class="field"><span>Chiều cao: <strong id="height-value"></strong> cm</span>
+            <input type="range" id="height" min="140" max="185" value="160"></label>
+          <label class="field"><span>Cân nặng: <strong id="weight-value"></strong> kg</span>
+            <input type="range" id="weight" min="38" max="90" value="49"></label>
+          <p class="bmi small" id="bmi" aria-live="polite"></p>
+          <label class="field"><span>Giày cưới</span>
+            <select class="input" id="heel">
+              <option value="0">Giày bệt</option>
+              <option value="5">Cao 5cm</option>
+              <option value="7" selected>Cao 7cm</option>
+              <option value="10">Cao 10cm</option>
+            </select>
+          </label>
+          <div class="field"><span>Dáng người</span><div class="chips" id="shapes"></div></div>
+          <p class="small muted" id="body-save-note"></p>
+        </section>
+
+        <section class="card stack">
+          <h3>3. Đặt lịch tư vấn & giữ cọc</h3>
+          <div id="summary"></div>
+          <button class="btn btn-primary btn-block" id="book-btn" type="button" disabled>Đặt lịch tư vấn may đo</button>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="sticky-cta">
+    <div class="stack" style="gap:0;flex:1;min-width:0">
+      <strong id="cta-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></strong>
+      <span class="price" id="cta-price"></span>
+    </div>
+    <button class="btn btn-primary" id="cta-book" type="button" disabled>Đặt lịch</button>
+  </div>
+
+  <footer id="app-footer"></footer>
+</body>
+</html>

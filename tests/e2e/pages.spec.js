@@ -3,7 +3,8 @@ const { test, expect, trackErrors, expectNoHorizontalOverflow } = require('./hel
 
 const PUBLIC_PAGES = [
   { path: '/index.html', heading: /Thử váy cưới trên chính dáng/ },
-  { path: '/tryon.html', heading: 'Xem váy lên dáng của bạn' },
+  { path: '/tryon.html', heading: 'Phòng thử váy AI' },
+  { path: '/thiet-ke-vay.html', heading: 'Thiết kế váy may đo' },
   { path: '/marketplace.html', heading: 'Đối tác được Trạm Hỷ bảo chứng' },
   { path: '/vendor.html?slug=tuart', heading: 'TuArt Wedding' },
   { path: '/login.html', heading: 'Chào mừng trở lại' },

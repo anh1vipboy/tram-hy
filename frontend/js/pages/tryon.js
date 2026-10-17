@@ -1,115 +1,156 @@
+// Phòng thử váy AI dạng trò chuyện: chọn "Ảnh của bạn" + "Váy cưới" ở khung soạn tin, bấm gửi (kèm tin nhắn
+// nếu muốn) → AI ướm váy, ảnh hiện ngay trong khung chat. Chỉ ướm váy lên ảnh: không đổi nền, khung, không video.
+//   - Tin nhắn chữ → Edge Function tro-ly-thu-vay (Gemini): ướm hay hỏi đáp, ghi chú cách mặc, gợi ý kiểu váy
+//   - Ướm váy → Edge Function thu-vay-ai (FASHN). Lịch sử dựng lại từ bảng tryon_jobs (SQL 28).
+// Tự thiết kế váy may đo nằm ở trang riêng: thiet-ke-vay.html.
 import { initLayout } from '../core/layout.js';
-import { $, $$, html, render, money, param, debounce, sleep } from '../core/utils.js';
-import { badge, priceTag, DRESS_THEME } from '../core/labels.js';
+import { $, $$, html, render, money, param, debounce, sizedImage } from '../core/utils.js';
+import { priceTag } from '../core/labels.js';
 import { toast, toastError, openDialog } from '../core/ui.js';
-import { BESPOKE_VENDOR_SLUG } from '../config.js';
-import { listDresses, getVendorBySlug } from '../services/catalog.js';
+import { loginUrl } from '../core/auth.js';
+import { listDresses } from '../services/catalog.js';
 import {
   getBodyProfile, saveBodyProfile, uploadBridePhoto, listBridePhotos, deleteBridePhoto,
   MAX_BRIDE_PHOTOS, MAX_GARMENT_PHOTOS,
 } from '../services/profile.js';
+import {
+  aiTryOn, askTryonAssistant, creditsUsedToday, getTryonSettings, listTryonHistory, tryonCost,
+} from '../services/tryon-ai.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
 import { openDressGallery, realPhotoCount } from '../components/dress-gallery.js';
-import { aiTryOn, creditsUsedToday, getTryonSettings, listAiResults, tryonCost } from '../services/tryon-ai.js';
-import { loginUrl } from '../core/auth.js';
-import {
-  MODELS, BODY_SHAPES, BESPOKE_OPTIONS, BESPOKE_EXTRAS,
-  renderImageFor, dressThumb, fitScore, bmiInfo, bespokePrice, bespokeTheme, bespokeLabel,
-} from '../data/tryon-data.js';
+import { resultViewer } from '../components/tryon-result.js';
+import { openPersonSheet, openDressSheet, openSettingsSheet, QUALITY_SECONDS } from '../components/tryon-sheets.js';
+import { MODELS, dressThumb, fitScore } from '../data/tryon-data.js';
 
-// ---------- TÙY CHỈNH ƯỚM THỬ AI ----------
-// Chỉ ướm váy lên người – không đổi nền / khung. Giá trị phải khớp readOptions() của Edge Function thu-vay-ai.
-const AI_OPTION_DEFAULTS = {
-  model: 'standard', quality: 'quality', samples: 1, category: 'one-pieces', photoType: 'auto', cleanOriginal: false,
+// ---------- TÙY CHỈNH (nhớ trên máy) ----------
+// Giá trị phải khớp readOptions() của Edge Function thu-vay-ai
+const OPTIONS_KEY = 'tramhy.tryon-chat-options';
+const OPTION_DEFAULTS = {
+  model: 'max',                                        // Siêu nét khi admin bật, không thì tự dùng Tiêu chuẩn
+  quality: { max: 'balanced', standard: 'quality' },   // Tiêu chuẩn: chất lượng không đổi giá → mặc định đẹp nhất
+  samples: 1,
+  category: 'one-pieces',
+  photoType: 'auto',
+  cleanOriginal: false,
 };
-const AI_OPTIONS_KEY = 'tramhy.tryon-options';
 
-function loadAiOptions() {
+function loadOptions() {
   try {
-    const saved = JSON.parse(localStorage.getItem(AI_OPTIONS_KEY) ?? '{}');
-    return { ...AI_OPTION_DEFAULTS, ...saved };
+    const saved = JSON.parse(localStorage.getItem(OPTIONS_KEY) ?? '{}');
+    const options = { ...OPTION_DEFAULTS, ...saved, quality: { ...OPTION_DEFAULTS.quality, ...saved.quality } };
+    // Giá trị lạ (bản cũ, sửa tay) → về mặc định, tránh tính sai credit
+    for (const model of ['max', 'standard']) {
+      if (!['fast', 'balanced', 'quality'].includes(options.quality[model])) options.quality[model] = OPTION_DEFAULTS.quality[model];
+    }
+    if (![1, 2, 3, 4].includes(options.samples)) options.samples = 1;
+    return options;
   } catch {
-    return { ...AI_OPTION_DEFAULTS };
+    return structuredClone(OPTION_DEFAULTS);
   }
 }
 
-function saveAiOptions() {
+function saveOptions() {
   try {
-    localStorage.setItem(AI_OPTIONS_KEY, JSON.stringify(state.aiOptions));
+    localStorage.setItem(OPTIONS_KEY, JSON.stringify(state.options));
   } catch { /* trình duyệt chặn lưu → lần sau dùng mặc định */ }
 }
 
 // ---------- TRẠNG THÁI TRANG ----------
 const state = {
   profile: null,
-  dresses: [],
-  bespokeVendor: null,
-  mode: 'catalog',              // 'catalog' (mẫu của tiệm) | 'own' (ảnh váy tự tải) | 'bespoke'
-  themeFilter: 'all',
-  dress: null,                  // mẫu đang chọn (mode catalog)
-  model: MODELS[0],
-  myPhotos: [],                 // ảnh toàn thân đã lưu trong tài khoản: [{ path, url }] (mới nhất trước)
-  localPhoto: null,             // ảnh vừa chọn nhưng chưa lưu (chưa đăng nhập / đang tải lên)
-  garments: [],                 // ảnh váy mẫu tự tải đã lưu: [{ path, url }]
-  garment: null,                // ảnh váy đang chọn ở chế độ 'own': { path, url } (path null = chưa lưu)
-  aiHistory: [],                // ảnh đã thử bằng AI: [{ id, url, createdAt }]
-  historyView: null,            // đang xem lại ảnh AI cũ nào trên gương (url)
-  aiResults: new Map(),         // ảnh AI đã ghép: "người mẫu|váy" → { urls, index } (tránh gọi AI lại, tốn tiền)
-  aiRemaining: null,            // số credit AI còn lại hôm nay (null = chưa biết)
-  aiSettings: { maxEnabled: false, dailyCredits: 6 },   // admin chỉnh ở trang Quản trị (SQL 28)
-  aiOptions: loadAiOptions(),   // tùy chỉnh ướm thử (nhớ trên máy cho lần sau)
-  aiBusy: false,
-  showOriginal: false,
-  compare: false,               // đang so sánh trước/sau trên gương
+  dresses: [],              // mẫu váy của các tiệm (chỉ mẫu có ảnh thật mới ướm bằng AI được)
+  myPhotos: [],             // ảnh của bạn đã lưu: [{ path, url }] (mới nhất trước)
+  garments: [],             // ảnh váy tự tải đã lưu: [{ path, url }]
+  person: null,             // ảnh người đang chọn: { key, name, photo, path? | sample?, uploading? }
+  garment: null,            // váy đang chọn: { kind: 'dress', dress, … } | { kind: 'own', path, … }
+  settings: { maxEnabled: false, dailyCredits: 6 },   // admin chỉnh ở trang Quản trị (SQL 28)
+  remaining: null,          // credit AI còn lại hôm nay (null = chưa biết)
+  options: loadOptions(),
   body: { height: 160, weight: 49, heel: 7, shape: 'hourglass' },
-  bespoke: { silhouette: 'aline', neckline: 'sweetheart', sleeve: 'none', fabric: 'mikado', train: 1, extras: [] },
+  busy: false,
+  chat: [],                 // tin nhắn chữ gần đây, gửi kèm cho trợ lý hiểu ngữ cảnh: [{ role, text }]
+  history: { batches: [], cursor: null },
 };
+const runs = new Map();     // các lần ướm trong phiên → "Thử kiểu khác" dùng lại đúng ảnh + váy của lần đó
+
+const INTRO = 'Mình sẽ ướm chiếc váy lên ảnh của bạn, giữ nguyên khuôn mặt, dáng người và khung cảnh nhé!';
+const FALLBACK_MESSAGES = {
+  'not-configured': 'AI ướm váy chưa được bật trên web – bạn quay lại sau nhé.',
+  'free-tier': 'AI ướm váy chưa được bật trên web – bạn quay lại sau nhé.',
+  'no-credits': 'Dịch vụ AI tạm hết lượt (cần nạp thêm credit) – bạn quay lại sau ít phút nhé.',
+  'bad-photo': 'Mình chưa nhận ra người hoặc chiếc váy trong ảnh. Bạn thử ảnh rõ mặt, đứng thẳng và ảnh thấy trọn chiếc váy nhé.',
+  'no-dress-photo': 'Mẫu này chưa có ảnh thật từ tiệm nên mình chưa ướm được – bạn chọn mẫu khác nhé.',
+  'provider-error': 'Dịch vụ AI đang bận, bạn thử lại sau ít phút nhé.',
+};
+const MAX_SECONDS = { fast: 25, balanced: 45, quality: 60 };   // Siêu nét: thời gian chờ ước tính 1 ảnh
+
+// ---------- NGƯỜI & VÁY ----------
+function samplePerson(key) {
+  const model = MODELS.find((m) => m.key === key);
+  return model && { key: `sample:${model.key}`, sample: model.key, name: model.name, photo: model.photo };
+}
+const photoPerson = ({ path, url }) => ({ key: path, path, name: 'Ảnh của bạn', photo: url });
+const dressGarment = (dress) => ({ kind: 'dress', key: `dress:${dress.id}`, dress, name: dress.name, photo: sizedImage(dress.image_url, 480) });
+const ownGarment = ({ path, url }) => ({ kind: 'own', key: path, path, name: 'Váy bạn tải lên', photo: url });
+const findDress = (id) => state.dresses.find((d) => d.id === id);
+
+const personParams = (p) => (p.path ? { photoPath: p.path } : { sampleModel: p.sample });
+const garmentParams = (g) => (g.kind === 'dress' ? { dressId: g.dress.id } : { garmentPath: g.path });
+const garmentInfo = (g) => (!g ? null : g.kind === 'own'
+  ? { kind: 'own' }
+  : { kind: 'dress', name: g.dress.name, theme: g.dress.theme, vendor: g.dress.vendor.name });
+
+// Tùy chọn thật sự gửi đi: admin tắt Siêu nét → Tiêu chuẩn; mẫu của tiệm luôn là váy liền
+function effectiveOptions(garment = state.garment) {
+  const o = state.options;
+  const model = o.model === 'max' && state.settings.maxEnabled ? 'max' : 'standard';
+  return {
+    model,
+    quality: o.quality[model],
+    samples: o.samples,
+    category: garment?.kind === 'own' ? o.category : 'one-pieces',
+    photoType: o.photoType,
+    cleanOriginal: o.cleanOriginal,
+  };
+}
+
+function setOption(key, value) {
+  if (key === 'quality') state.options.quality[effectiveOptions().model] = value;
+  else state.options[key] = value;
+  saveOptions();
+  renderComposer();
+}
+
+const modelName = (model) => ({ max: 'Siêu nét', gemini: 'Gemini' }[model] ?? 'Tiêu chuẩn');
+const estimateSeconds = (o) => (o.model === 'max'
+  ? MAX_SECONDS[o.quality] + (o.samples - 1) * 10
+  : QUALITY_SECONDS[o.quality] + (o.samples - 1) * 4);
+const returnPath = () => (state.garment?.kind === 'dress' ? `tryon.html?dress=${state.garment.dress.slug}` : 'tryon.html');
 
 // ---------- TẢI DỮ LIỆU ----------
 async function loadDresses() {
   try {
-    [state.dresses, state.bespokeVendor] = await Promise.all([listDresses(), getVendorBySlug(BESPOKE_VENDOR_SLUG)]);
-    state.dress = state.dresses.find((d) => d.slug === param('dress')) ?? state.dresses[0] ?? null;
+    state.dresses = await listDresses();
   } catch (error) {
     toastError(error);
   }
 }
 
-async function loadBodyProfile() {
-  if (!state.profile) {
-    $('#body-save-note').textContent = 'Đăng nhập để lưu số đo cho lần sau.';
-    return;
-  }
-  try {
-    const saved = await getBodyProfile(state.profile.id);
-    if (saved) {
-      state.body = { height: saved.height_cm, weight: saved.weight_kg, heel: saved.heel_cm, shape: saved.body_shape || 'hourglass' };
-    }
-    $('#body-save-note').textContent = 'Số đo được tự lưu vào tài khoản của bạn.';
-  } catch (error) {
-    toastError(error);
-  }
-}
-
-async function loadMyPhotos() {
+async function loadAccountData() {
   if (!state.profile) return;
-  try {
-    [state.myPhotos, state.garments] = await Promise.all([
-      listBridePhotos(state.profile.id, 'body'),
-      listBridePhotos(state.profile.id, 'garment'),
-    ]);
-  } catch (error) {
-    toastError(error);
+  const id = state.profile.id;
+  const [body, photos, garments, used, history] = await Promise.allSettled([
+    getBodyProfile(id), listBridePhotos(id, 'body'), listBridePhotos(id, 'garment'), creditsUsedToday(), listTryonHistory(),
+  ]);
+  if (body.value) {
+    const b = body.value;
+    state.body = { height: b.height_cm, weight: b.weight_kg, heel: b.heel_cm, shape: b.body_shape || 'hourglass' };
   }
-}
-
-async function loadAiHistory() {
-  if (!state.profile) return;
-  try {
-    state.aiHistory = await listAiResults();
-  } catch {
-    state.aiHistory = [];          // chưa chạy SQL 11 → bỏ qua
-  }
+  state.myPhotos = photos.value ?? [];
+  state.garments = garments.value ?? [];
+  if (used.status === 'fulfilled') state.remaining = Math.max(0, state.settings.dailyCredits - used.value);
+  if (history.value) state.history = history.value;
+  for (const failed of [body, photos, garments].filter((r) => r.status === 'rejected')) toastError(failed.reason);
 }
 
 const persistBody = debounce(async () => {
@@ -121,732 +162,639 @@ const persistBody = debounce(async () => {
   }
 }, 800);
 
-// ---------- SỰ KIỆN ----------
-function initControls() {
-  for (const [id, key] of [['#height', 'height'], ['#weight', 'weight']]) {
-    $(id).addEventListener('input', (e) => {
-      state.body[key] = Number(e.target.value);
-      renderBody();
-      renderFit();
-      persistBody();
+// ---------- KHUNG CHAT ----------
+const thread = () => $('#chat-thread');
+
+// Bám đáy khung chat: ảnh trong tin nhắn tải xong làm khung cao thêm → cuộn tiếp xuống, trừ khi người dùng
+// đang cuộn lên xem tin cũ. pinUntil: vừa tự cuộn (đang trượt mượt) thì vẫn coi như đang ở đáy.
+let followBottom = true;
+let pinUntil = 0;
+
+function scrollToEnd(behavior = 'smooth') {
+  pinUntil = Date.now() + 1500;
+  requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior }));
+}
+
+function initAutoScroll() {
+  window.addEventListener('scroll', () => {
+    followBottom = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight) < 160;
+  }, { passive: true });
+  thread().addEventListener('load', () => {
+    if (!followBottom && Date.now() > pinUntil) return;
+    requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight }));
+  }, true);                                    // sự kiện load của ảnh không nổi bọt → bắt ở pha capture
+}
+
+// Một dòng tin nhắn; role 'ai' có ảnh đại diện. Trả về phần thân để vẽ nội dung vào.
+function addRow(role, container = thread()) {
+  const row = document.createElement('div');
+  row.className = `msg-row ${role}`;
+  render(row, html`${role === 'ai' ? html`<img class="msg-avatar" src="assets/images/logo.webp" alt="">` : ''}
+    <div class="msg-body"></div>`);
+  container.append(row);
+  return $('.msg-body', row);
+}
+
+// Nút gợi ý dưới tin nhắn: { act, label, arg?, primary? } – xử lý ở onThreadClick
+const chipRow = (chips) => (chips.length ? html`
+  <div class="suggest-row">
+    ${chips.map((c) => html`
+      <button type="button" class="suggest ${c.primary ? 'primary' : ''}" data-act="${c.act}" data-arg="${c.arg ?? ''}">${c.label}</button>`)}
+  </div>` : '');
+
+function postAi(text, chips = []) {
+  const body = addRow('ai');
+  render(body, html`${text ? html`<p class="msg-text">${text}</p>` : ''}${chipRow(chips)}`);
+  scrollToEnd();
+  return body;
+}
+
+function postUser({ person, garment, text, time }, container) {
+  const body = addRow('user', container);
+  const attachments = [person, garment].filter(Boolean);
+  render(body, html`
+    ${attachments.length ? html`
+      <div class="msg-attachments">
+        ${attachments.map((a) => html`
+          <figure>
+            ${a.photo ? html`<img src="${a.photo}" alt="">` : html`<span class="ph" aria-hidden="true">🖼️</span>`}
+            <figcaption>${a.photo ? a.name : a.gone ?? 'Ảnh đã xóa'}</figcaption>
+          </figure>`)}
+      </div>` : ''}
+    ${text ? html`<p class="msg-bubble">${text}</p>` : ''}
+    ${time ? html`<span class="msg-time">${time}</span>` : ''}`);
+  if (!container) scrollToEnd();
+}
+
+function postTyping() {
+  const body = addRow('ai');
+  render(body, html`<span class="typing" role="status" aria-label="Trợ lý đang trả lời"><i></i><i></i><i></i></span>`);
+  scrollToEnd();
+  return () => body.parentElement.remove();
+}
+
+const postLoginPrompt = () => postAi('Bạn đăng nhập để mình ướm váy lên ảnh nhé – ảnh được lưu riêng tư, chỉ bạn xem được.',
+  [{ act: 'login', label: '🔑 Đăng nhập', primary: true }]);
+
+const fitText = ({ score, tip }) => html`Độ tôn dáng với số đo của bạn: <strong>${score}%</strong> – ${tip}`;
+
+// Độ tôn dáng trong các tin nhắn cập nhật theo số đo (sửa ở Tùy chỉnh)
+function updateFitLines() {
+  for (const el of $$('[data-fit]')) render(el, fitText(fitScore(state.body, el.dataset.fit)));
+}
+
+function dressCard(dress) {
+  const photos = realPhotoCount(dress);
+  return html`
+    <article class="dress-card">
+      <div class="dress-card-photo">
+        <img src="${dress.image_url ? sizedImage(dress.image_url, 360) : dressThumb(dress)}" alt="${dress.name}">
+        ${dress.image_url ? '' : html`<span class="dress-card-tag">Ảnh minh họa</span>`}
+      </div>
+      <div class="dress-card-info">
+        <strong class="dress-card-name">${dress.name}</strong>
+        <span class="small muted">${dress.vendor.name}${dress.vendor.district ? ` · ${dress.vendor.district}` : ''}</span>
+        ${priceTag(dress)}
+        <span class="fit-line small" data-fit="${dress.theme}">${fitText(fitScore(state.body, dress.theme))}</span>
+        <div class="dress-card-actions">
+          <button type="button" class="btn btn-primary btn-sm" data-act="book" data-arg="${dress.id}">📅 Đặt lịch thử váy</button>
+          ${photos ? html`<button type="button" class="btn btn-outline btn-sm" data-act="photos" data-arg="${dress.id}">Xem ${photos} ảnh thật</button>` : ''}
+        </div>
+      </div>
+    </article>`;
+}
+
+function postWelcome() {
+  const returning = state.history.batches.length > 0;
+  const body = addRow('ai');
+  render(body, html`
+    ${returning
+      ? html`<p class="msg-text">Chào bạn quay lại! Chọn ảnh và váy ở khung bên dưới rồi bấm gửi để ướm tiếp nhé.</p>`
+      : html`
+        <p class="msg-text">Chào bạn 👋 Mình là trợ lý thử váy của Trạm Hỷ.</p>
+        <p class="msg-text">Gửi mình <strong>1 ảnh của bạn</strong> và <strong>1 chiếc váy cưới</strong> bạn thích – mình sẽ ướm váy
+          lên ảnh, giữ nguyên khuôn mặt, dáng người và khung cảnh.</p>
+        <ol class="chat-steps">
+          <li><span aria-hidden="true">👤</span><strong>Ảnh của bạn</strong><small>hoặc người mẫu có sẵn</small></li>
+          <li><span aria-hidden="true">👗</span><strong>Váy cưới</strong><small>mẫu của tiệm hoặc ảnh bạn tải lên</small></li>
+          <li><span aria-hidden="true">✨</span><strong>Bấm gửi</strong><small>ảnh ướm thử hiện ngay đây</small></li>
+        </ol>`}
+    ${chipRow([
+      { act: 'person', label: '📷 Chọn ảnh của bạn' },
+      { act: 'dress', label: '👗 Chọn váy có sẵn' },
+      { act: 'ask', arg: 'Váy cưới kiểu nào hợp với dáng của mình?', label: '💡 Váy nào hợp dáng mình?' },
+    ])}`);
+}
+
+// Mở từ "Thử váy này" (?dress=…): giới thiệu mẫu + đặt lịch + độ tôn dáng
+function postDressIntro(dress) {
+  const canTry = Boolean(dress.image_url);
+  const body = addRow('ai');
+  render(body, html`
+    <p class="msg-text">Bạn đang xem mẫu <strong>${dress.name}</strong> của ${dress.vendor.name}.
+      ${canTry ? 'Chọn 1 ảnh của bạn rồi bấm gửi – mình ướm chiếc váy này lên cho bạn xem nhé!'
+        : 'Mẫu này chưa có ảnh thật từ tiệm nên mình chưa ướm bằng AI được – bạn vẫn đặt lịch thử tại tiệm được nhé.'}</p>
+    ${dressCard(dress)}
+    ${canTry && !state.person ? chipRow([{ act: 'person', label: '📷 Chọn ảnh của bạn', primary: true }]) : ''}`);
+}
+
+// Vài mẫu của tiệm đúng kiểu trợ lý gợi ý – bấm để chọn vào ô "Váy cưới"
+function appendSuggestions(body, theme) {
+  const list = state.dresses.filter((d) => d.theme === theme && d.image_url).slice(0, 6);
+  if (!list.length) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'suggest-dresses';
+  render(wrap, list.map((d) => html`
+    <button type="button" class="mini-dress" data-act="pick-dress" data-arg="${d.id}">
+      <img src="${sizedImage(d.image_url, 240)}" alt="" loading="lazy">
+      <span class="mini-name">${d.name}</span>
+      <span class="mini-price">${money(d.price)}</span>
+    </button>`));
+  body.append(wrap);
+  scrollToEnd();
+}
+
+// Các lần ướm đã lưu (mới nhất trước) → khối tin nhắn để chèn lên đầu khung chat
+function historyBlock(batches) {
+  const block = document.createElement('div');
+  block.className = 'chat-history';
+  for (const b of [...batches].reverse()) {
+    const dress = b.dressId ? findDress(b.dressId) : null;
+    // Ảnh người: người mẫu có sẵn | ảnh đã lưu | đã xóa; lần ướm trước SQL 28 không ghi ảnh người → bỏ qua
+    const person = b.personSample ? samplePerson(b.personSample)
+      : b.personUrl || b.personDeleted ? { name: 'Ảnh của bạn', photo: b.personUrl } : null;
+    const garment = dress ? { name: dress.name, photo: dress.image_url ? sizedImage(dress.image_url, 480) : dressThumb(dress) }
+      : b.dressId ? { name: 'Mẫu váy', photo: null, gone: 'Mẫu đã gỡ' }
+      : { name: 'Váy bạn tải lên', photo: b.garmentUrl };
+    const time = new Date(b.createdAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
+    postUser({ person, garment, text: b.message, time }, block);
+    const meta = [b.model && modelName(b.model), b.images.length > 1 && `${b.images.length} ảnh`].filter(Boolean).join(' · ');
+    addRow('ai', block).append(resultViewer({ images: b.images, original: person?.photo ?? null, meta }));
+  }
+  return block;
+}
+
+function renderHistoryMore() {
+  $('#history-more')?.remove();
+  if (!state.history.cursor) return;
+  thread().insertAdjacentHTML('afterbegin',
+    '<button type="button" class="history-more" id="history-more" data-act="more-history">Xem các lần ướm trước</button>');
+}
+
+async function loadMoreHistory(button) {
+  button.disabled = true;
+  try {
+    const page = await listTryonHistory({ before: state.history.cursor });
+    state.history.cursor = page.cursor;
+    // Chèn lên trên mà không làm khung nhìn nhảy
+    const before = document.documentElement.scrollHeight;
+    button.after(historyBlock(page.batches));
+    window.scrollBy(0, document.documentElement.scrollHeight - before);
+    renderHistoryMore();
+  } catch (error) {
+    toastError(error);
+    button.disabled = false;
+  }
+}
+
+function buildThread() {
+  render(thread(), '');
+  if (state.history.batches.length) thread().append(historyBlock(state.history.batches));
+  renderHistoryMore();
+  postWelcome();
+  const linked = param('dress') && state.dresses.find((d) => d.slug === param('dress'));
+  if (linked) postDressIntro(linked);
+}
+
+// ---------- GỬI TIN ----------
+function nudgeMissing() {
+  const missing = !state.person ? 'person' : 'dress';
+  const slot = $(`[data-slot="${missing}"]`);
+  slot?.classList.remove('nudge');
+  void slot?.offsetWidth;              // chạy lại hiệu ứng rung
+  slot?.classList.add('nudge');
+  toast(missing === 'person' ? 'Chọn ảnh của bạn trước nhé.' : 'Chọn chiếc váy muốn thử nhé.');
+}
+
+// preset: câu gửi từ nút gợi ý; không có → lấy chữ trong khung soạn tin
+async function send(preset) {
+  if (state.busy) return;
+  const fromComposer = preset === undefined;
+  const text = (fromComposer ? $('#composer-text').value : preset).trim();
+  const { person, garment } = state;
+  if (person?.uploading || garment?.uploading) {
+    toast('Đợi ảnh tải lên xong nhé…');
+    return;
+  }
+  if (!text && !(person && garment)) {
+    nudgeMissing();
+    return;
+  }
+  if (fromComposer) {
+    $('#composer-text').value = '';
+    autosize();
+  }
+  postUser({ person, garment, text });
+  if (!state.profile) {
+    postLoginPrompt();
+    return;
+  }
+
+  let plan = { action: 'tryon', prompt: '', samples: 0 };
+  if (text) {
+    plan = await consultAssistant(text, person, garment);
+    if (plan.action !== 'tryon') return;
+  } else {
+    postAi(INTRO);
+  }
+  if (!person || !garment) return;                 // trợ lý đã nhắc chọn ảnh / váy
+  await runTryOn({ person, garment, prompt: plan.prompt, samples: plan.samples, message: text });
+}
+
+async function consultAssistant(text, person, garment) {
+  const ready = Boolean(person && garment);
+  state.busy = true;
+  renderComposer();
+  const stopTyping = postTyping();
+  let plan;
+  try {
+    plan = await askTryonAssistant({
+      message: text,
+      hasPerson: Boolean(person),
+      garment: garmentInfo(garment),
+      model: effectiveOptions(garment).model,
+      body: state.body,
+      history: state.chat.slice(-6),
     });
+  } catch (error) {
+    // Trợ lý lỗi → vẫn ướm được nếu đã đủ ảnh và váy
+    plan = { action: ready ? 'tryon' : 'chat', reply: ready ? INTRO : error.message, prompt: '', samples: 0, theme: '' };
+  } finally {
+    stopTyping();
+    state.busy = false;
+    renderComposer();
   }
-  $('#heel').addEventListener('change', (e) => {
-    state.body.heel = Number(e.target.value);
-    renderFit();
-    persistBody();
-  });
+  state.chat.push({ role: 'user', text }, { role: 'ai', text: plan.reply });
 
-  $('#photo-input').addEventListener('change', onPhotoSelected);
-  $('#toggle-original').addEventListener('click', () => {
-    state.showOriginal = !state.showOriginal;
-    state.compare = false;
-    renderMirror();
-  });
-  $('#toggle-compare').addEventListener('click', () => {
-    state.compare = !state.compare;
-    renderMirror();
-  });
-  $('#compare-range').addEventListener('input', (e) => {
-    // Khớp tâm núm kéo: thanh cách mép 14px + nửa núm 8px mỗi bên
-    $('.mirror-frame').style.setProperty('--split', `calc(22px + (100% - 44px) * ${e.target.value / 100})`);
-  });
-
-  for (const tab of $$('[data-mode]')) {
-    tab.addEventListener('click', () => switchMode(tab.dataset.mode));
-  }
-  $('#garment-input').addEventListener('change', onGarmentSelected);
-
-  $('#train').addEventListener('input', (e) => {
-    state.bespoke.train = Number(e.target.value);
-    renderBespoke();
-    renderSummary();
-  });
-  $('#bespoke-notes').addEventListener('input', debounce(renderSummary, 300));
-
-  $('#book-btn').addEventListener('click', book);
-  $('#ai-tryon').addEventListener('click', runAiTryOn);
-  $('#cta-book').addEventListener('click', book);
+  const chips = [];
+  if (plan.action === 'tryon' && !person) chips.push({ act: 'person', label: '📷 Chọn ảnh của bạn', primary: true });
+  if (plan.action === 'tryon' && !garment) chips.push({ act: 'dress', label: '👗 Chọn váy', primary: !chips.length });
+  if (plan.action === 'chat' && ready && !plan.theme) chips.push({ act: 'tryon', label: '✨ Ướm thử ngay', primary: true });
+  const body = postAi(plan.reply, chips);
+  if (plan.theme) appendSuggestions(body, plan.theme);
+  return plan;
 }
 
-function switchMode(mode) {
-  state.mode = mode;
-  for (const t of $$('[data-mode]')) t.classList.toggle('active', t.dataset.mode === mode);
-  $('#catalog-panel').hidden = mode !== 'catalog';
-  $('#own-panel').hidden = mode !== 'own';
-  $('#bespoke-panel').hidden = mode !== 'bespoke';
-  tryOn();
+// Một lần ướm: { person, garment, prompt, samples, message } – prompt/samples do trợ lý đọc từ tin nhắn
+async function runTryOn(run) {
+  const { person, garment } = run;
+  const options = { ...effectiveOptions(garment), ...(run.samples ? { samples: run.samples } : {}) };
+  const cost = tryonCost(options);
+  if (state.remaining !== null && cost > state.remaining) {
+    postAi(state.remaining
+      ? `Lần ướm này cần ${cost} credit nhưng hôm nay bạn còn ${state.remaining} credit – bạn giảm số ảnh hoặc chất lượng trong Tùy chỉnh nhé.`
+      : `Bạn đã dùng hết ${state.settings.dailyCredits} credit thử váy hôm nay. Mai quay lại ướm tiếp nhé!`,
+    state.remaining ? [{ act: 'settings', label: '⚙️ Mở Tùy chỉnh' }] : []);
+    return;
+  }
+
+  const runId = String(runs.size + 1);
+  runs.set(runId, run);
+  state.busy = true;
+  renderComposer();
+  const body = addRow('ai');
+  const seconds = estimateSeconds(options);
+  render(body, html`
+    <div class="gen gen-pending">
+      <div class="gen-head">
+        <span class="gen-tag">✨ Đang ướm váy</span>
+        <span class="gen-meta">${modelName(options.model)} · khoảng ${seconds}–${seconds * 2} giây</span>
+      </div>
+      <div class="gen-frame">
+        <img class="gen-ghost" src="${person.photo}" alt="">
+        <div class="gen-wait"><span class="spinner" aria-hidden="true"></span>AI đang ướm váy lên ảnh của bạn…</div>
+        <div class="gen-progress"><span></span></div>
+      </div>
+    </div>`);
+  $('.gen-pending', body).style.setProperty('--eta', `${seconds * 1.6}s`);
+  scrollToEnd();
+
+  try {
+    const result = await aiTryOn({
+      ...garmentParams(garment),
+      ...personParams(person),
+      body: { height: state.body.height, weight: state.body.weight, heel: state.body.heel },
+      options: { ...options, seed: Math.floor(Math.random() * 2 ** 31) },     // seed mới → mỗi lần một kiểu
+      prompt: run.prompt,
+      message: run.message,
+    });
+    if (result.fallback) {
+      body.parentElement.remove();
+      postAi(FALLBACK_MESSAGES[result.reason] ?? FALLBACK_MESSAGES['provider-error'],
+        result.reason === 'no-dress-photo' ? [{ act: 'dress', label: '👗 Chọn váy khác' }] : [{ act: 'again', arg: runId, label: '↻ Thử lại' }]);
+      return;
+    }
+    const images = result.images?.length ? result.images : [result.imageUrl];
+    if (typeof result.remaining === 'number') state.remaining = result.remaining;
+    if (result.limit) state.settings.dailyCredits = result.limit;
+    const meta = [modelName(result.provider === 'gemini' ? 'gemini' : options.model), images.length > 1 && `${images.length} ảnh`]
+      .filter(Boolean).join(' · ');
+    body.replaceChildren(resultViewer({ images, original: person.photo, meta }));
+    const fit = garment.kind === 'dress' ? garment.dress.theme : null;
+    body.insertAdjacentHTML('beforeend', html`
+      <p class="msg-text">${images.length > 1
+        ? `Xong rồi! Mình ướm ${images.length} kiểu – bấm từng ảnh nhỏ để xem kiểu bạn ưng nhất.`
+        : 'Xong rồi! Bạn thấy chiếc váy này thế nào?'}</p>
+      ${fit ? html`<p class="fit-line small" data-fit="${fit}">${fitText(fitScore(state.body, fit))}</p>` : ''}
+      ${chipRow([
+        { act: 'again', arg: runId, label: '🎲 Thử kiểu khác' },
+        { act: 'dress', label: '👗 Đổi váy khác' },
+        garment.kind === 'dress'
+          ? { act: 'book', arg: garment.dress.id, label: '📅 Đặt lịch thử váy này', primary: true }
+          : { act: 'bespoke', label: '✂️ Đặt may theo mẫu này', primary: true },
+      ])}`.value);
+    scrollToEnd();
+  } catch (error) {
+    body.parentElement.remove();
+    if (typeof error.remaining === 'number') state.remaining = error.remaining;
+    if (/Siêu nét đang tắt/.test(error.message)) state.settings.maxEnabled = false;
+    postAi(error.message, state.remaining === 0 ? [] : [{ act: 'again', arg: runId, label: '↻ Thử lại' }]);
+  } finally {
+    state.busy = false;
+    renderComposer();
+  }
 }
 
-// Ảnh của người dùng: { key, name, photo, custom: true, path } – path = null khi chưa lưu lên server
-const photoModel = ({ path, url }) => ({ key: `photo:${path}`, name: 'Ảnh của bạn', photo: url, custom: true, path });
+function runAgain(runId) {
+  const run = runs.get(runId);
+  if (!run || state.busy) return;
+  postUser({ text: '🎲 Thử kiểu khác' });
+  runTryOn({ ...run, message: '' });
+}
 
-async function onPhotoSelected(e) {
-  const file = e.target.files[0];
-  e.target.value = '';                    // chọn lại đúng file đó vẫn nhận
-  if (!file) return;
+function bookDress(id) {
+  const dress = findDress(id);
+  if (!dress) return;
+  openBookingDialog({
+    vendorId: dress.vendor.id,
+    vendorName: dress.vendor.name,
+    dressId: dress.id,
+    title: dress.name,
+    price: dress.price,
+    type: dress.type === 'bespoke' ? 'bespoke_manual' : 'rental',
+    details: { body: state.body },
+  }, `tryon.html?dress=${dress.slug}`).catch(toastError);
+}
+
+function onThreadClick(e) {
+  const button = e.target.closest('[data-act]');
+  if (!button || button.disabled) return;
+  const { act, arg } = button.dataset;
+  if (act === 'person') openPersonPicker();
+  else if (act === 'dress') openDressPicker('catalog');
+  else if (act === 'ask') send(arg);
+  else if (act === 'tryon') send('');
+  else if (act === 'again') runAgain(arg);
+  else if (act === 'settings') openSettings();
+  else if (act === 'login') location.href = loginUrl(returnPath());
+  else if (act === 'book') bookDress(arg);
+  else if (act === 'photos') openDressGallery(findDress(arg)).catch(toastError);
+  else if (act === 'pick-dress') pickDress(arg, { announce: true });
+  else if (act === 'bespoke') location.href = 'thiet-ke-vay.html?tu=anh-vay';
+  else if (act === 'more-history') loadMoreHistory(button);
+}
+
+// ---------- CHỌN ẢNH & VÁY ----------
+function focusComposer() {
+  if (matchMedia('(pointer: fine)').matches) $('#composer-text').focus();   // điện thoại: không bật bàn phím
+}
+
+// Mẫu của tiệm thì ghi lên đường dẫn → đăng nhập xong / chia sẻ link quay lại đúng mẫu
+function syncUrl() {
+  const dress = state.garment?.kind === 'dress' ? state.garment.dress : null;
+  history.replaceState(null, '', dress ? `?dress=${dress.slug}` : location.pathname);
+}
+
+function pickDress(id, { announce = false } = {}) {
+  const dress = findDress(id);
+  if (!dress) return;
+  state.garment = dressGarment(dress);
+  syncUrl();
+  renderComposer();
+  if (announce) toast(`Đã chọn “${dress.name}” – bấm gửi để ướm thử nhé.`, 'success');
+  focusComposer();
+}
+
+function checkFile(file, count, max, what) {
   if (file.size > 10 * 1024 * 1024) {
     toastError(new Error('Ảnh tối đa 10MB'));
-    return;
+    return false;
   }
-  if (state.profile && state.myPhotos.length >= MAX_BRIDE_PHOTOS) {
-    toastError(new Error(`Bạn đã lưu đủ ${MAX_BRIDE_PHOTOS} ảnh – bấm × trên ảnh cũ để xóa bớt rồi tải lại`));
-    return;
+  if (count >= max) {
+    toastError(new Error(`Bạn đã lưu đủ ${max} ${what} – bấm × trên ảnh cũ để xóa bớt rồi tải lại`));
+    return false;
   }
-  if (state.localPhoto) URL.revokeObjectURL(state.localPhoto.photo);
-  const local = { key: 'local', name: 'Ảnh của bạn', photo: URL.createObjectURL(file), custom: true, path: null };
-  state.localPhoto = local;
-  state.model = local;
-  renderModels();
-  tryOn({ reveal: true });
-
-  if (!state.profile) return;
-  try {
-    const path = await uploadBridePhoto(state.profile.id, file);   // AI thật cần ảnh nằm trên server
-    const saved = photoModel({ path, url: local.photo });          // vẫn hiện bằng ảnh trong máy, khỏi tải lại
-    state.myPhotos.unshift({ path, url: local.photo });
-    state.localPhoto = null;
-    if (state.model === local) state.model = saved;
-    toast('Đã lưu ảnh riêng tư vào tài khoản – lần sau vào vẫn chọn lại được.', 'success');
-    renderModels();
-    renderAiButton();
-  } catch (error) {
-    toastError(error);
-  }
+  return true;
 }
 
-// Ảnh váy mẫu (chế độ "Váy bạn chọn"): giống ảnh của bạn – lưu riêng tư để AI ướm thử
-async function onGarmentSelected(e) {
-  const file = e.target.files[0];
-  e.target.value = '';
-  if (!file) return;
-  if (file.size > 10 * 1024 * 1024) {
-    toastError(new Error('Ảnh tối đa 10MB'));
-    return;
-  }
-  if (state.profile && state.garments.length >= MAX_GARMENT_PHOTOS) {
-    toastError(new Error(`Bạn đã lưu đủ ${MAX_GARMENT_PHOTOS} ảnh váy – bấm × trên ảnh cũ để xóa bớt`));
-    return;
-  }
-  if (state.garment && !state.garment.path) URL.revokeObjectURL(state.garment.url);
-  const local = { path: null, url: URL.createObjectURL(file) };
-  state.garment = local;
-  tryOn({ reveal: true });
-
-  if (!state.profile) return;
+// Ảnh mới tải hiện ngay bằng ảnh trong máy, lưu riêng tư lên server ở nền (AI cần ảnh nằm trên server)
+async function uploadPhoto(file, kind) {
+  const isPerson = kind === 'body';
+  if (!checkFile(file, isPerson ? state.myPhotos.length : state.garments.length,
+    isPerson ? MAX_BRIDE_PHOTOS : MAX_GARMENT_PHOTOS, isPerson ? 'ảnh' : 'ảnh váy')) return;
+  const local = { key: 'uploading', name: isPerson ? 'Ảnh của bạn' : 'Váy bạn tải lên', photo: URL.createObjectURL(file), uploading: true };
+  if (isPerson) state.person = local;
+  else state.garment = { ...local, kind: 'own' };
+  const current = isPerson ? () => state.person : () => state.garment;
+  const placeholder = current();
+  if (!isPerson) syncUrl();
+  renderComposer();
   try {
-    const path = await uploadBridePhoto(state.profile.id, file, 'garment');
-    const saved = { path, url: local.url };
-    state.garments.unshift(saved);
-    if (state.garment === local) state.garment = saved;
-    toast('Đã lưu ảnh váy – bấm "Ướm thử bằng AI thật" để ghép lên ảnh của bạn.', 'success');
-    renderGarments();
-    renderAiButton();
+    const path = await uploadBridePhoto(state.profile.id, file, kind);
+    const saved = { path, url: local.photo };
+    (isPerson ? state.myPhotos : state.garments).unshift(saved);
+    if (current() === placeholder) {
+      if (isPerson) state.person = photoPerson(saved);
+      else state.garment = ownGarment(saved);
+    }
+    toast(isPerson ? 'Đã lưu ảnh riêng tư vào tài khoản – lần sau vào vẫn chọn lại được.'
+      : 'Đã lưu ảnh váy – bấm gửi để AI ướm lên ảnh của bạn.', 'success');
   } catch (error) {
+    if (current() === placeholder) {
+      if (isPerson) state.person = null;
+      else state.garment = null;
+    }
     toastError(error);
   }
+  renderComposer();
 }
 
-function confirmDeletePhoto(path) {
-  openDialog({
+// Xóa ảnh đã lưu (từ tấm chọn) – trả về true nếu đã xóa để tấm chọn vẽ lại
+async function confirmDelete(path) {
+  const done = await openDialog({
     title: 'Xóa ảnh này?',
     content: html`<p>Ảnh sẽ bị xóa hẳn khỏi tài khoản của bạn và không khôi phục được.</p>`,
     confirmText: 'Xóa ảnh',
     danger: true,
-    onConfirm: async () => {
-      await deleteBridePhoto(path);
-      state.myPhotos = state.myPhotos.filter((p) => p.path !== path);
-      state.garments = state.garments.filter((g) => g.path !== path);
-      for (const key of state.aiResults.keys()) if (key.split('|').includes(path)) state.aiResults.delete(key);
-      if (state.model.path === path) state.model = MODELS[0];
-      if (state.garment?.path === path) state.garment = null;
-      toast('Đã xóa ảnh.', 'success');
-      renderModels();
-      tryOn({ reveal: true });
+    onConfirm: () => deleteBridePhoto(path),
+  });
+  if (!done) return false;
+  state.myPhotos = state.myPhotos.filter((p) => p.path !== path);
+  state.garments = state.garments.filter((g) => g.path !== path);
+  if (state.person?.path === path) state.person = null;
+  if (state.garment?.path === path) state.garment = null;
+  toast('Đã xóa ảnh.', 'success');
+  renderComposer();
+  return true;
+}
+
+function openPersonPicker() {
+  openPersonSheet({
+    loggedIn: Boolean(state.profile),
+    loginHref: loginUrl(returnPath()),
+    getPhotos: () => state.myPhotos,
+    max: MAX_BRIDE_PHOTOS,
+    selectedKey: state.person?.key,
+    onPick: (key) => {
+      state.person = key.startsWith('sample:') ? samplePerson(key.slice(7)) : photoPerson(state.myPhotos.find((p) => p.path === key));
+      renderComposer();
+      focusComposer();
     },
+    onDelete: confirmDelete,
+    onUpload: (file) => uploadPhoto(file, 'body'),
   });
 }
 
-// ---------- THỬ VÁY BẰNG AI THẬT ----------
-// Chọn váy chỉ hiện ảnh minh họa (miễn phí, tức thì). AI thật chỉ chạy khi bấm nút vì mỗi lần tốn phí.
-// AI chưa bật (key Free tier / chưa cấu hình) → server trả fallback → giữ ảnh minh họa, báo lý do.
-
-const AI_FALLBACK_MESSAGES = {
-  'not-configured': 'AI thử váy thật chưa được bật – đang hiển thị ảnh minh họa cùng kiểu váy.',
-  'free-tier': 'AI thử váy thật chưa được bật – đang hiển thị ảnh minh họa cùng kiểu váy.',
-  'no-credits': 'Dịch vụ AI tạm hết lượt (cần nạp thêm credit) – đang hiển thị ảnh minh họa.',
-  'bad-photo': 'AI chưa nhận ra người hoặc chiếc váy trong ảnh. Hãy dùng ảnh toàn thân rõ nét và ảnh thấy trọn chiếc váy.',
-  'no-dress-photo': 'Mẫu này chưa có ảnh thật từ tiệm nên chưa thử bằng AI được.',
-  'provider-error': 'Dịch vụ AI đang bận, vui lòng thử lại sau ít phút.',
-};
-
-// Lựa chọn trong khung "Tùy chỉnh" (giá trị → nhãn)
-const AI_CHOICES = {
-  model: [['standard', '⚡ Tiêu chuẩn'], ['max', '💎 Siêu nét']],
-  quality: [['fast', 'Nhanh'], ['balanced', 'Cân bằng'], ['quality', 'Đẹp nhất']],
-  samples: [[1, '1 ảnh'], [2, '2 ảnh'], [3, '3 ảnh'], [4, '4 ảnh']],
-  category: [['one-pieces', 'Váy liền'], ['tops', 'Áo'], ['bottoms', 'Chân váy / quần'], ['auto', 'AI tự nhận']],
-  photoType: [['auto', 'AI tự nhận'], ['flat-lay', 'Váy trải phẳng'], ['model', 'Người mẫu đang mặc']],
-};
-const QUALITY_SECONDS = { fast: 6, balanced: 10, quality: 17 };     // thời gian chờ ước tính cho 1 ảnh
-const choiceLabel = (group, value) => AI_CHOICES[group].find(([v]) => v === value)?.[1] ?? '';
-
-// Tùy chọn thật sự gửi đi: admin tắt Siêu nét → Tiêu chuẩn; mẫu của tiệm luôn là váy liền
-function effectiveOptions() {
-  const o = state.aiOptions;
-  return {
-    ...o,
-    model: o.model === 'max' && state.aiSettings.maxEnabled ? 'max' : 'standard',
-    category: state.mode === 'own' ? o.category : 'one-pieces',
-  };
-}
-const aiCost = () => tryonCost(effectiveOptions());
-
-// Khóa ảnh AI theo đúng người mẫu/ảnh + đúng váy đang chọn (mẫu của tiệm hoặc ảnh váy tự tải)
-const garmentKey = () => (state.mode === 'own' ? state.garment?.path : state.dress?.id);
-const aiKey = () => `${state.model.custom ? state.model.path : state.model.key}|${garmentKey()}`;
-const currentAiEntry = () => (state.mode === 'bespoke' ? null : state.aiResults.get(aiKey()));
-const currentAiImage = () => {
-  const entry = currentAiEntry();
-  return entry ? entry.urls[entry.index] : null;
-};
-
-async function loadAiRemaining() {
-  state.aiSettings = await getTryonSettings();
-  if (!state.profile) return;
-  try {
-    state.aiRemaining = Math.max(0, state.aiSettings.dailyCredits - await creditsUsedToday());
-  } catch {
-    state.aiRemaining = null;        // chưa chạy SQL 11 → không biết số credit, nút vẫn dùng được
-  }
-}
-
-function renderAiButton() {
-  const box = $('#ai-tryon-box');
-  const button = $('#ai-tryon');
-  const hint = $('#ai-hint');
-  const own = state.mode === 'own';
-  box.hidden = state.mode === 'bespoke' || (!own && !state.dress);
-  if (box.hidden) return;
-
-  const cost = aiCost();
-  const remaining = state.aiRemaining;
-  const limit = state.aiSettings.dailyCredits;
-  const tooCostly = remaining !== null && cost > remaining;
-  let reason = '';
-  if (!state.profile) reason = 'Đăng nhập để ghép váy lên ảnh bằng AI thật';
-  else if (own && !state.garment) reason = 'Tải ảnh váy mẫu ở bước 2 trước nhé';
-  else if (own && !state.garment.path) reason = 'Đang lưu ảnh váy…';
-  else if (!own && !state.dress.image_url) reason = 'Mẫu này chưa có ảnh thật từ tiệm';
-  else if (state.model.custom && !state.model.path) reason = 'Đang lưu ảnh của bạn…';
-  else if (remaining === 0) reason = `Đã dùng hết ${limit} credit AI hôm nay`;
-  else if (tooCostly) reason = `Cần ${cost} credit, hôm nay còn ${remaining} – giảm số ảnh hoặc chất lượng`;
-  else if (remaining !== null) reason = `Còn ${remaining}/${limit} credit hôm nay`;
-
-  const garmentReady = own ? Boolean(state.garment?.path) : Boolean(state.dress.image_url);
-  // Chưa đăng nhập vẫn bấm được → đưa tới trang đăng nhập
-  button.disabled = state.aiBusy || (Boolean(state.profile) && (!garmentReady
-    || (state.model.custom && !state.model.path) || tooCostly));
-  // Đã có ảnh AI cho cặp người–váy này → bấm lại ra kiểu khác (seed mới), ảnh cũ vẫn ở "Ảnh đã thử"
-  render(button, html`${currentAiImage() ? '🎲 Ướm kiểu khác' : '✨ Ướm thử bằng AI thật'}
-    <span class="ai-cost">${cost} credit</span>`);
-  hint.textContent = reason;
-  renderAiOptions();
-}
-
-function renderAiOptions() {
-  const o = effectiveOptions();
-  const max = o.model === 'max';
-  const perImage = (quality) => tryonCost({ ...o, quality, samples: 1 });
-  const group = (title, key, choices, note = '') => html`
-    <div class="ai-opt">
-      <span class="ai-opt-label">${title}</span>
-      <div class="chips">${choices.map(([value, text]) => html`
-        <button class="chip ${o[key] === value ? 'active' : ''}" type="button"
-                data-ai-opt="${key}" data-value="${value}">${text}</button>`)}</div>
-      ${note ? html`<span class="ai-opt-note">${note}</span>` : ''}
-    </div>`;
-
-  render($('#ai-options-body'), html`
-    ${state.aiSettings.maxEnabled ? group('Mô hình AI', 'model', AI_CHOICES.model, max
-      ? 'Siêu nét: ảnh nét, chất vải tự nhiên hơn – tốn 1–3 credit mỗi ảnh.'
-      : 'Tiêu chuẩn: 1 credit mỗi ảnh.') : ''}
-    ${group('Chất lượng', 'quality', AI_CHOICES.quality.map(([value, text]) =>
-      [value, max ? `${text} · ${perImage(value)} credit` : `${text} · ~${QUALITY_SECONDS[value]} giây`]))}
-    ${group('Số ảnh mỗi lần', 'samples', AI_CHOICES.samples, 'Nhiều ảnh = nhiều kiểu để chọn ảnh ưng nhất.')}
-    ${max ? '' : html`
-      ${state.mode === 'own' ? group('Loại trang phục', 'category', AI_CHOICES.category) : ''}
-      ${group('Ảnh váy là', 'photoType', AI_CHOICES.photoType)}
-      <label class="ai-opt-check">
-        <input type="checkbox" data-ai-clean ${o.cleanOriginal ? 'checked' : ''}>
-        <span>Xóa kỹ đồ đang mặc <span class="ai-opt-note">– bật khi áo/váy cũ còn lộ ra trên ảnh</span></span>
-      </label>`}
-    <div class="ai-opt-total">Mỗi lần ướm: <strong>${aiCost()} credit</strong>${state.aiRemaining !== null
-      ? ` · hôm nay còn ${state.aiRemaining} credit` : ''}</div>`);
-
-  for (const chip of $$('#ai-options-body [data-ai-opt]')) {
-    chip.addEventListener('click', () => {
-      const key = chip.dataset.aiOpt;
-      state.aiOptions[key] = key === 'samples' ? Number(chip.dataset.value) : chip.dataset.value;
-      saveAiOptions();
-      renderAiButton();
-    });
-  }
-  $('#ai-options-body [data-ai-clean]')?.addEventListener('change', (e) => {
-    state.aiOptions.cleanOriginal = e.target.checked;
-    saveAiOptions();
-    renderAiButton();
-  });
-  $('#ai-options-sum').textContent = `${max ? 'Siêu nét' : 'Tiêu chuẩn'} · ${choiceLabel('quality', o.quality)} · ${o.samples} ảnh`;
-}
-
-async function runAiTryOn() {
-  if (!state.profile) {
-    location.href = loginUrl(state.mode === 'own' ? 'tryon.html?mode=own' : `tryon.html?dress=${state.dress.slug}`);
-    return;
-  }
-  const key = aiKey();
-  const options = effectiveOptions();
-  const scan = $('#mirror-scan');
-  const defaultScanText = scan.textContent;
-  const seconds = (QUALITY_SECONDS[options.quality] + (options.samples - 1) * 4) * (options.model === 'max' ? 2 : 1);
-  state.aiBusy = true;
-  renderAiButton();
-  scan.textContent = `AI đang ướm váy lên ảnh của bạn… (khoảng ${seconds}–${seconds * 2} giây)`;
-  scan.hidden = false;
-  try {
-    const result = await aiTryOn({
-      ...(state.mode === 'own' ? { garmentPath: state.garment.path } : { dressId: state.dress.id }),
-      ...(state.model.custom ? { photoPath: state.model.path } : { sampleModel: state.model.key }),
-      body: { height: state.body.height, weight: state.body.weight, heel: state.body.heel },
-      options: { ...options, seed: Math.floor(Math.random() * 2 ** 31) },   // seed mới → mỗi lần một kiểu
-    });
-
-    if (result.fallback) {
-      toast(AI_FALLBACK_MESSAGES[result.reason] ?? AI_FALLBACK_MESSAGES['provider-error']);
-    } else {
-      const urls = result.images?.length ? result.images : [result.imageUrl];
-      const createdAt = new Date().toISOString();
-      state.aiResults.set(key, { urls, index: 0 });
-      state.aiHistory.unshift(...urls.map((url) => ({ id: crypto.randomUUID(), url, createdAt })));
-      if (typeof result.remaining === 'number') state.aiRemaining = result.remaining;
-      if (result.limit) state.aiSettings.dailyCredits = result.limit;
-      state.showOriginal = false;
-      state.compare = false;
-      state.historyView = null;
-      renderAiHistory();
-      toast(urls.length > 1
-        ? `Đã ướm ${urls.length} ảnh! Bấm từng ảnh dưới gương để chọn ảnh ưng nhất – tất cả được lưu riêng tư.`
-        : 'Đã ghép váy bằng AI! Ảnh được lưu riêng tư trong tài khoản của bạn.', 'success');
-    }
-  } catch (error) {
-    if (typeof error.remaining === 'number') state.aiRemaining = error.remaining;
-    if (/Siêu nét đang tắt/.test(error.message)) state.aiSettings.maxEnabled = false;
-    toastError(error);
-  } finally {
-    state.aiBusy = false;
-    scan.hidden = true;
-    scan.textContent = defaultScanText;
-    renderMirror();
-  }
-}
-
-const isPhoneLayout = () => matchMedia('(max-width: 900px)').matches;
-
-// Hiệu ứng AI xử lý ngắn rồi hiện kết quả.
-// reveal: trên điện thoại gương nằm ở đầu trang → cuộn lên để người dùng thấy kết quả vừa chọn.
-async function tryOn({ reveal = false } = {}) {
-  state.showOriginal = false;
-  state.historyView = null;
-  renderAll();
-  if (reveal && isPhoneLayout()) $('.mirror').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  const scan = $('#mirror-scan');
-  scan.hidden = false;
-  await sleep(900);
-  scan.hidden = true;
-}
-
-// ---------- GIÁ TRỊ SUY RA ----------
-function currentTheme() {
-  if (state.mode === 'own') return null;          // váy tự chọn: không có ảnh minh họa, chỉ AI ghép
-  return state.mode === 'bespoke' ? bespokeTheme(state.bespoke) : state.dress?.theme;
-}
-
-// Thông tin để đặt lịch, tùy chế độ đang chọn
-function currentSelection() {
-  if (state.mode === 'catalog') {
-    const dress = state.dress;
-    if (!dress) return null;
-    return {
-      title: dress.name,
-      vendorName: dress.vendor.name,
-      vendorId: dress.vendor.id,
-      dressId: dress.id,
-      price: dress.price,
-      type: dress.type === 'bespoke' ? 'bespoke_manual' : 'rental',
-      details: { body: state.body },
-    };
-  }
-
-  const notes = $('#bespoke-notes').value.trim();
-  const price = bespokePrice(state.bespoke);
-  return {
-    title: `Váy may đo: ${bespokeLabel('silhouette', state.bespoke.silhouette)}, ${bespokeLabel('fabric', state.bespoke.fabric)}`,
-    vendorName: state.bespokeVendor?.name ?? 'Trạm Hỷ Atelier',
-    vendorId: state.bespokeVendor?.id,
-    price,
-    customPrice: price,
-    type: notes ? 'bespoke_prompt' : 'bespoke_manual',
-    details: {
-      body: state.body,
-      design: {
-        ...Object.fromEntries(Object.keys(BESPOKE_OPTIONS).map((g) => [g, bespokeLabel(g, state.bespoke[g])])),
-        train_m: state.bespoke.train,
-        extras: BESPOKE_EXTRAS.filter((x) => state.bespoke.extras.includes(x.key)).map((x) => x.label),
-        notes,
-      },
+function openDressPicker(tab = 'catalog') {
+  openDressSheet({
+    tab,
+    loggedIn: Boolean(state.profile),
+    loginHref: loginUrl('tryon.html?mode=own'),
+    dresses: state.dresses.filter((d) => d.image_url),
+    getGarments: () => state.garments,
+    max: MAX_GARMENT_PHOTOS,
+    selectedKey: state.garment?.key,
+    onPickDress: (id) => pickDress(id),
+    onPickGarment: (path) => {
+      state.garment = ownGarment(state.garments.find((g) => g.path === path));
+      syncUrl();
+      renderComposer();
+      focusComposer();
     },
-  };
+    onDelete: confirmDelete,
+    onUpload: (file) => uploadPhoto(file, 'garment'),
+  });
 }
 
-function book() {
-  if (state.mode === 'own') {
-    // Váy tự chọn chưa có tiệm cho thuê → gợi ý may đo theo mẫu ở Trạm Hỷ Atelier
-    const notes = $('#bespoke-notes');
-    if (!notes.value.trim()) notes.value = 'May theo ảnh váy mẫu tôi đã ướm thử bằng AI trên Trạm Hỷ (sẽ gửi ảnh khi tư vấn).';
-    switchMode('bespoke');
-    toast('Chọn phom, chất liệu gần giống mẫu rồi đặt lịch – thợ may sẽ xem ảnh mẫu khi tư vấn.');
-    return;
-  }
-  const selection = currentSelection();
-  if (!selection?.vendorId) {
-    toastError(new Error('Vui lòng chọn một mẫu váy'));
-    return;
-  }
-  const returnTo = state.dress ? `tryon.html?dress=${state.dress.slug}` : 'tryon.html';
-  openBookingDialog(selection, returnTo).catch(toastError);
-}
-
-// ---------- VẼ GIAO DIỆN ----------
-function renderAll() {
-  renderModels();
-  renderGarments();
-  renderAiHistory();
-  renderBody();
-  renderThemeFilter();
-  renderDressList();
-  renderBespoke();
-  renderMirror();
-  renderSummary();
-}
-
-function renderMirror() {
-  const theme = currentTheme();
-  const isCustom = Boolean(state.model.custom);
-  const img = $('#mirror-img');
-
-  const aiImage = currentAiImage();
-
-  if (state.historyView) {
-    img.src = state.historyView;
-    $('#mirror-label').textContent = '✨ Ảnh AI đã thử trước đây';
-  } else if (state.showOriginal) {
-    img.src = state.model.photo;
-    $('#mirror-label').textContent = 'Ảnh gốc';
-  } else if (aiImage) {
-    img.src = aiImage;
-    $('#mirror-label').textContent = '✨ Ảnh AI ghép váy thật';
-  } else if (!theme) {
-    img.src = state.model.photo;     // váy tự chọn: chưa có ảnh minh họa → hiện ảnh người, chờ AI ghép
-    $('#mirror-label').textContent = state.mode === 'own' && state.garment ? 'Chưa ghép váy' : 'Ảnh gốc';
-  } else {
-    img.src = renderImageFor(isCustom ? 'user' : state.model.key, theme);
-    $('#mirror-label').textContent = `Minh họa: ${DRESS_THEME[theme]}`;
-  }
-  $('#download-img').href = img.src;
-  $('#toggle-original').textContent = state.showOriginal ? 'Xem ảnh đã thử váy' : 'Xem ảnh gốc';
-
-  // 1 lần ướm ra nhiều ảnh → dải ảnh nhỏ dưới gương để chọn ảnh ưng nhất
-  const entry = currentAiEntry();
-  const viewingAi = Boolean(aiImage) && !state.historyView && !state.showOriginal;
-  const picks = $('#ai-picks');
-  picks.hidden = !viewingAi || entry.urls.length < 2;
-  if (!picks.hidden) {
-    render(picks, entry.urls.map((url, i) => html`
-      <button type="button" class="${i === entry.index ? 'active' : ''}" data-pick="${i}" aria-label="Xem ảnh ${i + 1}">
-        <img src="${url}" alt=""><span>${i + 1}</span>
-      </button>`));
-    for (const btn of $$('#ai-picks [data-pick]')) {
-      btn.addEventListener('click', () => {
-        entry.index = Number(btn.dataset.pick);
-        renderMirror();
-      });
-    }
-  }
-
-  // So sánh trước/sau: ảnh gốc phủ lên ảnh AI vừa ướm, kéo thanh để đổi chỗ chia
-  if (!viewingAi) state.compare = false;
-  $('#toggle-compare').hidden = !viewingAi;
-  $('#toggle-compare').textContent = state.compare ? 'Tắt so sánh' : 'So sánh trước/sau';
-  $('#mirror-compare').hidden = !state.compare;
-  $('#compare-range').hidden = !state.compare;
-  if (state.compare) $('#compare-img').src = state.model.photo;
-
-  const note = $('#mirror-note');
-  const showNote = !state.historyView && !state.showOriginal && !aiImage
-    && (state.mode === 'own' ? Boolean(state.garment) : isCustom && Boolean(theme));
-  note.hidden = !showNote;
-  note.textContent = state.mode === 'own'
-    ? 'Bấm "Ướm thử bằng AI thật" để AI ghép chiếc váy bạn chọn lên ảnh này.'
-    : 'Đây là ảnh minh họa cùng kiểu váy. Bấm "Ướm thử bằng AI thật" để ghép váy lên chính ảnh của bạn.';
-  renderFit();
-  renderAiButton();
-  for (const btn of $$('#ai-history-list [data-history]')) {
-    btn.classList.toggle('active', btn.dataset.history === state.historyView);
-  }
-}
-
-function renderFit() {
-  const theme = currentTheme();
-  if (!theme) {
-    $('#fit-score').textContent = '–';
-    $('#fit-tip').textContent = 'Điểm tôn dáng tính cho mẫu có sẵn và váy tự thiết kế. Với váy bạn chọn, hãy xem ảnh AI ghép.';
-    return;
-  }
-  const { score, tip } = fitScore(state.body, theme);
-  $('#fit-score').textContent = `${score}%`;
-  $('#fit-tip').textContent = tip;
-}
-
-function renderModels() {
-  const models = [
-    ...MODELS,
-    ...(state.localPhoto ? [state.localPhoto] : []),
-    ...state.myPhotos.map(photoModel),
-  ];
-  render($('#models'), models.map((m) => html`
-    <div class="model-wrap">
-      <button class="model ${m.key === state.model.key ? 'active' : ''}" type="button" data-model="${m.key}">
-        <img src="${m.photo}" alt="">${m.name}
-      </button>
-      ${m.path ? html`<button class="model-remove" type="button" data-remove="${m.path}" title="Xóa ảnh" aria-label="Xóa ảnh">×</button>` : ''}
-    </div>`));
-  for (const btn of $$('[data-model]')) {
-    btn.addEventListener('click', () => {
-      state.model = models.find((m) => m.key === btn.dataset.model);
-      tryOn({ reveal: true });
-    });
-  }
-  for (const btn of $$('#models [data-remove]')) {
-    btn.addEventListener('click', () => confirmDeletePhoto(btn.dataset.remove));
-  }
-  $('#photo-note').textContent = !state.profile
-    ? 'Đăng nhập để lưu ảnh và chọn lại ở lần sau.'
-    : `Ảnh được lưu riêng tư – chỉ bạn xem được (${state.myPhotos.length}/${MAX_BRIDE_PHOTOS} ảnh).`;
-}
-
-function renderGarments() {
-  const list = [
-    ...(state.garment && !state.garment.path ? [state.garment] : []),
-    ...state.garments,
-  ];
-  render($('#garments'), list.map((g, i) => html`
-    <div class="model-wrap">
-      <button class="model ${g === state.garment || (g.path && g.path === state.garment?.path) ? 'active' : ''}"
-              type="button" data-garment="${i}">
-        <img src="${g.url}" alt="">Váy ${i + 1}
-      </button>
-      ${g.path ? html`<button class="model-remove" type="button" data-remove="${g.path}" title="Xóa ảnh váy" aria-label="Xóa ảnh váy">×</button>` : ''}
-    </div>`));
-  for (const btn of $$('[data-garment]')) {
-    btn.addEventListener('click', () => {
-      state.garment = list[Number(btn.dataset.garment)];
-      tryOn({ reveal: true });
-    });
-  }
-  for (const btn of $$('#garments [data-remove]')) {
-    btn.addEventListener('click', () => confirmDeletePhoto(btn.dataset.remove));
-  }
-  $('#garment-note').textContent = !state.profile
-    ? 'Đăng nhập để lưu ảnh váy và ướm thử bằng AI.'
-    : list.length ? `Đã lưu ${state.garments.length}/${MAX_GARMENT_PHOTOS} ảnh váy – riêng tư, chỉ bạn xem được.` : '';
-}
-
-function renderAiHistory() {
-  $('#ai-history').hidden = !state.aiHistory.length;
-  render($('#ai-history-list'), state.aiHistory.map((r) => html`
-    <button type="button" data-history="${r.url}" class="${r.url === state.historyView ? 'active' : ''}"
-            title="${new Date(r.createdAt).toLocaleString('vi-VN')}">
-      <img src="${r.url}" alt="Ảnh đã thử bằng AI">
-    </button>`));
-  for (const btn of $$('#ai-history-list [data-history]')) {
-    btn.addEventListener('click', () => {
-      state.historyView = btn.dataset.history;
-      state.showOriginal = false;
-      renderMirror();
-      if (isPhoneLayout()) $('.mirror').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  }
-}
-
-function renderBody() {
-  $('#height').value = state.body.height;
-  $('#weight').value = state.body.weight;
-  $('#heel').value = String(state.body.heel);
-  $('#height-value').textContent = state.body.height;
-  $('#weight-value').textContent = state.body.weight;
-  const bmi = bmiInfo(state.body.height, state.body.weight);
-  render($('#bmi'), html`BMI <strong>${bmi.value.toLocaleString('vi-VN')}</strong> · ${bmi.label}
-    <span class="muted">– ${bmi.tip}</span>`);
-
-  render($('#shapes'), BODY_SHAPES.map((s) => html`
-    <button class="chip ${s.key === state.body.shape ? 'active' : ''}" type="button" data-shape="${s.key}">${s.label}</button>`));
-  for (const chip of $$('[data-shape]')) {
-    chip.addEventListener('click', () => {
-      state.body.shape = chip.dataset.shape;
-      renderBody();
-      renderFit();
+function openSettings() {
+  openSettingsSheet({
+    maxEnabled: state.settings.maxEnabled,
+    ownGarment: state.garment?.kind === 'own',
+    getOptions: () => effectiveOptions(),
+    setOption,
+    cost: tryonCost,
+    remaining: state.remaining,
+    body: state.body,
+    loggedIn: Boolean(state.profile),
+    onBodyChange: () => {
       persistBody();
-    });
-  }
+      updateFitLines();
+    },
+  });
 }
 
-function renderThemeFilter() {
-  const themes = [['all', 'Tất cả'], ...Object.entries(DRESS_THEME)];
-  render($('#theme-filter'), themes.map(([key, label]) => html`
-    <button class="chip ${key === state.themeFilter ? 'active' : ''}" type="button" data-theme="${key}">${label}</button>`));
-  for (const chip of $$('[data-theme]')) {
-    chip.addEventListener('click', () => {
-      state.themeFilter = chip.dataset.theme;
-      renderThemeFilter();
-      renderDressList();
-    });
+// ---------- KHUNG SOẠN TIN ----------
+function slot(kind) {
+  const item = kind === 'person' ? state.person : state.garment;
+  const label = kind === 'person' ? 'Ảnh của bạn' : 'Váy cưới';
+  if (!item) {
+    return html`
+      <div class="slot-wrap">
+        <button type="button" class="slot empty" data-slot="${kind}">
+          <span class="slot-plus" aria-hidden="true">＋</span>
+          <span class="slot-text"><strong>${label}</strong><small>${kind === 'person' ? 'Chọn ảnh' : 'Chọn váy'}</small></span>
+        </button>
+      </div>`;
   }
+  return html`
+    <div class="slot-wrap">
+      <button type="button" class="slot ${item.uploading ? 'uploading' : ''}" data-slot="${kind}" aria-label="${label}: ${item.name} – bấm để đổi">
+        <img src="${item.photo}" alt="">
+        <span class="slot-text"><small>${label}</small><strong>${item.uploading ? 'Đang lưu…' : item.name}</strong></span>
+      </button>
+      <button type="button" class="slot-clear" data-clear="${kind}" aria-label="Bỏ ${label.toLowerCase()}">×</button>
+    </div>`;
 }
 
-function renderDressList() {
-  const list = state.dresses.filter((d) => state.themeFilter === 'all' || d.theme === state.themeFilter);
-  if (!list.length) {
-    render($('#dress-list'), html`<div class="muted">Chưa có mẫu váy phù hợp.</div>`);
-    return;
-  }
-  render($('#dress-list'), list.map((d) => html`
-    <button class="dress-option ${d.id === state.dress?.id ? 'active' : ''}" type="button" data-dress="${d.id}">
-      <img src="${dressThumb(d)}" alt="">
-      <span class="info">
-        <span class="name">${d.name}</span>
-        <span class="small muted vendor">${d.vendor.name}</span>
-        <span class="meta">${priceTag(d, { small: true })}
-          ${d.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê')}</span>
-      </span>
-    </button>`));
-  for (const btn of $$('[data-dress]')) {
-    btn.addEventListener('click', () => {
-      state.dress = state.dresses.find((d) => d.id === btn.dataset.dress);
-      history.replaceState(null, '', `?dress=${state.dress.slug}`);
-      tryOn({ reveal: true });
-    });
-  }
+function renderComposer() {
+  render($('#composer-slots'), [slot('person'), slot('dress')]);
+  const o = effectiveOptions();
+  const cost = tryonCost(o);
+  $('#settings-sum').textContent = `${modelName(o.model)} · ${o.samples} ảnh`;
+  const costLabel = $('#composer-cost');
+  costLabel.textContent = state.remaining === null ? `${cost} credit` : `${cost} credit · còn ${state.remaining}/${state.settings.dailyCredits}`;
+  costLabel.classList.toggle('short', state.remaining !== null && cost > state.remaining);
+  $('#send-btn').disabled = state.busy || Boolean(state.person?.uploading || state.garment?.uploading);
 }
 
-function renderBespoke() {
-  render($('#bespoke-options'), Object.entries(BESPOKE_OPTIONS).map(([group, { label, choices }]) => html`
-    <div class="field"><span>${label}</span>
-      <div class="chips">
-        ${choices.map((c) => html`
-          <button class="chip ${state.bespoke[group] === c.key ? 'active' : ''}" type="button"
-                  data-group="${group}" data-choice="${c.key}">
-            ${c.label}${c.price ? ` +${(c.price / 1e6).toLocaleString('vi-VN')}tr` : ''}
-          </button>`)}
-      </div>
-    </div>`));
-  for (const chip of $$('[data-group]')) {
-    chip.addEventListener('click', () => {
-      state.bespoke[chip.dataset.group] = chip.dataset.choice;
-      if (chip.dataset.group === 'silhouette') tryOn({ reveal: true });
-      else { renderBespoke(); renderSummary(); }
-    });
-  }
-
-  $('#train').value = state.bespoke.train;
-  $('#train-value').textContent = state.bespoke.train;
-
-  render($('#bespoke-extras'), BESPOKE_EXTRAS.map((x) => html`
-    <label class="row small">
-      <input type="checkbox" data-extra="${x.key}" ${state.bespoke.extras.includes(x.key) ? 'checked' : ''}>
-      ${x.label} (+${money(x.price)})
-    </label>`));
-  for (const box of $$('[data-extra]')) {
-    box.addEventListener('change', () => {
-      const key = box.dataset.extra;
-      state.bespoke.extras = box.checked
-        ? [...state.bespoke.extras, key]
-        : state.bespoke.extras.filter((k) => k !== key);
-      renderSummary();
-    });
-  }
+function autosize() {
+  const box = $('#composer-text');
+  box.style.height = 'auto';
+  box.style.height = `${Math.min(box.scrollHeight, 140)}px`;
 }
 
-function renderSummary() {
-  if (state.mode === 'own') {
-    $('#book-btn').disabled = false;
-    $('#cta-book').disabled = false;
-    $('#book-btn').textContent = 'Đặt may theo mẫu này';
-    render($('#summary'), html`
-      <p class="small muted" style="margin:0">Ưng chiếc váy bạn chọn? <strong>Trạm Hỷ Atelier</strong> may đo theo mẫu và đúng số đo của bạn,
-        tiền cọc vẫn được giữ an toàn 3 đợt.</p>`);
-    $('#cta-name').textContent = 'Váy bạn chọn';
-    $('#cta-price').textContent = 'May đo theo mẫu';
-    return;
-  }
-  $('#book-btn').textContent = 'Đặt lịch thử váy';
-  const selection = currentSelection();
-  // Khóa nút đặt lịch cho tới khi đã tải xong và có mẫu được chọn
-  $('#book-btn').disabled = !selection?.vendorId;
-  $('#cta-book').disabled = !selection?.vendorId;
-  if (!selection) {
-    render($('#summary'), html`<p class="muted">Chọn một mẫu váy để đặt lịch.</p>`);
-    return;
-  }
-  const isBespoke = selection.type.startsWith('bespoke');
-  const split = isBespoke ? [30, 40, 30] : [30, 50, 20];
-  const steps = isBespoke
-    ? ['Duyệt thiết kế & vải', 'Thử rập mộc', 'Nhận váy hoàn thiện']
-    : ['Giữ lịch', 'Sau buổi thử', 'Trả váy / hoàn tất'];
-
-  const realPhotos = state.mode === 'catalog' && state.dress ? realPhotoCount(state.dress) : 0;
-
-  render($('#summary'), html`
-    <div class="stack" style="gap:6px">
-      <strong>${selection.title}</strong>
-      ${realPhotos ? html`<button class="btn btn-outline btn-sm" type="button" data-view-photos style="width:fit-content">
-        Xem ${realPhotos} ảnh thật của tiệm</button>` : ''}
-      <span class="muted small">${selection.vendorName}</span>
-      ${state.mode === 'catalog' && state.dress
-        ? priceTag(state.dress)
-        : html`<span class="price" style="font-size:20px">${money(selection.price)}</span>`}
-      <div class="milestones">
-        ${split.map((p, i) => html`
-          <div class="milestone">
-            <span class="small muted">Đợt ${i + 1}: ${steps[i]}</span>
-            <span class="amount">${money(Math.round(selection.price * p / 100))}</span>
-            <span class="small">${p}%</span>
-          </div>`)}
-      </div>
-      <p class="small muted">Tiền được Trạm Hỷ giữ, chỉ chuyển cho tiệm khi bạn nghiệm thu từng đợt. Tiệm sai cam kết → hoàn 100%.</p>
-    </div>`);
-  $('#summary [data-view-photos]')?.addEventListener('click', () => openDressGallery(state.dress));
-  $('#cta-name').textContent = selection.title;
-  $('#cta-price').textContent = money(selection.price);
+function initComposer() {
+  $('#composer').addEventListener('submit', (e) => {
+    e.preventDefault();
+    send();
+  });
+  const box = $('#composer-text');
+  if (matchMedia('(max-width: 560px)').matches) box.placeholder = 'Nhắn cho trợ lý thử váy…';   // câu dài bị cắt dòng
+  box.addEventListener('input', autosize);
+  // Máy tính: Enter để gửi, Shift+Enter xuống dòng. Điện thoại: Enter xuống dòng, gửi bằng nút.
+  // isComposing: đang gõ dấu tiếng Việt (bộ gõ Telex/VNI) thì Enter chưa phải là gửi
+  box.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && matchMedia('(pointer: fine)').matches) {
+      e.preventDefault();
+      send();
+    }
+  });
+  $('#composer-slots').addEventListener('click', (e) => {
+    const clear = e.target.closest('[data-clear]');
+    if (clear) {
+      if (clear.dataset.clear === 'person') state.person = null;
+      else {
+        state.garment = null;
+        syncUrl();
+      }
+      renderComposer();
+      return;
+    }
+    const target = e.target.closest('[data-slot]');
+    if (target?.dataset.slot === 'person') openPersonPicker();
+    else if (target) openDressPicker(state.garment?.kind === 'own' ? 'own' : 'catalog');
+  });
+  $('#open-settings').addEventListener('click', openSettings);
+  thread().addEventListener('click', onThreadClick);
+  // Đang ướm mà rời trang thì mất kết quả (AI vẫn chạy và trừ credit) → hỏi lại
+  window.addEventListener('beforeunload', (e) => {
+    if (state.busy) e.preventDefault();
+  });
 }
 
 // ---------- KHỞI CHẠY TRANG ----------
-initControls();
-// Hiện ngay ảnh người mẫu & số đo trong lúc chờ tải dữ liệu
-renderModels();
-renderBody();
-renderMirror();
+initComposer();
+initAutoScroll();
+renderComposer();
 state.profile = await initLayout('tryon');
-await Promise.all([loadDresses(), loadBodyProfile(), loadAiRemaining(), loadMyPhotos(), loadAiHistory()]);
-if (param('mode') === 'own') switchMode('own');      // quay lại sau khi đăng nhập từ "Váy bạn chọn"
-renderAll();
+const [settings] = await Promise.all([getTryonSettings(), loadDresses()]);
+state.settings = settings;
+await loadAccountData();
+
+const linked = state.dresses.find((d) => d.slug === param('dress'));
+if (linked?.image_url) state.garment = dressGarment(linked);
+buildThread();
+renderComposer();
+scrollToEnd('auto');
+if (param('chon-vay')) openDressPicker('catalog');
+else if (param('mode') === 'own') openDressPicker('own');

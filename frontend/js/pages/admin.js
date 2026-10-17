@@ -233,18 +233,25 @@ async function renderAiSettings() {
   render(container, html`
     <form class="card stack" style="max-width:640px" id="ai-settings">
       <h3>Thử váy bằng AI (FASHN)</h3>
+      ${settings.ready ? '' : html`
+        <div class="notice notice-error" role="alert">
+          <strong>Database chưa có phần cài đặt này</strong>
+          Mở Supabase → SQL Editor, chạy file <code>backend/supabase/28_tryon_settings.sql</code> rồi tải lại trang.
+          Trong lúc chờ, web dùng mô hình Tiêu chuẩn và 6 credit/người/ngày.
+        </div>`}
       <label class="row" style="cursor:pointer">
-        <input type="checkbox" name="maxEnabled" ${settings.maxEnabled ? 'checked' : ''}>
+        <input type="checkbox" name="maxEnabled" ${settings.maxEnabled ? 'checked' : ''} ${settings.ready ? '' : 'disabled'}>
         <strong>Bật mô hình Siêu nét (Max) cho người dùng</strong>
       </label>
-      <p class="small muted" style="margin:0">Ảnh nét, chất vải tự nhiên hơn nhưng tốn 1–3 credit FASHN mỗi ảnh
-        (Tiêu chuẩn luôn 1 credit). Nên chỉ bật lúc review / demo rồi tắt.</p>
+      <p class="small muted" style="margin:0">Siêu nét là mô hình FASHN dùng trên chính web của họ: ảnh đẹp, giống thật, ướm được cả
+        ảnh selfie và váy xòe phồng – tốn 1–3 credit mỗi ảnh (Tiêu chuẩn luôn 1 credit). Bật lên thì Phòng thử tự dùng Siêu nét;
+        nên chỉ bật lúc review / demo rồi tắt.</p>
       <label class="field"><span>Hạn mức mỗi người mỗi ngày (credit)</span>
         <input class="input" type="number" name="dailyCredits" min="1" max="50" required value="${settings.dailyCredits}"
                style="max-width:160px"></label>
       <p class="small muted" style="margin:0">VD 6 credit = 6 ảnh Tiêu chuẩn, hoặc 2 ảnh Siêu nét "Đẹp nhất".
         Người dùng chọn chất lượng / số ảnh, web tự trừ đúng số credit.</p>
-      <div class="row"><button class="btn btn-primary btn-sm" type="submit">Lưu cài đặt</button></div>
+      <div class="row"><button class="btn btn-primary btn-sm" type="submit" ${settings.ready ? '' : 'disabled'}>Lưu cài đặt</button></div>
     </form>`);
   const form = $('#ai-settings');
   form.addEventListener('submit', (e) => {

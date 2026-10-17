@@ -97,6 +97,35 @@ export function openDialog({ title, content, confirmText = 'Xác nhận', cancel
   });
 }
 
+/**
+ * Tấm chọn không có nút xác nhận: trượt từ dưới lên trên điện thoại, hộp giữa màn hình trên máy tính.
+ * Bấm ✕, bấm ra ngoài hoặc Esc để đóng. onOpen(body, close) để vẽ nội dung + gắn sự kiện.
+ * Trả về hàm close().
+ */
+export function openSheet({ title, onOpen, onClose, className = '' }) {
+  const dialog = document.createElement('dialog');
+  dialog.className = `sheet ${className}`;
+  render(dialog, html`
+    <div class="sheet-head">
+      <h3>${title}</h3>
+      <button type="button" class="sheet-close" data-close aria-label="Đóng">✕</button>
+    </div>
+    <div class="sheet-body"></div>`);
+  document.body.append(dialog);
+
+  const close = () => dialog.close();
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog || e.target.closest('[data-close]')) close();
+  });
+  dialog.addEventListener('close', () => {
+    dialog.remove();
+    onClose?.();
+  });
+  dialog.showModal();
+  onOpen(dialog.querySelector('.sheet-body'), close);
+  return close;
+}
+
 // Link từ chuông thông báo (?focus=MÃ ĐƠN): cuộn tới phần tử [data-code="MÃ"] và nháy sáng – chỉ lần đầu vẽ trang
 let focusDone = false;
 export function focusFromUrl(root = document) {
