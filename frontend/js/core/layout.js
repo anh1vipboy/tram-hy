@@ -159,6 +159,7 @@ export async function initLayout(activePage) {
   render(footer, html`
     <div class="container footer-row">
       <span>© 2026 Trạm Hỷ – Kết duyên cát hỷ, trọn vẹn niềm tin · Dự án EXE – Group 5</span>
+      <a href="gioi-thieu.html">Giới thiệu Trạm Hỷ</a>
       ${profile?.role === 'admin' ? '' : html`<a href="doi-tac.html">🏪 Trở thành đối tác bán hàng</a>`}
     </div>`);
 

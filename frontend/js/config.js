@@ -24,5 +24,9 @@ export const ESCROW_BANK = {
 // Phí nền tảng trừ vào tiền giải ngân cho đối tác
 export const PLATFORM_FEE_RATE = 0.10;
 
+// Kênh liên hệ hiện ở cuối trang Giới thiệu (gioi-thieu.html). Để trống mục nào thì ẩn mục đó.
+//   email: 'lienhe@...' · phone: '09xx xxx xxx' · zalo: số điện thoại Zalo · facebook: link trang Facebook
+export const CONTACT = { email: '', phone: '', zalo: '', facebook: '' };
+
 // Tiệm nhận đơn may đo tự thiết kế (slug trong bảng vendors)
 export const BESPOKE_VENDOR_SLUG = 'tramhy-atelier';

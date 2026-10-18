@@ -16,6 +16,22 @@ export async function getVendorBySlug(slug) {
   return unwrap(await sb.from('vendors').select(VENDOR_FIELDS).eq('slug', slug).maybeSingle());
 }
 
+/** Số liệu thật cho trang Giới thiệu (chỉ đếm, không tải dữ liệu): { vendors, verified, dresses } */
+export async function platformStats() {
+  const count = async (query) => {
+    const { count: total, error } = await query;
+    if (error) throw new Error(error.message);
+    return total ?? 0;
+  };
+  const vendors = () => sb.from('vendors').select('id', { count: 'exact', head: true }).eq('status', 'approved');
+  const [all, verified, dresses] = await Promise.all([
+    count(vendors()),
+    count(vendors().eq('is_verified', true)),
+    count(sb.from('dresses').select('id', { count: 'exact', head: true }).eq('is_active', true)),
+  ]);
+  return { vendors: all, verified, dresses };
+}
+
 export async function listDresses({ vendorId, limit } = {}) {
   let query = sb.from('dresses').select(DRESS_FIELDS).eq('is_active', true).order('price');
   if (vendorId) query = query.eq('vendor_id', vendorId);
