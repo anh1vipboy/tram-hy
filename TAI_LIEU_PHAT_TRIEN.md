@@ -26,6 +26,7 @@ exe202/
 │   ├── index.html            Trang chủ
 │   ├── tryon.html            Phòng thử váy AI dạng trò chuyện (ướm váy lên ảnh của bạn)
 │   ├── thiet-ke-vay.html     Tự thiết kế váy may đo (Trạm Hỷ Atelier)
+│   ├── gioi-thieu.html       Giới thiệu Trạm Hỷ (số liệu đếm thật; đội ngũ: TEAM trong js/pages/about.js; liên hệ: CONTACT trong js/config.js)
 │   ├── marketplace.html      Danh sách đối tác (lọc, tìm, sắp xếp)
 │   ├── vendor.html           Chi tiết đối tác (?slug=tuart)
 │   ├── bookings.html         Đơn của tôi: trả cọc, nghiệm thu, khiếu nại, đánh giá
