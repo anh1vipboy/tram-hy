@@ -62,10 +62,13 @@ export async function listVendorPhotos(vendorId) {
 
 // Ảnh các góc của một mẫu váy (ảnh chính nằm ở dresses.image_url)
 // Gói dịch vụ đang bán của tiệm (SQL 19). Chưa chạy SQL → trả danh sách rỗng, trang tiệm vẫn hiện bình thường.
+// price_unit / min_qty / max_qty (giá theo bàn của nhà hàng) và is_demo có từ SQL 30 – chưa có thì đọc như cũ.
+const PACKAGE_FIELDS = 'id, vendor_id, name, price, original_price, description, image_url, photos:package_photos(count)';
 export async function listPackages(vendorId) {
-  const { data, error } = await sb.from('vendor_packages')
-    .select('id, vendor_id, name, price, original_price, description, image_url, photos:package_photos(count)')
+  const query = (fields) => sb.from('vendor_packages').select(fields)
     .eq('vendor_id', vendorId).eq('is_active', true).order('price');
+  let { data, error } = await query(`${PACKAGE_FIELDS}, price_unit, min_qty, max_qty, is_demo`);
+  if (error) ({ data, error } = await query(PACKAGE_FIELDS));
   if (error) return [];
   return data;
 }

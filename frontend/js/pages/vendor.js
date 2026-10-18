@@ -1,9 +1,9 @@
 import { initLayout } from '../core/layout.js';
 import { $, html, render, money, param, date, sizedImage } from '../core/utils.js';
-import { badge, priceTag, packageLabel, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
+import { badge, priceTag, packageLabel, lowerLabel, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
 import { getVendorBySlug, listDresses, listPackages, listReviews, listVendorPhotos } from '../services/catalog.js';
-import { packageThumbButton, bindPackageGalleries } from '../components/package-card.js';
+import { packageThumbButton, bindPackageGalleries, packagePrice, tableRange } from '../components/package-card.js';
 import { CATEGORY_CHOICES } from '../components/shop-form.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
@@ -36,6 +36,8 @@ try {
 
 function renderPage(vendor, dresses, reviews, photos, packages) {
   const isBridal = vendor.category === 'bridal';
+  // Nhà hàng tiệc tính giá MỖI BÀN (cả gói lẫn giá khởi điểm) – hộp thoại đặt lịch hỏi số bàn rồi mới ra tổng
+  const isVenue = vendor.category === 'venue';
   const label = packageLabel(vendor.category);
   const bookPackage = (pkg) => openBookingDialog({
     vendorId: vendor.id,
@@ -44,6 +46,7 @@ function renderPage(vendor, dresses, reviews, photos, packages) {
     packageId: pkg.id,
     title: pkg.name,
     price: pkg.price,
+    ...(isVenue ? { isVenue, unitPrice: pkg.price, minQty: pkg.min_qty, maxQty: pkg.max_qty } : {}),
   }, `vendor.html?slug=${vendor.slug}`).catch(toastError);
   render(page, html`
     <a href="marketplace.html" class="small">← Dịch vụ cưới</a>
@@ -67,9 +70,12 @@ function renderPage(vendor, dresses, reviews, photos, packages) {
       <section class="section" id="packages" style="margin-top:32px">
         <div class="section-head"><div>
           <h2 style="margin:0">${label.section}</h2>
-          <p>${packages.length} ${label.item} · bấm ảnh để xem chi tiết, giá đã gồm trong thanh toán 3 đợt qua Trạm Hỷ.</p>
+          <p>${packages.length} ${label.item} · bấm ảnh để xem chi tiết, ${isVenue
+            ? 'giá tính theo bàn – nhập số bàn khi đặt, Trạm Hỷ tự tính tổng và chia 3 đợt.'
+            : 'giá đã gồm trong thanh toán 3 đợt qua Trạm Hỷ.'}</p>
         </div></div>
-        <div class="grid packages-grid">${packages.map((p) => packageCard(p, label, CATEGORY_CHOICES[vendor.category]?.icon))}</div>
+        ${packages.some((p) => p.is_demo) ? html`<p class="small muted">Một số gói là dữ liệu mẫu phục vụ demo.</p>` : ''}
+        <div class="grid packages-grid">${packages.map((p) => packageCard(p, label, CATEGORY_CHOICES[vendor.category]?.icon, isVenue))}</div>
       </section>` : ''}
 
     ${photos.length ? html`
@@ -97,7 +103,7 @@ function renderPage(vendor, dresses, reviews, photos, packages) {
 
   bindDressGalleries(page, dresses);
   bindPackageGalleries(page, packages, (pkg) => ({
-    subtitle: vendor.name,
+    subtitle: isVenue ? `${vendor.name} · giá mỗi bàn, nhận ${tableRange(pkg).min}–${tableRange(pkg).max} bàn` : vendor.name,
     action: vendor.status === 'approved' ? { label: `Đặt ${label.item} này`, onClick: () => bookPackage(pkg) } : null,
   }));
   page.querySelectorAll('[data-book-package]').forEach((btn) => {
@@ -110,8 +116,10 @@ function renderPage(vendor, dresses, reviews, photos, packages) {
       vendorId: vendor.id,
       vendorName: vendor.name,
       type: 'service',
-      title: `Gói dịch vụ ${VENDOR_CATEGORY[vendor.category].toLowerCase()}`,
+      title: isVenue ? 'Tiệc cưới tại nhà hàng' : `Gói dịch vụ ${lowerLabel(VENDOR_CATEGORY[vendor.category])}`,
       price: vendor.base_price,
+      // không chọn gói → nhận 5–300 bàn như database (để trống minQty / maxQty)
+      ...(isVenue ? { isVenue, unitPrice: vendor.base_price } : {}),
     }, `vendor.html?slug=${vendor.slug}`).catch(toastError);
   });
 }
@@ -119,31 +127,39 @@ function renderPage(vendor, dresses, reviews, photos, packages) {
 function serviceBox(vendor, packages, label) {
   const split = [30, 50, 20];
   const labels = ['Cọc giữ lịch', 'Sau buổi thực hiện', 'Nghiệm thu'];
+  const isVenue = vendor.category === 'venue';
   // Có gói → giá từ gói rẻ nhất, nút chính dẫn tới danh sách gói; vẫn cho đặt lịch tư vấn theo giá khởi điểm
-  const from = packages.length ? Math.min(...packages.map((p) => p.price)) : vendor.base_price;
+  const cheapest = packages.length ? packages.reduce((a, b) => (b.price < a.price ? b : a)) : null;
+  const from = cheapest?.price ?? vendor.base_price;
+  // Nhà hàng: giá trên là giá MỖI BÀN → bảng 3 đợt tính ví dụ cho số bàn tối thiểu (của gói rẻ nhất,
+  // không có gói thì 5 bàn như database) để khách hình dung đúng số tiền cọc
+  const tables = isVenue ? tableRange(cheapest).min : 1;
+  const total = from * tables;
+  const perTable = isVenue ? '/bàn' : '';
   return html`
     <aside class="card stack">
       <div class="eyebrow">Thanh toán bảo chứng</div>
-      <div>${packages.length ? `${packages.length} ${label.item} · từ ` : 'Gói từ '}<span class="price" style="font-size:22px">${money(from)}</span></div>
+      <div>${packages.length ? `${packages.length} ${label.item} · từ ` : isVenue ? 'Từ ' : 'Gói từ '}<span class="price" style="font-size:22px">${money(from)}</span>${perTable}</div>
+      ${isVenue ? html`<div class="small muted">Ví dụ tiệc ${tables} bàn (tối thiểu): ${tables} × ${money(from)} = <strong>${money(total)}</strong>, chia 3 đợt:</div>` : ''}
       <table>
         ${split.map((p, i) => html`<tr><td>Đợt ${i + 1}: ${labels[i]} (${p}%)</td>
-          <td class="price">${money(Math.round(from * p / 100))}</td></tr>`)}
+          <td class="price">${money(Math.round(total * p / 100))}</td></tr>`)}
       </table>
       ${packages.length
         ? html`<button class="btn btn-primary btn-block" id="see-packages" type="button">Chọn ${label.item} & đặt lịch</button>
-               <button class="btn btn-link btn-sm" id="book-service" type="button">Hoặc đặt lịch tư vấn chung (từ ${money(vendor.base_price)})</button>`
+               <button class="btn btn-link btn-sm" id="book-service" type="button">Hoặc đặt lịch tư vấn chung (từ ${money(vendor.base_price)}${perTable})</button>`
         : html`<button class="btn btn-primary btn-block" id="book-service" type="button">Đặt lịch qua Trạm Hỷ</button>`}
       <p class="small muted">Tiền cọc được Trạm Hỷ giữ. Đối tác sai cam kết → hoàn 100%.</p>
     </aside>`;
 }
 
-function packageCard(pkg, label, icon) {
+function packageCard(pkg, label, icon, isVenue) {
   return html`
     <article class="card item-card">
       ${packageThumbButton(pkg, icon)}
       <div class="body">
         <h3>${pkg.name}</h3>
-        <div>${priceTag(pkg)}</div>
+        <div>${packagePrice(pkg, isVenue)}</div>
         ${pkg.description ? html`<div class="small muted package-desc">${pkg.description}</div>` : ''}
         <button class="btn btn-primary btn-sm" type="button" data-book-package="${pkg.id}">Đặt ${label.item} này</button>
       </div>

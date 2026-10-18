@@ -15,25 +15,39 @@ test('cô dâu đặt lịch → chuông đối tác nhảy số ngay → bấm 
   const bell = vendor.locator('.site-header [data-notif]');
   await expect(bell, 'Chưa chạy SQL 18 trên database test?').toBeVisible({ timeout: 20_000 });
   await vendor.waitForTimeout(1500);                       // chờ chuông tải số chưa đọc ban đầu
+  // Tài khoản test tích từ 99 thông báo chưa đọc trở lên thì chuông chỉ hiện "99+" – không thấy được số tăng thêm 1
+  // → đọc hết trước (chờ database lưu xong, kẻo đánh dấu luôn thông báo mới sắp tới) rồi đếm lại từ 0.
+  if (await badgeCount(bell) >= 99) {
+    await bell.click();
+    const saved = vendor.waitForResponse((r) => r.url().includes('/rest/v1/notifications') && r.request().method() === 'PATCH');
+    await vendor.locator('#notif-panel [data-read-all]').click();
+    await saved;
+    await vendor.keyboard.press('Escape');                 // đóng bảng thông báo
+    await expect(vendor.locator('#notif-panel')).toBeHidden();
+  }
   const before = await badgeCount(bell);
 
   // ---- Cô dâu đặt lịch → đối tác thấy ngay (không tải lại trang) ----
   const bride = await openAs(browser, 'bride');
   const { code } = await bookFromTryon(bride);
   await expect(vendor.locator('.toast', { hasText: `Đơn đặt lịch mới ${code}` })).toBeVisible({ timeout: 15_000 });
-  await expect.poll(() => badgeCount(bell)).toBe(before + 1);
+  // Tăng ít nhất 1 (bài test khác chạy song song cũng có thể tạo đơn cho cùng tài khoản đối tác test)
+  await expect.poll(() => badgeCount(bell)).toBeGreaterThan(before);
   await expect(vendor).toHaveTitle(/^\(\d+\+?\) /);         // số chưa đọc trên tiêu đề tab
 
   // ---- Mở chuông → thông báo mới nhất ở đầu, chưa đọc → bấm → tới đúng đơn trên Kanban ----
   await bell.click();
   const panel = vendor.locator('#notif-panel');
-  const item = panel.locator('.notif-item').first();
-  await expect(item).toContainText(`Đơn đặt lịch mới ${code}`);
+  // Tìm đúng thông báo của đơn này (bài test chạy song song có thể tạo thông báo khác cho cùng tài khoản)
+  const item = panel.locator('.notif-item', { hasText: `Đơn đặt lịch mới ${code}` });
+  await expect(item).toBeVisible();
   await expect(item).toHaveClass(/unread/);
   await item.click();
   await expect(vendor).toHaveURL(new RegExp(`vendor-dashboard\\.html\\?focus=${code}`));
   await expect(vendor.locator(`.kanban-card[data-code="${code}"]`)).toHaveClass(/flash/);
-  await expect.poll(() => badgeCount(vendor.locator('.site-header [data-notif]'))).toBe(before);   // đã đọc
+  await vendor.locator('.site-header [data-notif]').click();
+  await expect(vendor.locator('#notif-panel .notif-item', { hasText: `Đơn đặt lịch mới ${code}` })).not.toHaveClass(/unread/);   // đã đọc
+  await vendor.keyboard.press('Escape');
 
   // ---- Đối tác từ chối đơn → chuông cô dâu báo ----
   const card = await vendorCard(vendor, code);
@@ -41,7 +55,7 @@ test('cô dâu đặt lịch → chuông đối tác nhảy số ngay → bấm 
   await vendor.locator('dialog.modal').getByRole('button', { name: 'Từ chối' }).click();
   await expect(bride.locator('.toast', { hasText: `đã hủy đơn ${code}` })).toBeVisible({ timeout: 15_000 });
   await bride.locator('.site-header [data-notif]').click();
-  await expect(bride.locator('#notif-panel .notif-item').first()).toContainText('Đơn chưa đặt cọc nên bạn không mất tiền');
+  await expect(bride.locator('#notif-panel .notif-item', { hasText: code }).first()).toContainText('Đơn chưa đặt cọc nên bạn không mất tiền');
 
   // ---- Đánh dấu đã đọc tất cả ----
   await bride.locator('#notif-panel').getByRole('button', { name: 'Đánh dấu đã đọc tất cả' }).click();

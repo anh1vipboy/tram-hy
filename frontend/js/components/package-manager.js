@@ -1,16 +1,29 @@
 // Kênh đối tác → tab gói dịch vụ (tiệm không bán váy): "Mẫu rạp & trang trí", "Gói chụp", "Gói trang điểm", "Sảnh & thực đơn".
 // Thêm / sửa / ẩn / xóa gói: tên, giá, giá gốc, mô tả, ảnh chính + tối đa 10 ảnh chi tiết.
+// Nhà hàng tiệc: giá là giá MỖI BÀN + số bàn tối thiểu / tối đa của sảnh (SQL 30) – khách nhập số bàn khi đặt.
 import { html, render } from '../core/utils.js';
-import { badge, priceTag, packageLabel } from '../core/labels.js';
+import { badge, packageLabel } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { listShopPackages, savePackage, setPackageActive, deletePackage, MAX_PACKAGE_PHOTOS } from '../services/shop.js';
-import { packageThumbButton, bindPackageGalleries } from './package-card.js';
+import { packageThumbButton, bindPackageGalleries, packagePrice, VENUE_TABLES } from './package-card.js';
 import { moneyValue, readMoneyField } from './money-input.js';
 import { CATEGORY_CHOICES } from './shop-form.js';
+
+/** Đọc ô số bàn: số nguyên 1–300 (giống ràng buộc trong database), sai thì báo lỗi rõ ràng */
+function readTables(text, label) {
+  const raw = String(text ?? '').trim();
+  if (!raw) throw new Error(`Vui lòng nhập ${label.toLowerCase()}`);
+  const value = Number(raw);
+  if (!Number.isInteger(value) || value < 1 || value > VENUE_TABLES.max) {
+    throw new Error(`${label} phải là số nguyên từ 1 đến ${VENUE_TABLES.max}`);
+  }
+  return value;
+}
 
 export async function mountPackageManager(container, shop) {
   const label = packageLabel(shop.category);
   const icon = CATEGORY_CHOICES[shop.category]?.icon ?? '✨';
+  const perTable = shop.category === 'venue';
   let packages = [];
 
   async function reload() {
@@ -28,7 +41,8 @@ export async function mountPackageManager(container, shop) {
       <div class="section-head">
         <div>
           <h2 style="margin:0">${label.section}</h2>
-          <p>Mỗi ${label.item} có giá riêng – khách xem ảnh và bấm "Đặt ${label.item} này" ngay trên trang tiệm. ${label.item[0].toUpperCase() + label.item.slice(1)} "Đang bán" mới hiện với khách.</p>
+          <p>Mỗi ${label.item} có giá riêng – khách xem ảnh và bấm "Đặt ${label.item} này" ngay trên trang tiệm. ${label.item[0].toUpperCase() + label.item.slice(1)} "Đang bán" mới hiện với khách.
+            ${perTable ? 'Nhà hàng ghi giá mỗi bàn và số bàn sảnh nhận được – khách nhập số bàn, Trạm Hỷ tự tính tổng và chia 3 đợt.' : ''}</p>
         </div>
         <button class="btn btn-primary" type="button" data-add>${label.add}</button>
       </div>
@@ -68,7 +82,7 @@ export async function mountPackageManager(container, shop) {
         <div class="body">
           <div class="row">${p.is_active ? badge('Đang bán', 'green') : badge('Đã ẩn')}</div>
           <h3>${p.name}</h3>
-          <div>${priceTag(p)}</div>
+          <div>${packagePrice(p, perTable)}</div>
           ${p.description ? html`<div class="small muted package-desc">${p.description}</div>` : ''}
           ${p.image_url ? '' : html`<div class="small muted">Chưa có ảnh chính – khách sẽ ít chú ý hơn</div>`}
           <div class="row">
@@ -89,15 +103,25 @@ export async function mountPackageManager(container, shop) {
         <div class="form-grid">
           <label class="field full"><span>Tên ${label.item}</span>
             <input class="input" name="name" value="${pkg?.name || ''}" required maxlength="120" placeholder="${label.hint}"></label>
-          <label class="field"><span>Giá (VNĐ)</span>
-            <input class="input" name="price" data-money inputmode="numeric" autocomplete="off" placeholder="VD: 25.000.000"
+          <label class="field"><span>${perTable ? 'Giá mỗi bàn (VNĐ)' : 'Giá (VNĐ)'}</span>
+            <input class="input" name="price" data-money inputmode="numeric" autocomplete="off" placeholder="${perTable ? 'VD: 3.500.000' : 'VD: 25.000.000'}"
               value="${moneyValue(pkg?.price)}" required></label>
-          <label class="field"><span>Giá gốc trước giảm (không bắt buộc)</span>
+          <label class="field"><span>${perTable ? 'Giá gốc mỗi bàn trước giảm (không bắt buộc)' : 'Giá gốc trước giảm (không bắt buộc)'}</span>
             <input class="input" name="originalPrice" data-money inputmode="numeric" autocomplete="off"
               value="${moneyValue(pkg?.original_price)}"></label>
+          ${perTable ? html`
+            <label class="field"><span>Số bàn tối thiểu</span>
+              <input class="input" name="minQty" type="number" min="1" max="${VENUE_TABLES.max}" step="1" inputmode="numeric"
+                placeholder="VD: 20" value="${pkg?.min_qty ?? ''}" required></label>
+            <label class="field"><span>Số bàn tối đa (sức chứa sảnh)</span>
+              <input class="input" name="maxQty" type="number" min="1" max="${VENUE_TABLES.max}" step="1" inputmode="numeric"
+                placeholder="VD: 50" value="${pkg?.max_qty ?? ''}" required></label>
+            <p class="small muted full" style="margin:-6px 0 0">Khách nhập số bàn trong khoảng này khi đặt; tổng tiền = giá mỗi bàn × số bàn.</p>` : ''}
           <label class="field full"><span>Mô tả – gồm những gì, phù hợp bao nhiêu khách… (không bắt buộc)</span>
             <textarea class="input" name="description" maxlength="1500" rows="4"
-              placeholder="VD: Cổng hoa lụa 3m, lối đi 8 trụ hoa, backdrop sân khấu, bàn gallery; phù hợp sảnh 20–40 bàn.">${pkg?.description || ''}</textarea></label>
+              placeholder="${perTable
+                ? 'VD: Thực đơn Á 8 món, bia & nước ngọt, sân khấu, âm thanh ánh sáng, MC; sảnh Ruby có 2 lối vào riêng.'
+                : 'VD: Cổng hoa lụa 3m, lối đi 8 trụ hoa, backdrop sân khấu, bàn gallery; phù hợp sảnh 20–40 bàn.'}">${pkg?.description || ''}</textarea></label>
           <div class="field full"><span>Ảnh chính – hiện ở ngoài để thu hút khách ${pkg?.image_url ? '(chọn ảnh mới để thay)' : ''}</span>
             ${pkg?.image_url ? html`<img src="${pkg.image_url}" alt="" style="max-height:160px;width:auto;border-radius:10px">` : ''}
             <input class="input" type="file" name="image" accept="image/*"></div>
@@ -129,10 +153,15 @@ export async function mountPackageManager(container, shop) {
         });
       },
       onConfirm: (form) => {
-        const price = readMoneyField(form.get('price'), 'Giá', { min: 100_000 });
+        const price = readMoneyField(form.get('price'), perTable ? 'Giá mỗi bàn' : 'Giá', { min: 100_000 });
         const originalPrice = readMoneyField(form.get('originalPrice'), 'Giá gốc', { required: false });
         if (originalPrice && originalPrice <= price) throw new Error('Giá gốc phải cao hơn giá bán');
+        const tables = perTable
+          ? { priceUnit: 'table', minQty: readTables(form.get('minQty'), 'Số bàn tối thiểu'), maxQty: readTables(form.get('maxQty'), 'Số bàn tối đa') }
+          : {};
+        if (perTable && tables.maxQty < tables.minQty) throw new Error('Số bàn tối đa phải lớn hơn hoặc bằng số bàn tối thiểu');
         return savePackage(shop.id, pkg, {
+          ...tables,
           name: form.get('name').trim(),
           price,
           originalPrice,

@@ -3,6 +3,7 @@
 // khiếu nại → admin hoàn tiền → cô dâu thấy "Đã hoàn tiền".
 // Chạy trên database TEST, mỗi lần chạy tạo 1 đơn mới.
 const { test, expect, openAs, requireAccounts } = require('../helpers');
+const { pickFreeSlot } = require('./flow-helpers');
 
 test.describe.configure({ mode: 'serial' });
 
@@ -17,6 +18,7 @@ test('đặt lịch → cọc → đối tác thực hiện → khiếu nại �
   await bride.goto('/tryon.html?dress=royal-mermaid');
   await bride.locator('.dress-card').getByRole('button', { name: '📅 Đặt lịch thử váy' }).click();
   await bride.getByLabel('Số điện thoại').fill('0900000000');   // tài khoản test chưa có SĐT, ô này bắt buộc
+  await pickFreeSlot(bride);                                    // giờ ngẫu nhiên – không vướng lịch các lần chạy trước
   await bride.getByRole('button', { name: 'Xác nhận đặt lịch' }).click();
   await expect(bride).toHaveURL(/bookings\.html\?new=BK/);
   const code = new URL(bride.url()).searchParams.get('new');

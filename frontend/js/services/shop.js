@@ -119,16 +119,24 @@ export async function deletePortfolioPhoto(photo) {
 // ---------- GÓI DỊCH VỤ (tiệm không bán váy – SQL 19) ----------
 export const MAX_PACKAGE_PHOTOS = 10;
 
-// Gồm cả gói đã ẩn, kèm ảnh chi tiết
+// Gồm cả gói đã ẩn, kèm ảnh chi tiết.
+// price_unit / min_qty / max_qty (giá theo bàn của nhà hàng) có từ SQL 30 – database chưa có thì đọc như cũ.
+const SHOP_PACKAGE_FIELDS = 'id, vendor_id, name, price, original_price, description, image_url, is_active, created_at, photos:package_photos(id, path, url, created_at)';
 export async function listShopPackages(vendorId) {
-  const packages = unwrap(await sb.from('vendor_packages')
-    .select('id, vendor_id, name, price, original_price, description, image_url, is_active, created_at, photos:package_photos(id, path, url, created_at)')
-    .eq('vendor_id', vendorId).order('created_at', { ascending: false }));
+  const query = (fields) => sb.from('vendor_packages').select(fields)
+    .eq('vendor_id', vendorId).order('created_at', { ascending: false });
+  let result = await query(`${SHOP_PACKAGE_FIELDS}, price_unit, min_qty, max_qty`);
+  if (result.error) result = await query(SHOP_PACKAGE_FIELDS);
+  const packages = unwrap(result);
   for (const p of packages) p.photos.sort((a, b) => a.created_at.localeCompare(b.created_at));
   return packages;
 }
 
-/** pkg = null → thêm mới. values: { name, price, originalPrice, description, imageFile, photoFiles, removePhotoIds } */
+/**
+ * pkg = null → thêm mới.
+ * values: { name, price, originalPrice, description, imageFile, photoFiles, removePhotoIds,
+ *           priceUnit?: 'table' (nhà hàng – price là giá mỗi bàn), minQty?, maxQty? (số bàn nhận) }
+ */
 export async function savePackage(vendorId, pkg, values) {
   const keptCount = (pkg?.photos.length ?? 0) - values.removePhotoIds.length;
   if (keptCount + values.photoFiles.length > MAX_PACKAGE_PHOTOS) {
@@ -140,6 +148,11 @@ export async function savePackage(vendorId, pkg, values) {
     original_price: values.originalPrice || null,
     description: values.description || null,
   };
+  // Chỉ gói theo bàn mới gửi 3 cột của SQL 30; gói thường để database tự ghi 'package'
+  // → tiệm khác vẫn lưu gói được cả khi database chưa chạy SQL 30.
+  if (values.priceUnit === 'table') {
+    Object.assign(row, { price_unit: 'table', min_qty: values.minQty, max_qty: values.maxQty });
+  }
   const hasNewCover = values.imageFile?.size > 0;
   if (hasNewCover) row.image_url = (await uploadImage('vendor-portfolio', vendorId, values.imageFile, 'pkg')).url;
 

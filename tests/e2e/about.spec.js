@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test('số liệu lấy thật từ database', async ({ page }) => {
   await expect(page.locator('[data-stat="vendors"]')).toHaveText(/^\d[\d.]*$/);
   await expect(page.locator('[data-stat="dresses"]')).toHaveText(/^\d[\d.]*$/);
-  await expect(page.locator('[data-stat="categories"]')).toHaveText('5');
+  await expect(page.locator('[data-stat="categories"]')).toHaveText('8');   // 5 loại cũ + tráp ăn hỏi, MC & âm nhạc, xe hoa
 });
 
 test('thẻ tính năng dẫn tới đúng trang', async ({ page }) => {

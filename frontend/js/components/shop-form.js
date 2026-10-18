@@ -10,9 +10,19 @@ export const CATEGORY_CHOICES = {
   decor:  { icon: '💐', hint: 'Hoa, cổng cưới, sân khấu' },
   makeup: { icon: '💄', hint: 'Trang điểm, làm tóc cô dâu' },
   venue:  { icon: '🍽️', hint: 'Nhà hàng, sảnh tiệc cưới' },
+  betrothal:     { icon: '🎁', hint: 'Tráp lễ, đội bê tráp, lễ vật' },
+  entertainment: { icon: '🎤', hint: 'MC, ban nhạc, âm thanh ánh sáng' },
+  car:           { icon: '🚗', hint: 'Xe cưới, xe đưa đón khách' },
 };
 
-/** 5 thẻ chọn loại dịch vụ (radio name="category") */
+// Nhà hàng báo giá theo bàn (khách đặt theo số bàn) → "giá khởi điểm" của nhà hàng là giá 1 bàn rẻ nhất
+const BASE_PRICE_FIELD = {
+  venue:   { label: 'Giá mỗi bàn từ (VNĐ)', placeholder: 'VD: 3.500.000', hint: 'Giá thực đơn rẻ nhất cho 1 bàn 10 khách. Trên sàn hiện "Từ …/bàn".' },
+  default: { label: 'Giá khởi điểm (VNĐ)', placeholder: 'VD: 5.000.000', hint: '' },
+};
+const basePriceField = (category) => BASE_PRICE_FIELD[category] ?? BASE_PRICE_FIELD.default;
+
+/** Thẻ chọn loại dịch vụ (radio name="category") – một thẻ cho mỗi loại trong VENDOR_CATEGORY */
 export function categoryPicker(selected) {
   return html`
     <fieldset class="field full category-picker">
@@ -32,6 +42,7 @@ export function categoryPicker(selected) {
 
 /** withCategory = false khi sửa: loại dịch vụ không đổi được sau khi đăng ký. */
 export function shopFields(shop = {}, { withCategory = true } = {}) {
+  const price = basePriceField(shop.category);
   return html`
     <div class="form-grid">
       <label class="field full"><span>Tên tiệm / thương hiệu</span>
@@ -41,9 +52,10 @@ export function shopFields(shop = {}, { withCategory = true } = {}) {
         <input class="input" type="tel" name="phone" value="${shop.phone || ''}" required pattern="[0-9+ ]{9,15}"></label>
       <label class="field"><span>Quận / khu vực</span>
         <input class="input" name="district" value="${shop.district || ''}" required maxlength="80" placeholder="VD: Cầu Giấy, Hà Nội"></label>
-      <label class="field"><span>Giá khởi điểm (VNĐ)</span>
-        <input class="input" name="basePrice" data-money inputmode="numeric" autocomplete="off" placeholder="VD: 5.000.000"
-          value="${moneyValue(shop.base_price)}" required></label>
+      <label class="field"><span>${price.label}</span>
+        <input class="input" name="basePrice" data-money inputmode="numeric" autocomplete="off" placeholder="${price.placeholder}"
+          value="${moneyValue(shop.base_price)}" required>
+        ${price.hint ? html`<small class="muted">${price.hint}</small>` : ''}</label>
       <label class="field full"><span>Địa chỉ cụ thể</span>
         <input class="input" name="address" value="${shop.address || ''}" required maxlength="200"></label>
       <label class="field full"><span>Giới thiệu tiệm (không bắt buộc)</span>

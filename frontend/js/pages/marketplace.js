@@ -15,6 +15,12 @@ const filters = {
 };
 let vendors = [];
 
+// Nhà hàng tiệc ghi giá MỖI BÀN (base_price = giá 1 bàn), các loại tiệm khác ghi giá trọn gói.
+// "Ngân sách tối đa" và sắp xếp theo giá phải so cùng một kiểu tiền → nhà hàng quy ra cả tiệc 30 bàn
+// (cỡ tiệc cưới phổ biến). Không quy đổi thì nhà hàng 3,5 triệu/bàn lọt cả mốc ngân sách 5 triệu.
+const TYPICAL_TABLES = 30;
+const comparablePrice = (v) => (v.category === 'venue' ? v.base_price * TYPICAL_TABLES : v.base_price);
+
 initLayout('marketplace');
 bindFilters();
 renderCategories();
@@ -92,13 +98,13 @@ function applyFilters() {
   const list = vendors.filter((v) =>
     (filters.category === 'all' || v.category === filters.category)
     && (!filters.verifiedOnly || v.is_verified)
-    && (!filters.maxPrice || v.base_price <= filters.maxPrice)
+    && (!filters.maxPrice || comparablePrice(v) <= filters.maxPrice)
     && (!filters.search || `${v.name} ${v.district ?? ''}`.toLowerCase().includes(filters.search)));
 
   const sorters = {
     rating: (a, b) => b.rating - a.rating,
-    'price-asc': (a, b) => a.base_price - b.base_price,
-    'price-desc': (a, b) => b.base_price - a.base_price,
+    'price-asc': (a, b) => comparablePrice(a) - comparablePrice(b),
+    'price-desc': (a, b) => comparablePrice(b) - comparablePrice(a),
   };
   return list.sort(sorters[filters.sort]);
 }
@@ -123,7 +129,10 @@ function renderVendors() {
         <div class="muted small vendor-district">📍 ${v.district}</div>
         <div class="small vendor-rating"><span class="stars">★</span> <strong>${v.rating}</strong>
           <span class="muted">(${v.review_count} đánh giá)</span></div>
-        <div>Từ <span class="price">${money(v.base_price)}</span></div>
+        ${v.category === 'venue'
+          ? html`<div>Từ <span class="price">${money(v.base_price)}</span>/bàn</div>
+                 <div class="small muted">≈ ${money(comparablePrice(v))} cho tiệc ${TYPICAL_TABLES} bàn</div>`
+          : html`<div>Từ <span class="price">${money(v.base_price)}</span></div>`}
         <a class="btn btn-outline btn-sm" href="vendor.html?slug=${v.slug}">Xem chi tiết</a>
       </div>
     </article>`));

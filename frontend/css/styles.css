@@ -681,7 +681,9 @@ dialog.sheet::backdrop { background: rgba(30, 24, 20, .5); }
 /* Đăng ký mở tiệm: chọn loại dịch vụ bằng thẻ lớn */
 .category-picker { border: 0; padding: 0; margin: 0; min-width: 0; }
 .category-picker legend { font-size: 13px; font-weight: 600; color: var(--muted); padding: 0; margin-bottom: 6px; }
-.category-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 10px; margin-bottom: 6px; }
+/* 8 loại dịch vụ → lưới 4 × 2 cân đối (tự chia cột thì máy tính ra 7 + 1), điện thoại 2 cột */
+.category-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 6px; }
+@media (max-width: 560px) { .category-options { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .category-option { position: relative; display: flex; flex-direction: column; gap: 2px; padding: 12px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); cursor: pointer; }
 .category-option:hover { border-color: var(--brand); }
 .category-option input { position: absolute; opacity: 0; pointer-events: none; }

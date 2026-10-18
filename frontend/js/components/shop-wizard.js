@@ -40,7 +40,7 @@ export function mountShopWizard(container, { userId, onSubmitted }) {
           <dt>Điện thoại</dt><dd>${draft.phone}</dd>
           <dt>Khu vực</dt><dd>${draft.district}</dd>
           <dt>Địa chỉ</dt><dd>${draft.address}</dd>
-          <dt>Giá khởi điểm</dt><dd>${money(draft.basePrice)}</dd>
+          <dt>${draft.category === 'venue' ? 'Giá mỗi bàn từ' : 'Giá khởi điểm'}</dt><dd>${money(draft.basePrice)}${draft.category === 'venue' ? '/bàn' : ''}</dd>
           ${draft.description ? html`<dt>Giới thiệu</dt><dd>${draft.description}</dd>` : ''}
         </dl>
       </div>

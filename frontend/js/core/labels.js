@@ -33,6 +33,9 @@ export const VENDOR_CATEGORY = {
   decor:  'Trang trí',
   makeup: 'Trang điểm',
   venue:  'Nhà hàng tiệc',
+  betrothal:     'Tráp ăn hỏi',
+  entertainment: 'MC & âm nhạc',
+  car:           'Xe hoa',
 };
 
 // "Gói dịch vụ" của tiệm không bán váy – tên gọi theo loại tiệm (tab Kênh đối tác, mục trên trang tiệm)
@@ -41,8 +44,14 @@ export const PACKAGE_LABEL = {
   studio: { section: 'Gói chụp ảnh cưới', item: 'gói', add: '+ Thêm gói chụp', hint: 'VD: Pre-wedding studio, Phóng sự ngày cưới…' },
   makeup: { section: 'Gói trang điểm', item: 'gói', add: '+ Thêm gói trang điểm', hint: 'VD: Makeup cô dâu + làm tóc, Trang điểm mẹ…' },
   venue:  { section: 'Sảnh & thực đơn', item: 'gói', add: '+ Thêm sảnh / thực đơn', hint: 'VD: Sảnh Ruby 30 bàn, Thực đơn Á 8 món…' },
+  betrothal:     { section: 'Gói tráp ăn hỏi', item: 'gói', add: '+ Thêm gói tráp', hint: 'VD: Tráp 7 lễ + đội bê tráp, Tráp 5 lễ truyền thống…' },
+  entertainment: { section: 'Gói MC & âm nhạc', item: 'gói', add: '+ Thêm gói MC / âm nhạc', hint: 'VD: MC lễ cưới, Ban nhạc acoustic, Âm thanh ánh sáng…' },
+  car:           { section: 'Gói xe hoa', item: 'gói', add: '+ Thêm gói xe', hint: 'VD: Mercedes kết hoa 4 giờ, Xe 16 chỗ đưa đón khách…' },
 };
 export const packageLabel = (category) => PACKAGE_LABEL[category] ?? PACKAGE_LABEL.decor;
+
+/** Viết thường để ghép vào giữa câu nhưng giữ chữ viết tắt: "MC & âm nhạc" (không thành "mc"), "Chụp ảnh cưới" → "chụp ảnh cưới" */
+export const lowerLabel = (text) => text.replace(/[^\s&/]+/g, (word) => (/^[A-ZĐ]{2,}$/.test(word) ? word : word.toLowerCase()));
 
 export const VENDOR_STATUS = {
   pending:  { label: 'Chờ duyệt', tone: 'gold' },

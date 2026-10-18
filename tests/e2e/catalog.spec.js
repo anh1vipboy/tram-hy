@@ -1,5 +1,5 @@
 // Trang chủ, Dịch vụ cưới, Chi tiết đối tác – dữ liệu đọc thật từ Supabase
-const { test, expect, trackErrors } = require('./helpers');
+const { test, expect, trackErrors, expectNoHorizontalOverflow } = require('./helpers');
 
 test.describe('Trang chủ', () => {
   test('hiện 4 mẫu váy nổi bật và đối tác uy tín', async ({ page }) => {
@@ -107,6 +107,21 @@ test.describe('Dịch vụ cưới', () => {
     expect(new Set(categories)).toEqual(new Set(['Chụp ảnh cưới']));
   });
 
+  test('đủ 8 loại dịch vụ (có tráp ăn hỏi, MC & âm nhạc, xe hoa), vừa màn hình điện thoại', async ({ page }) => {
+    const chip = (key) => page.locator(`#category-filter [data-category="${key}"]`);
+    await expect(page.locator('#category-filter [data-category]')).toHaveCount(9);   // "Tất cả" + 8 loại
+    await expect(chip('betrothal')).toHaveText('Tráp ăn hỏi');
+    await expect(chip('entertainment')).toHaveText('MC & âm nhạc');
+    await expect(chip('car')).toHaveText('Xe hoa');
+    await expectNoHorizontalOverflow(page);
+
+    // Lọc loại mới: chỉ còn tiệm đúng loại. Database chưa chạy SQL 29–31 thì danh sách rỗng – vẫn đúng.
+    await page.getByRole('button', { name: 'Xe hoa' }).click();
+    await expect(chip('car')).toHaveClass(/active/);
+    const badges = await page.locator('#vendor-grid article .badge-gold').allTextContents();
+    expect(badges.filter((b) => b !== 'Xe hoa')).toEqual([]);
+  });
+
   test('tìm theo tên và báo khi không có kết quả', async ({ page }) => {
     await page.locator('#search').fill('TuArt');
     await expect(page.locator('#vendor-grid article')).toHaveCount(1);
@@ -143,7 +158,21 @@ test.describe('Chi tiết đối tác', () => {
   test('dịch vụ: có bảng thanh toán 3 đợt và nút đặt lịch', async ({ page }) => {
     await page.goto('/vendor.html?slug=tuart');
     await expect(page.getByText('Đợt 1: Cọc giữ lịch (30%)')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Đặt lịch qua Trạm Hỷ' })).toBeVisible();
+    // Tiệm có gói (gói mẫu từ SQL 31) → nút chính là chọn gói; chưa có gói → đặt lịch theo giá khởi điểm
+    await expect(page.getByRole('button', { name: /^(Chọn gói & đặt lịch|Đặt lịch qua Trạm Hỷ)$/ })).toBeVisible();
+  });
+
+  // CẦN chạy SQL 29–31 trên database test (tiệm mẫu tráp / MC / xe hoa + gói mẫu) – chưa chạy thì tự bỏ qua
+  test('tiệm mẫu xe hoa (SQL 31): có loại dịch vụ mới và gói mẫu', async ({ page }) => {
+    await page.goto('/vendor.html?slug=xe-cuoi-hac-trang');
+    const heading = page.getByRole('heading', { level: 1 });
+    const notFound = page.getByText('Không tìm thấy đối tác.');
+    await expect(heading.or(notFound)).toBeVisible();
+    test.skip(await notFound.isVisible(), 'Database test chưa chạy SQL 29–31');
+    await expect(heading).toHaveText('Xe Cưới Hạc Trắng');
+    await expect(page.locator('#vendor-page .badge-gold').first()).toHaveText('Xe hoa');
+    await expect(page.locator('#packages')).toContainText('Gói xe hoa');
+    await expect(page.locator('#packages')).toContainText('Mercedes E300 trắng kết hoa tươi');
   });
 
   test('đường dẫn sai báo không tìm thấy', async ({ page }) => {

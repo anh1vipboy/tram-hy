@@ -4,7 +4,7 @@ import { openDialog, toast, toastError } from '../core/ui.js';
 import { BANKS, bankName } from '../data/banks.js';
 import { listVendorPhotos } from '../services/catalog.js';
 import { listShopDresses, listShopPackages, getPayout, savePayout } from '../services/shop.js';
-import { packageLabel } from '../core/labels.js';
+import { packageLabel, lowerLabel } from '../core/labels.js';
 
 const MIN_ITEMS = 3;
 const read = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
@@ -36,7 +36,7 @@ export async function mountPartnerChecklist(container, shop, { goTo }) {
         hint: 'Khách nhận ra tiệm của bạn ngay ở danh sách Dịch vụ cưới.', action: 'Tải ảnh', go: 'media' },
       { done: itemCount >= MIN_ITEMS,
         title: isBridal ? `Đăng ít nhất ${MIN_ITEMS} mẫu váy (${itemCount}/${MIN_ITEMS})`
-          : `Đăng ít nhất ${MIN_ITEMS} ${packageLabel(shop.category).item} – ${packageLabel(shop.category).section.toLowerCase()} (${itemCount}/${MIN_ITEMS})`,
+          : `Đăng ít nhất ${MIN_ITEMS} ${packageLabel(shop.category).item} – ${lowerLabel(packageLabel(shop.category).section)} (${itemCount}/${MIN_ITEMS})`,
         hint: isBridal ? 'Mẫu váy có ảnh thật sẽ được khách ướm thử bằng AI.' : 'Mỗi gói có giá và ảnh riêng – khách chọn đúng gói và đặt ngay.',
         action: isBridal ? 'Thêm mẫu váy' : packageLabel(shop.category).add.replace('+ ', ''), go: 'dresses' },
       { done: Boolean(payout), title: 'Tài khoản nhận tiền giải ngân',

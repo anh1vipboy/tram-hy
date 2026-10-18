@@ -80,7 +80,7 @@ function card(b) {
     <article class="kanban-card" data-booking="${b.id}" data-code="${b.code}">
       <div class="row"><strong>${b.contact_name || 'Khách hàng'}</strong><span class="spacer"></span>${statusBadge(BOOKING_STATUS, b.status)}</div>
       <div class="small muted">${b.code} · ${b.contact_phone || ''}</div>
-      <div class="small">${b.dress?.name || b.details?.package?.name || BOOKING_TYPE[b.type]}</div>
+      <div class="small">${b.dress?.name || b.details?.package?.name || BOOKING_TYPE[b.type]}${b.details?.tables ? ` · ${b.details.tables} bàn` : ''}</div>
       <div class="small">Hẹn: <strong>${dateTime(b.appointment_at)}</strong></div>
       <div class="small">Tổng: <span class="price">${money(b.total_price)}</span></div>
       ${b.note ? html`<div class="small muted">Ghi chú: ${b.note}</div>` : ''}

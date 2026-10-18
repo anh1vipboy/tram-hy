@@ -19,8 +19,9 @@ function sortMilestones(bookings) {
   return bookings;
 }
 
+// Database tự tính giá (nhà hàng: giá mỗi bàn × số bàn) và tự chặn trùng lịch – lỗi trả về đã là câu dễ hiểu.
 export async function createBooking(params) {
-  return unwrap(await sb.rpc('create_booking', {
+  const { data, error } = await sb.rpc('create_booking', {
     p_vendor_id: params.vendorId,
     p_type: params.type,
     p_dress_id: params.dressId ?? null,
@@ -31,7 +32,35 @@ export async function createBooking(params) {
     p_details: params.details ?? {},
     p_custom_price: params.customPrice ?? null,
     ...(params.packageId ? { p_package_id: params.packageId } : {}),   // gói dịch vụ (SQL 19)
+    ...(params.quantity != null ? { p_quantity: params.quantity } : {}), // số bàn nhà hàng tiệc (SQL 30)
+  });
+  if (error) {
+    // Web đã có ô "Số bàn" nhưng database chưa chạy SQL 30 (chưa có p_quantity) → không báo lỗi kỹ thuật
+    if (params.quantity != null && error.code === 'PGRST202') {
+      throw new Error('Trạm Hỷ đang cập nhật cách tính giá theo bàn – bạn thử lại sau ít phút nhé');
+    }
+    throw new Error(error.message);
+  }
+  return data;
+}
+
+/**
+ * Giờ đã có lịch của một tiệm trong khoảng [from, to) – chỉ giờ hẹn, không kèm thông tin khách (SQL 30).
+ * Đơn đã hủy / hoàn tiền không tính. Trả về mảng Date đã sắp xếp.
+ */
+export async function vendorBusyTimes(vendorId, from, to) {
+  const rows = unwrap(await sb.rpc('vendor_busy_times', {
+    p_vendor_id: vendorId,
+    p_from: new Date(from).toISOString(),
+    p_to: new Date(to).toISOString(),
   }));
+  return (rows ?? []).map((r) => new Date(r.appointment_at));
+}
+
+/** Số sảnh tiệc của nhà hàng – mỗi sảnh nhận 1 tiệc/ngày (SQL 30). Database chưa có cột → coi như 1 sảnh. */
+export async function vendorHalls(vendorId) {
+  const { data, error } = await sb.from('vendors').select('halls').eq('id', vendorId).maybeSingle();
+  return error ? 1 : (data?.halls ?? 1);
 }
 
 // Đơn mà mình là cô dâu

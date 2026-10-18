@@ -68,7 +68,7 @@ function renderApprovals() {
           <div><strong>Chủ tiệm:</strong> ${v.owner?.full_name || '—'}</div>
           <div><strong>Điện thoại:</strong> ${v.phone || v.owner?.phone || '—'}</div>
           <div><strong>Địa chỉ:</strong> ${[v.address, v.district].filter(Boolean).join(', ') || '—'}</div>
-          <div><strong>Giá khởi điểm:</strong> <span class="price">${money(v.base_price)}</span></div>
+          <div><strong>${v.category === 'venue' ? 'Giá mỗi bàn từ' : 'Giá khởi điểm'}:</strong> <span class="price">${money(v.base_price)}${v.category === 'venue' ? '/bàn' : ''}</span></div>
         </div>
         <div><strong>Giới thiệu:</strong> ${v.description || html`<span class="muted">Không có</span>`}</div>
       </div>
@@ -215,7 +215,7 @@ function renderBookings() {
               <td>${b.code}</td>
               <td>${b.contact_name}<div class="small muted">${b.contact_phone}</div></td>
               <td>${b.vendor.name}</td>
-              <td>${BOOKING_TYPE[b.type]}${b.details?.package?.name ? html`<div class="small muted">${b.details.package.name}</div>` : ''}</td>
+              <td>${BOOKING_TYPE[b.type]}${b.details?.package?.name ? html`<div class="small muted">${b.details.package.name}${b.details.tables ? ` · ${b.details.tables} bàn` : ''}</div>` : ''}</td>
               <td class="price">${money(b.total_price)}</td>
               <td>${statusBadge(BOOKING_STATUS, b.status)}</td>
               <td class="small">${dateTime(b.created_at)}</td>

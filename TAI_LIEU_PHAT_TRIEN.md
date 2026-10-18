@@ -74,6 +74,11 @@ exe202/
 │   ├── 26_invitation_media.sql Kho video thiệp tải từ máy (bucket invitation-media, 50MB)
 │   ├── 27_invitation_storage_select.sql Chủ thiệp đọc được thư mục ảnh/video của mình → xóa file cũ mới có tác dụng
 │   ├── 28_tryon_settings.sql Thử váy AI: app_settings (admin bật/tắt Siêu nét, hạn mức credit); tryon_jobs ghi credit, tùy chọn, lượt gửi, tin nhắn; ai_usage thêm tryon_chat
+│   ├── 29_vendor_categories.sql Thêm 3 loại dịch vụ: betrothal (Tráp ăn hỏi), entertainment (MC & âm nhạc), car (Xe hoa) – file riêng vì Postgres không dùng được giá trị enum mới trong cùng lần chạy
+│   ├── 30_booking_rules.sql  Nhà hàng tính giá theo bàn (gói price_unit/min_qty/max_qty, vendors.halls), create_booking tính tổng + chặn trùng lịch, RPC vendor_busy_times; cột is_demo cho gói mẫu
+│   ├── 31_demo_services.sql  9 tiệm demo cho 3 loại mới + gói mẫu (is_demo) cho mọi tiệm demo không bán váy; nhà hàng demo giá theo bàn, số sảnh
+│   ├── 32_welcome_email_signup.sql Email chào mừng cả cho người đăng ký bằng email (gửi lúc vừa xác nhận); bảng welcome_emails chống gửi 2 lần
+│   ├── email-templates/      Mẫu email Supabase Auth tiếng Việt (xác nhận đăng ký, đặt lại mật khẩu, đổi email, magic link) + HUONG_DAN.md cách dán
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
 │   ├── functions/tro-ly-thu-vay/  Edge Function trợ lý chat ở Phòng thử (Gemini model chữ)
@@ -297,6 +302,19 @@ Mở lại trang: các lần ướm đã lưu hiện lại thành đoạn chat (
   Bài admin bật/tắt Siêu nét và `pages.spec.js` (trang không lỗi console) cần SQL 28 trên project test.
 - Deploy lại 2 function: trong `backend/` chạy `npx supabase functions deploy thu-vay-ai --project-ref vsjdijmuvuetmhmszcrl`
   và `npx supabase functions deploy tro-ly-thu-vay --project-ref vsjdijmuvuetmhmszcrl`.
+
+### Loại dịch vụ, giá theo bàn, chặn trùng lịch (SQL 29–31)
+- **8 loại dịch vụ**: Váy cưới, Chụp ảnh cưới, Trang trí, Trang điểm, Nhà hàng tiệc, **Tráp ăn hỏi, MC & âm nhạc, Xe hoa** – `VENDOR_CATEGORY` + `PACKAGE_LABEL` (`core/labels.js`), biểu tượng ở `CATEGORY_CHOICES` (`components/shop-form.js`), ảnh bìa minh họa SVG ở `assets/images/covers/`. Thêm loại mới: enum `vendor_category` (file SQL riêng) + 3 chỗ trên.
+- **Nhà hàng tính theo bàn**: gói có `price_unit = 'table'`, giá = giá 1 bàn 10 khách, `min_qty–max_qty` = số bàn sảnh nhận (đối tác nhập ở Kênh đối tác). Hộp đặt lịch hỏi **Số bàn**, hiện tổng + 3 đợt; database tính lại tổng (`create_booking` tham số `p_quantity`, lưu `details.tables`, `details.unit_price`). `vendors.base_price` của nhà hàng = giá bàn rẻ nhất; trang Dịch vụ lọc/sắp xếp nhà hàng theo tiệc 30 bàn.
+- **Chặn trùng lịch** (trong `create_booking`, khóa theo tiệm để 2 người bấm cùng lúc không lọt): lịch hẹn phải ở tương lai; tiệm thường – 2 lịch cách nhau ≥ 2 tiếng; nhà hàng – mỗi ngày (giờ Việt Nam) tối đa `vendors.halls` tiệc. Đơn đã hủy / hoàn tiền không tính. Hộp đặt lịch gọi `vendor_busy_times` để hiện giờ đã kín và gợi ý giờ trống (chờ tối đa 8 giây, lỗi thì để database tự chặn).
+- **Gói mẫu**: `vendor_packages.is_demo = true` → trang tiệm ghi "Một số gói là dữ liệu mẫu phục vụ demo". Xóa dữ liệu demo: `tools/xoa_du_lieu_demo.sql`.
+- Test: `flows/booking-rules.spec.js` (nhà hàng theo bàn, kín sảnh, trùng giờ) – mỗi lần chạy tạo đơn thật trên database test; các bài đặt lịch dùng `pickFreeSlot()` (ngày giờ ngẫu nhiên) để không tự trùng lịch nhau.
+- Chưa có: giao diện cho đối tác sửa số sảnh (`halls`, đã cấp quyền cột), tiêu đề 3 đợt riêng cho nhà hàng.
+
+### Email đăng ký & chào mừng (SQL 32, email-templates/)
+- Email xác nhận / đặt lại mật khẩu / đổi email / magic link: mẫu tiếng Việt ở `backend/supabase/email-templates/`, dán tay vào Supabase → Authentication → Emails → Templates (xem `HUONG_DAN.md`, gồm cả Site URL / Redirect URLs).
+- Email chào mừng (Brevo, function `gui-email-chao-mung`): Google – lúc tạo tài khoản; email + mật khẩu – lúc vừa bấm link xác nhận. Bảng `welcome_emails` bảo đảm mỗi người tối đa 1 thư (Supabase tạo tài khoản Google rồi mới xác nhận trong cùng giao dịch, nên chỉ dựa vào điều kiện xác nhận sẽ gửi 2 lần).
+- Font tiêu đề email dùng 'Palatino Linotype', Cambria… (Georgia trên Windows tách dấu tiếng Việt: "đế n").
 
 ### AI tư vấn chia ngân sách cưới
 - Trang chủ → **Gợi ý chia ngân sách cưới** chia 2 cột. **Trái**: nhập ngân sách, số khách, nơi tổ chức, ưu tiên, ghi chú → *✨ AI tư vấn* (hoặc *Chia nhanh theo tỷ lệ phổ biến*, không cần AI). **Phải**: bảng chia 6 hạng mục (thanh %, lý do, *Tìm đối tác →* lọc sẵn loại + mức tiền), mẹo, cảnh báo nếu ngân sách không đủ cho số khách.

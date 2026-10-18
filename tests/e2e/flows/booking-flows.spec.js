@@ -1,6 +1,6 @@
 // Các nhánh còn lại của luồng đặt lịch + Escrow (nhánh hoàn tiền nằm ở escrow-journey.spec.js)
 const { test, expect, openAs, requireAccounts } = require('../helpers');
-const { bookFromTryon, payNextStage, releaseStage, vendorCard, adminTab } = require('./flow-helpers');
+const { bookFromTryon, pickFreeSlot, payNextStage, releaseStage, vendorCard, adminTab } = require('./flow-helpers');
 
 test('trả đủ 3 đợt → nghiệm thu hết → đơn hoàn tất → đánh giá đối tác', async ({ browser }) => {
   requireAccounts('bride');
@@ -81,6 +81,7 @@ test('tự thiết kế may đo → đặt lịch → đơn chia 30/40/30 và c�
 
   await bride.locator('#book-btn').click();
   await bride.getByLabel('Số điện thoại').fill('0900000000');
+  await pickFreeSlot(bride);                       // mọi đơn may đo về cùng 1 tiệm → mỗi lần chọn giờ khác
   await bride.getByRole('button', { name: 'Xác nhận đặt lịch' }).click();
   await expect(bride).toHaveURL(/bookings\.html\?new=BK/);
   const code = new URL(bride.url()).searchParams.get('new');
