@@ -81,9 +81,22 @@ main.container { padding-block: 28px 56px; flex: 1 0 auto; }
 .brand img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brand); }
 .brand strong { font-family: var(--font-title); font-size: 20px; font-style: italic; }
 .nav { display: flex; gap: 4px; overflow-x: auto; flex: 1; scrollbar-width: none; }
-.nav a { padding: 8px 12px; border-radius: 999px; color: var(--muted); font-weight: 600; font-size: 14px; white-space: nowrap; text-decoration: none; }
+.nav a { padding: 8px 10px; border-radius: 999px; color: var(--muted); font-weight: 600; font-size: 14px; white-space: nowrap; text-decoration: none; }
 .nav a:hover { color: var(--ink); background: #f5ebe6; }
 .nav a.active { color: var(--brand-dark); background: var(--brand-soft); }
+/* Menu nhiều mục (đối tác có 9 mục): laptop → ẩn tên tài khoản (còn ảnh đại diện); màn hình vừa → rút gọn chữ */
+@media (max-width: 1400px) {
+  .user-name { display: none; }
+  .account-button { padding: 3px; }
+}
+@media (max-width: 1240px) {
+  .nav a { padding: 8px 9px; font-size: 13.5px; }
+  .nav-suffix { display: none; }
+}
+@media (max-width: 1000px) {
+  .nav { gap: 2px; }
+  .nav a { padding: 8px 7px; font-size: 13px; }
+}
 .user-area { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 .user-name { font-weight: 600; font-size: 14px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
 .ellipsis { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

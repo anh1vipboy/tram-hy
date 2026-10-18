@@ -5,12 +5,14 @@ import { sb } from './supabase.js';
 import { mountNotificationBell } from '../components/notification-bell.js';
 
 // roles: undefined = ai cũng thấy; 'any' = đã đăng nhập; mảng = chỉ các vai trò đó
+// suffix: phần chữ ẩn đi ở màn hình vừa (≤ 1240px) cho menu đủ chỗ – "Dịch vụ cưới" → "Dịch vụ"
 const NAV_ITEMS = [
   { page: 'home',        href: 'index.html',            label: 'Trang chủ' },
-  { page: 'tryon',       href: 'tryon.html',            label: 'Thử váy AI' },
-  { page: 'marketplace', href: 'marketplace.html',      label: 'Dịch vụ cưới' },
-  { page: 'invitation',  href: 'invitation.html',       label: 'Thiệp cưới' },
-  { page: 'planner',     href: 'ke-hoach.html',         label: 'Kế hoạch cưới' },
+  { page: 'about',       href: 'gioi-thieu.html',       label: 'Giới thiệu' },
+  { page: 'tryon',      href: 'tryon.html',            label: 'Thử váy AI' },
+  { page: 'marketplace', href: 'marketplace.html',      label: 'Dịch vụ', suffix: ' cưới' },
+  { page: 'invitation',  href: 'invitation.html',       label: 'Thiệp', suffix: ' cưới' },
+  { page: 'planner',     href: 'ke-hoach.html',         label: 'Kế hoạch', suffix: ' cưới' },
   { page: 'bookings',    href: 'bookings.html',         label: 'Đơn của tôi', roles: ['bride', 'vendor'] },   // admin xem đơn ở Quản trị
   { page: 'vendor',      href: 'vendor-dashboard.html', label: 'Kênh đối tác', roles: ['vendor'] },
   { page: 'admin',       href: 'admin.html',            label: 'Quản trị', roles: ['admin'] },
@@ -109,7 +111,8 @@ export async function initLayout(activePage) {
       </a>
       <nav class="nav" aria-label="Điều hướng chính">
         ${NAV_ITEMS.filter((item) => canSee(item, profile)).map((item) => html`
-          <a href="${item.href}" class="${item.page === activePage ? 'active' : ''}">${item.label}</a>`)}
+          <a href="${item.href}" class="${item.page === activePage ? 'active' : ''}">${item.label}${item.suffix
+            ? html`<span class="nav-suffix">${item.suffix}</span>` : ''}</a>`)}
       </nav>
       <div class="user-area">
         ${profile
