@@ -147,3 +147,15 @@ test('admin bật/tắt Siêu nét và đổi hạn mức credit', async ({ brow
   await expect(admin.locator('.toast-success', { hasText: 'Đã lưu' }).last()).toBeVisible();
   await admin.context().close();
 });
+
+test('admin dùng không giới hạn credit và luôn có Siêu nét (kể cả khi đang tắt cho mọi người)', async ({ browser }) => {
+  requireAccounts('admin');
+  const admin = await openAs(browser, 'admin');
+  await mockSettings(admin, { maxEnabled: false });
+  await admin.goto('/tryon.html');
+  await expect(admin.locator('.msg-row.ai').last()).toBeVisible({ timeout: 30_000 });
+  await expect(admin.locator('#composer-cost')).toContainText('admin không giới hạn');
+  await admin.locator('#open-settings').click();
+  await expect(admin.locator('dialog.sheet').getByRole('button', { name: '💎 Siêu nét' })).toBeVisible();
+  await admin.context().close();
+});

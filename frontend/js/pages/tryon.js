@@ -121,6 +121,7 @@ function setOption(key, value) {
   renderComposer();
 }
 
+const isAdmin = () => state.profile?.role === 'admin';
 const modelName = (model) => ({ max: 'Siêu nét', gemini: 'Gemini' }[model] ?? 'Tiêu chuẩn');
 const estimateSeconds = (o) => (o.model === 'max'
   ? MAX_SECONDS[o.quality] + (o.samples - 1) * 10
@@ -148,7 +149,7 @@ async function loadAccountData() {
   }
   state.myPhotos = photos.value ?? [];
   state.garments = garments.value ?? [];
-  if (used.status === 'fulfilled') state.remaining = Math.max(0, state.settings.dailyCredits - used.value);
+  if (used.status === 'fulfilled' && !isAdmin()) state.remaining = Math.max(0, state.settings.dailyCredits - used.value);
   if (history.value) state.history = history.value;
   for (const failed of [body, photos, garments].filter((r) => r.status === 'rejected')) toastError(failed.reason);
 }
@@ -732,7 +733,8 @@ function renderComposer() {
   const cost = tryonCost(o);
   $('#settings-sum').textContent = `${modelName(o.model)} · ${o.samples} ảnh`;
   const costLabel = $('#composer-cost');
-  costLabel.textContent = state.remaining === null ? `${cost} credit` : `${cost} credit · còn ${state.remaining}/${state.settings.dailyCredits}`;
+  costLabel.textContent = isAdmin() ? `${cost} credit · admin không giới hạn`
+    : state.remaining === null ? `${cost} credit` : `${cost} credit · còn ${state.remaining}/${state.settings.dailyCredits}`;
   costLabel.classList.toggle('short', state.remaining !== null && cost > state.remaining);
   $('#send-btn').disabled = state.busy || Boolean(state.person?.uploading || state.garment?.uploading);
 }
@@ -789,6 +791,8 @@ renderComposer();
 state.profile = await initLayout('tryon');
 const [settings] = await Promise.all([getTryonSettings(), loadDresses()]);
 state.settings = settings;
+// Admin dùng thoải mái: không giới hạn credit, luôn có Siêu nét để thử trước khi bật cho mọi người (server cũng kiểm tra)
+if (isAdmin()) state.settings.maxEnabled = true;
 await loadAccountData();
 
 const linked = state.dresses.find((d) => d.slug === param('dress'));

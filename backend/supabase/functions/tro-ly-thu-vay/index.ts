@@ -11,7 +11,7 @@
 //   samples – số ảnh người dùng nói rõ (1–4); 0 = theo cài đặt trên web
 //   theme   – kiểu váy nên xem: mermaid | fairy | minimalist | royal | heritage; '' nếu không tư vấn
 // AI bận / chưa có key → vẫn trả lời theo luật đơn giản (kèm fallback: true) để web chạy tiếp.
-// Giới hạn 40 tin / người / ngày (bảng ai_usage, kind 'tryon_chat' – SQL 28).
+// Giới hạn 40 tin / người / ngày (bảng ai_usage, kind 'tryon_chat' – SQL 28); tài khoản admin không giới hạn.
 //
 // Secrets: GEMINI_API_KEY (dùng chung), GEMINI_TEXT_MODEL (không bắt buộc – ưu tiên model này trước)
 import { createClient } from 'jsr:@supabase/supabase-js@2';
@@ -193,9 +193,11 @@ Deno.serve(async (req) => {
   const input = readInput(await req.json().catch(() => ({})));
   if (!input.message) return json({ error: 'Bạn chưa nhập tin nhắn' }, 400);
 
+  // Admin không giới hạn số tin mỗi ngày
+  const { data: profile } = await admin.from('profiles').select('role').eq('id', user.id).maybeSingle();
   const { count } = await admin.from('ai_usage').select('id', { count: 'exact', head: true })
     .eq('user_id', user.id).eq('kind', 'tryon_chat').gte('created_at', startOfVietnamDay());
-  const used = count ?? 0;
+  const used = profile?.role === 'admin' ? 0 : count ?? 0;
   if (used >= DAILY_LIMIT) {
     return json({ ...ruleBased(input), fallback: true, limited: true, remaining: 0 });
   }

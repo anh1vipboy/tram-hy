@@ -20,7 +20,7 @@
 //     seed     số nguyên – đổi seed để ra "kiểu khác"
 //
 // Credit (FASHN tính): standard 1/ảnh; max 1k: fast 1 · balanced 2 · quality 3 /ảnh. Gemini: 1 ảnh = 1.
-// Hạn mức mỗi người/ngày tính theo TỔNG credit (app_settings 'tryon'.daily_credits, SQL 28).
+// Hạn mức mỗi người/ngày tính theo TỔNG credit (app_settings 'tryon'.daily_credits, SQL 28). Tài khoản admin không giới hạn.
 //
 // Trả về:
 //   { imageUrl, images, batchId, remaining, limit, credits, provider } – thành công (link riêng tư, hết hạn sau 1 giờ)
@@ -257,8 +257,11 @@ Deno.serve(async (req) => {
   const ownsPath = (path: unknown) => typeof path === 'string' && path.startsWith(`${user.id}/`) && !path.includes('..');
 
   const settings = await readSettings(admin);
+  // Admin: không giới hạn credit/ngày và dùng được Siêu nét kể cả khi đang tắt (thử trước khi bật cho mọi người)
+  const { data: profile } = await admin.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  const unlimited = profile?.role === 'admin';
   const options = readOptions(rawOptions);
-  if (options.model === 'max' && !settings.maxEnabled) {
+  if (options.model === 'max' && !settings.maxEnabled && !unlimited) {
     return json({ error: 'Mô hình Siêu nét đang tắt – hãy chọn Tiêu chuẩn' }, 403);
   }
   // Gemini chỉ trả 1 ảnh, không có tùy chỉnh → tính 1 credit
@@ -276,8 +279,8 @@ Deno.serve(async (req) => {
     dress = data;
   }
 
-  const used = await creditsUsedToday(admin, user.id);
-  const left = Math.max(0, settings.limit - used);
+  const used = unlimited ? 0 : await creditsUsedToday(admin, user.id);
+  const left = unlimited ? Infinity : Math.max(0, settings.limit - used);
   if (cost > left) {
     return json({
       error: left
@@ -365,8 +368,9 @@ Deno.serve(async (req) => {
     imageUrl: urls[0],
     images: urls,
     batchId,
-    remaining: Math.max(0, left - charged),
+    remaining: unlimited ? null : Math.max(0, left - charged),
     limit: settings.limit,
+    unlimited,
     credits: charged,
     provider: usedProvider,
   });
