@@ -8,7 +8,9 @@
 .page-chat #app-footer { display: none; }
 
 .chat { width: min(800px, 100%); margin: 0 auto; padding: 18px 16px 0; flex: 1 0 auto; display: flex; flex-direction: column; }
-.chat-top { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+/* Thanh tiêu đề dính ngay dưới header khi cuộn (--header-h đo bằng JS trong tryon.js) */
+.chat-top { position: sticky; top: calc(var(--header-h, 64px) + env(safe-area-inset-top, 0px)); z-index: 15; display: flex; align-items: center; gap: 12px;
+  margin-top: -18px; padding: 14px 0; border-bottom: 1px solid var(--line); background: var(--bg); }
 .chat-top-logo { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: #fff; }
 .chat-top-text { flex: 1; min-width: 0; }
 .chat-top h1 { margin: 0; font-size: clamp(21px, 2.6vw, 26px); }
@@ -204,7 +206,7 @@
 }
 @media (max-width: 560px) {
   .chat { padding: 12px 12px 0; }
-  .chat-top { gap: 10px; padding-bottom: 10px; }
+  .chat-top { gap: 10px; margin-top: -12px; padding: 10px 0; }
   .chat-top-logo, .chat-top p { display: none; }
   .chat-top-link { padding: 6px 10px; font-size: 12.5px; }
   .chat-thread { gap: 16px; padding-top: 16px; }

@@ -176,6 +176,14 @@ function scrollToEnd(behavior = 'smooth') {
   requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior }));
 }
 
+// Thanh tiêu đề "Phòng thử váy AI" dính ngay dưới header – header cao khác nhau giữa máy tính và điện thoại → đo thật
+function trackHeaderHeight() {
+  const header = $('#app-header');
+  const update = () => document.documentElement.style.setProperty('--header-h', `${header.offsetHeight}px`);
+  new ResizeObserver(update).observe(header);
+  update();
+}
+
 function initAutoScroll() {
   window.addEventListener('scroll', () => {
     followBottom = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight) < 160;
@@ -787,6 +795,7 @@ function initComposer() {
 // ---------- KHỞI CHẠY TRANG ----------
 initComposer();
 initAutoScroll();
+trackHeaderHeight();
 renderComposer();
 state.profile = await initLayout('tryon');
 const [settings] = await Promise.all([getTryonSettings(), loadDresses()]);
