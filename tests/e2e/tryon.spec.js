@@ -96,11 +96,49 @@ test.describe('Thiết kế váy may đo', () => {
     await expect(page.locator('#summary strong').first()).toContainText('Váy may đo');
   });
 
-  test('giá thay đổi theo lựa chọn', async ({ page }) => {
-    const price = page.locator('#summary .price').first();
-    const before = await price.textContent();
-    await page.getByRole('button', { name: /Ren Chantilly Pháp/ }).click();
-    await expect(price).not.toHaveText(before);
+  test('lựa chọn thiết kế không kèm giá – khách tự chọn ngân sách mong muốn', async ({ page }) => {
+    // Không còn "+2,5tr" / "(+2.000.000đ)" ở lựa chọn, tóm tắt không có số tiền khi chưa chọn ngân sách
+    const priceLike = /\+\s?\d|\d\s?tr\b|\d\.\d{3}đ/;
+    await expect(page.locator('#bespoke-options')).not.toContainText(priceLike);
+    await expect(page.locator('#bespoke-extras')).not.toContainText(priceLike);
+    await expect(page.locator('#summary')).not.toContainText(priceLike);
+    const budget = page.locator('#bespoke-budget');
+    await expect(budget).toContainText('Chưa chọn');
+
+    const range = page.getByRole('button', { name: /12–18 triệu/ });
+    await range.click();
+    await expect(range).toHaveAttribute('aria-pressed', 'true');
+    await expect(budget).toContainText('12–18 triệu');
+    await expect(budget).toContainText('Giá chốt sau buổi tư vấn');
+    await expect(page.locator('#cta-price')).toHaveText('Ngân sách: 12–18 triệu');
+
+    // Đổi thiết kế không làm đổi ngân sách
+    await page.getByRole('button', { name: 'Ren Chantilly Pháp' }).click();
+    await expect(budget).toContainText('12–18 triệu');
+  });
+
+  test('nhập số tiền cụ thể: "20" = 20 triệu, ngoài 5–50 triệu thì báo lỗi', async ({ page }) => {
+    const amount = page.locator('#budget-amount');
+    const budget = page.locator('#bespoke-budget');
+    await page.getByRole('button', { name: /8–12 triệu/ }).click();
+    await amount.fill('20');
+    await expect(budget).toContainText('20.000.000đ');
+    await expect(page.locator('[data-budget][aria-pressed="true"]')).toHaveCount(0);   // số cụ thể thay cho khoảng
+
+    await amount.fill('3.000.000');
+    await expect(page.locator('#budget-hint')).toContainText('từ 5 triệu đến 50 triệu');
+    await expect(amount).toHaveAttribute('aria-invalid', 'true');
+    await expect(budget).toContainText('Chưa chọn');
+
+    await amount.fill('27.500.000');
+    await expect(budget).toContainText('27.500.000đ');
+  });
+
+  test('bấm đặt lịch khi chưa chọn ngân sách → nhắc chọn, không rời trang', async ({ page }) => {
+    await page.locator('#book-btn').click();
+    await expect(page.locator('.toast', { hasText: 'Chọn ngân sách mong muốn' })).toBeVisible();
+    await expect(page.locator('#budget-card')).toHaveClass(/nudge/);
+    await expect(page).toHaveURL(/thiet-ke-vay\.html/);
   });
 
   test('đổi phom và dáng người làm đổi ảnh minh họa và điểm tôn dáng', async ({ page }) => {
@@ -117,6 +155,7 @@ test.describe('Thiết kế váy may đo', () => {
   });
 
   test('đặt lịch khi chưa đăng nhập chuyển sang trang đăng nhập', async ({ page }) => {
+    await page.getByRole('button', { name: /Dưới 8 triệu/ }).click();
     await page.locator('#book-btn').click();
     await expect(page).toHaveURL(/login\.html\?next=thiet-ke-vay\.html/);
   });

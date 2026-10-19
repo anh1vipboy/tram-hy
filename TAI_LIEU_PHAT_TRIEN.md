@@ -78,6 +78,7 @@ exe202/
 │   ├── 30_booking_rules.sql  Nhà hàng tính giá theo bàn (gói price_unit/min_qty/max_qty, vendors.halls), create_booking tính tổng + chặn trùng lịch, RPC vendor_busy_times; cột is_demo cho gói mẫu
 │   ├── 31_demo_services.sql  9 tiệm demo cho 3 loại mới + gói mẫu (is_demo) cho mọi tiệm demo không bán váy; nhà hàng demo giá theo bàn, số sảnh
 │   ├── 32_welcome_email_signup.sql Email chào mừng cả cho người đăng ký bằng email (gửi lúc vừa xác nhận); bảng welcome_emails chống gửi 2 lần
+│   ├── 33_plan_share.sql     Chia sẻ kế hoạch cưới bằng link chỉ xem: bảng wedding_plan_shares (không mở cho API), RPC my_plan_share / set_plan_share / rotate_plan_share (chủ kế hoạch), get_shared_plan(token) cho khách không đăng nhập
 │   ├── email-templates/      Mẫu email Supabase Auth tiếng Việt (xác nhận đăng ký, đặt lại mật khẩu, đổi email, magic link) + HUONG_DAN.md cách dán
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
 │   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
@@ -315,6 +316,17 @@ Mở lại trang: các lần ướm đã lưu hiện lại thành đoạn chat (
 - Email xác nhận / đặt lại mật khẩu / đổi email / magic link: mẫu tiếng Việt ở `backend/supabase/email-templates/`, dán tay vào Supabase → Authentication → Emails → Templates (xem `HUONG_DAN.md`, gồm cả Site URL / Redirect URLs).
 - Email chào mừng (Brevo, function `gui-email-chao-mung`): Google – lúc tạo tài khoản; email + mật khẩu – lúc vừa bấm link xác nhận. Bảng `welcome_emails` bảo đảm mỗi người tối đa 1 thư (Supabase tạo tài khoản Google rồi mới xác nhận trong cùng giao dịch, nên chỉ dựa vào điều kiện xác nhận sẽ gửi 2 lần).
 - Font tiêu đề email dùng 'Palatino Linotype', Cambria… (Georgia trên Windows tách dấu tiếng Việt: "đế n").
+
+### Thiết kế váy may đo – ngân sách mong muốn
+- Trang `thiet-ke-vay.html` không còn hiện giá từng lựa chọn (may đo không có giá cố định). Khách chọn **ngân sách mong muốn**: 6 khoảng (Dưới 8 triệu … Trên 35 triệu) hoặc nhập số / kéo thanh 5–50 triệu.
+- Đặt lịch: khoảng giá → gửi giá giữa khoảng (kẹp 5–50 triệu, giới hạn của create_booking) làm `customPrice`; `details.design.budget` (+ `budget_min`, `budget_max`) ghi nhãn khách chọn, hiện trong "Hồ sơ số đo & thiết kế" của đơn. Hộp đặt lịch ghi "Ngân sách dự kiến – giá chốt sau buổi tư vấn".
+- Chưa có: chỉnh giá đơn sau buổi tư vấn (các đợt cọc tạm tính theo ngân sách dự kiến).
+
+### Kế hoạch cưới – xuất Excel & chia sẻ (SQL 33)
+- **⬇ Xuất Excel** (đầu trang Kế hoạch cưới): file `ke-hoach-cuoi-tram-hy.xlsx` gồm Tổng quan, Ngân sách (cộng từng danh mục + tổng), Checklist, Đơn Trạm Hỷ. Thư viện SheetJS CE 0.20.3 (`js/vendor/xlsx-0.20.3.mini.min.js`, Apache-2.0) chỉ tải khi bấm nút.
+- **🔗 Chia sẻ**: bật/tắt link chỉ xem, sao chép, gửi Zalo/Messenger, mã QR, "Tạo link mới" (link cũ hết hiệu lực). Người xem mở `ke-hoach.html?xem=<token>` không cần đăng nhập, chỉ thấy ngân sách, checklist, đơn (tên dịch vụ, tiền, trạng thái) – không có email, số điện thoại, mã đơn. Mọi thứ đi qua RPC `get_shared_plan` (giống thiệp cưới SQL 25).
+- Thẻ đếm ngày cưới (`components/plan-summary.js`): trước / đúng ngày / sau ngày cưới đều có màu chữ đọc được (lỗi cũ: `.card` đè nền gradient → chữ trắng trên nền trắng).
+- Test: `flows/planner-share.spec.js` (đếm ngày, Excel, chia sẻ – phần chia sẻ cần SQL 33).
 
 ### AI tư vấn chia ngân sách cưới
 - Trang chủ → **Gợi ý chia ngân sách cưới** chia 2 cột. **Trái**: nhập ngân sách, số khách, nơi tổ chức, ưu tiên, ghi chú → *✨ AI tư vấn* (hoặc *Chia nhanh theo tỷ lệ phổ biến*, không cần AI). **Phải**: bảng chia 6 hạng mục (thanh %, lý do, *Tìm đối tác →* lọc sẵn loại + mức tiền), mẹo, cảnh báo nếu ngân sách không đủ cho số khách.

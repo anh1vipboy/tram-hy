@@ -90,6 +90,9 @@ export function fitScore({ shape, height, heel }, theme) {
 }
 
 // ---------- MAY ĐO TỰ THIẾT KẾ ----------
+// Giá theo từng lựa chọn (price, BESPOKE_BASE_PRICE, bespokePrice) KHÔNG còn hiện cho khách: váy may đo
+// không định giá cố định theo từng chi tiết được. Khách chọn ngân sách mong muốn (BESPOKE_BUDGETS ở cuối file),
+// Atelier tư vấn thiết kế vừa ngân sách và chốt giá sau buổi tư vấn. Số liệu giữ lại để tham khảo nội bộ.
 export const BESPOKE_BASE_PRICE = 9800000;
 
 export const BESPOKE_OPTIONS = {
@@ -157,3 +160,22 @@ export function bespokeTheme(config) {
 export function bespokeLabel(group, key) {
   return BESPOKE_OPTIONS[group].choices.find((c) => c.key === key)?.label ?? key;
 }
+
+// Ngân sách khách mong muốn. Giới hạn giống create_booking (SQL 30): giá đơn may đo phải 5–50 triệu.
+// estimate = giữa khoảng → số tiền tạm tính gửi lên làm giá đơn, để chia 3 đợt giữ cọc 30/40/30.
+export const BESPOKE_BUDGET_MIN = 5000000;
+export const BESPOKE_BUDGET_MAX = 50000000;
+
+const budgetRange = (key, label, min, max, extra) => ({ key, label, min, max, estimate: Math.round((min + max) / 2), ...extra });
+
+export const BESPOKE_BUDGETS = [
+  budgetRange('duoi-8',  'Dưới 8 triệu',  5000000,  8000000,  { hint: 'Tối giản, tinh tế' }),
+  budgetRange('8-12',    '8–12 triệu',    8000000,  12000000, { hint: 'Vải đẹp, phom gọn' }),
+  budgetRange('12-18',   '12–18 triệu',   12000000, 18000000, { hint: 'Được chọn nhiều nhất', popular: true }),
+  budgetRange('18-25',   '18–25 triệu',   18000000, 25000000, { hint: 'Ren, đính kết thủ công' }),
+  budgetRange('25-35',   '25–35 triệu',   25000000, 35000000, { hint: 'Vải nhập, chi tiết cầu kỳ' }),
+  budgetRange('tren-35', 'Trên 35 triệu', 35000000, 50000000, { hint: 'Couture trọn vẹn' }),
+];
+
+/** Kẹp số tiền về khoảng database nhận (5–50 triệu) */
+export const clampBudget = (amount) => Math.min(BESPOKE_BUDGET_MAX, Math.max(BESPOKE_BUDGET_MIN, Math.round(amount)));

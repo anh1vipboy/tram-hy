@@ -30,6 +30,7 @@ export function detailsView(details) {
         ${design ? html`
           <div>Phom: ${design.silhouette} · Cổ: ${design.neckline} · Tay: ${design.sleeve} · Vải: ${design.fabric} · Đuôi: ${design.train_m}m</div>
           ${design.extras?.length ? html`<div>Thêm: ${design.extras.join(', ')}</div>` : ''}
+          ${design.budget ? html`<div>Ngân sách mong muốn: <strong>${design.budget}</strong></div>` : ''}
           ${design.notes ? html`<div>Ý tưởng: ${design.notes}</div>` : ''}` : ''}
       </div>
     </details>`;

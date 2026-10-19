@@ -41,6 +41,8 @@ function splitAmounts(total, percents) {
  *            isVenue?, unitPrice?, minQty?, maxQty? }
  *   isVenue: nhà hàng tiệc – price / unitPrice là giá MỖI BÀN, khách nhập số bàn trong khoảng minQty–maxQty
  *            (để trống → 5–300 bàn như database).
+ *   priceLabel?, priceText?, priceNote?: (không bắt buộc) ghi rõ ý nghĩa số tiền, vd may đo:
+ *            "Ngân sách dự kiến: 12–18 triệu" + lời nhắc giá chốt sau tư vấn. Bỏ trống → hiện giá như cũ.
  * Chưa đăng nhập → chuyển sang trang đăng nhập rồi quay lại `returnTo`.
  * Thành công → chuyển sang trang Đơn của tôi.
  */
@@ -67,7 +69,10 @@ export async function openBookingDialog(booking, returnTo) {
           <div class="muted small">${booking.vendorName}</div>
           ${venue
             ? html`<div><span class="price" data-unit-price="${venue.unitPrice}">${money(venue.unitPrice)}</span><span class="muted small"> / bàn · nhận ${venue.min}–${venue.max} bàn</span></div>`
-            : html`<div class="price">${money(booking.price)}</div>`}
+            : booking.priceLabel
+              ? html`<div data-price-label><span class="muted small">${booking.priceLabel}: </span><span class="price">${booking.priceText ?? money(booking.price)}</span></div>`
+              : html`<div class="price">${money(booking.price)}</div>`}
+          ${booking.priceNote ? html`<div class="small muted" style="margin-bottom:4px">${booking.priceNote}</div>` : ''}
           <div class="small muted">Thanh toán 3 đợt qua Trạm Hỷ: ${split.join('% → ')}%. Tiền chỉ đến tay đối tác sau khi bạn nghiệm thu từng đợt.</div>
         </div>
         <div class="form-grid">

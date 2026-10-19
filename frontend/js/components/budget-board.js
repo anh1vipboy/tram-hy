@@ -11,9 +11,27 @@ import {
 } from '../services/planner.js';
 
 const ACTIVE_BOOKING = (b) => !['cancelled', 'refunded'].includes(b.status);
-const bookingPaid = (b) => b.milestones.filter((m) => ['paid', 'released'].includes(m.status)).reduce((s, m) => s + m.amount, 0);
-const bookingName = (b) => b.dress?.name || b.details?.package?.name || BOOKING_TYPE[b.type];
+// Dùng chung với file Excel và trang xem kế hoạch được chia sẻ (cùng cách tính → số khớp nhau ở mọi nơi)
+export const bookingPaid = (b) => b.milestones.filter((m) => ['paid', 'released'].includes(m.status)).reduce((s, m) => s + m.amount, 0);
+export const bookingName = (b) => b.dress?.name || b.details?.package?.name || BOOKING_TYPE[b.type];
 const pct = (part, whole) => (whole > 0 ? Math.round((part / whole) * 100) : 0);
+
+/**
+ * Đơn Trạm Hỷ (còn hiệu lực) gắn vào danh mục nào: danh mục ĐẦU TIÊN cùng loại tiệm.
+ * Trả về { byCategory: Map<danh mục, đơn[]>, unlinked: đơn không có danh mục cùng loại (vd xe hoa khi kế hoạch chưa có danh mục xe) }.
+ */
+export function linkBookings(categories, bookings) {
+  const active = bookings.filter(ACTIVE_BOOKING);
+  const byCategory = new Map(categories.map((c) => [c, []]));
+  const linked = new Set();
+  for (const c of categories) {
+    if (!c.vendor_category || categories.find((x) => x.vendor_category === c.vendor_category) !== c) continue;
+    const mine = active.filter((b) => b.vendor?.category === c.vendor_category);
+    mine.forEach((b) => linked.add(b));
+    byCategory.set(c, mine);
+  }
+  return { byCategory, unlinked: active.filter((b) => !linked.has(b)) };
+}
 
 /** Tổng hợp số liệu – dùng cho bảng ngân sách và tab Tổng quan */
 export function budgetTotals(categories, bookings, plan) {
@@ -36,11 +54,7 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
   const active = bookings.filter(ACTIVE_BOOKING);
 
   // Đơn Trạm Hỷ thuộc danh mục đầu tiên cùng loại tiệm
-  const bookingsOf = (category) => {
-    if (!category.vendor_category) return [];
-    const first = categories.find((c) => c.vendor_category === category.vendor_category);
-    return first?.id === category.id ? active.filter((b) => b.vendor?.category === category.vendor_category) : [];
-  };
+  const bookingsOf = (category) => linkBookings(categories, active).byCategory.get(category) ?? [];
   const categoryTotals = (c) => {
     const linked = bookingsOf(c);
     return {

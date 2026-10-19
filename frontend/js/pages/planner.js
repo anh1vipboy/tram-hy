@@ -1,7 +1,8 @@
 // Trang "Đám cưới của tôi" (ke-hoach.html): Tổng quan · Ngân sách · Checklist · Trợ lý AI
+// + Xuất Excel, Chia sẻ link chỉ xem. ke-hoach.html?xem=<token> → trang xem kế hoạch được chia sẻ (không cần đăng nhập).
 import { initLayout } from '../core/layout.js';
 import { loginUrl } from '../core/auth.js';
-import { $, $$, html, render, money } from '../core/utils.js';
+import { $, $$, html, render, money, param } from '../core/utils.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { getPlan, createPlan, updatePlan, deletePlan, readPlanDraft, spreadAllocations, applyEstimates } from '../services/planner.js';
 import { listMyBookings } from '../services/bookings.js';
@@ -12,6 +13,12 @@ import { mountChecklistBoard, checklistProgress, nextTasks, dueLabel } from '../
 import { listBudget, listChecklist } from '../services/planner.js';
 import { mountPlanAssistant } from '../components/plan-assistant.js';
 import { trackSave } from '../components/save-status.js';
+import { countdownCard, daysToWedding, weddingDateLabel } from '../components/plan-summary.js';
+import { exportPlanExcel } from '../components/plan-export.js';
+import { openPlanShare } from '../components/plan-share.js';
+import { mountSharedPlan, renderShareError, coupleNames } from '../components/plan-viewer.js';
+import { getSharedPlan } from '../services/planner.js';
+import { getMyInvitation } from '../services/invitations.js';
 
 const root = $('#planner-root');
 const TABS = [['overview', 'Tổng quan'], ['budget', 'Ngân sách'], ['checklist', 'Checklist'], ['ai', '✨ Hỏi AI']];
@@ -23,6 +30,7 @@ let mounted = {};
 let budgetBoard = null;   // Promise<{ reload }>
 let assistant = null;     // { ask }
 const fromAi = new URLSearchParams(location.search).get('from') === 'ai';
+const shareToken = param('xem');   // link chia sẻ chỉ xem
 
 // ---------- CHƯA ĐĂNG NHẬP ----------
 function renderGuest() {
@@ -180,18 +188,10 @@ async function renderOverview() {
     const [categories, tasks] = await Promise.all([listBudget(plan.id), listChecklist(plan.id)]);
     const t = budgetTotals(categories, bookings, plan);
     const { done, total } = checklistProgress(tasks);
-    const days = plan.wedding_date ? Math.ceil((new Date(`${plan.wedding_date}T00:00:00`) - new Date()) / 86_400_000) : null;
     const activeBookings = bookings.filter((b) => !['cancelled', 'refunded'].includes(b.status));
     render(panel, html`
       <div class="overview-grid">
-        <section class="card countdown-card">
-          ${days === null
-            ? html`<span class="small">Chưa có ngày cưới</span><button type="button" class="btn btn-light btn-sm" data-edit>Đặt ngày cưới</button>`
-            : days > 0 ? html`<span class="small">Còn</span><strong class="countdown-num">${days}</strong><span>ngày đến đám cưới</span>
-                <span class="small">${new Date(`${plan.wedding_date}T00:00:00`).toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}</span>`
-            : days === 0 ? html`<strong class="countdown-num">🎉</strong><span>Hôm nay là ngày cưới!</span>`
-            : html`<strong class="countdown-num">💍</strong><span>Đã cưới được ${-days} ngày</span>`}
-        </section>
+        ${countdownCard(plan)}
         <a class="card overview-stat" href="ke-hoach.html?tab=budget" data-go="budget">
           <span class="small muted">Ngân sách</span>
           <strong>${money(t.estimated)}</strong>
@@ -214,7 +214,7 @@ async function renderOverview() {
       <div class="grid-2" style="margin-top:16px;align-items:start">
         <section class="card stack">
           <div class="row"><h3 style="margin:0">Việc sắp tới</h3><span class="spacer"></span>
-            <button type="button" class="btn-link btn-sm" data-go-btn="checklist">Xem tất cả →</button></div>
+            <button type="button" class="btn btn-link btn-sm" data-go-btn="checklist">Xem tất cả →</button></div>
           ${nextTasks(tasks).length ? html`<ul class="next-tasks">${nextTasks(tasks).map((task) => {
             const due = dueLabel(plan, task);
             return html`<li class="${due.tone}"><span class="dot"></span><div><strong>${task.title}</strong><span class="small muted">${due.text}</span></div>
@@ -248,9 +248,35 @@ async function renderOverview() {
 
 function updateHeader() {
   $('#planner-title').textContent = 'Kế hoạch cưới của bạn';
-  const days = plan.wedding_date ? Math.ceil((new Date(`${plan.wedding_date}T00:00:00`) - new Date()) / 86_400_000) : null;
+  const days = daysToWedding(plan);
   $('#planner-subtitle').textContent = days > 0 ? `Còn ${days} ngày nữa là đến ngày cưới – cùng chuẩn bị thật chu đáo nhé!`
+    : days === 0 ? 'Hôm nay là ngày trọng đại – chúc hai bạn thật nhiều hạnh phúc!'
+    : days < 0 ? 'Chúc mừng hai bạn đã về chung một nhà! Kế hoạch vẫn ở đây để theo dõi các khoản còn lại.'
     : 'Ngân sách, việc cần làm và các đơn đặt dịch vụ – tất cả ở một nơi.';
+  renderActions();
+}
+
+// Nút Chia sẻ + Xuất Excel trên đầu trang: áp dụng cho cả kế hoạch nên đặt ngoài các tab
+function renderActions() {
+  const box = $('#planner-actions');
+  render(box, html`
+    <button type="button" class="btn btn-outline btn-sm" data-share-plan>🔗 Chia sẻ</button>
+    <button type="button" class="btn btn-outline btn-sm" data-export-plan>⬇ Xuất Excel</button>`);
+  box.hidden = false;
+  box.querySelector('[data-share-plan]').addEventListener('click', openPlanShare);
+  box.querySelector('[data-export-plan]').addEventListener('click', (e) => withBusy(e.currentTarget, exportOwnPlan));
+}
+
+async function exportOwnPlan() {
+  try {
+    // Lấy số mới nhất từ database (bảng ngân sách có thể vừa được sửa) + tên cô dâu chú rể trên thiệp (nếu có)
+    const [categories, tasks, invitation] = await Promise.all([
+      listBudget(plan.id), listChecklist(plan.id), getMyInvitation(profile.id).catch(() => null)]);
+    await exportPlanExcel({ plan, couple: invitation, categories, tasks, bookings });
+    toast('Đã tải file Excel kế hoạch cưới.', 'success');
+  } catch (error) {
+    toastError(error);
+  }
 }
 
 async function editPlan() {
@@ -290,6 +316,7 @@ async function resetPlan() {
   if (ok) {
     plan = null;
     $('#planner-title').textContent = 'Kế hoạch cưới';
+    $('#planner-actions').hidden = true;
     renderCreate();
   }
 }
@@ -304,9 +331,42 @@ root.addEventListener('ask-ai', (e) => {
   else $('#panel-ai input[name=question]')?.focus();
 });
 
+// ---------- XEM KẾ HOẠCH ĐƯỢC CHIA SẺ (?xem=token) ----------
+async function renderShared() {
+  // Link riêng tư: không cho công cụ tìm kiếm lập chỉ mục nếu lỡ bị đăng công khai
+  document.head.append(Object.assign(document.createElement('meta'), { name: 'robots', content: 'noindex, nofollow' }));
+  $('#save-status').hidden = true;
+  $('#planner-title').textContent = 'Kế hoạch cưới được chia sẻ';
+  $('.planner .eyebrow').textContent = 'Chỉ xem';
+  try {
+    const data = await getSharedPlan(shareToken);
+    if (data?.status !== 'ok') {
+      $('#planner-subtitle').textContent = 'Không mở được kế hoạch từ link này.';
+      renderShareError(root, data?.status);
+      return;
+    }
+    const names = coupleNames(data.couple);
+    $('#planner-title').textContent = names ? `Kế hoạch cưới của ${names}` : 'Kế hoạch cưới được chia sẻ';
+    document.title = `${$('#planner-title').textContent} – Trạm Hỷ`;
+    $('#planner-subtitle').textContent = [data.plan.wedding_date ? `Ngày cưới ${weddingDateLabel(data.plan)}` : '', data.plan.city]
+      .filter(Boolean).join(' · ') || 'Ngân sách và việc cần chuẩn bị của cô dâu chú rể.';
+    mountSharedPlan(root, data, {
+      onExport: async (shared) => {
+        await exportPlanExcel({ plan: shared.plan, couple: shared.couple, categories: shared.categories, tasks: shared.checklist, bookings: shared.bookings });
+        toast('Đã tải file Excel kế hoạch cưới.', 'success');
+      },
+    });
+  } catch (error) {
+    render(root, html`<div class="empty">${error.code === 'SHARE_UNAVAILABLE' ? error.message : 'Chưa mở được kế hoạch – bạn kiểm tra kết nối mạng rồi tải lại trang nhé.'}</div>`);
+    console.warn(error);
+  }
+}
+
 // ---------- KHỞI CHẠY TRANG ----------
 profile = await initLayout('planner');
-if (!profile) {
+if (shareToken) {
+  await renderShared();
+} else if (!profile) {
   renderGuest();
 } else {
   try {

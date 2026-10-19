@@ -11,16 +11,24 @@
   <link rel="modulepreload" href="js/vendor/supabase-2.117.3.js">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/bespoke.css">
   <script type="module" src="js/pages/bespoke.js"></script>
 </head>
 <body class="has-sticky-cta">
   <header id="app-header"></header>
 
   <main class="container">
-    <div class="section-head">
+    <div class="section-head bespoke-head">
       <div>
         <div class="eyebrow">Trạm Hỷ Atelier</div>
         <h1>Thiết kế váy may đo</h1>
+        <p class="bespoke-slogan">Chiếc váy chỉ thuộc về riêng bạn – vẽ nên từ ý tưởng của bạn, may vừa từng đường cong.</p>
+        <ul class="bespoke-perks" aria-label="Điểm khác biệt">
+          <li>✂️ Thiết kế theo ý bạn</li>
+          <li>📏 May vừa số đo</li>
+          <li>💬 Tư vấn theo ngân sách</li>
+          <li>🔒 Giữ cọc an toàn 3 đợt</li>
+        </ul>
       </div>
       <a class="btn btn-outline btn-sm" href="tryon.html">✨ Ướm váy bằng AI</a>
     </div>
@@ -49,7 +57,7 @@
           <div id="bespoke-options" class="stack"></div>
           <label class="field"><span>Độ dài đuôi váy: <strong id="train-value"></strong> m</span>
             <input type="range" id="train" min="0.5" max="2.5" step="0.5" value="1"></label>
-          <div class="stack" id="bespoke-extras"></div>
+          <div class="field"><span>Điểm nhấn thêm (tùy chọn)</span><div class="chips" id="bespoke-extras"></div></div>
           <label class="field"><span>Mô tả thêm ý tưởng (không bắt buộc)</span>
             <textarea class="input" id="bespoke-notes" maxlength="500" placeholder="VD: thêu tên hai vợ chồng ở gấu váy, ren hoa nhỏ ở lưng…"></textarea></label>
         </section>
@@ -74,8 +82,31 @@
           <p class="small muted" id="body-save-note"></p>
         </section>
 
+        <!-- Khách tự chọn mức giá mong muốn: váy may đo không định giá cố định theo từng chi tiết -->
+        <section class="card stack budget-card" id="budget-card" aria-labelledby="budget-title">
+          <div>
+            <h3 id="budget-title">3. Ngân sách mong muốn</h3>
+            <p class="small muted budget-lead">Bạn dự định dành khoảng bao nhiêu cho chiếc váy? Không cần chính xác – chọn mức bạn thấy thoải mái nhất.</p>
+          </div>
+          <div class="budget-options" id="budget-options"></div>
+          <div class="budget-exact">
+            <label class="field" for="budget-amount"><span>Hoặc nhập số tiền cụ thể</span></label>
+            <div class="money-input">
+              <input class="input" id="budget-amount" data-money inputmode="numeric" autocomplete="off" placeholder="VD: 15.000.000" aria-describedby="budget-hint">
+              <span aria-hidden="true">đ</span>
+            </div>
+            <input type="range" id="budget-range" min="5000000" max="50000000" step="500000" value="15000000" aria-label="Kéo để chọn ngân sách">
+            <div class="budget-scale small muted" aria-hidden="true"><span>5 triệu</span><span>50 triệu</span></div>
+            <p class="small" id="budget-hint" aria-live="polite"></p>
+          </div>
+          <div class="budget-promise">
+            <strong>Trạm Hỷ Atelier tư vấn thiết kế vừa ngân sách của bạn</strong>
+            <span>Nhà thiết kế sẽ gợi ý chất liệu, chi tiết phù hợp với mức bạn chọn. Giá chốt sau buổi tư vấn – không phát sinh bất ngờ.</span>
+          </div>
+        </section>
+
         <section class="card stack">
-          <h3>3. Đặt lịch tư vấn & giữ cọc</h3>
+          <h3>4. Đặt lịch tư vấn & giữ cọc</h3>
           <div id="summary"></div>
           <button class="btn btn-primary btn-block" id="book-btn" type="button" disabled>Đặt lịch tư vấn may đo</button>
         </section>
@@ -86,7 +117,7 @@
   <div class="sticky-cta">
     <div class="stack" style="gap:0;flex:1;min-width:0">
       <strong id="cta-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></strong>
-      <span class="price" id="cta-price"></span>
+      <span class="small" id="cta-price"></span>
     </div>
     <button class="btn btn-primary" id="cta-book" type="button" disabled>Đặt lịch</button>
   </div>

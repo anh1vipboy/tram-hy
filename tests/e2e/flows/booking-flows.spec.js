@@ -78,8 +78,10 @@ test('tự thiết kế may đo → đặt lịch → đơn chia 30/40/30 và c�
   await bride.getByRole('button', { name: /Đuôi cá/ }).click();
   await bride.getByRole('button', { name: /Ren Chantilly Pháp/ }).click();
   await bride.locator('#bespoke-notes').fill('Thêu tên hai vợ chồng ở gấu váy');
+  await bride.getByRole('button', { name: /12–18 triệu/ }).click();   // ngân sách mong muốn → giá tạm tính 15 triệu
 
   await bride.locator('#book-btn').click();
+  await expect(bride.locator('dialog.modal [data-price-label]')).toHaveText('Ngân sách dự kiến: 12–18 triệu');
   await bride.getByLabel('Số điện thoại').fill('0900000000');
   await pickFreeSlot(bride);                       // mọi đơn may đo về cùng 1 tiệm → mỗi lần chọn giờ khác
   await bride.getByRole('button', { name: 'Xác nhận đặt lịch' }).click();
@@ -91,6 +93,8 @@ test('tự thiết kế may đo → đặt lịch → đơn chia 30/40/30 và c�
   await expect(order.locator('.milestone').nth(0)).toContainText('(30%)');
   await expect(order.locator('.milestone').nth(1)).toContainText('(40%)');
   await expect(order.locator('.milestone').nth(2)).toContainText('(30%)');
+  await expect(order.locator('.milestone').nth(0)).toContainText('4.500.000đ');   // 30% của 15 triệu (giữa 12–18)
+  await expect(order.locator('.milestone').nth(1)).toContainText('6.000.000đ');
   await order.getByText('Hồ sơ số đo & thiết kế').click();
   await expect(order).toContainText('Phom: Đuôi cá');
   await expect(order).toContainText('Vải: Ren Chantilly Pháp');

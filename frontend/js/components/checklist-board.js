@@ -10,7 +10,8 @@ const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 const dueDate = (plan, task) => (plan.wedding_date ? new Date(new Date(`${plan.wedding_date}T00:00:00`).getTime() - task.days_before * DAY) : null);
 const fmt = (d) => d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-const stageIndex = (days) => CHECKLIST_STAGES.findIndex((s) => days >= s.from);
+// Việc thuộc mốc thời gian nào (vị trí trong CHECKLIST_STAGES) – dùng chung với file Excel và trang xem được chia sẻ
+export const stageIndex = (days) => CHECKLIST_STAGES.findIndex((s) => days >= s.from);
 
 export const checklistProgress =(tasks) => ({ done: tasks.filter((t) => t.done).length, total: tasks.length });
 

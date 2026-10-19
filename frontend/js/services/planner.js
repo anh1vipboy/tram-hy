@@ -126,6 +126,30 @@ export async function deleteTask(id) {
   unwrap(await sb.from('checklist_items').delete().eq('id', id));
 }
 
+// ---------- CHIA SẺ CHỈ XEM (SQL 33) ----------
+// Token nằm trong bảng không ai đọc trực tiếp được – mọi việc qua hàm ở server.
+// Database chưa chạy SQL 33 (chưa có hàm → PGRST202) → báo câu dễ hiểu thay vì lỗi kỹ thuật.
+async function shareRpc(name, args) {
+  const { data, error } = await sb.rpc(name, args);
+  if (error) {
+    if (error.code === 'PGRST202' || error.code === '42883') {
+      throw Object.assign(new Error('Tính năng chia sẻ kế hoạch đang được cập nhật – bạn thử lại sau ít phút nhé'), { code: 'SHARE_UNAVAILABLE' });
+    }
+    throw new Error(error.message);
+  }
+  return data;
+}
+
+/** Trạng thái chia sẻ của chủ kế hoạch: { enabled, token, created_at } */
+export const getPlanShare = () => shareRpc('my_plan_share');
+/** Bật / tắt link xem. Tắt rồi bật lại dùng lại link cũ. */
+export const setPlanShare = (enabled) => shareRpc('set_plan_share', { p_enabled: enabled });
+/** Tạo link mới – link cũ hết hiệu lực ngay */
+export const rotatePlanShare = () => shareRpc('rotate_plan_share');
+/** Người xem mở link: { status: 'ok' | 'not_found' | 'disabled', plan, couple, categories, checklist, bookings } */
+export const getSharedPlan = (token) => shareRpc('get_shared_plan', { p_token: token });
+export const shareUrl = (token) => new URL(`ke-hoach.html?xem=${encodeURIComponent(token)}`, location.href).href;
+
 // ---------- Cách chia AI ở trang chủ → mang sang trang Kế hoạch (qua cả bước đăng nhập) ----------
 const DRAFT_KEY = 'tramhy:plan-from-ai';
 
