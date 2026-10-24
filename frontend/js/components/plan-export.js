@@ -324,6 +324,15 @@ export async function exportPlanExcel(data, filename = EXCEL_FILENAME) {
 }
 
 /**
+ * Tạo mảng byte (.xlsx) của Kế hoạch cưới để lưu vào file Excel Cloud cố định của tài khoản.
+ */
+export async function buildPlanExcelBytes(data) {
+  const XLSX = await loadXlsx();
+  const wb = buildPlanWorkbook(XLSX, data);
+  return new Uint8Array(XLSX.write(wb, { bookType: 'xlsx', type: 'array', compression: true }));
+}
+
+/**
  * Xuất bảng so sánh các dịch vụ / mẫu váy / gói dịch vụ từ trang Dịch vụ cưới ra file Excel (.xlsx).
  */
 export async function exportCompareExcel(items, filename = 'bang-so-sanh-dich-vu-tram-hy.xlsx') {

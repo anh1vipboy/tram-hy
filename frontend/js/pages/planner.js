@@ -14,7 +14,8 @@ import { listBudget, listChecklist } from '../services/planner.js';
 import { mountPlanAssistant } from '../components/plan-assistant.js';
 import { trackSave } from '../components/save-status.js';
 import { countdownCard, daysToWedding, weddingDateLabel } from '../components/plan-summary.js';
-import { exportPlanExcel } from '../components/plan-export.js';
+import { exportPlanExcel, buildPlanExcelBytes } from '../components/plan-export.js';
+import { autoSyncCloudExcel, openCloudExcelSyncDialog } from '../components/finance-export.js';
 import { openPlanShare } from '../components/plan-share.js';
 import { mountSharedPlan, renderShareError, coupleNames } from '../components/plan-viewer.js';
 import { getSharedPlan } from '../services/planner.js';
@@ -256,25 +257,41 @@ function updateHeader() {
   renderActions();
 }
 
-// Nút Chia sẻ + Bản In / PDF + Xuất Excel trên đầu trang: áp dụng cho cả kế hoạch nên đặt ngoài các tab
+// Nút Chia sẻ + Bản In / PDF + Cloud Excel + Xuất Excel trên đầu trang: áp dụng cho cả kế hoạch nên đặt ngoài các tab
 function renderActions() {
   const box = $('#planner-actions');
   render(box, html`
     <button type="button" class="btn btn-outline btn-sm" data-share-plan>🔗 Chia sẻ</button>
     <button type="button" class="btn btn-outline btn-sm" data-print-plan>🖨️ Bản In / PDF</button>
-    <button type="button" class="btn btn-outline btn-sm" data-export-plan>⬇ Xuất Excel</button>`);
+    <button type="button" class="btn btn-outline btn-sm" data-cloud-plan>☁️ File Excel Cloud</button>
+    <button type="button" class="btn btn-primary btn-sm" data-export-plan>⬇ Tải Excel (.xlsx)</button>`);
   box.hidden = false;
   box.querySelector('[data-share-plan]').addEventListener('click', openPlanShare);
   box.querySelector('[data-print-plan]').addEventListener('click', () => window.print());
+  box.querySelector('[data-cloud-plan]').addEventListener('click', openOwnPlanCloudSync);
   box.querySelector('[data-export-plan]').addEventListener('click', (e) => withBusy(e.currentTarget, exportOwnPlan));
+}
+
+async function fetchFullPlanExportData() {
+  const [categories, tasks, invitation] = await Promise.all([
+    listBudget(plan.id), listChecklist(plan.id), getMyInvitation(profile.id).catch(() => null),
+  ]);
+  return { plan, couple: invitation, categories, tasks, bookings };
+}
+
+function openOwnPlanCloudSync() {
+  openCloudExcelSyncDialog({
+    scope: 'plan',
+    title: '☁️ File Excel Cloud Cố Định – Kế Hoạch Cưới Của Bạn',
+    getBytes: async () => buildPlanExcelBytes(await fetchFullPlanExportData()),
+    onDownloadLocal: exportOwnPlan,
+  });
 }
 
 async function exportOwnPlan() {
   try {
-    // Lấy số mới nhất từ database (bảng ngân sách có thể vừa được sửa) + tên cô dâu chú rể trên thiệp (nếu có)
-    const [categories, tasks, invitation] = await Promise.all([
-      listBudget(plan.id), listChecklist(plan.id), getMyInvitation(profile.id).catch(() => null)]);
-    await exportPlanExcel({ plan, couple: invitation, categories, tasks, bookings });
+    const data = await fetchFullPlanExportData();
+    await exportPlanExcel(data);
     toast('Đã tải file Excel kế hoạch cưới.', 'success');
   } catch (error) {
     toastError(error);
@@ -375,6 +392,7 @@ if (shareToken) {
     [plan, bookings] = await Promise.all([getPlan(profile.id), listMyBookings(profile.id).catch(() => [])]);
     if (plan) {
       renderPlan();
+      autoSyncCloudExcel('plan', async () => buildPlanExcelBytes(await fetchFullPlanExportData()));
       if (fromAi) offerDraft().catch(toastError);
     } else {
       renderCreate();

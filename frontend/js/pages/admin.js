@@ -5,7 +5,8 @@ import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_CATEGORY, VENDOR_STATUS, badge, st
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
 import {
-  bookingFinance, summarizeBookingsFinance, serviceTitle, exportAdminFinanceExcel, openLiveSpreadsheetSyncDialog,
+  bookingFinance, summarizeBookingsFinance, serviceTitle, exportAdminFinanceExcel,
+  buildAdminFinanceBytes, autoSyncCloudExcel, openCloudExcelSyncDialog,
 } from '../components/finance-export.js';
 import { listAllBookings, subscribeBookingChanges } from '../services/bookings.js';
 import { subscribeVendorChanges } from '../services/catalog.js';
@@ -27,6 +28,7 @@ async function load() {
     renderDisputes();
     renderVendors();
     renderBookings();
+    autoSyncCloudExcel('admin', () => buildAdminFinanceBytes(data.bookings, data.vendors));
   } catch (error) {
     toastError(error);
   }
@@ -255,8 +257,8 @@ function renderBookings() {
               <option value="all">Tất cả đối tác (${vendorOptions.length})</option>
               ${vendorOptions.map(([id, name]) => html`<option value="${id}" ${bookingFilter.vendorId === id ? 'selected' : ''}>${name}</option>`)}
             </select>
-            <button type="button" class="btn btn-outline btn-sm" data-sync-filtered>🔄 Đồng bộ Sheets</button>
-            <button type="button" class="btn btn-primary btn-sm" data-export-filtered>⬇ Xuất Excel (${filtered.length} đơn)</button>
+            <button type="button" class="btn btn-outline btn-sm" data-sync-filtered>☁️ File Excel Cloud & Link Tự Đồng Bộ</button>
+            <button type="button" class="btn btn-primary btn-sm" data-export-filtered>⬇ Tải Excel (${filtered.length} đơn)</button>
           </div>
         </div>
         <div class="small muted">
@@ -328,7 +330,16 @@ function renderBookings() {
     await exportAdminFinanceExcel(filtered, data.vendors);
     toast(`Đã xuất file Excel đối soát (${filtered.length} đơn).`, 'success');
   }));
-  container.querySelector('[data-sync-filtered]')?.addEventListener('click', () => openLiveSpreadsheetSyncDialog(filtered));
+  container.querySelector('[data-sync-filtered]')?.addEventListener('click', () => openAdminCloudSync());
+}
+
+function openAdminCloudSync() {
+  return openCloudExcelSyncDialog({
+    scope: 'admin',
+    title: '☁️ File Excel Cloud Cố Định – Đối Soát Toàn Sàn (Admin)',
+    getBytes: () => buildAdminFinanceBytes(data.bookings, data.vendors),
+    onDownloadLocal: () => exportAdminFinanceExcel(data.bookings, data.vendors),
+  });
 }
 
 // ---------- THỬ VÁY AI ----------
@@ -389,7 +400,7 @@ $('#btn-export-admin')?.addEventListener('click', (e) => withBusy(e.currentTarge
   await exportAdminFinanceExcel(data.bookings, data.vendors);
   toast('Đã tải file Excel đối soát doanh thu & hoa hồng toàn sàn.', 'success');
 }));
-$('#btn-live-sync')?.addEventListener('click', () => openLiveSpreadsheetSyncDialog(data.bookings));
+$('#btn-live-sync')?.addEventListener('click', () => openAdminCloudSync());
 // Đến từ chuông thông báo (admin.html?tab=disputes) → mở đúng tab
 document.querySelector(`[data-tab="${new URLSearchParams(location.search).get('tab')}"]`)?.click();
 await initLayout('admin');

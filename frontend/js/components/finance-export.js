@@ -1,9 +1,12 @@
-// Tính toán minh bạch dòng tiền Escrow – Hoa hồng sàn (10%) – Thực nhận đối tác (90%)
-// và Xuất báo cáo đối soát Excel (.xlsx) / Đồng bộ trực tiếp sang Google Sheets & Microsoft Excel.
-import { html, money, dateTime } from '../core/utils.js';
+// Tính toán minh bạch dòng tiền Escrow – Hoa hồng sàn (10%) – Thực nhận đối tác (90%),
+// Xuất báo cáo đối soát Excel (.xlsx) và Quản lý File Excel Cố định trên Đám mây (Cloud Auto-Sync) cho từng tài khoản.
+import { html, render, money } from '../core/utils.js';
 import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_CATEGORY, MILESTONE_STATUS } from '../core/labels.js';
-import { openDialog, toast } from '../core/ui.js';
+import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
+import {
+  getAccountExcelLinks, uploadAccountCloudXlsx, rotateAccountExcelLinks,
+} from '../services/excel-sync.js';
 
 const XLSX_SRC = new URL('../vendor/xlsx-0.20.3.mini.min.js', import.meta.url).href;
 const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -157,8 +160,7 @@ export function bookingFinanceBreakdownView(booking) {
     </div>`;
 }
 
-function downloadWorkbook(XLSX, wb, filename) {
-  const bytes = XLSX.write(wb, { bookType: 'xlsx', type: 'array', compression: true });
+function downloadBytes(bytes, filename) {
   const url = URL.createObjectURL(new Blob([bytes], { type: XLSX_MIME }));
   const a = document.createElement('a');
   a.href = url;
@@ -171,8 +173,8 @@ function downloadWorkbook(XLSX, wb, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
-// ---------- 1. XUẤT EXCEL ĐỐI SOÁT SÀN (ADMIN) ----------
-export async function exportAdminFinanceExcel(bookings, vendors = [], filename = 'doi-soat-doanh-thu-tram-hy.xlsx') {
+// ---------- 1. DỰNG WORKBOOK & XUẤT EXCEL ĐỐI SOÁT SÀN (ADMIN) ----------
+export async function buildAdminFinanceBytes(bookings, vendors = []) {
   const XLSX = await loadXlsx();
   const wb = XLSX.utils.book_new();
   wb.Props = { Title: 'Đối soát Doanh thu & Hoa hồng – Trạm Hỷ', Author: 'Trạm Hỷ', CreatedDate: new Date() };
@@ -181,7 +183,6 @@ export async function exportAdminFinanceExcel(bookings, vendors = [], filename =
   const feePct = Math.round(PLATFORM_FEE_RATE * 100);
   const netPct = 100 - feePct;
 
-  // Sheet 1: Tổng hợp Sàn
   const overviewRows = [
     ['BÁO CÁO ĐỐI SOÁT DOANH THU & HOA HỒNG NỀN TẢNG – TRẠM HỶ'],
     ['Xuất báo cáo lúc', dateCell(new Date().toISOString())],
@@ -211,7 +212,6 @@ export async function exportAdminFinanceExcel(bookings, vendors = [], filename =
   wsOverview['!cols'] = [{ wch: 48 }, { wch: 24 }];
   XLSX.utils.book_append_sheet(wb, wsOverview, 'Tổng hợp Sàn');
 
-  // Sheet 2: Chi tiết Hoa hồng từng Đơn
   const orderHeader = [
     'Mã đơn', 'Ngày tạo', 'Khách hàng', 'Số điện thoại', 'Tiệm đối tác', 'Ngành dịch vụ',
     'Chi tiết dịch vụ / Mẫu váy', 'Trạng thái đơn',
@@ -221,7 +221,7 @@ export async function exportAdminFinanceExcel(bookings, vendors = [], filename =
   ];
   const orderRows = [orderHeader];
   bookings.forEach((b, idx) => {
-    const r = idx + 2; // Dòng Excel bắt đầu từ 2
+    const r = idx + 2;
     const f = bookingFinance(b);
     orderRows.push([
       b.code,
@@ -265,7 +265,6 @@ export async function exportAdminFinanceExcel(bookings, vendors = [], filename =
   if (bookings.length) wsOrders['!autofilter'] = { ref: `A1:P${endRow}` };
   XLSX.utils.book_append_sheet(wb, wsOrders, 'Hoa hồng từng Đơn');
 
-  // Sheet 3: Công nợ theo Tiệm Đối tác
   const byVendor = new Map();
   for (const v of vendors) {
     byVendor.set(v.id, {
@@ -311,7 +310,6 @@ export async function exportAdminFinanceExcel(bookings, vendors = [], filename =
   if (vendorRows.length > 1) wsVendors['!autofilter'] = { ref: `A1:K${vendorRows.length}` };
   XLSX.utils.book_append_sheet(wb, wsVendors, 'Công nợ theo Đối tác');
 
-  // Sheet 4: Chi tiết các Đợt thanh toán (Milestones 30-50-20)
   const msRows = [[
     'Mã đơn', 'Tiệm đối tác', 'Khách hàng', 'Đợt', 'Tỷ lệ %', 'Nội dung đợt',
     'Số tiền đợt (100%)', `Hoa hồng Sàn (${feePct}%)`, `Tiệm thực nhận (${netPct}%)`, 'Trạng thái đợt',
@@ -343,11 +341,16 @@ export async function exportAdminFinanceExcel(bookings, vendors = [], filename =
   if (msRows.length > 1) wsMs['!autofilter'] = { ref: `A1:J${msRows.length}` };
   XLSX.utils.book_append_sheet(wb, wsMs, 'Đợt thanh toán 30-50-20');
 
-  downloadWorkbook(XLSX, wb, filename);
+  return new Uint8Array(XLSX.write(wb, { bookType: 'xlsx', type: 'array', compression: true }));
 }
 
-// ---------- 2. XUẤT EXCEL DOANH THU CHO CHỦ TIỆM ĐỐI TÁC ----------
-export async function exportPartnerFinanceExcel(bookings, shopName = 'Đối tác Trạm Hỷ') {
+export async function exportAdminFinanceExcel(bookings, vendors = [], filename = 'doi-soat-doanh-thu-tram-hy.xlsx') {
+  const bytes = await buildAdminFinanceBytes(bookings, vendors);
+  downloadBytes(bytes, filename);
+}
+
+// ---------- 2. DỰNG WORKBOOK & XUẤT EXCEL DOANH THU CHO CHỦ TIỆM ĐỐI TÁC ----------
+export async function buildPartnerFinanceBytes(bookings, shopName = 'Đối tác Trạm Hỷ') {
   const XLSX = await loadXlsx();
   const wb = XLSX.utils.book_new();
   wb.Props = { Title: `Báo cáo Doanh thu – ${shopName}`, Author: 'Trạm Hỷ', CreatedDate: new Date() };
@@ -419,121 +422,120 @@ export async function exportPartnerFinanceExcel(bookings, shopName = 'Đối tá
   if (bookings.length) wsOrders['!autofilter'] = { ref: `A1:M${end}` };
   XLSX.utils.book_append_sheet(wb, wsOrders, 'Chi tiết Đơn & Hoa hồng');
 
-  downloadWorkbook(XLSX, wb, 'doanh-thu-doi-tac-tram-hy.xlsx');
+  return new Uint8Array(XLSX.write(wb, { bookType: 'xlsx', type: 'array', compression: true }));
 }
 
-// ---------- 3. ĐỒNG BỘ TRỰC TIẾP SANG GOOGLE SHEETS & MICROSOFT EXCEL (LIVE SYNC) ----------
-function buildDelimitedOrders(bookings, sep = '\t') {
-  const feePct = Math.round(PLATFORM_FEE_RATE * 100);
-  const netPct = 100 - feePct;
-  const header = [
-    'Mã đơn', 'Ngày tạo', 'Khách hàng', 'Số điện thoại', 'Tiệm đối tác', 'Ngành dịch vụ',
-    'Dịch vụ / Mẫu váy', 'Trạng thái', 'Tổng đơn (100%)', `Hoa hồng Sàn (${feePct}%)`,
-    `Đối tác nhận (${netPct}%)`, 'Khách đã đóng', 'Đang giữ Escrow', 'Đã giải ngân (100%)',
-    `Hoa hồng Thực thu (${feePct}%)`, `Đã trả Đối tác (${netPct}%)`,
-  ];
-  const clean = (val) => {
-    const str = String(val ?? '').replace(/[\r\n\t]+/g, ' ').trim();
-    if (sep === ',' && (str.includes(',') || str.includes('"'))) {
-      return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
-  };
-  const lines = [header.map(clean).join(sep)];
-  for (const b of bookings) {
-    const f = bookingFinance(b);
-    lines.push([
-      b.code,
-      dateTime(b.created_at),
-      b.contact_name || '',
-      b.contact_phone || '',
-      b.vendor?.name || '',
-      VENDOR_CATEGORY[b.vendor?.category] || '',
-      serviceTitle(b),
-      BOOKING_STATUS[b.status]?.label || b.status,
-      f.total,
-      f.expectedFee,
-      f.expectedPartnerNet,
-      f.collected,
-      f.paidEscrow,
-      f.releasedGross,
-      f.earnedFee,
-      f.partnerPaidNet,
-    ].map(clean).join(sep));
+export async function exportPartnerFinanceExcel(bookings, shopName = 'Đối tác Trạm Hỷ') {
+  const bytes = await buildPartnerFinanceBytes(bookings, shopName);
+  downloadBytes(bytes, 'doanh-thu-doi-tac-tram-hy.xlsx');
+}
+
+// ---------- 3. TỰ ĐỘNG ĐỒNG BỘ FILE EXCEL CỐ ĐỊNH TRÊN ĐÁM MÂY CHO TỪNG TÀI KHOẢN ----------
+export async function autoSyncCloudExcel(scope, getBytesFn) {
+  try {
+    const bytes = await getBytesFn();
+    return await uploadAccountCloudXlsx(scope, bytes);
+  } catch (err) {
+    console.warn('Tự động đồng bộ Cloud Excel:', err);
+    return null;
   }
-  return lines.join('\r\n');
 }
 
-export function downloadLiveCsvFeed(bookings, filename = 'tram-hy-live-orders.csv') {
-  // Thêm BOM \uFEFF đầu file để Microsoft Excel mở tiếng Việt có dấu chuẩn 100%
-  const csv = `\uFEFF${buildDelimitedOrders(bookings, ',')}`;
-  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.rel = 'noopener';
-  a.hidden = true;
-  document.body.append(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 60_000);
-}
-
-export function openLiveSpreadsheetSyncDialog(bookings) {
+export function openCloudExcelSyncDialog({ scope = 'plan', title = '☁️ File Excel Cố định & Tự động Đồng bộ', getBytes, onDownloadLocal }) {
   openDialog({
-    title: '🔄 Đồng bộ Đơn hàng & Hoa hồng sang Excel / Google Sheets',
+    title,
     confirmText: 'Đóng',
     cancelText: '',
-    content: html`
-      <div class="stack" style="gap:14px">
-        <p class="small muted" style="margin:0">
-          Dữ liệu trên trang Quản trị đã được kết nối trực tiếp với cơ sở dữ liệu theo thời gian thực (Realtime).
-          Bạn có thể đẩy toàn bộ <strong>${bookings.length} đơn hàng</strong> cùng cột <strong>Hoa hồng 10% &amp; Thực trả 90%</strong> sang Google Sheets hoặc Microsoft Excel chỉ với 1 chạm:
-        </p>
+    content: html`<div class="stack" data-cloud-excel-body><div class="empty">Đang tạo &amp; đồng bộ File Excel cố định của tài khoản…</div></div>`,
+    onOpen: async (dialogEl) => {
+      const box = dialogEl.querySelector('[data-cloud-excel-body]');
+      let state = null;
 
-        <div class="card stack" style="padding:14px;gap:8px;background:var(--gold-soft);border-color:var(--gold-line)">
-          <strong>Cách 1: Đồng bộ 1 chạm sang Google Sheets (Nhanh nhất)</strong>
-          <p class="small muted" style="margin:0">
-            Hệ thống tự động sao chép toàn bộ bảng đối soát chuẩn cột và mở trang Google Sheets mới — bạn chỉ cần bấm <code>Ctrl + V</code> ở ô <code>A1</code> là toàn bộ đơn và số tiền nhảy vào từng cột.
-          </p>
-          <div class="row" style="gap:8px">
-            <button type="button" class="btn btn-primary btn-sm" data-copy-open-sheets>
-              📊 Copy bảng &amp; Mở Google Sheets ngay
-            </button>
-            <button type="button" class="btn btn-outline btn-sm" data-copy-tsv>
-              📋 Chỉ sao chép bảng (dán vào Excel đang mở)
-            </button>
-          </div>
-        </div>
+      const draw = () => {
+        render(box, html`
+          <div class="stack" style="gap:14px">
+            <div class="notice small" style="background:var(--green-soft);color:var(--green);border:1px solid #b7e1c9">
+              ✓ <strong>Đã đồng bộ tự động!</strong> Tài khoản của bạn có riêng <strong>1 File Excel (.xlsx) cố định trên đám mây</strong> và <strong>1 Link dữ liệu trực tiếp (Live Sync)</strong>. Mỗi khi có đơn mới hoặc thay đổi số liệu, hệ thống tự động cập nhật vào đúng đường dẫn này (không cần tải đi tải lại hay copy-paste).
+            </div>
 
-        <div class="card stack" style="padding:14px;gap:8px">
-          <strong>Cách 2: Gắn nguồn dữ liệu tự làm mới (Power Query) trong Microsoft Excel</strong>
-          <p class="small muted" style="margin:0">
-            Tải nguồn dữ liệu chuẩn <code>tram-hy-live-orders.csv</code> (UTF-8 tiếng Việt). Trong Excel trên máy tính, vào <b>Data → From Text/CSV</b> chọn file này 1 lần. Những lần sau chỉ cần lưu đè file và bấm <b>Refresh All (Ctrl + Alt + F5)</b> trong Excel là bảng tổng hợp tự động cập nhật đơn mới!
-          </p>
-          <div>
-            <button type="button" class="btn btn-outline btn-sm" data-download-csv>
-              ⬇ Tải nguồn dữ liệu chuẩn (.csv UTF-8)
-            </button>
-          </div>
-        </div>
-      </div>`,
-    onOpen: (dialogEl) => {
-      dialogEl.querySelector('[data-copy-tsv]')?.addEventListener('click', async () => {
-        const tsv = buildDelimitedOrders(bookings, '\t');
-        await navigator.clipboard.writeText(tsv);
-        toast(`Đã sao chép ${bookings.length} đơn hàng! Bạn mở Excel hoặc Google Sheets bấm Ctrl+V là xong.`, 'success');
-      });
-      dialogEl.querySelector('[data-copy-open-sheets]')?.addEventListener('click', async () => {
-        const tsv = buildDelimitedOrders(bookings, '\t');
-        await navigator.clipboard.writeText(tsv);
-        toast('Đã sao chép toàn bộ bảng đơn! Khi Google Sheets mở ra, bạn bấm Ctrl+V vào ô A1 nhé.', 'success');
-        window.open('https://sheets.new', '_blank', 'noopener');
-      });
-      dialogEl.querySelector('[data-download-csv]')?.addEventListener('click', () => {
-        downloadLiveCsvFeed(bookings);
-        toast('Đã tải file nguồn tram-hy-live-orders.csv.', 'success');
-      });
+            <div class="card stack" style="padding:14px;gap:8px;background:var(--gold-soft);border-color:var(--gold-line)">
+              <div class="row" style="justify-content:space-between">
+                <strong>1. File Excel (.xlsx) Cố định của Tài khoản trên Đám mây</strong>
+                <span class="badge badge-green">Đủ các Sheet &amp; Công thức</span>
+              </div>
+              <p class="small muted" style="margin:0">
+                Đây là đường dẫn file <code>.xlsx</code> cố định của riêng tài khoản bạn. Bạn có thể bấm mở trực tiếp trên <b>Microsoft Excel Online</b> hoặc gắn thẳng link này vào <b>Excel trên máy tính (Data → From Web)</b>:
+              </p>
+              <div class="row">
+                <input class="input" value="${state.xlsxUrl}" readonly aria-label="Link File Excel .xlsx cố định" style="flex:1;font-size:12.5px">
+                <button type="button" class="btn btn-dark btn-sm" data-copy-val="${state.xlsxUrl}">Sao chép Link .xlsx</button>
+              </div>
+              <div class="row" style="gap:8px">
+                <a class="btn btn-primary btn-sm" href="${state.officeOnlineUrl}" target="_blank" rel="noopener">
+                  🌐 Mở trực tiếp trên Microsoft Excel Online ↗
+                </a>
+                ${onDownloadLocal ? html`<button type="button" class="btn btn-outline btn-sm" data-dl-local>⬇ Tải bản .xlsx về máy</button>` : ''}
+              </div>
+            </div>
+
+            <div class="card stack" style="padding:14px;gap:8px">
+              <div class="row" style="justify-content:space-between">
+                <strong>2. Link Tự động nhảy đơn mới 24/7 (Live Database Feed)</strong>
+                <span class="badge badge-blue">Realtime 24/7</span>
+              </div>
+              <p class="small muted" style="margin:0">
+                Link này truy vấn trực tiếp cơ sở dữ liệu ngay lúc Excel hoặc Google Sheets gọi tới (tự cập nhật cả khi bạn tắt trình duyệt web):
+              </p>
+              <label class="field"><span class="small">Dán vào Microsoft Excel (<b>Data → From Web → Dán URL</b>):</span>
+                <div class="row">
+                  <input class="input" value="${state.liveUrl}" readonly style="flex:1;font-size:12.5px">
+                  <button type="button" class="btn btn-outline btn-sm" data-copy-val="${state.liveUrl}">Sao chép URL</button>
+                </div>
+              </label>
+              <label class="field"><span class="small">Hoặc dán công thức này vào ô <code>A1</code> của <b>Google Sheets</b>:</span>
+                <div class="row">
+                  <input class="input" value="${state.googleSheetsFormula}" readonly style="flex:1;font-size:12.5px">
+                  <button type="button" class="btn btn-outline btn-sm" data-copy-val="${state.googleSheetsFormula}">Sao chép công thức</button>
+                </div>
+              </label>
+            </div>
+
+            <div class="row" style="justify-content:space-between;padding-top:6px;border-top:1px dashed var(--line)">
+              <span class="small muted">Lỡ lộ link cho người lạ? Đổi link mới sẽ vô hiệu hóa link cũ ngay.</span>
+              <button type="button" class="btn btn-outline btn-sm" data-rotate-link>🔄 Tạo Link cố định mới</button>
+            </div>
+          </div>`);
+
+        box.querySelectorAll('[data-copy-val]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            await navigator.clipboard.writeText(btn.dataset.copyVal);
+            toast('Đã sao chép đường dẫn đồng bộ!', 'success');
+          });
+        });
+        box.querySelector('[data-dl-local]')?.addEventListener('click', (e) => withBusy(e.currentTarget, onDownloadLocal));
+        box.querySelector('[data-rotate-link]')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
+          state = await rotateAccountExcelLinks(scope);
+          if (getBytes) {
+            const bytes = await getBytes();
+            state = await uploadAccountCloudXlsx(scope, bytes);
+          }
+          toast('Đã cấp Link Excel cố định mới – link cũ đã hủy hiệu lực.', 'success');
+          draw();
+        }));
+      };
+
+      try {
+        if (getBytes) {
+          const bytes = await getBytes();
+          state = await uploadAccountCloudXlsx(scope, bytes);
+        } else {
+          state = await getAccountExcelLinks(scope);
+        }
+        draw();
+      } catch (error) {
+        render(box, html`<div class="empty">Chưa đồng bộ được Cloud Excel: ${error.message}</div>`);
+        toastError(error);
+      }
     },
   });
 }

@@ -5,7 +5,8 @@ import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_STATUS, statusBadge, packageLabel 
 import { openDialog, toast, toastError, withBusy, focusFromUrl } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
 import {
-  summarizeBookingsFinance, bookingFinanceBreakdownView, exportPartnerFinanceExcel, openLiveSpreadsheetSyncDialog,
+  summarizeBookingsFinance, bookingFinanceBreakdownView, exportPartnerFinanceExcel,
+  buildPartnerFinanceBytes, autoSyncCloudExcel, openCloudExcelSyncDialog,
 } from '../components/finance-export.js';
 import { subscribeVendorChanges } from '../services/catalog.js';
 import { listMyShops, updateMyShop, resubmitVendor } from '../services/shop.js';
@@ -39,6 +40,8 @@ async function load() {
     renderStats();
     renderBoard();
     focusFromUrl($('#board'));                    // đến từ chuông thông báo → cuộn tới đúng đơn
+    const shopTitle = approvedShops().map((s) => s.name).join(', ') || 'Đối tác Trạm Hỷ';
+    autoSyncCloudExcel('vendor', () => buildPartnerFinanceBytes(bookings, shopTitle));
   } catch (error) {
     toastError(error);
   }
@@ -185,7 +188,15 @@ function initWorkspace() {
     await exportPartnerFinanceExcel(bookings, shopTitle);
     toast('Đã tải file Excel doanh thu & đối soát hoa hồng của tiệm.', 'success');
   }));
-  $('#btn-partner-sync')?.addEventListener('click', () => openLiveSpreadsheetSyncDialog(bookings));
+  $('#btn-partner-sync')?.addEventListener('click', () => {
+    const shopTitle = approvedShops().map((s) => s.name).join(', ') || 'Đối tác Trạm Hỷ';
+    openCloudExcelSyncDialog({
+      scope: 'vendor',
+      title: `☁️ File Excel Cloud Cố Định – ${shopTitle}`,
+      getBytes: () => buildPartnerFinanceBytes(bookings, shopTitle),
+      onDownloadLocal: () => exportPartnerFinanceExcel(bookings, shopTitle),
+    });
+  });
 }
 
 function renderWorkspace() {
