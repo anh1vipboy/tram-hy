@@ -680,6 +680,7 @@ function openDressPicker(tab = 'catalog') {
     loggedIn: Boolean(state.profile),
     loginHref: loginUrl('tryon.html?mode=own'),
     dresses: state.dresses.filter((d) => d.image_url),
+    body: state.body,
     getGarments: () => state.garments,
     max: MAX_GARMENT_PHOTOS,
     selectedKey: state.garment?.key,

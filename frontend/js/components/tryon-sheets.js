@@ -1,9 +1,9 @@
 // Các tấm chọn ở Phòng thử váy AI: "Ảnh của bạn", "Váy cưới", "Tùy chỉnh" (chất lượng ảnh + số đo).
 // Trang tryon.js giữ dữ liệu; các tấm này chỉ vẽ và báo lại lựa chọn qua callback.
 import { $, html, render, money, sizedImage } from '../core/utils.js';
-import { DRESS_THEME } from '../core/labels.js';
+import { DRESS_THEME, discountPercent } from '../core/labels.js';
 import { openSheet } from '../core/ui.js';
-import { MODELS, BODY_SHAPES, bmiInfo } from '../data/tryon-data.js';
+import { MODELS, BODY_SHAPES, bmiInfo, fitScore } from '../data/tryon-data.js';
 
 const ACCEPT = 'image/jpeg,image/png,image/webp';
 
@@ -84,42 +84,160 @@ export function openPersonSheet({ loggedIn, loginHref, getPhotos, max, selectedK
   });
 }
 
+// Nhận diện mẫu váy Hot Trend (nhiều góc ảnh thực tế, ưu đãi sâu hoặc mẫu biểu tượng được thử nhiều nhất)
+const HOT_DRESS_REGEX = /alina|song hỷ|hàn quốc|pha lê royal|camile|bellis|triều nguyễn|mikado/i;
+const isHotDress = (d) => (d.photos?.[0]?.count ?? 0) >= 3 || discountPercent(d) >= 20 || HOT_DRESS_REGEX.test(d.name);
+
+const RANGE_OPTIONS = [
+  ['all',        'Mọi mức giá'],
+  ['rental',     'Thuê sẵn'],
+  ['bespoke',    'May đo thiết kế'],
+  ['under3',     'Dưới 3 triệu'],
+  ['3to6',       'Từ 3 – 6 triệu'],
+  ['over6',      'Trên 6 triệu'],
+  ['price-desc', 'Giá cao → thấp'],
+];
+
+const dressTile = (d, { active, hot, off, fit }) => html`
+  <div class="pick-tile ${active ? 'active' : ''}">
+    <button type="button" class="pick-main" data-pick="dress:${d.id}" aria-pressed="${active ? 'true' : 'false'}">
+      <div class="pick-thumb-wrap">
+        <img src="${sizedImage(d.image_url, 360)}" alt="" loading="lazy" decoding="async">
+        ${hot ? html`<span class="pick-badge hot">🔥 Hot</span>` : ''}
+        ${off ? html`<span class="pick-badge sale">-${off}%</span>`
+              : d.type === 'bespoke' ? html`<span class="pick-badge bespoke">May đo</span>` : ''}
+        ${fit ? html`<span class="pick-fit">✨ ${fit}% tôn dáng</span>` : ''}
+      </div>
+      <span class="pick-name">${d.name}</span>
+      <span class="pick-sub">${d.vendor.name}${d.vendor.is_verified ? html` <b class="verified" title="Đối tác Tích Xanh">✓</b>` : ''}</span>
+      <span class="pick-price-row">
+        <span class="pick-price">${money(d.price)}</span>
+        ${off ? html`<s class="pick-old-price">${money(d.original_price)}</s>` : ''}
+      </span>
+    </button>
+  </div>`;
+
 /**
- * Tấm "Váy cưới": tab Mẫu của các tiệm (lọc theo kiểu) | Ảnh váy của bạn (tải lên, xóa được).
+ * Tấm "Váy cưới": tab Mẫu của các tiệm (lọc theo Hot Trend, Tôn dáng, Ưu đãi, Kiểu dáng, Giá, Tìm kiếm) | Ảnh váy của bạn.
  * onPickDress(id) cho mẫu của tiệm; onPickGarment(path) cho ảnh váy đã lưu.
  */
 export function openDressSheet({
-  tab = 'catalog', loggedIn, loginHref, dresses, getGarments, max, selectedKey,
+  tab = 'catalog', loggedIn, loginHref, dresses, body: userBody, getGarments, max, selectedKey,
   onPickDress, onPickGarment, onDelete, onUpload,
 }) {
   let current = tab;
   let theme = 'all';
+  let range = 'all';
+  let query = '';
+
+  const matchRange = (d) => {
+    if (range === 'rental') return d.type !== 'bespoke';
+    if (range === 'bespoke') return d.type === 'bespoke';
+    if (range === 'under3') return d.price <= 3_000_000;
+    if (range === '3to6') return d.price > 3_000_000 && d.price <= 6_000_000;
+    if (range === 'over6') return d.price > 6_000_000;
+    return true;
+  };
+
+  const matchTheme = (d, fit) => {
+    if (theme === 'all') return true;
+    if (theme === 'hot') return isHotDress(d);
+    if (theme === 'fit') return fit >= 92;
+    if (theme === 'sale') return discountPercent(d) > 0;
+    return d.theme === theme;
+  };
+
+  const matchQuery = (d) => {
+    if (!query) return true;
+    const q = query.toLowerCase();
+    return d.name.toLowerCase().includes(q)
+      || d.vendor.name.toLowerCase().includes(q)
+      || (DRESS_THEME[d.theme] ?? '').toLowerCase().includes(q);
+  };
+
   openSheet({
     title: 'Chọn váy cưới',
     className: 'pick-sheet',
     onOpen: (body, close) => {
+      // Chỉ vẽ lại phần chip và lưới kết quả để không làm mất con trỏ khi đang gõ tìm kiếm tiếng Việt
+      const drawCatalogResults = () => {
+        const filterBox = $('.sheet-filter', body);
+        const resultBox = $('.dress-results', body);
+        if (!filterBox || !resultBox) return;
+
+        const enriched = dresses.map((d) => ({
+          dress: d,
+          hot: isHotDress(d),
+          off: discountPercent(d),
+          fit: userBody ? fitScore(userBody, d.theme).score : 92,
+        }));
+
+        const afterSearchAndRange = enriched.filter(({ dress }) => matchRange(dress) && matchQuery(dress));
+        const countFor = (key) => afterSearchAndRange.filter(({ dress, fit }) => {
+          if (key === 'all') return true;
+          if (key === 'hot') return isHotDress(dress);
+          if (key === 'fit') return fit >= 92;
+          if (key === 'sale') return discountPercent(dress) > 0;
+          return dress.theme === key;
+        }).length;
+
+        const chips = [
+          ['all',  'Tất cả'],
+          ['hot',  '🔥 Hot Trend'],
+          ['fit',  '💖 Hợp dáng nhất'],
+          ['sale', '🏷️ Đang ưu đãi'],
+          ...Object.entries(DRESS_THEME),
+        ];
+
+        render(filterBox, chips.map(([key, label]) => {
+          const cnt = countFor(key);
+          return html`
+            <button class="chip ${key === theme ? 'active' : ''} ${['hot', 'fit', 'sale'].includes(key) ? 'chip-trend' : ''}"
+                    type="button" data-theme="${key}">
+              ${label} <span class="chip-count">${cnt}</span>
+            </button>`;
+        }));
+
+        let list = afterSearchAndRange.filter(({ dress, fit }) => matchTheme(dress, fit));
+        if (theme === 'fit') {
+          list = [...list].sort((a, b) => b.fit - a.fit || a.dress.price - b.dress.price);
+        } else if (theme === 'hot') {
+          list = [...list].sort((a, b) => (b.dress.photos?.[0]?.count ?? 0) - (a.dress.photos?.[0]?.count ?? 0) || b.off - a.off);
+        } else if (range === 'price-desc') {
+          list = [...list].sort((a, b) => b.dress.price - a.dress.price);
+        }
+
+        render(resultBox, list.length ? html`
+          <div class="pick-grid dresses">
+            ${list.map(({ dress, hot, off, fit }) => dressTile(dress, {
+              active: `dress:${dress.id}` === selectedKey, hot, off, fit,
+            }))}
+          </div>` : html`
+          <div class="empty dress-empty">
+            <p style="margin:0 0 8px">Không tìm thấy mẫu váy phù hợp với bộ lọc đang chọn.</p>
+            <button type="button" class="btn btn-outline btn-sm" data-reset-filter>Xem lại tất cả mẫu váy</button>
+          </div>`);
+      };
+
       const draw = () => {
         const garments = getGarments();
-        const list = dresses.filter((d) => theme === 'all' || d.theme === theme);
         render(body, html`
           <div class="tabs sheet-tabs" role="tablist">
             <button class="tab ${current === 'catalog' ? 'active' : ''}" type="button" role="tab" data-tab="catalog"
-                    aria-selected="${current === 'catalog'}">Mẫu của các tiệm</button>
+                    aria-selected="${current === 'catalog'}">Mẫu của các tiệm (${dresses.length})</button>
             <button class="tab ${current === 'own' ? 'active' : ''}" type="button" role="tab" data-tab="own"
                     aria-selected="${current === 'own'}">Ảnh váy của bạn</button>
           </div>
           ${current === 'catalog' ? html`
-            <div class="chips sheet-filter">
-              ${[['all', 'Tất cả'], ...Object.entries(DRESS_THEME)].map(([key, label]) => html`
-                <button class="chip ${key === theme ? 'active' : ''}" type="button" data-theme="${key}">${label}</button>`)}
+            <div class="dress-toolbar">
+              <input type="search" class="input dress-search" data-dress-search
+                     placeholder="🔍 Tìm tên váy, chất liệu (ren, satin, gấm), tên tiệm…" value="${query}">
+              <select class="input dress-range" data-dress-range aria-label="Lọc mức giá và loại váy">
+                ${RANGE_OPTIONS.map(([val, label]) => html`<option value="${val}" ${val === range ? 'selected' : ''}>${label}</option>`)}
+              </select>
             </div>
-            ${list.length ? html`
-              <div class="pick-grid dresses">
-                ${list.map((d) => tile({
-                  key: `dress:${d.id}`, photo: sizedImage(d.image_url, 360), name: d.name, sub: d.vendor.name,
-                  price: d.price, active: `dress:${d.id}` === selectedKey,
-                }))}
-              </div>` : html`<p class="muted">Chưa có mẫu váy kiểu này có ảnh thật để ướm thử.</p>`}`
+            <div class="chips sheet-filter" role="group" aria-label="Lọc theo xu hướng và kiểu váy"></div>
+            <div class="dress-results"></div>`
           : html`
             ${uploadTile({ loggedIn, loginHref, icon: '👗', title: 'Tải ảnh váy lên',
               hint: 'Váy thấy trên mạng hay ở tiệm – ảnh rõ nét, thấy trọn chiếc váy' })}
@@ -129,13 +247,40 @@ export function openDressSheet({
                 ${garments.map((g, i) => tile({ key: g.path, photo: g.url, name: `Váy ${garments.length - i}`,
                   active: g.path === selectedKey, removable: true }))}
               </div>` : html`<p class="small muted">Chưa có ảnh váy nào – tải ảnh lên để AI ướm chiếc váy đó lên ảnh của bạn.</p>`}`}`);
+        if (current === 'catalog') drawCatalogResults();
       };
+
       body.addEventListener('click', (e) => {
         const tabButton = e.target.closest('[data-tab]');
+        if (tabButton) {
+          current = tabButton.dataset.tab;
+          draw();
+          return;
+        }
         const themeChip = e.target.closest('[data-theme]');
-        if (tabButton) current = tabButton.dataset.tab;
-        if (themeChip) theme = themeChip.dataset.theme;
-        if (tabButton || themeChip) draw();
+        if (themeChip) {
+          theme = themeChip.dataset.theme;
+          drawCatalogResults();
+          return;
+        }
+        if (e.target.closest('[data-reset-filter]')) {
+          theme = 'all';
+          range = 'all';
+          query = '';
+          draw();
+        }
+      });
+      body.addEventListener('input', (e) => {
+        if (e.target.matches('[data-dress-search]')) {
+          query = e.target.value.trim();
+          drawCatalogResults();
+        }
+      });
+      body.addEventListener('change', (e) => {
+        if (e.target.matches('[data-dress-range]')) {
+          range = e.target.value;
+          drawCatalogResults();
+        }
       });
       bindTiles(body, {
         onPick: (key) => (key.startsWith('dress:') ? onPickDress(key.slice(6)) : onPickGarment(key)),
