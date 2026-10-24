@@ -134,6 +134,8 @@ export async function listVendorPhotos(vendorId) {
 // Gói dịch vụ đang bán của tiệm (SQL 19). Chưa chạy SQL → trả danh sách rỗng, trang tiệm vẫn hiện bình thường.
 // price_unit / min_qty / max_qty (giá theo bàn của nhà hàng) và is_demo có từ SQL 30 – chưa có thì đọc như cũ.
 const PACKAGE_FIELDS = 'id, vendor_id, name, price, original_price, description, image_url, photos:package_photos(count)';
+const ALL_PACKAGE_FIELDS = `${PACKAGE_FIELDS}, vendor:vendors!inner(id, slug, name, category, district, rating, is_verified, status)`;
+
 export async function listPackages(vendorId) {
   const query = (fields) => sb.from('vendor_packages').select(fields)
     .eq('vendor_id', vendorId).eq('is_active', true).order('price');
@@ -141,6 +143,18 @@ export async function listPackages(vendorId) {
   if (error) ({ data, error } = await query(PACKAGE_FIELDS));
   if (error) return [];
   return data;
+}
+
+/** Toàn bộ gói dịch vụ đang bán của các đối tác đã duyệt (dùng cho trang Dịch vụ cưới) */
+export async function listAllPackages() {
+  return swrCache('packages:all', async () => {
+    const query = (fields) => sb.from('vendor_packages').select(fields)
+      .eq('is_active', true).eq('vendor.status', 'approved').order('price');
+    let { data, error } = await query(`${ALL_PACKAGE_FIELDS}, price_unit, min_qty, max_qty, is_demo`);
+    if (error) ({ data, error } = await query(ALL_PACKAGE_FIELDS));
+    if (error) return [];
+    return data;
+  });
 }
 
 export async function listPackagePhotos(packageId) {

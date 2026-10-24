@@ -1022,12 +1022,13 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
   .hero::after { font-size: 140px; left: -10px; bottom: -24px; }
   .hero .row .btn { flex: 1 1 auto; }
   .eyebrow { font-size: 11px; padding: 3px 9px; }
-  /* Phòng thử: 3 tab chọn váy chia đều, không bị cắt chữ */
-  .studio .tabs { width: 100%; }
-  .studio .tab { flex: 1; padding: 8px 4px; font-size: 13px; white-space: normal; line-height: 1.25; }
+  /* Phòng thử & Chợ dịch vụ: 3 tab chia đều, không bị cắt chữ */
+  .studio .tabs, .marketplace-tabs { width: 100%; }
+  .studio .tab, .marketplace-tabs .tab { flex: 1; padding: 8px 4px; font-size: 13px; white-space: normal; line-height: 1.25; }
   /* Thẻ tiệm 2 cột trên điện thoại: logo nhỏ trên tên, tên tối đa 2 dòng, chữ gọn */
   .item-card .body { padding: 10px 12px 12px; gap: 4px; }
   .item-card .body .badge { font-size: 11px; padding: 2px 8px; }
+  .item-card .body .row .btn.sm { flex: 1 1 auto; padding: 6px 10px; font-size: 12px; text-align: center; }
   .item-card .vendor-title { flex-direction: column; align-items: flex-start; gap: 6px; }
   .item-card .vendor-title .vendor-logo { width: 28px !important; height: 28px !important; font-size: 11px !important; }
   .item-card h3 { font-size: 15px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
