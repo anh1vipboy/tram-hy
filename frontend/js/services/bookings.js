@@ -1,9 +1,6 @@
 // Đơn đặt lịch + Escrow 3 chặng. Mọi thay đổi trạng thái đều gọi hàm (RPC) hoặc Edge Function trong database,
 // database tự kiểm tra quyền và thứ tự – frontend không tự sửa bảng.
 import { sb, unwrap } from '../core/supabase.js';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config.js';
-
-const SLA_ENDPOINT = `${SUPABASE_URL}/functions/v1/khieu-nai-sla`;
 
 const BOOKING_FIELDS = `
   id, code, type, status, appointment_at, total_price, contact_name, contact_phone, note, details, created_at, updated_at, bride_id,
@@ -103,21 +100,10 @@ export async function openDispute(bookingId, kind, reason) {
 }
 
 async function callDisputeSla(payload) {
-  const { data: sessionData } = await sb.auth.getSession();
-  const token = sessionData?.session?.access_token;
-  if (!token) throw new Error('Vui lòng đăng nhập để thực hiện thao tác này.');
-  const res = await fetch(SLA_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  });
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.error || 'Không thể xử lý yêu cầu lúc này.');
-  return json;
+  const { data, error } = await sb.functions.invoke('khieu-nai-sla', { body: payload });
+  if (error) throw new Error(error.message || 'Không thể xử lý yêu cầu lúc này.');
+  if (data?.error) throw new Error(data.error);
+  return data;
 }
 
 /** Khách hàng phản hồi khiếu nại: xin dời lịch hẹn mới ('reschedule') hoặc gửi giải trình ('rebuttal') */

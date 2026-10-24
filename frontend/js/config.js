@@ -8,6 +8,7 @@ const testOverride = globalThis.__TRAMHY_TEST_SUPABASE__;
 
 export const SUPABASE_URL = testOverride?.url ?? 'https://vsjdijmuvuetmhmszcrl.supabase.co';
 export const SUPABASE_KEY = testOverride?.key ?? 'sb_publishable_2w5vXBrIRNTxEHjFJ_4Scw_4QfusfXv';
+export const SUPABASE_ANON_KEY = SUPABASE_KEY;
 
 // Cloudflare Turnstile (CAPTCHA chống bot khi đăng nhập / đăng ký / quên mật khẩu).
 // Site key được phép công khai. Để trống = tắt CAPTCHA ở web (database test cũng không bật CAPTCHA).
