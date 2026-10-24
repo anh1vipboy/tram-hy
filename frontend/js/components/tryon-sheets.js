@@ -95,6 +95,7 @@ const RANGE_OPTIONS = [
   ['under3',     'Dưới 3 triệu'],
   ['3to6',       'Từ 3 – 6 triệu'],
   ['over6',      'Trên 6 triệu'],
+  ['price-asc',  'Giá thấp → cao'],
   ['price-desc', 'Giá cao → thấp'],
 ];
 
@@ -199,12 +200,14 @@ export function openDressSheet({
         }));
 
         let list = afterSearchAndRange.filter(({ dress, fit }) => matchTheme(dress, fit));
-        if (theme === 'fit') {
+        if (range === 'price-asc') {
+          list = [...list].sort((a, b) => a.dress.price - b.dress.price);
+        } else if (range === 'price-desc') {
+          list = [...list].sort((a, b) => b.dress.price - a.dress.price);
+        } else if (theme === 'fit') {
           list = [...list].sort((a, b) => b.fit - a.fit || a.dress.price - b.dress.price);
         } else if (theme === 'hot') {
           list = [...list].sort((a, b) => (b.dress.photos?.[0]?.count ?? 0) - (a.dress.photos?.[0]?.count ?? 0) || b.off - a.off);
-        } else if (range === 'price-desc') {
-          list = [...list].sort((a, b) => b.dress.price - a.dress.price);
         }
 
         render(resultBox, list.length ? html`
