@@ -1293,6 +1293,72 @@ body.has-tabbar .compare-tray {
   padding-block: 12px;
 }
 
+/* ---------- Hộp Khiếu nại, Đếm ngược SLA 48h/72h & Thanh cảnh báo khẩn ---------- */
+.dispute-box {
+  background: var(--red-soft);
+  border: 1px solid #efc2bd;
+  border-radius: 14px;
+  padding: 14px;
+  gap: 10px;
+}
+.sla-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 700; padding: 5px 10px;
+  border-radius: 999px; font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.sla-pill.is-countdown {
+  background: #fff8ea; color: #8c5a14; border: 1px solid #e6c687;
+}
+.sla-pill.is-info {
+  background: var(--green-soft); color: var(--green); border: 1px solid #b5dec4;
+}
+.sla-pill.is-overdue {
+  background: var(--red); color: #fff;
+}
+.dispute-response-card {
+  padding: 10px 12px; border-radius: 10px;
+  background: #fffdf9; border: 1px solid var(--gold-bright);
+}
+.dispute-response-card.is-vendor {
+  background: var(--bg-soft); border-color: var(--line);
+}
+.dispute-sla-bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  padding: 9px 12px; border-radius: 10px; font-size: 13px;
+  background: var(--gold-soft); border: 1px solid #e6c687; color: #6e450d;
+  font-variant-numeric: tabular-nums;
+}
+.urgent-alert-banner {
+  border-bottom: 1px solid #efc2bd;
+  background: linear-gradient(90deg, #fdf0ee 0%, #fff8ea 100%);
+  padding: 10px 0;
+}
+.urgent-alert-banner.is-warn {
+  background: #fff8ea; border-bottom-color: #e6c687;
+}
+.urgent-alert-banner.is-info {
+  background: var(--bg-soft); border-bottom-color: var(--line);
+}
+.urgent-alert-inner {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.urgent-alert-icon {
+  font-size: 20px; line-height: 1;
+}
+.urgent-alert-copy {
+  flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 2px; font-size: 13px;
+}
+.urgent-alert-copy strong {
+  color: var(--ink); font-size: 14px;
+}
+.urgent-alert-copy span {
+  color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.urgent-alert-cta {
+  white-space: nowrap;
+}
+
 @media (max-width: 560px) {
   .plan-sync-bar { padding: 10px 12px; }
   .plan-sync-bar .row { width: 100%; }

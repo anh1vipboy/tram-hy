@@ -1,13 +1,13 @@
 import { initLayout } from '../core/layout.js';
 import { requireAuth } from '../core/auth.js';
 import { $, html, render, money, param, dateTime, debounce } from '../core/utils.js';
-import { BOOKING_STATUS, BOOKING_TYPE, statusBadge } from '../core/labels.js';
+import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_CATEGORY, statusBadge } from '../core/labels.js';
 import { openDialog, toast, toastError, focusFromUrl } from '../core/ui.js';
 import { ESCROW_BANK } from '../config.js';
 import {
   listMyBookings, payMilestone, releaseMilestone, openDispute, addReview, subscribeBookingChanges,
 } from '../services/bookings.js';
-import { milestonesView, detailsView, openDisputeView } from '../components/booking-card.js';
+import { milestonesView, detailsView, openDisputeView, bindDisputeActions } from '../components/booking-card.js';
 
 const CLOSED = ['disputed', 'cancelled', 'refunded', 'completed'];
 const DISPUTABLE = ['confirmed', 'in_progress', 'ready_for_review'];
@@ -40,9 +40,9 @@ function renderList() {
         <span class="muted small">Mã ${b.code}</span>
       </div>
       <div class="muted small">
-        ${b.vendor.name} · ${BOOKING_TYPE[b.type]} · Hẹn ${dateTime(b.appointment_at)} · Tổng <span class="price">${money(b.total_price)}</span>
+        ${b.vendor.name} (${VENDOR_CATEGORY[b.vendor.category] || 'Dịch vụ cưới'}) · Hẹn ${dateTime(b.appointment_at)} · Tổng <span class="price">${money(b.total_price)}</span>
       </div>
-      ${openDisputeView(b)}
+      ${openDisputeView(b, { viewerRole: 'bride' })}
       ${milestonesView(b, (m) => milestoneAction(b, m))}
       ${detailsView(b.details)}
       <div class="row">
@@ -56,6 +56,7 @@ function renderList() {
     const booking = bookings.find((b) => b.id === btn.closest('[data-booking]').dataset.booking);
     btn.addEventListener('click', () => ACTIONS[btn.dataset.action](booking, Number(btn.dataset.stage)));
   });
+  bindDisputeActions(container, (id) => bookings.find((b) => b.id === id), load);
   focusFromUrl(container);                     // đến từ chuông thông báo → cuộn tới đúng đơn
 }
 
@@ -111,8 +112,8 @@ const ACTIONS = {
       confirmText: 'Gửi yêu cầu',
       danger: true,
       content: html`
-        <p class="small muted">Tiền đang giữ sẽ bị khóa cho đến khi Trạm Hỷ xử lý (trong 2 giờ làm việc).</p>
-        <label class="field"><span>Lý do (váy sai mẫu, trễ hẹn, hư hỏng…)</span>
+        <p class="small muted">Tiền đang giữ sẽ bị khóa cho đến khi Trạm Hỷ xử lý (hạn phản hồi tối đa 48 giờ cho đối tác).</p>
+        <label class="field"><span>Lý do (dịch vụ sai cam kết, trễ hẹn, hư hỏng…)</span>
           <textarea class="input" name="reason" required minlength="10" maxlength="1000"></textarea></label>`,
       onConfirm: (form) => openDispute(booking.id, 'refund_request', form.get('reason').trim()),
     });

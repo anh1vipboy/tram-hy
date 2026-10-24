@@ -11,7 +11,7 @@ import {
 import { subscribeVendorChanges } from '../services/catalog.js';
 import { listMyShops, updateMyShop, resubmitVendor } from '../services/shop.js';
 import { listVendorBookings, vendorSetStatus, openDispute, subscribeBookingChanges } from '../services/bookings.js';
-import { milestonesView, detailsView, openDisputeView } from '../components/booking-card.js';
+import { milestonesView, detailsView, openDisputeView, bindDisputeActions } from '../components/booking-card.js';
 import { shopFields, readShopForm } from '../components/shop-form.js';
 import { mountDressManager } from '../components/dress-manager.js';
 import { mountShopMedia } from '../components/shop-media.js';
@@ -84,6 +84,7 @@ function renderBoard() {
     const booking = bookings.find((b) => b.id === btn.closest('[data-booking]').dataset.booking);
     btn.addEventListener('click', () => ACTIONS[btn.dataset.action](booking));
   });
+  bindDisputeActions($('#board'), (id) => bookings.find((b) => b.id === id), load);
 }
 
 function card(b) {
@@ -95,7 +96,7 @@ function card(b) {
       <div class="small">Hẹn: <strong>${dateTime(b.appointment_at)}</strong></div>
       ${bookingFinanceBreakdownView(b)}
       ${b.note ? html`<div class="small muted">Ghi chú: ${b.note}</div>` : ''}
-      ${openDisputeView(b)}
+      ${openDisputeView(b, { viewerRole: 'vendor' })}
       <details><summary class="small" style="cursor:pointer">Tiến độ thanh toán 3 đợt</summary>${milestonesView(b)}</details>
       ${detailsView(b.details)}
       <div class="row">${actionButtons(b)}</div>

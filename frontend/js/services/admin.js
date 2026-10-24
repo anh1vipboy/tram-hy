@@ -3,9 +3,9 @@ import { sb, unwrap } from '../core/supabase.js';
 
 export async function listOpenDisputes() {
   return unwrap(await sb.from('disputes')
-    .select(`id, kind, reason, created_at, opened_by,
-             booking:bookings(id, code, type, total_price, contact_name, contact_phone,
-                              vendor:vendors(name), milestones(stage, amount, status))`)
+    .select(`id, kind, reason, created_at, opened_by, prev_status,
+             booking:bookings(id, code, type, status, appointment_at, total_price, contact_name, contact_phone, details, updated_at,
+                              vendor:vendors(id, name, category, phone), milestones(stage, amount, status))`)
     .eq('status', 'open')
     .order('created_at'));
 }

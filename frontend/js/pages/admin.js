@@ -8,6 +8,7 @@ import {
   bookingFinance, summarizeBookingsFinance, serviceTitle, exportAdminFinanceExcel,
   buildAdminFinanceBytes, autoSyncCloudExcel, openCloudExcelSyncDialog,
 } from '../components/finance-export.js';
+import { disputeSlaInfo, bindDisputeActions } from '../components/booking-card.js';
 import { listAllBookings, subscribeBookingChanges } from '../services/bookings.js';
 import { subscribeVendorChanges } from '../services/catalog.js';
 import {
@@ -121,22 +122,91 @@ function renderDisputes() {
     return;
   }
   render(container, html`<div class="stack">${data.disputes.map((d) => {
-    const held = d.booking.milestones.filter((m) => m.status === 'paid').reduce((t, m) => t + m.amount, 0);
+    const b = d.booking;
+    const held = (b.milestones || []).filter((m) => m.status === 'paid').reduce((t, m) => t + m.amount, 0);
+    const partnerNet = Math.round(held * (1 - PLATFORM_FEE_RATE));
+    const platformFee = held - partnerNet;
     const isNoShow = d.kind === 'no_show';
+    const sla = disputeSlaInfo(d, b.details);
+    const brideResp = sla?.brideResponse;
+    const vendorReply = sla?.vendorReply;
+    const catLabel = VENDOR_CATEGORY[b.vendor?.category] || 'Dịch vụ cưới';
+    const cleanCustomerPhone = String(b.contact_phone || '').replace(/[^0-9+]/g, '');
+    const cleanVendorPhone = String(b.vendor?.phone || '').replace(/[^0-9+]/g, '');
+
     return html`
-      <article class="card stack" data-dispute="${d.id}">
-        <div class="row">
-          ${badge(isNoShow ? 'Đối tác báo khách không đến' : 'Cô dâu yêu cầu hoàn cọc', 'red')}
-          <strong>${d.booking.code}</strong><span class="spacer"></span>
-          <span class="small muted">${dateTime(d.created_at)}</span>
+      <article class="card stack" data-dispute="${d.id}" data-booking="${b.id}">
+        <div class="row" style="justify-content:space-between;align-items:flex-start">
+          <div class="row" style="gap:8px">
+            ${badge(isNoShow ? '🚫 Đối tác báo khách không đến' : '⚠️ Cô dâu yêu cầu hoàn cọc', 'red')}
+            <strong>${b.code}</strong>
+            <span class="badge badge-gold">${catLabel}</span>
+          </div>
+          <div class="row" style="gap:8px">
+            ${sla ? html`<span class="sla-pill is-${sla.badgeTone}">${sla.badgeText}</span>` : ''}
+            <span class="small muted">Mở lúc ${dateTime(d.created_at)}</span>
+          </div>
         </div>
-        <div class="small">${d.booking.vendor.name} · ${BOOKING_TYPE[d.booking.type]} · Khách: ${d.booking.contact_name} (${d.booking.contact_phone})</div>
-        <div><strong>Lý do:</strong> ${d.reason}</div>
-        <div>Tiền đang giữ: <span class="price">${money(held)}</span></div>
-        <div class="row">
-          <button class="btn btn-danger btn-sm" data-resolve="refund">Hoàn tiền cho cô dâu</button>
-          <button class="btn btn-outline btn-sm" data-resolve="vendor">
-            ${isNoShow ? 'Giải ngân đền bù cho đối tác' : 'Bác yêu cầu, tiếp tục đơn'}</button>
+
+        <div class="small">
+          <strong>${b.vendor?.name}</strong> · ${BOOKING_TYPE[b.type]}
+          ${b.appointment_at ? html` · Lịch hẹn gốc: <strong>${dateTime(b.appointment_at)}</strong>` : ''}
+          · Khách: <strong>${b.contact_name}</strong> (${b.contact_phone})
+        </div>
+
+        <div class="small" style="background:var(--bg-soft);padding:10px 12px;border-radius:10px;border:1px solid var(--line)">
+          <div><strong>Lý do báo cáo (${isNoShow ? 'từ Đối tác' : 'từ Khách hàng'}):</strong> ${d.reason}</div>
+          <div class="muted" style="margin-top:4px">
+            Tiền đang giữ trong Escrow: <strong class="price">${money(held)}</strong>
+            (Nếu giải ngân: Đối tác nhận <strong>${money(partnerNet)}</strong> · Hoa hồng sàn 10%: <strong>${money(platformFee)}</strong>)
+          </div>
+        </div>
+
+        ${brideResp ? html`
+          <div class="dispute-response-card is-bride">
+            <div class="row" style="justify-content:space-between">
+              <strong>${brideResp.type === 'reschedule' ? '📅 Khách hàng xin dời sang lịch hẹn mới' : '💬 Giải trình từ Khách hàng'}</strong>
+              <span class="small muted">${dateTime(brideResp.responded_at)}</span>
+            </div>
+            ${brideResp.proposed_appointment_at ? html`
+              <div class="small" style="margin-top:4px">
+                Giờ hẹn mới khách đề xuất: <strong style="color:var(--brand)">${dateTime(brideResp.proposed_appointment_at)}</strong>
+              </div>` : ''}
+            <div class="small" style="margin-top:4px">"${brideResp.message}"</div>
+          </div>` : html`
+          <div class="small muted">
+            ⏳ <em>Khách hàng chưa gửi phản hồi trên web. Nếu khách bận quên, Admin có thể bấm Gọi/Zalo nhắc khách hoặc chờ hết 48h để giải ngân đền bù cho đối tác.</em>
+          </div>`}
+
+        ${vendorReply ? html`
+          <div class="dispute-response-card is-vendor">
+            <div class="row" style="justify-content:space-between">
+              <strong>🏪 Phản hồi từ Đối tác (${vendorReply.by_name})</strong>
+              <span class="small muted">${dateTime(vendorReply.responded_at)}</span>
+            </div>
+            <div class="small" style="margin-top:4px">"${vendorReply.message}"</div>
+          </div>` : ''}
+
+        <div class="row" style="justify-content:space-between;padding-top:4px">
+          <div class="row" style="gap:8px">
+            <button type="button" class="btn ${brideResp?.type === 'reschedule' ? 'btn-primary' : 'btn-outline'} btn-sm"
+                    data-dispute-act="restore-booking" data-booking-id="${b.id}">
+              ✅ Cho dời lịch &amp; Khôi phục đơn
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" data-resolve="vendor">
+              ⚖️ ${isNoShow ? `Giải ngân đền bù cho đối tác (${money(partnerNet)})` : 'Bác yêu cầu, tiếp tục đơn'}
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" data-resolve="refund">
+              ↩️ Hoàn tiền cho cô dâu (${money(held)})
+            </button>
+          </div>
+          <div class="row" style="gap:6px">
+            ${cleanCustomerPhone ? html`
+              <a class="btn btn-outline btn-sm" href="tel:${cleanCustomerPhone}">📞 Gọi khách</a>
+              <a class="btn btn-outline btn-sm" href="https://zalo.me/${cleanCustomerPhone}" target="_blank" rel="noopener">💬 Zalo khách</a>
+            ` : ''}
+            ${cleanVendorPhone ? html`<a class="btn btn-outline btn-sm" href="tel:${cleanVendorPhone}">📞 Gọi tiệm</a>` : ''}
+          </div>
         </div>
       </article>`;
   })}</div>`);
@@ -144,6 +214,11 @@ function renderDisputes() {
   container.querySelectorAll('[data-resolve]').forEach((btn) => {
     btn.addEventListener('click', () => resolve(btn.closest('[data-dispute]').dataset.dispute, btn.dataset.resolve === 'refund'));
   });
+  bindDisputeActions(
+    container,
+    (bookingId) => data.disputes.find((d) => d.booking?.id === bookingId)?.booking || data.bookings.find((b) => b.id === bookingId),
+    load,
+  );
 }
 
 async function resolve(disputeId, refund) {

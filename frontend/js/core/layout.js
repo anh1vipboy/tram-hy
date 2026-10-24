@@ -3,6 +3,7 @@ import { getCachedProfile, getProfile, signOut } from './auth.js';
 import { $, html, render, initials } from './utils.js';
 import { sb } from './supabase.js';
 import { mountNotificationBell } from '../components/notification-bell.js';
+import { getUrgentBookingAlert } from '../services/bookings.js';
 
 // Tải trước trang đích khi người dùng rê chuột (máy tính) hoặc chạm tay (điện thoại) vào liên kết điều hướng
 function injectSpeculationRules() {
@@ -206,7 +207,43 @@ export async function initLayout(activePage) {
   if (profile && bellButton) {
     closeBell = mountNotificationBell(bellButton, profile, { onOpen: () => closeAccount() }).close;
   }
+  if (profile && activePage !== 'login') {
+    mountUrgentAlertBanner(profile, activePage);
+  }
   if (activePage !== 'login') watchAccountSwitch(profile);
 
   return profile;
+}
+
+async function mountUrgentAlertBanner(profile, activePage) {
+  try {
+    const alert = await getUrgentBookingAlert(profile);
+    const existing = $('#urgent-booking-banner');
+    if (!alert) {
+      existing?.remove();
+      return;
+    }
+    const header = $('#app-header');
+    if (!header) return;
+    let bar = existing;
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'urgent-booking-banner';
+      header.insertAdjacentElement('afterend', bar);
+    }
+    bar.className = `urgent-alert-banner is-${alert.tone}`;
+    render(bar, html`
+      <div class="container urgent-alert-inner">
+        <span class="urgent-alert-icon" aria-hidden="true">${alert.icon}</span>
+        <div class="urgent-alert-copy">
+          <strong>${alert.title}</strong>
+          <span>${alert.sub}</span>
+        </div>
+        ${activePage === 'bookings' && profile.role !== 'admin' ? '' : html`
+          <a class="btn btn-primary btn-sm urgent-alert-cta" href="${alert.href}">${alert.cta}</a>
+        `}
+      </div>`);
+  } catch {
+    // Không làm gián đoạn hiển thị trang nếu mạng chập chờn
+  }
 }
