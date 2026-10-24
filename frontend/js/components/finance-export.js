@@ -135,28 +135,29 @@ export function serviceTitle(b) {
   return b.details?.tables ? `${base} (${b.details.tables} bàn)` : base;
 }
 
-/** Khung hiển thị minh bạch 3 con số (Tổng đơn 100% – Hoa hồng sàn 10% – Tiệm thực nhận 90%) trên thẻ đơn */
+/** Khung hiển thị minh bạch 4 chỉ số (Tổng đơn 100% – Hoa hồng sàn 10% – Tiệm thực nhận 90% – Ví Escrow) trên thẻ đơn */
 export function bookingFinanceBreakdownView(booking) {
   const f = bookingFinance(booking);
   return html`
-    <div class="booking-finance-box">
-      <div class="finance-line">
-        <span class="muted">Giá trị đơn (Khách trả 100%)</span>
-        <strong>${money(f.total)}</strong>
+    <div class="booking-finance-strip">
+      <div class="bf-cell">
+        <span class="bf-label">Giá trị đơn (100%)</span>
+        <strong class="bf-val">${money(f.total)}</strong>
       </div>
-      <div class="finance-line fee">
-        <span>Hoa hồng nền tảng Trạm Hỷ (${f.feePercent}%)</span>
-        <strong>−${money(f.expectedFee)}</strong>
+      <div class="bf-cell is-fee">
+        <span class="bf-label">Hoa hồng sàn (${f.feePercent}%)</span>
+        <strong class="bf-val">−${money(f.expectedFee)}</strong>
       </div>
-      <div class="finance-line net">
-        <span>Tiệm thực nhận (${f.partnerPercent}%)</span>
-        <strong>${money(f.expectedPartnerNet)}</strong>
+      <div class="bf-cell is-net">
+        <span class="bf-label">Tiệm thực nhận (${f.partnerPercent}%)</span>
+        <strong class="bf-val">${money(f.expectedPartnerNet)}</strong>
       </div>
-      ${f.paidEscrow > 0 || f.releasedGross > 0 ? html`
-        <div class="finance-sub">
-          <span>Đang giữ hộ: <b>${money(f.paidEscrow)}</b> (nhận về ${money(f.partnerEscrowNet)})</span>
-          <span>Đã giải ngân: <b class="text-green">${money(f.partnerPaidNet)}</b></span>
-        </div>` : ''}
+      <div class="bf-cell is-escrow">
+        <span class="bf-label">Tiến độ ví Escrow</span>
+        <span class="bf-sub">
+          Giữ hộ: <b>${money(f.paidEscrow)}</b> (nhận ${money(f.partnerEscrowNet)}) · Đã về: <b class="text-green">${money(f.partnerPaidNet)}</b>
+        </span>
+      </div>
     </div>`;
 }
 

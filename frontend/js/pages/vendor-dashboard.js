@@ -19,16 +19,19 @@ import { mountShopWizard } from '../components/shop-wizard.js';
 import { mountPackageManager } from '../components/package-manager.js';
 import { mountPartnerChecklist } from '../components/partner-checklist.js';
 
-const COLUMNS = [
-  { title: 'Chờ khách đặt cọc', statuses: ['pending'] },
-  { title: 'Đã nhận cọc', statuses: ['confirmed'] },
-  { title: 'Đang thực hiện', statuses: ['in_progress', 'ready_for_review'] },
-  { title: 'Đã đóng', statuses: ['completed', 'disputed', 'cancelled', 'refunded'] },
+const STAGE_FILTERS = [
+  { key: 'all',         label: 'Tất cả đơn',         statuses: null },
+  { key: 'disputed',    label: '🚨 Đang khiếu nại',  statuses: ['disputed'] },
+  { key: 'pending',     label: 'Chờ khách đặt cọc',  statuses: ['pending'] },
+  { key: 'confirmed',   label: 'Đã nhận cọc',        statuses: ['confirmed'] },
+  { key: 'in_progress', label: 'Đang thực hiện',     statuses: ['in_progress', 'ready_for_review'] },
+  { key: 'closed',      label: 'Hoàn tất & Đã đóng', statuses: ['completed', 'cancelled', 'refunded'] },
 ];
 
 let profile = null;
 let shops = [];
 let bookings = [];
+let orderStageFilter = 'all';
 let unsubscribeBookings = null;
 let activePanel = 'orders';
 let managedShopId = null;    // tiệm đang quản lý mẫu váy / ảnh (khi tài khoản có nhiều tiệm)
@@ -68,17 +71,38 @@ function renderStats() {
 }
 
 function renderBoard() {
+  const activeFilter = STAGE_FILTERS.find((f) => f.key === orderStageFilter) || STAGE_FILTERS[0];
+  const filtered = activeFilter.statuses
+    ? bookings.filter((b) => activeFilter.statuses.includes(b.status))
+    : bookings;
+
   render($('#board'), html`
-    <div class="kanban">
-      ${COLUMNS.map((col) => {
-        const items = bookings.filter((b) => col.statuses.includes(b.status));
-        return html`
-          <section class="kanban-col">
-            <h3>${col.title} <span class="badge">${items.length}</span></h3>
-            ${items.length ? items.map(card) : html`<p class="small muted">Chưa có đơn</p>`}
-          </section>`;
-      })}
+    <div class="stack" style="gap:16px">
+      <div class="vendor-filter-bar" role="tablist" aria-label="Lọc đơn theo tiến độ">
+        ${STAGE_FILTERS.map((f) => {
+          const count = f.statuses ? bookings.filter((b) => f.statuses.includes(b.status)).length : bookings.length;
+          if (f.key === 'disputed' && count === 0 && orderStageFilter !== 'disputed') return '';
+          return html`
+            <button type="button"
+                    class="vendor-stage-pill ${orderStageFilter === f.key ? 'active' : ''} ${f.key === 'disputed' && count > 0 ? 'is-alert' : ''}"
+                    data-stage-filter="${f.key}">
+              <span>${f.label}</span>
+              <span class="pill-count">${count}</span>
+            </button>`;
+        })}
+      </div>
+
+      ${filtered.length
+        ? html`<div class="vendor-order-list">${filtered.map(card)}</div>`
+        : html`<div class="empty">Chưa có đơn hàng nào ở mục "${activeFilter.label}".</div>`}
     </div>`);
+
+  $('#board').querySelectorAll('[data-stage-filter]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      orderStageFilter = btn.dataset.stageFilter;
+      renderBoard();
+    });
+  });
 
   $('#board').querySelectorAll('[data-action]').forEach((btn) => {
     const booking = bookings.find((b) => b.id === btn.closest('[data-booking]').dataset.booking);
@@ -88,18 +112,41 @@ function renderBoard() {
 }
 
 function card(b) {
+  const serviceName = b.dress?.name || b.details?.package?.name || BOOKING_TYPE[b.type] || 'Dịch vụ cưới';
+  const paidDoneCount = (b.milestones || []).filter((m) => ['paid', 'released'].includes(m.status)).length;
+  const actions = actionButtons(b);
   return html`
-    <article class="kanban-card" data-booking="${b.id}" data-code="${b.code}">
-      <div class="row"><strong>${b.contact_name || 'Khách hàng'}</strong><span class="spacer"></span>${statusBadge(BOOKING_STATUS, b.status)}</div>
-      <div class="small muted">${b.code} · ${b.contact_phone || ''}</div>
-      <div class="small"><strong>${b.dress?.name || b.details?.package?.name || BOOKING_TYPE[b.type]}</strong>${b.details?.tables ? ` · ${b.details.tables} bàn` : ''}</div>
-      <div class="small">Hẹn: <strong>${dateTime(b.appointment_at)}</strong></div>
+    <article class="card vendor-order-card ${b.status === 'disputed' ? 'is-disputed' : ''}" data-booking="${b.id}" data-code="${b.code}">
+      <div class="vendor-order-head">
+        <div class="vendor-order-title-group">
+          <strong class="vendor-order-service">${serviceName}${b.details?.tables ? ` · ${b.details.tables} bàn` : ''}</strong>
+          ${statusBadge(BOOKING_STATUS, b.status)}
+          <span class="vendor-order-code">Mã ${b.code}</span>
+        </div>
+        <div class="vendor-order-head-right">
+          <span class="vendor-order-appt">🗓️ Hẹn: <strong>${dateTime(b.appointment_at)}</strong></span>
+          ${actions ? html`<div class="row" style="gap:8px">${actions}</div>` : ''}
+        </div>
+      </div>
+
+      <div class="vendor-order-meta">
+        <span>👤 Khách hàng: <strong>${b.contact_name || 'Khách hàng'}</strong></span>
+        ${b.contact_phone ? html`<span>📞 <strong>${b.contact_phone}</strong></span>` : ''}
+        ${b.note ? html`<span class="vendor-order-note">💬 Ghi chú: "${b.note}"</span>` : ''}
+      </div>
+
       ${bookingFinanceBreakdownView(b)}
-      ${b.note ? html`<div class="small muted">Ghi chú: ${b.note}</div>` : ''}
       ${openDisputeView(b, { viewerRole: 'vendor' })}
-      <details><summary class="small" style="cursor:pointer">Tiến độ thanh toán 3 đợt</summary>${milestonesView(b)}</details>
-      ${detailsView(b.details)}
-      <div class="row">${actionButtons(b)}</div>
+
+      <div class="vendor-order-foot">
+        <details class="vendor-milestones-details">
+          <summary class="small">
+            <span>Tiến độ thanh toán 3 đợt (${paidDoneCount}/${(b.milestones || []).length || 3} đợt đã đóng)</span>
+          </summary>
+          ${milestonesView(b)}
+        </details>
+        ${detailsView(b.details)}
+      </div>
     </article>`;
 }
 

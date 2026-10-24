@@ -166,92 +166,95 @@ export function openDisputeView(booking, { viewerRole = 'bride' } = {}) {
   const vendorPhone = cleanPhone(booking.vendor?.phone);
 
   return html`
-    <div class="dispute-box stack" data-dispute-box="${booking.id}">
-      <div class="row" style="justify-content:space-between;align-items:flex-start;gap:8px">
+    <div class="dispute-box" data-dispute-box="${booking.id}">
+      <div class="dispute-head">
         <div>
-          <strong style="color:var(--red);font-size:14px">${isNoShow ? '🚫' : '⚠️'} ${who}</strong>
-          <div class="small muted">Áp dụng quy chuẩn bảo chứng Escrow (${catLabel}) · Đang khóa tạm thời: <strong>${money(held)}</strong></div>
+          <strong class="dispute-title">${isNoShow ? '🚫' : '⚠️'} ${who}</strong>
+          <div class="small muted">Bảo chứng Escrow (${catLabel}) · Đang khóa tạm thời: <strong>${money(held)}</strong></div>
         </div>
         <span class="sla-pill is-${sla.badgeTone}">${sla.badgeText}</span>
       </div>
 
-      <div class="small" style="background:rgba(255,255,255,0.75);padding:8px 10px;border-radius:8px;border:1px solid #efc2bd">
-        <div><strong>Lý do báo cáo:</strong> ${open.reason}</div>
-        ${booking.appointment_at ? html`<div class="muted" style="margin-top:2px">Lịch hẹn gốc của đơn: <strong>${dateTime(booking.appointment_at)}</strong></div>` : ''}
+      <div class="dispute-compare-grid">
+        <div class="dispute-col">
+          <div class="dispute-col-label">Báo cáo ban đầu</div>
+          <div class="small"><strong>Lý do:</strong> ${open.reason}</div>
+          ${booking.appointment_at ? html`<div class="small muted">Lịch hẹn gốc: <strong>${dateTime(booking.appointment_at)}</strong></div>` : ''}
+        </div>
+
+        ${brideResp ? html`
+          <div class="dispute-col is-response">
+            <div class="dispute-col-label">
+              ${brideResp.type === 'reschedule' ? '📅 Khách xin dời sang lịch hẹn mới' : '💬 Giải trình từ Khách hàng'}
+              <span class="muted" style="font-weight:400"> · ${dateTime(brideResp.responded_at)}</span>
+            </div>
+            ${brideResp.proposed_appointment_at ? html`
+              <div class="small">Giờ hẹn mới đề xuất: <strong style="color:var(--brand)">${dateTime(brideResp.proposed_appointment_at)}</strong></div>` : ''}
+            <div class="small">"${brideResp.message}"</div>
+          </div>` : ''}
+
+        ${vendorReply ? html`
+          <div class="dispute-col is-response">
+            <div class="dispute-col-label">
+              🏪 Phản hồi từ Đối tác (${vendorReply.by_name})
+              <span class="muted" style="font-weight:400"> · ${dateTime(vendorReply.responded_at)}</span>
+            </div>
+            <div class="small">"${vendorReply.message}"</div>
+          </div>` : ''}
       </div>
 
-      ${brideResp ? html`
-        <div class="dispute-response-card is-bride">
-          <div class="row" style="justify-content:space-between">
-            <strong>${brideResp.type === 'reschedule' ? '📅 Khách hàng xin dời sang lịch hẹn mới' : '💬 Giải trình từ Khách hàng'}</strong>
-            <span class="small muted">${dateTime(brideResp.responded_at)}</span>
-          </div>
-          ${brideResp.proposed_appointment_at ? html`
-            <div class="small" style="margin-top:4px">
-              Giờ hẹn mới đề xuất: <strong style="color:var(--brand)">${dateTime(brideResp.proposed_appointment_at)}</strong>
-            </div>` : ''}
-          <div class="small" style="margin-top:4px">"${brideResp.message}"</div>
-        </div>` : ''}
+      <div class="dispute-foot">
+        <span class="small muted">
+          ${isNoShow
+            ? (sla.hasCounterResponse
+                ? '💡 Khách hàng đã gửi đề xuất. Nếu đồng ý hẹn lại, đơn hàng sẽ khôi phục ngay và giữ nguyên tiền cọc.'
+                : `💡 Nếu khách không phản hồi hoặc xin dời lịch trong ${SLA_DISPUTE_HOURS}h, hệ thống cho phép giải ngân đền bù cho Đối tác.`)
+            : `💡 Tiền cọc ${money(held)} đang được khóa an toàn. Nếu Đối tác không phản hồi trong ${SLA_DISPUTE_HOURS}h, khách hàng được hoàn cọc 100%.`}
+        </span>
 
-      ${vendorReply ? html`
-        <div class="dispute-response-card is-vendor">
-          <div class="row" style="justify-content:space-between">
-            <strong>🏪 Phản hồi từ Đối tác (${vendorReply.by_name})</strong>
-            <span class="small muted">${dateTime(vendorReply.responded_at)}</span>
-          </div>
-          <div class="small" style="margin-top:4px">"${vendorReply.message}"</div>
-        </div>` : ''}
+        ${viewerRole === 'bride' ? html`
+          <div class="dispute-actions">
+            ${isNoShow ? html`
+              <button type="button" class="btn btn-primary btn-sm" data-dispute-act="bride-reschedule" data-booking-id="${booking.id}">
+                📅 ${brideResp?.type === 'reschedule' ? 'Đổi lại lịch đề xuất' : 'Xin hẹn lại lịch mới (Giữ cọc)'}
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" data-dispute-act="bride-rebuttal" data-booking-id="${booking.id}">
+                💬 ${brideResp ? 'Cập nhật giải trình' : 'Gửi giải trình cho Admin'}
+              </button>
+              ${vendorPhone ? html`<a class="btn btn-outline btn-sm" href="tel:${vendorPhone}">📞 Gọi tiệm</a>` : ''}
+            ` : html`
+              <button type="button" class="btn btn-outline btn-sm" data-dispute-act="restore-booking" data-booking-id="${booking.id}">
+                ↩️ Rút khiếu nại &amp; Tiếp tục đơn
+              </button>
+              ${sla.isOverdue && !sla.hasCounterResponse ? html`
+                <button type="button" class="btn btn-primary btn-sm" data-dispute-act="trigger-sla" data-booking-id="${booking.id}">
+                  ⚡ Nhận hoàn cọc tự động (Quá 48h)
+                </button>` : ''}
+            `}
+          </div>` : ''}
 
-      <div class="small muted">
-        ${isNoShow
-          ? (sla.hasCounterResponse
-              ? '💡 Khách hàng đã gửi đề xuất. Nếu Đối tác đồng ý hẹn lại, đơn hàng sẽ được khôi phục ngay và giữ nguyên tiền cọc.'
-              : `💡 Cơ chế tự động bảo vệ 2 chiều: Nếu khách bận/quên không phản hồi hoặc xin dời lịch trong ${SLA_DISPUTE_HOURS} giờ kể từ lúc báo cáo, hệ thống cho phép giải ngân tiền cọc đền bù cho Đối tác.`)
-          : `💡 Tiền cọc ${money(held)} đang được Trạm Hỷ khóa an toàn. Nếu Đối tác không phản hồi trong ${SLA_DISPUTE_HOURS} giờ, khách hàng được ưu tiên hoàn cọc 100%.`}
+        ${viewerRole === 'vendor' ? html`
+          <div class="dispute-actions">
+            ${isNoShow ? html`
+              <button type="button" class="btn ${brideResp?.type === 'reschedule' ? 'btn-primary' : 'btn-outline'} btn-sm"
+                      data-dispute-act="restore-booking" data-booking-id="${booking.id}">
+                ✅ ${brideResp?.type === 'reschedule' ? `Đồng ý lịch mới (${dateTime(brideResp.proposed_appointment_at)})` : 'Đồng ý hẹn lại & Khôi phục đơn'}
+              </button>
+              ${sla.isOverdue && !sla.hasCounterResponse ? html`
+                <button type="button" class="btn btn-primary btn-sm" data-dispute-act="trigger-sla" data-booking-id="${booking.id}">
+                  ⚡ Giải ngân đền bù (Quá 48h)
+                </button>` : ''}
+            ` : html`
+              <button type="button" class="btn btn-outline btn-sm" data-dispute-act="vendor-reply" data-booking-id="${booking.id}">
+                💬 ${vendorReply ? 'Cập nhật giải trình của tiệm' : 'Gửi giải trình cho Admin'}
+              </button>
+            `}
+            ${customerPhone ? html`
+              <a class="btn btn-outline btn-sm" href="tel:${customerPhone}" title="Gọi nhắc khách">📞 Gọi khách</a>
+              <a class="btn btn-outline btn-sm" href="https://zalo.me/${customerPhone}" target="_blank" rel="noopener">💬 Zalo khách</a>
+            ` : ''}
+          </div>` : ''}
       </div>
-
-      ${viewerRole === 'bride' ? html`
-        <div class="row" style="gap:8px;padding-top:4px">
-          ${isNoShow ? html`
-            <button type="button" class="btn btn-primary btn-sm" data-dispute-act="bride-reschedule" data-booking-id="${booking.id}">
-              📅 ${brideResp?.type === 'reschedule' ? 'Đổi lại lịch đề xuất' : 'Xin hẹn lại lịch mới (Giữ cọc)'}
-            </button>
-            <button type="button" class="btn btn-outline btn-sm" data-dispute-act="bride-rebuttal" data-booking-id="${booking.id}">
-              💬 ${brideResp ? 'Cập nhật giải trình' : 'Gửi giải trình cho Admin'}
-            </button>
-            ${vendorPhone ? html`<a class="btn btn-outline btn-sm" href="tel:${vendorPhone}">📞 Gọi tiệm</a>` : ''}
-          ` : html`
-            <button type="button" class="btn btn-outline btn-sm" data-dispute-act="restore-booking" data-booking-id="${booking.id}">
-              ↩️ Rút khiếu nại &amp; Tiếp tục đơn
-            </button>
-            ${sla.isOverdue && !sla.hasCounterResponse ? html`
-              <button type="button" class="btn btn-primary btn-sm" data-dispute-act="trigger-sla" data-booking-id="${booking.id}">
-                ⚡ Nhận hoàn cọc tự động (Quá 48h)
-              </button>` : ''}
-          `}
-        </div>` : ''}
-
-      ${viewerRole === 'vendor' ? html`
-        <div class="row" style="gap:8px;padding-top:4px">
-          ${isNoShow ? html`
-            <button type="button" class="btn ${brideResp?.type === 'reschedule' ? 'btn-primary' : 'btn-outline'} btn-sm"
-                    data-dispute-act="restore-booking" data-booking-id="${booking.id}">
-              ✅ ${brideResp?.type === 'reschedule' ? `Đồng ý lịch mới (${dateTime(brideResp.proposed_appointment_at)})` : 'Đồng ý hẹn lại & Khôi phục đơn'}
-            </button>
-            ${sla.isOverdue && !sla.hasCounterResponse ? html`
-              <button type="button" class="btn btn-primary btn-sm" data-dispute-act="trigger-sla" data-booking-id="${booking.id}">
-                ⚡ Giải ngân đền bù (Quá 48h khách quên)
-              </button>` : ''}
-          ` : html`
-            <button type="button" class="btn btn-outline btn-sm" data-dispute-act="vendor-reply" data-booking-id="${booking.id}">
-              💬 ${vendorReply ? 'Cập nhật giải trình của tiệm' : 'Gửi giải trình cho Admin'}
-            </button>
-          `}
-          ${customerPhone ? html`
-            <a class="btn btn-outline btn-sm" href="tel:${customerPhone}" title="Gọi nhắc khách">📞 Gọi khách</a>
-            <a class="btn btn-outline btn-sm" href="https://zalo.me/${customerPhone}" target="_blank" rel="noopener">💬 Zalo khách</a>
-          ` : ''}
-        </div>` : ''}
     </div>`;
 }
 

@@ -1263,26 +1263,144 @@ body.has-tabbar .compare-tray {
 .party-pill.party-bride { background: var(--brand-soft); color: var(--brand-dark); border-color: #e9c2bc; }
 
 /* ---------- Minh bạch Hoa hồng Sàn (10%) & Thực nhận Đối tác (90%) ---------- */
-.booking-finance-box {
-  display: flex; flex-direction: column; gap: 4px;
-  margin: 4px 0; padding: 9px 11px; border-radius: 11px;
-  background: linear-gradient(180deg, #fffdf9, var(--gold-soft));
-  border: 1px solid var(--gold-line);
-  font-size: 12.5px; font-variant-numeric: tabular-nums;
+.vendor-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
 }
-.finance-line {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+@media (max-width: 1080px) {
+  .vendor-stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-.finance-line.fee { color: #8a5b10; }
-.finance-line.net {
-  padding-top: 4px; margin-top: 2px; border-top: 1px dashed var(--gold-line);
-  color: var(--brand-dark); font-size: 13px;
+@media (max-width: 680px) {
+  .vendor-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.finance-sub {
-  display: flex; flex-direction: column; gap: 2px;
-  padding-top: 4px; margin-top: 2px; border-top: 1px solid rgba(228, 207, 163, .5);
-  font-size: 11.5px; color: var(--muted);
+@media (max-width: 440px) {
+  .vendor-stats-grid { grid-template-columns: 1fr; }
 }
+
+.vendor-filter-bar {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 6px; border-radius: 14px;
+  background: var(--bg-soft); border: 1px solid var(--line);
+}
+.vendor-stage-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; min-height: 38px; border-radius: 10px;
+  border: 1px solid transparent; background: transparent;
+  color: var(--ink); font-family: inherit; font-size: 13.5px; font-weight: 600;
+  cursor: pointer;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms ease;
+}
+.vendor-stage-pill:active { transform: scale(0.97); }
+.vendor-stage-pill.active {
+  background: #fff; border-color: var(--line);
+  color: var(--brand-dark); box-shadow: 0 2px 8px rgba(42, 36, 33, .06);
+}
+.vendor-stage-pill.is-alert {
+  color: var(--red); background: var(--red-soft); border-color: #efc2bd;
+}
+.vendor-stage-pill.is-alert.active {
+  background: var(--red); color: #fff; border-color: var(--red);
+}
+.pill-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 20px; padding: 0 6px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums;
+  background: rgba(42, 36, 33, .08); color: inherit;
+}
+.vendor-stage-pill.is-alert.active .pill-count {
+  background: rgba(255, 255, 255, .22); color: #fff;
+}
+
+.vendor-order-list {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.vendor-order-card {
+  container-type: inline-size;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 18px 20px;
+}
+.vendor-order-card.is-disputed {
+  border-color: #e5a9a2;
+}
+.vendor-order-head {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px;
+}
+.vendor-order-title-group {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-width: 0;
+}
+.vendor-order-service {
+  font-family: var(--font-title); font-size: 18px; color: var(--ink);
+}
+.vendor-order-code {
+  font-size: 12.5px; font-weight: 600; color: var(--muted);
+  padding: 3px 9px; border-radius: 999px; background: var(--bg-soft); border: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.vendor-order-head-right {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+}
+.vendor-order-appt {
+  font-size: 13.5px; color: var(--ink); font-variant-numeric: tabular-nums;
+}
+.vendor-order-meta {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 18px;
+  font-size: 13.5px; color: var(--muted);
+  padding-bottom: 12px; border-bottom: 1px solid var(--line);
+}
+.vendor-order-meta strong { color: var(--ink); }
+.vendor-order-note {
+  color: #6e450d; background: var(--gold-soft); padding: 3px 10px; border-radius: 8px;
+}
+
+.booking-finance-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.bf-cell {
+  display: flex; flex-direction: column; gap: 3px;
+  min-width: 0;
+}
+.bf-cell + .bf-cell {
+  border-left: 1px solid var(--line);
+  padding-left: 12px;
+}
+.bf-label {
+  font-size: 12px; color: var(--muted);
+}
+.bf-val {
+  font-size: 15px; font-weight: 700; color: var(--ink);
+}
+.bf-cell.is-fee .bf-val { color: #8a5b10; }
+.bf-cell.is-net .bf-val { color: var(--brand-dark); font-size: 16px; }
+.bf-sub {
+  font-size: 12.5px; color: var(--ink); line-height: 1.4;
+}
+@container (max-width: 680px) {
+  .booking-finance-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bf-cell:nth-child(3) {
+    border-left: none; padding-left: 0;
+  }
+}
+@media (max-width: 520px) {
+  .booking-finance-strip {
+    grid-template-columns: 1fr;
+  }
+  .bf-cell + .bf-cell {
+    border-left: none; padding-left: 0;
+    border-top: 1px dashed var(--line); padding-top: 8px;
+  }
+}
+
 .finance-table th, .finance-table td {
   font-variant-numeric: tabular-nums;
 }
@@ -1295,17 +1413,25 @@ body.has-tabbar .compare-tray {
 
 /* ---------- Hộp Khiếu nại, Đếm ngược SLA 48h/72h & Thanh cảnh báo khẩn ---------- */
 .dispute-box {
-  background: var(--red-soft);
-  border: 1px solid #efc2bd;
+  container-type: inline-size;
+  display: flex; flex-direction: column; gap: 12px;
+  background: #fdf4f2;
+  border: 1px solid #eabbb5;
   border-radius: 14px;
-  padding: 14px;
-  gap: 10px;
+  padding: 14px 16px;
+}
+.dispute-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px;
+}
+.dispute-title {
+  color: var(--red); font-size: 14.5px;
 }
 .sla-pill {
   display: inline-flex; align-items: center; gap: 5px;
-  font-size: 12px; font-weight: 700; padding: 5px 10px;
+  font-size: 12px; font-weight: 700; padding: 5px 11px;
   border-radius: 999px; font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  max-width: 100%; overflow-wrap: anywhere;
 }
 .sla-pill.is-countdown {
   background: #fff8ea; color: #8c5a14; border: 1px solid #e6c687;
@@ -1316,12 +1442,49 @@ body.has-tabbar .compare-tray {
 .sla-pill.is-overdue {
   background: var(--red); color: #fff;
 }
+.dispute-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(220, 160, 152, .45);
+  border-bottom: 1px solid rgba(220, 160, 152, .45);
+}
+@container (min-width: 580px) {
+  .dispute-compare-grid:has(.is-response) {
+    grid-template-columns: 1fr 1.25fr;
+    gap: 18px;
+  }
+  .dispute-col.is-response {
+    border-left: 1px solid rgba(220, 160, 152, .5);
+    padding-left: 18px;
+  }
+}
+.dispute-col {
+  display: flex; flex-direction: column; gap: 4px; min-width: 0;
+}
+.dispute-col-label {
+  font-size: 12.5px; font-weight: 700; color: var(--ink);
+}
+.dispute-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.dispute-actions {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+}
 .dispute-response-card {
   padding: 10px 12px; border-radius: 10px;
   background: #fffdf9; border: 1px solid var(--gold-bright);
 }
 .dispute-response-card.is-vendor {
   background: var(--bg-soft); border-color: var(--line);
+}
+.vendor-order-foot {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.vendor-milestones-details summary {
+  cursor: pointer; font-weight: 600; color: var(--muted);
 }
 .dispute-sla-bar {
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
