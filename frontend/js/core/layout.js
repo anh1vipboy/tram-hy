@@ -131,8 +131,9 @@ function paintLayout(activePage, profile, onAccountOpen) {
   render(header, html`
     <div class="container">
       <a class="brand" href="index.html">
-        <img src="assets/images/logo.webp" alt="" width="34" height="34" decoding="async">
+        <img src="assets/images/logo.webp" alt="" width="38" height="38" decoding="async">
         <strong>Trạm Hỷ</strong>
+        <span class="hy-seal" aria-hidden="true" title="Song Hỷ Cát Tường">囍</span>
       </a>
       <nav class="nav" aria-label="Điều hướng chính">
         ${NAV_ITEMS.filter((item) => canSee(item, profile)).map((item) => html`
@@ -177,6 +178,7 @@ function paintLayout(activePage, profile, onAccountOpen) {
   if (footer) {
     footer.className = 'site-footer';
     render(footer, html`
+      <div class="footer-ornament" aria-hidden="true"><span>囍</span></div>
       <div class="container footer-row">
         <span>© 2026 Trạm Hỷ – Kết duyên cát hỷ, trọn vẹn niềm tin · Dự án EXE – Group 5</span>
         <a href="gioi-thieu.html">Giới thiệu Trạm Hỷ</a>
