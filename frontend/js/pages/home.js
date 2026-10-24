@@ -50,7 +50,7 @@ async function loadFeaturedDresses() {
 async function loadTopVendors() {
   const container = $('#top-vendors');
   try {
-    const vendors = (await listVendors()).filter((v) => v.is_verified).slice(0, 5);
+    const vendors = await listVendors({ verifiedOnly: true, limit: 5 });
     render(container, vendors.map((v) => html`
       <a class="top-vendor-row" href="vendor.html?slug=${v.slug}">
         ${vendorLogo(v, { size: 42 })}

@@ -4,9 +4,9 @@ import { $, $$ } from '../core/utils.js';
 import { listVendors } from '../services/catalog.js';
 
 // ---------- KHỞI CHẠY TRANG ----------
+listVendors().then((v) => { $('#vendor-count').textContent = String(v.length); }).catch(() => {});
 const profile = await initLayout('partner');
 const ctas = $$('#partner-cta, #partner-cta-bottom');
-listVendors().then((v) => { $('#vendor-count').textContent = String(v.length); }).catch(() => {});
 
 if (profile?.role === 'admin') {
   ctas.forEach((a) => { a.style.display = 'none'; });

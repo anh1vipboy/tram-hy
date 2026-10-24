@@ -2,6 +2,24 @@
 import { sb, unwrap } from './supabase.js';
 
 let profilePromise = null;
+const PROFILE_CACHE_KEY = 'tramhy.auth.profile';
+
+/** Đọc nhanh hồ sơ lưu tạm trong phiên để vẽ Header/Menu ngay lập tức (0ms), trước khi đồng bộ lại với Supabase. */
+export function getCachedProfile() {
+  try {
+    const raw = sessionStorage.getItem(PROFILE_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedProfile(profile) {
+  try {
+    if (profile) sessionStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile));
+    else sessionStorage.removeItem(PROFILE_CACHE_KEY);
+  } catch { /* trình duyệt chặn sessionStorage */ }
+}
 
 export async function getUser() {
   const { data } = await sb.auth.getSession();
@@ -12,9 +30,14 @@ export async function getUser() {
 export function getProfile() {
   profilePromise ??= (async () => {
     const user = await getUser();
-    if (!user) return null;
+    if (!user) {
+      writeCachedProfile(null);
+      return null;
+    }
     const profile = unwrap(await sb.from('profiles').select('*').eq('id', user.id).single());
-    return { ...profile, email: user.email };
+    const full = { ...profile, email: user.email };
+    writeCachedProfile(full);
+    return full;
   })();
   return profilePromise;
 }
@@ -22,6 +45,7 @@ export function getProfile() {
 // Gọi sau khi đăng nhập/đăng ký để getProfile() đọc lại hồ sơ mới
 export function clearProfileCache() {
   profilePromise = null;
+  writeCachedProfile(null);
 }
 
 export function loginUrl(next = currentPath()) {
@@ -111,6 +135,7 @@ export async function updatePassword(password) {
 }
 
 export async function signOut() {
+  clearProfileCache();
   await sb.auth.signOut();
   location.href = 'index.html';
 }

@@ -797,8 +797,12 @@ initComposer();
 initAutoScroll();
 trackHeaderHeight();
 renderComposer();
-state.profile = await initLayout('tryon');
-const [settings] = await Promise.all([getTryonSettings(), loadDresses()]);
+const [profile, settings] = await Promise.all([
+  initLayout('tryon'),
+  getTryonSettings(),
+  loadDresses(),
+]);
+state.profile = profile;
 state.settings = settings;
 // Admin dùng thoải mái: không giới hạn credit, luôn có Siêu nét để thử trước khi bật cho mọi người (server cũng kiểm tra)
 if (isAdmin()) state.settings.maxEnabled = true;

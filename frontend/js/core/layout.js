@@ -1,8 +1,28 @@
 // Header + footer dùng chung cho mọi trang
-import { getProfile, signOut } from './auth.js';
+import { getCachedProfile, getProfile, signOut } from './auth.js';
 import { $, html, render, initials } from './utils.js';
 import { sb } from './supabase.js';
 import { mountNotificationBell } from '../components/notification-bell.js';
+
+// Tải trước trang đích khi người dùng rê chuột (máy tính) hoặc chạm tay (điện thoại) vào liên kết điều hướng
+function injectSpeculationRules() {
+  if (!HTMLScriptElement.supports?.('speculationrules') || document.querySelector('script[type="speculationrules"]')) return;
+  const specScript = document.createElement('script');
+  specScript.type = 'speculationrules';
+  specScript.textContent = JSON.stringify({
+    prefetch: [{
+      where: {
+        and: [
+          { href_matches: '/*' },
+          { not: { href_matches: '/login*' } },
+          { not: { selector_matches: '[data-signout]' } },
+        ],
+      },
+      eagerness: 'moderate',
+    }],
+  });
+  document.head.append(specScript);
+}
 
 // roles: undefined = ai cũng thấy; 'any' = đã đăng nhập; mảng = chỉ các vai trò đó
 // suffix: phần chữ ẩn đi ở màn hình vừa (≤ 1240px) cho menu đủ chỗ – "Dịch vụ cưới" → "Dịch vụ"
@@ -97,16 +117,21 @@ function bindAccountMenu({ onOpen } = {}) {
   return () => setOpen(false);
 }
 
-/** Vẽ header/footer và trả về hồ sơ người dùng (hoặc null) để trang dùng tiếp. */
-export async function initLayout(activePage) {
-  const profile = await getProfile().catch(() => null);
+function sameProfileSnapshot(a, b) {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return a.id === b.id && a.role === b.role && a.full_name === b.full_name && a.email === b.email;
+}
+
+function paintLayout(activePage, profile, onAccountOpen) {
+  document.querySelectorAll('body > #account-menu').forEach((el) => el.remove());
 
   const header = $('#app-header');
   header.className = 'site-header';
   render(header, html`
     <div class="container">
       <a class="brand" href="index.html">
-        <img src="assets/images/logo.webp" alt="">
+        <img src="assets/images/logo.webp" alt="" width="34" height="34" decoding="async">
         <strong>Trạm Hỷ</strong>
       </a>
       <nav class="nav" aria-label="Điều hướng chính">
@@ -148,23 +173,38 @@ export async function initLayout(activePage) {
                ${avatar(profile, 'sm')}Tài khoản</button>`
       : html`<a href="login.html" class="${accountActive ? 'active' : ''}"><span aria-hidden="true">👤</span>Đăng nhập</a>`}`);
 
-  // Chuông thông báo + menu tài khoản: mở cái này thì đóng cái kia
+  const footer = $('#app-footer');
+  if (footer) {
+    footer.className = 'site-footer';
+    render(footer, html`
+      <div class="container footer-row">
+        <span>© 2026 Trạm Hỷ – Kết duyên cát hỷ, trọn vẹn niềm tin · Dự án EXE – Group 5</span>
+        <a href="gioi-thieu.html">Giới thiệu Trạm Hỷ</a>
+        ${profile?.role === 'admin' ? '' : html`<a href="doi-tac.html">🏪 Trở thành đối tác bán hàng</a>`}
+      </div>`);
+  }
+
+  return bindAccountMenu({ onOpen: onAccountOpen });
+}
+
+/** Vẽ header/footer ngay lập tức (0ms) rồi đồng bộ hồ sơ người dùng từ Supabase để trang dùng tiếp. */
+export async function initLayout(activePage) {
+  injectSpeculationRules();
+
   let closeBell = () => {};
-  const closeAccount = bindAccountMenu({ onOpen: () => closeBell() });
-  const bellButton = header.querySelector('[data-notif]');
+  const cached = getCachedProfile();
+  let closeAccount = paintLayout(activePage, cached, () => closeBell());
+
+  const profile = await getProfile().catch(() => null);
+  if (!sameProfileSnapshot(cached, profile)) {
+    closeAccount = paintLayout(activePage, profile, () => closeBell());
+  }
+
+  const bellButton = $('#app-header [data-notif]');
   if (profile && bellButton) {
-    closeBell = mountNotificationBell(bellButton, profile, { onOpen: closeAccount }).close;
+    closeBell = mountNotificationBell(bellButton, profile, { onOpen: () => closeAccount() }).close;
   }
   if (activePage !== 'login') watchAccountSwitch(profile);
-
-  const footer = $('#app-footer');
-  footer.className = 'site-footer';
-  render(footer, html`
-    <div class="container footer-row">
-      <span>© 2026 Trạm Hỷ – Kết duyên cát hỷ, trọn vẹn niềm tin · Dự án EXE – Group 5</span>
-      <a href="gioi-thieu.html">Giới thiệu Trạm Hỷ</a>
-      ${profile?.role === 'admin' ? '' : html`<a href="doi-tac.html">🏪 Trở thành đối tác bán hàng</a>`}
-    </div>`);
 
   return profile;
 }

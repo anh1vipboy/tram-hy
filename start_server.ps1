@@ -51,9 +51,13 @@ while ($listener.IsListening) {
             $bytes = [System.IO.File]::ReadAllBytes($filePath)
             $response.ContentType = $mime
             $response.ContentLength64 = $bytes.Length
-            $response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate")
-            $response.Headers.Add("Pragma", "no-cache")
-            $response.Headers.Add("Expires", "0")
+            if ($urlPath.StartsWith("/js/vendor/") -or $urlPath.StartsWith("/assets/")) {
+                $response.Headers.Add("Cache-Control", "public, max-age=86400")
+            } else {
+                $response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate")
+                $response.Headers.Add("Pragma", "no-cache")
+                $response.Headers.Add("Expires", "0")
+            }
             $response.StatusCode = 200
             $response.OutputStream.Write($bytes, 0, $bytes.Length)
         } else {

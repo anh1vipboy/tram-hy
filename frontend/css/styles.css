@@ -989,3 +989,13 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
 @media (prefers-reduced-motion: reduce) {
   .btn, .chip, .item-card, .item-card .thumb, .budget-bar span, .top-vendor-row, .top-vendor-arrow { transition: none !important; }
 }
+
+/* Hoãn dựng các khối nằm sâu dưới màn hình đầu để tăng tốc hiển thị lần đầu */
+#budget, .partner-banner {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 420px;
+}
+.site-footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 84px;
+}

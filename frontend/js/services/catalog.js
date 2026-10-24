@@ -5,10 +5,68 @@ export const VENDOR_FIELDS = 'id, slug, name, category, district, address, phone
 // photos: số ảnh các góc (để hiện nhãn "N ảnh" và nút xem ảnh)
 const DRESS_FIELDS = 'id, slug, name, type, theme, price, original_price, image_url, tryon_slug, photos:dress_photos(count), vendor:vendors(id, slug, name, district, is_verified)';
 
+const CACHE_PREFIX = 'tramhy.catalog.';
+const FRESH_MS = 30_000;      // < 30 giây: dùng luôn không cần hỏi lại
+const MAX_AGE_MS = 300_000;   // < 5 phút: trả ngay từ bộ nhớ phiên (0ms) + làm mới ngầm phía sau
+
+function readCache(key) {
+  try {
+    const raw = sessionStorage.getItem(CACHE_PREFIX + key);
+    if (!raw) return null;
+    const entry = JSON.parse(raw);
+    if (!entry || Date.now() - entry.ts > MAX_AGE_MS) return null;
+    return entry;
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(key, data) {
+  try {
+    sessionStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ ts: Date.now(), data }));
+  } catch { /* bộ nhớ phiên đầy hoặc bị chặn */ }
+}
+
+export function clearCatalogCache() {
+  try {
+    for (const key of Object.keys(sessionStorage)) {
+      if (key.startsWith(CACHE_PREFIX)) sessionStorage.removeItem(key);
+    }
+  } catch { /* bỏ qua */ }
+}
+
+async function swrCache(key, fetcher) {
+  const hit = readCache(key);
+  if (hit) {
+    if (Date.now() - hit.ts > FRESH_MS) {
+      fetcher().then((fresh) => writeCache(key, fresh)).catch(() => {});
+    }
+    return hit.data;
+  }
+  const data = await fetcher();
+  writeCache(key, data);
+  return data;
+}
+
 // Chỉ tiệm đã được duyệt (admin/chủ tiệm đọc được cả tiệm chờ duyệt nên phải lọc rõ)
-export async function listVendors() {
-  return unwrap(await sb.from('vendors').select(VENDOR_FIELDS)
-    .eq('status', 'approved').order('rating', { ascending: false }));
+export async function listVendors({ verifiedOnly = false, limit } = {}) {
+  // Nếu đã có sẵn toàn bộ danh sách đối tác trong phiên, lọc trực tiếp (0ms) không cần gọi mạng
+  if (verifiedOnly || limit) {
+    const allHit = readCache('vendors:all');
+    if (allHit) {
+      let list = allHit.data;
+      if (verifiedOnly) list = list.filter((v) => v.is_verified);
+      return limit ? list.slice(0, limit) : list;
+    }
+  }
+  const key = `vendors:${verifiedOnly ? 'verified' : 'all'}:${limit || 'all'}`;
+  return swrCache(key, async () => {
+    let query = sb.from('vendors').select(VENDOR_FIELDS)
+      .eq('status', 'approved').order('rating', { ascending: false });
+    if (verifiedOnly) query = query.eq('is_verified', true);
+    if (limit) query = query.limit(limit);
+    return unwrap(await query);
+  });
 }
 
 // Không lọc trạng thái: chủ tiệm / admin xem trước được trang của tiệm chờ duyệt
@@ -18,25 +76,34 @@ export async function getVendorBySlug(slug) {
 
 /** Số liệu thật cho trang Giới thiệu (chỉ đếm, không tải dữ liệu): { vendors, verified, dresses } */
 export async function platformStats() {
-  const count = async (query) => {
-    const { count: total, error } = await query;
-    if (error) throw new Error(error.message);
-    return total ?? 0;
-  };
-  const vendors = () => sb.from('vendors').select('id', { count: 'exact', head: true }).eq('status', 'approved');
-  const [all, verified, dresses] = await Promise.all([
-    count(vendors()),
-    count(vendors().eq('is_verified', true)),
-    count(sb.from('dresses').select('id', { count: 'exact', head: true }).eq('is_active', true)),
-  ]);
-  return { vendors: all, verified, dresses };
+  return swrCache('stats', async () => {
+    const count = async (query) => {
+      const { count: total, error } = await query;
+      if (error) throw new Error(error.message);
+      return total ?? 0;
+    };
+    const vendors = () => sb.from('vendors').select('id', { count: 'exact', head: true }).eq('status', 'approved');
+    const [all, verified, dresses] = await Promise.all([
+      count(vendors()),
+      count(vendors().eq('is_verified', true)),
+      count(sb.from('dresses').select('id', { count: 'exact', head: true }).eq('is_active', true)),
+    ]);
+    return { vendors: all, verified, dresses };
+  });
 }
 
 export async function listDresses({ vendorId, limit } = {}) {
-  let query = sb.from('dresses').select(DRESS_FIELDS).eq('is_active', true).order('price');
-  if (vendorId) query = query.eq('vendor_id', vendorId);
-  if (limit) query = query.limit(limit);
-  return unwrap(await query);
+  if (!vendorId && limit) {
+    const allHit = readCache('dresses:all:all');
+    if (allHit) return allHit.data.slice(0, limit);
+  }
+  const key = `dresses:${vendorId || 'all'}:${limit || 'all'}`;
+  return swrCache(key, async () => {
+    let query = sb.from('dresses').select(DRESS_FIELDS).eq('is_active', true).order('price');
+    if (vendorId) query = query.eq('vendor_id', vendorId);
+    if (limit) query = query.limit(limit);
+    return unwrap(await query);
+  });
 }
 
 export async function listReviews(vendorId) {
@@ -50,7 +117,10 @@ export async function listReviews(vendorId) {
 // Nghe thay đổi bảng vendors (đối tác thấy kết quả duyệt ngay, admin thấy hồ sơ mới). Trả về hàm hủy.
 export function subscribeVendorChanges(channelName, onChange) {
   const channel = sb.channel(channelName)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'vendors' }, onChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'vendors' }, (payload) => {
+      clearCatalogCache();
+      onChange(payload);
+    })
     .subscribe();
   return () => sb.removeChannel(channel);
 }
