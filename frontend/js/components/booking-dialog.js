@@ -74,6 +74,7 @@ export async function openBookingDialog(booking, returnTo) {
               : html`<div class="price">${money(booking.price)}</div>`}
           ${booking.priceNote ? html`<div class="small muted" style="margin-bottom:4px">${booking.priceNote}</div>` : ''}
           <div class="small muted">Thanh toán 3 đợt qua Trạm Hỷ: ${split.join('% → ')}%. Tiền chỉ đến tay đối tác sau khi bạn nghiệm thu từng đợt.</div>
+          <div class="small" style="margin-top:4px;color:var(--green);font-weight:600">🛡️ Phí bảo chứng Escrow Trạm Hỷ: 0đ (Miễn phí 100% cho Cô dâu Chú rể)</div>
         </div>
         <div class="form-grid">
           ${venue ? html`

@@ -4,6 +4,9 @@ import { $, $$, html, render, money, date, dateTime, debounce } from '../core/ut
 import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_STATUS, statusBadge, packageLabel } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy, focusFromUrl } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
+import {
+  summarizeBookingsFinance, bookingFinanceBreakdownView, exportPartnerFinanceExcel, openLiveSpreadsheetSyncDialog,
+} from '../components/finance-export.js';
 import { subscribeVendorChanges } from '../services/catalog.js';
 import { listMyShops, updateMyShop, resubmitVendor } from '../services/shop.js';
 import { listVendorBookings, vendorSetStatus, openDispute, subscribeBookingChanges } from '../services/bookings.js';
@@ -42,18 +45,23 @@ async function load() {
 }
 
 function renderStats() {
-  const sumMilestones = (status) => bookings
-    .flatMap((b) => b.milestones).filter((m) => m.status === status)
-    .reduce((total, m) => total + m.amount, 0);
-  const released = sumMilestones('released');
+  const s = summarizeBookingsFinance(bookings);
+  const feePct = Math.round(PLATFORM_FEE_RATE * 100);
+  const netPct = 100 - feePct;
+  const activeOrders = bookings.filter((b) => ['pending', 'confirmed', 'in_progress', 'ready_for_review'].includes(b.status)).length;
   const stats = [
-    ['Đơn đang xử lý', bookings.filter((b) => ['pending', 'confirmed', 'in_progress', 'ready_for_review'].includes(b.status)).length],
-    ['Trạm Hỷ đang giữ hộ', money(sumMilestones('paid'))],
-    ['Đã giải ngân (sau phí 10%)', money(Math.round(released * (1 - PLATFORM_FEE_RATE)))],
-    ['Đơn hoàn tất', bookings.filter((b) => b.status === 'completed').length],
+    ['Tổng doanh số (100%)', money(s.gmv), `${activeOrders} đơn đang xử lý · ${s.completedCount} đơn hoàn tất`],
+    [`Phí hoa hồng sàn (${feePct}%)`, `−${money(s.expectedFee)}`, 'Chỉ khấu trừ khi đợt tiền được giải ngân'],
+    [`Tiệm thực nhận (${netPct}%)`, money(s.expectedPartnerNet), `Tổng doanh thu thuần của tiệm`],
+    ['Trạm Hỷ đang giữ hộ', money(s.paidEscrow), `Sẽ về tiệm ${money(s.partnerEscrowNet)} (${netPct}%) sau nghiệm thu`],
+    [`Đã giải ngân về tiệm (${netPct}%)`, money(s.partnerPaidNet), `Đã trừ ${money(s.earnedFee)} phí hoa hồng sàn`],
   ];
-  render($('#stats'), stats.map(([label, value]) => html`
-    <div class="card stat"><div class="stat-label">${label}</div><div class="stat-value">${value}</div></div>`));
+  render($('#stats'), stats.map(([label, value, sub]) => html`
+    <div class="card stat">
+      <div class="stat-label">${label}</div>
+      <div class="stat-value">${value}</div>
+      <div class="small muted" style="margin-top:4px">${sub}</div>
+    </div>`));
 }
 
 function renderBoard() {
@@ -80,12 +88,12 @@ function card(b) {
     <article class="kanban-card" data-booking="${b.id}" data-code="${b.code}">
       <div class="row"><strong>${b.contact_name || 'Khách hàng'}</strong><span class="spacer"></span>${statusBadge(BOOKING_STATUS, b.status)}</div>
       <div class="small muted">${b.code} · ${b.contact_phone || ''}</div>
-      <div class="small">${b.dress?.name || b.details?.package?.name || BOOKING_TYPE[b.type]}${b.details?.tables ? ` · ${b.details.tables} bàn` : ''}</div>
+      <div class="small"><strong>${b.dress?.name || b.details?.package?.name || BOOKING_TYPE[b.type]}</strong>${b.details?.tables ? ` · ${b.details.tables} bàn` : ''}</div>
       <div class="small">Hẹn: <strong>${dateTime(b.appointment_at)}</strong></div>
-      <div class="small">Tổng: <span class="price">${money(b.total_price)}</span></div>
+      ${bookingFinanceBreakdownView(b)}
       ${b.note ? html`<div class="small muted">Ghi chú: ${b.note}</div>` : ''}
       ${openDisputeView(b)}
-      <details><summary class="small" style="cursor:pointer">Tiến độ thanh toán</summary>${milestonesView(b)}</details>
+      <details><summary class="small" style="cursor:pointer">Tiến độ thanh toán 3 đợt</summary>${milestonesView(b)}</details>
       ${detailsView(b.details)}
       <div class="row">${actionButtons(b)}</div>
     </article>`;
@@ -142,8 +150,6 @@ const ACTIONS = {
 };
 
 // ---------- HỒ SƠ TIỆM ----------
-// Chưa có tiệm → form đăng ký; chờ duyệt → thông báo; bị từ chối → lý do + sửa & gửi lại;
-// đã duyệt → bảng đơn hàng.
 async function refreshShops() {
   try {
     shops = await listMyShops(profile.id);
@@ -153,6 +159,8 @@ async function refreshShops() {
   }
   const approved = approvedShops();
   $('#shop-name').textContent = approved.length ? approved.map((s) => s.name).join(', ') : 'Mở tiệm trên Trạm Hỷ';
+  const financeActions = $('#partner-finance-actions');
+  if (financeActions) financeActions.hidden = !approved.length;
   renderShopStatus();
   renderWorkspace();
 
@@ -162,9 +170,6 @@ async function refreshShops() {
   }
 }
 
-// ---------- KHU LÀM VIỆC: Đơn hàng | Mẫu váy | Ảnh tiệm ----------
-// Tab Mẫu váy / Ảnh tiệm chỉ vẽ khi mở lần đầu (hoặc khi đổi tiệm), để realtime cập nhật đơn
-// không làm mất thao tác đang dở ở các tab đó.
 const approvedShops = () => shops.filter((s) => s.status === 'approved');
 const managedShop = () => approvedShops().find((s) => s.id === managedShopId);
 
@@ -175,6 +180,12 @@ function initWorkspace() {
     mountedPanels = {};
     renderWorkspace();
   });
+  $('#btn-partner-excel')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
+    const shopTitle = approvedShops().map((s) => s.name).join(', ') || 'Đối tác Trạm Hỷ';
+    await exportPartnerFinanceExcel(bookings, shopTitle);
+    toast('Đã tải file Excel doanh thu & đối soát hoa hồng của tiệm.', 'success');
+  }));
+  $('#btn-partner-sync')?.addEventListener('click', () => openLiveSpreadsheetSyncDialog(bookings));
 }
 
 function renderWorkspace() {
@@ -222,7 +233,6 @@ function showPanel(name) {
 function renderShopStatus() {
   const container = $('#shop-status');
   if (!shops.length) {
-    // Cô dâu / đối tác chưa có tiệm → đăng ký từng bước. Gửi xong tải lại để header đổi sang vai trò đối tác.
     mountShopWizard(container, {
       userId: profile.id,
       onSubmitted: async () => {
@@ -268,7 +278,6 @@ function renderShopStatus() {
   });
 }
 
-// Dòng thời gian duyệt hồ sơ: Đã gửi → Đang xét duyệt → Kết quả
 function reviewTimeline(shop) {
   const rejected = shop.status === 'rejected';
   const steps = [

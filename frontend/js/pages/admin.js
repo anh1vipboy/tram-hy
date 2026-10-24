@@ -4,6 +4,9 @@ import { $, $$, html, render, money, dateTime, debounce } from '../core/utils.js
 import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_CATEGORY, VENDOR_STATUS, badge, statusBadge } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
+import {
+  bookingFinance, summarizeBookingsFinance, serviceTitle, exportAdminFinanceExcel, openLiveSpreadsheetSyncDialog,
+} from '../components/finance-export.js';
 import { listAllBookings, subscribeBookingChanges } from '../services/bookings.js';
 import { subscribeVendorChanges } from '../services/catalog.js';
 import {
@@ -12,6 +15,7 @@ import {
 import { getTryonSettings, saveTryonSettings } from '../services/tryon-ai.js';
 
 const data = { bookings: [], disputes: [], vendors: [] };
+const bookingFilter = { state: 'all', vendorId: 'all' };
 
 async function load() {
   try {
@@ -29,19 +33,24 @@ async function load() {
 }
 
 function renderStats() {
-  const milestones = data.bookings.flatMap((b) => b.milestones);
-  const sum = (status) => milestones.filter((m) => m.status === status).reduce((t, m) => t + m.amount, 0);
-  const released = sum('released');
+  const s = summarizeBookingsFinance(data.bookings);
+  const feePct = Math.round(PLATFORM_FEE_RATE * 100);
+  const netPct = 100 - feePct;
+  const pendingVendors = data.vendors.filter((v) => v.status === 'pending').length;
   const stats = [
-    ['Tổng số đơn', data.bookings.length],
-    ['Đang giữ trong Escrow', money(sum('paid'))],
-    ['Đã giải ngân cho đối tác', money(released)],
-    ['Doanh thu phí sàn (10%)', money(Math.round(released * PLATFORM_FEE_RATE))],
-    ['Đối tác chờ duyệt', data.vendors.filter((v) => v.status === 'pending').length],
-    ['Khiếu nại chờ xử lý', data.disputes.length],
+    ['Tổng giao dịch (GMV 100%)', money(s.gmv), `${s.activeCount}/${s.totalCount} đơn hiệu lực`],
+    [`Hoa hồng Sàn dự kiến (${feePct}%)`, money(s.expectedFee), `Tính trên ${s.activeCount} đơn hiệu lực`],
+    [`Hoa hồng Sàn thực thu (${feePct}%)`, money(s.earnedFee), `Từ ${money(s.releasedGross)} đã giải ngân`],
+    ['Đang giữ hộ trong Escrow', money(s.paidEscrow), `Sẽ trả tiệm ${money(s.partnerEscrowNet)} (${netPct}%)`],
+    [`Đã trả Đối tác (${netPct}%)`, money(s.partnerPaidNet), `${s.completedCount} đơn hoàn tất trọn vẹn`],
+    ['Cần xử lý ngay', `${pendingVendors} tiệm · ${data.disputes.length} đơn`, 'Đối tác chờ duyệt & khiếu nại'],
   ];
-  render($('#stats'), stats.map(([label, value]) => html`
-    <div class="card stat"><div class="stat-label">${label}</div><div class="stat-value">${value}</div></div>`));
+  render($('#stats'), stats.map(([label, value, sub]) => html`
+    <div class="card stat">
+      <div class="stat-label">${label}</div>
+      <div class="stat-value">${value}</div>
+      <div class="small muted" style="margin-top:4px">${sub}</div>
+    </div>`));
 }
 
 // ---------- DUYỆT ĐỐI TÁC ----------
@@ -199,30 +208,127 @@ function renderVendors() {
   });
 }
 
-// ---------- TẤT CẢ ĐƠN ----------
+// ---------- TẤT CẢ ĐƠN & ĐỐI SOÁT HOA HỒNG ----------
+function filterBookingsList() {
+  return data.bookings.filter((b) => {
+    const f = bookingFinance(b);
+    if (bookingFilter.vendorId !== 'all' && String(b.vendor_id || b.vendor?.id) !== bookingFilter.vendorId) return false;
+    if (bookingFilter.state === 'escrow') return f.paidEscrow > 0;
+    if (bookingFilter.state === 'released') return f.releasedGross > 0;
+    if (bookingFilter.state === 'pending') return b.status === 'pending';
+    if (bookingFilter.state === 'cancelled') return f.isCancelled;
+    return true;
+  });
+}
+
 function renderBookings() {
+  const container = $('#tab-bookings');
   if (!data.bookings.length) {
-    render($('#tab-bookings'), html`<div class="empty">Chưa có đơn nào.</div>`);
+    render(container, html`<div class="empty">Chưa có đơn nào.</div>`);
     return;
   }
-  render($('#tab-bookings'), html`
-    <div class="card table-wrap">
-      <table>
-        <thead><tr><th>Mã</th><th>Khách</th><th>Đối tác</th><th>Loại</th><th>Tổng</th><th>Trạng thái</th><th>Tạo lúc</th></tr></thead>
-        <tbody>
-          ${data.bookings.map((b) => html`
-            <tr>
-              <td>${b.code}</td>
-              <td>${b.contact_name}<div class="small muted">${b.contact_phone}</div></td>
-              <td>${b.vendor.name}</td>
-              <td>${BOOKING_TYPE[b.type]}${b.details?.package?.name ? html`<div class="small muted">${b.details.package.name}${b.details.tables ? ` · ${b.details.tables} bàn` : ''}</div>` : ''}</td>
-              <td class="price">${money(b.total_price)}</td>
-              <td>${statusBadge(BOOKING_STATUS, b.status)}</td>
-              <td class="small">${dateTime(b.created_at)}</td>
-            </tr>`)}
-        </tbody>
-      </table>
+  const filtered = filterBookingsList();
+  const s = summarizeBookingsFinance(filtered);
+  const feePct = Math.round(PLATFORM_FEE_RATE * 100);
+  const netPct = 100 - feePct;
+
+  const vendorOptions = [...new Map(
+    data.bookings.filter((b) => b.vendor).map((b) => [String(b.vendor_id || b.vendor.id), b.vendor.name]),
+  ).entries()];
+
+  render(container, html`
+    <div class="stack" style="gap:14px">
+      <div class="card stack" style="padding:14px;gap:12px">
+        <div class="row" style="justify-content:space-between">
+          <div class="chips">
+            ${[
+              ['all',       `Tất cả (${data.bookings.length})`],
+              ['escrow',    'Đang giữ tiền Escrow'],
+              ['released',  'Đã giải ngân & thu hoa hồng'],
+              ['pending',   'Chờ khách đặt cọc'],
+              ['cancelled', 'Đã hủy / Hoàn cọc'],
+            ].map(([k, lbl]) => html`
+              <button type="button" class="chip ${bookingFilter.state === k ? 'active' : ''}" data-bfilter="${k}">${lbl}</button>`)}
+          </div>
+          <div class="row" style="gap:8px">
+            <select class="input" style="width:auto;padding:7px 12px;font-size:13px" data-vendor-filter aria-label="Lọc theo tiệm đối tác">
+              <option value="all">Tất cả đối tác (${vendorOptions.length})</option>
+              ${vendorOptions.map(([id, name]) => html`<option value="${id}" ${bookingFilter.vendorId === id ? 'selected' : ''}>${name}</option>`)}
+            </select>
+            <button type="button" class="btn btn-outline btn-sm" data-sync-filtered>🔄 Đồng bộ Sheets</button>
+            <button type="button" class="btn btn-primary btn-sm" data-export-filtered>⬇ Xuất Excel (${filtered.length} đơn)</button>
+          </div>
+        </div>
+        <div class="small muted">
+          💡 Công thức minh bạch trên mỗi đơn: <b>Tổng giá trị đơn (100%) = Hoa hồng nền tảng Trạm Hỷ (${feePct}%) + Đối tác thực nhận (${netPct}%)</b>. Cô dâu chú rể được miễn phí 0đ phí bảo chứng.
+        </div>
+      </div>
+
+      ${filtered.length ? html`
+        <div class="card table-wrap">
+          <table class="finance-table">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Đối tác</th>
+                <th>Dịch vụ</th>
+                <th>Tổng đơn (100%)</th>
+                <th>Hoa hồng (${feePct}%)</th>
+                <th>Trả Tiệm (${netPct}%)</th>
+                <th>Giữ Escrow</th>
+                <th>Hoa hồng Thực thu</th>
+                <th>Trạng thái</th>
+                <th>Tạo lúc</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.map((b) => {
+                const f = bookingFinance(b);
+                return html`
+                  <tr>
+                    <td><strong>${b.code}</strong></td>
+                    <td>${b.contact_name}<div class="small muted">${b.contact_phone}</div></td>
+                    <td><strong>${b.vendor?.name ?? '—'}</strong><div class="small muted">${VENDOR_CATEGORY[b.vendor?.category] ?? ''}</div></td>
+                    <td>${serviceTitle(b)}</td>
+                    <td class="price">${money(f.total)}</td>
+                    <td class="fee-cell">${f.isCancelled ? '0đ' : money(f.expectedFee)}</td>
+                    <td class="net-cell">${f.isCancelled ? '0đ' : money(f.expectedPartnerNet)}</td>
+                    <td>${f.paidEscrow ? html`<strong>${money(f.paidEscrow)}</strong>` : html`<span class="muted">0đ</span>`}</td>
+                    <td>${f.earnedFee ? html`<strong class="text-green">${money(f.earnedFee)}</strong><div class="small muted">Đã trả tiệm ${money(f.partnerPaidNet)}</div>` : html`<span class="muted">Chưa giải ngân</span>`}</td>
+                    <td>${statusBadge(BOOKING_STATUS, b.status)}</td>
+                    <td class="small">${dateTime(b.created_at)}</td>
+                  </tr>`;
+              })}
+            </tbody>
+            <tfoot>
+              <tr class="finance-total-row">
+                <td colspan="4"><strong>TỔNG CỘNG (${filtered.length} đơn đang lọc)</strong></td>
+                <td class="price"><strong>${money(s.gmv)}</strong></td>
+                <td class="fee-cell"><strong>${money(s.expectedFee)}</strong></td>
+                <td class="net-cell"><strong>${money(s.expectedPartnerNet)}</strong></td>
+                <td><strong>${money(s.paidEscrow)}</strong></td>
+                <td><strong class="text-green">${money(s.earnedFee)}</strong></td>
+                <td colspan="2"><span class="small muted">Đã trả tiệm: ${money(s.partnerPaidNet)}</span></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>` : html`<div class="empty">Không có đơn hàng nào khớp bộ lọc đang chọn.</div>`}
     </div>`);
+
+  container.querySelectorAll('[data-bfilter]').forEach((chip) => chip.addEventListener('click', () => {
+    bookingFilter.state = chip.dataset.bfilter;
+    renderBookings();
+  }));
+  container.querySelector('[data-vendor-filter]')?.addEventListener('change', (e) => {
+    bookingFilter.vendorId = e.target.value;
+    renderBookings();
+  });
+  container.querySelector('[data-export-filtered]')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
+    await exportAdminFinanceExcel(filtered, data.vendors);
+    toast(`Đã xuất file Excel đối soát (${filtered.length} đơn).`, 'success');
+  }));
+  container.querySelector('[data-sync-filtered]')?.addEventListener('click', () => openLiveSpreadsheetSyncDialog(filtered));
 }
 
 // ---------- THỬ VÁY AI ----------
@@ -258,9 +364,9 @@ async function renderAiSettings() {
     e.preventDefault();
     withBusy(form.querySelector('[type=submit]'), async () => {
       try {
-        const data = new FormData(form);
-        await saveTryonSettings({ maxEnabled: data.has('maxEnabled'), dailyCredits: Number(data.get('dailyCredits')) });
-        toast(data.has('maxEnabled') ? 'Đã lưu – Siêu nét đang BẬT.' : 'Đã lưu – Siêu nét đang tắt.', 'success');
+        const formData = new FormData(form);
+        await saveTryonSettings({ maxEnabled: formData.has('maxEnabled'), dailyCredits: Number(formData.get('dailyCredits')) });
+        toast(formData.has('maxEnabled') ? 'Đã lưu – Siêu nét đang BẬT.' : 'Đã lưu – Siêu nét đang tắt.', 'success');
       } catch (error) {
         toastError(error);
       }
@@ -279,6 +385,11 @@ function initTabs() {
 
 // ---------- KHỞI CHẠY TRANG ----------
 initTabs();                    // gắn sự kiện tab ngay, không chờ kiểm tra đăng nhập (bấm sớm vẫn ăn)
+$('#btn-export-admin')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
+  await exportAdminFinanceExcel(data.bookings, data.vendors);
+  toast('Đã tải file Excel đối soát doanh thu & hoa hồng toàn sàn.', 'success');
+}));
+$('#btn-live-sync')?.addEventListener('click', () => openLiveSpreadsheetSyncDialog(data.bookings));
 // Đến từ chuông thông báo (admin.html?tab=disputes) → mở đúng tab
 document.querySelector(`[data-tab="${new URLSearchParams(location.search).get('tab')}"]`)?.click();
 await initLayout('admin');

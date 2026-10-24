@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://vsjdijmuvuetmhmszcrl.supabase.co" crossorigin>
   <link rel="modulepreload" href="js/vendor/supabase-2.117.3.js">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/styles.css">
-  <script type="module" src="js/pages/admin.js"></script>
+  <link rel="stylesheet" href="css/styles.css?v=5">
+  <script type="module" src="js/pages/admin.js?v=5"></script>
 </head>
 <body>
   <header id="app-header"></header>
@@ -20,7 +20,12 @@
     <div class="section-head">
       <div>
         <div class="eyebrow">Quản trị Trạm Hỷ</div>
-        <h1>Dòng tiền Escrow & đối tác</h1>
+        <h1>Dòng tiền Escrow, Hoa hồng (10%) &amp; Đối tác</h1>
+        <p>Minh bạch 100% giá trị đơn hàng: Hoa hồng nền tảng 10% · Giải ngân đối tác 90% · Miễn phí 0đ cho Cô dâu Chú rể.</p>
+      </div>
+      <div class="row" id="admin-head-actions">
+        <button class="btn btn-outline btn-sm" type="button" id="btn-live-sync">🔄 Đồng bộ Google Sheets / Excel</button>
+        <button class="btn btn-primary btn-sm" type="button" id="btn-export-admin">⬇ Xuất Excel Đối soát (.xlsx)</button>
       </div>
     </div>
     <div class="grid" id="stats" style="margin-bottom:24px"></div>
