@@ -15,9 +15,11 @@ export function openPlanShare() {
     onOpen: (body) => {
       render(body, html`<div class="empty">Đang tải…</div>`);
       let state = null;
+      let hideMoney = false;
+      let party = 'all';
 
       const draw = () => {
-        const link = state.token ? shareUrl(state.token) : '';
+        const link = state.token ? shareUrl(state.token, { hideMoney, party }) : '';
         const qr = state.enabled && link ? qrCanvas(link, { caption: 'Kế hoạch cưới – Trạm Hỷ' }) : null;
         render(body, html`
           <p class="small muted" style="margin:0">Gửi link cho bố mẹ, nửa kia hay wedding planner để mọi người cùng theo dõi
@@ -29,6 +31,19 @@ export function openPlanShare() {
               <span class="small muted">${state.enabled ? 'Đang bật – ai có link đều xem được' : 'Đang tắt – link không mở được'}</span></span>
           </label>
           ${state.enabled ? html`
+            <div class="share-options stack" style="gap:10px;padding:12px;border:1px solid var(--gold-line);border-radius:14px;background:var(--gold-soft)">
+              <label class="row" style="cursor:pointer;gap:8px;font-size:13.5px">
+                <input type="checkbox" data-hide-money ${hideMoney ? 'checked' : ''} style="accent-color:var(--brand);width:16px;height:16px">
+                <span><strong>🔒 Ẩn số tiền chi tiết</strong> <span class="muted small">(chỉ hiện tiến độ %, việc cần làm &amp; dịch vụ đã chọn)</span></span>
+              </label>
+              <div class="stack" style="gap:6px">
+                <span class="small muted" style="font-weight:600">Gửi riêng theo gia đình:</span>
+                <div class="chips">
+                  ${[['all', 'Tất cả hai bên'], ['groom', '🤵 Nhà Trai & Chung'], ['bride', '👰 Nhà Gái & Chung']].map(([k, lbl]) => html`
+                    <button type="button" class="chip ${party === k ? 'active' : ''}" data-share-party="${k}">${lbl}</button>`)}
+                </div>
+              </div>
+            </div>
             <div class="row share-link-row">
               <input class="input" value="${link}" readonly aria-label="Link xem kế hoạch" data-link>
               <button class="btn btn-dark btn-sm" type="button" data-copy>Sao chép</button>
@@ -40,13 +55,13 @@ export function openPlanShare() {
             <div class="share-qr">
               <img src="${qr.toDataURL('image/png')}" alt="Mã QR mở kế hoạch cưới" width="120" height="120">
               <div class="stack" style="gap:6px">
-                <strong class="small">Mã QR</strong>
+                <strong class="small">Mã QR ${hideMoney ? '(Chế độ ẩn tiền)' : ''}</strong>
                 <span class="small muted">Bố mẹ quét bằng camera điện thoại là mở được kế hoạch.</span>
                 <button class="btn btn-outline btn-sm" type="button" data-download-qr style="align-self:flex-start">⬇ Tải mã QR</button>
               </div>
             </div>` : ''}
           <div class="notice small share-note">
-            👀 Người có link <b>chỉ xem</b> được ngân sách, checklist và các đơn dịch vụ (tên, số tiền, trạng thái) –
+            👀 Người có link <b>chỉ xem</b> được ${hideMoney ? 'tiến độ phần trăm, checklist và dịch vụ đã chọn (số tiền đã được ẩn)' : 'ngân sách, checklist và các đơn dịch vụ'} –
             không sửa được gì, không thấy email hay số điện thoại của bạn.
           </div>
           ${state.token ? html`
@@ -54,6 +69,17 @@ export function openPlanShare() {
               <span class="small muted" style="flex:1;min-width:180px">Lỡ gửi nhầm người? Tạo link mới – link cũ sẽ không mở được nữa.</span>
               <button class="btn btn-outline btn-sm" type="button" data-rotate>🔄 Tạo link mới</button>
             </div>` : ''}`);
+
+        body.querySelector('[data-hide-money]')?.addEventListener('change', (e) => {
+          hideMoney = e.target.checked;
+          draw();
+        });
+        body.querySelectorAll('[data-share-party]').forEach((chip) => {
+          chip.addEventListener('click', () => {
+            party = chip.dataset.shareParty;
+            draw();
+          });
+        });
 
         const toggle = body.querySelector('[data-toggle]');
         toggle.addEventListener('change', async () => {

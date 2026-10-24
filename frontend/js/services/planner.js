@@ -148,7 +148,85 @@ export const setPlanShare = (enabled) => shareRpc('set_plan_share', { p_enabled:
 export const rotatePlanShare = () => shareRpc('rotate_plan_share');
 /** Người xem mở link: { status: 'ok' | 'not_found' | 'disabled', plan, couple, categories, checklist, bookings } */
 export const getSharedPlan = (token) => shareRpc('get_shared_plan', { p_token: token });
-export const shareUrl = (token) => new URL(`ke-hoach.html?xem=${encodeURIComponent(token)}`, location.href).href;
+export const shareUrl = (token, opts = {}) => {
+  const url = new URL(`ke-hoach.html?xem=${encodeURIComponent(token)}`, location.href);
+  if (opts.hideMoney) url.searchParams.set('an_tien', '1');
+  if (opts.party && opts.party !== 'all') url.searchParams.set('ben', opts.party);
+  return url.href;
+};
+
+// ---------- PHÂN BỔ BÊN PHỤ TRÁCH (CHUNG / NHÀ TRAI / NHÀ GÁI) ----------
+export const PARTY_META = {
+  both:  { key: 'both',  label: 'Hai vợ chồng', short: 'Chung',    badge: '💑 Chung',    next: 'groom' },
+  groom: { key: 'groom', label: 'Nhà Trai',     short: 'Nhà Trai', badge: '🤵 Nhà Trai', next: 'bride' },
+  bride: { key: 'bride', label: 'Nhà Gái',      short: 'Nhà Gái',  badge: '👰 Nhà Gái',  next: 'both'  },
+};
+
+const PARTY_PREFIX = { groom: '[NT] ', bride: '[NG] ', both: '[CH] ' };
+
+export function parseCategoryParty(rawName = '') {
+  const str = String(rawName || '').trim();
+  if (str.startsWith('[NT] ')) return { name: str.slice(5).trim(), party: 'groom', ...PARTY_META.groom };
+  if (str.startsWith('[NG] ')) return { name: str.slice(5).trim(), party: 'bride', ...PARTY_META.bride };
+  if (str.startsWith('[CH] ')) return { name: str.slice(5).trim(), party: 'both',  ...PARTY_META.both };
+  if (/nhà trai|sính lễ|dạm ngõ|ăn hỏi|tráp|rước dâu|xe hoa/i.test(str)) {
+    return { name: str, party: 'groom', ...PARTY_META.groom };
+  }
+  if (/nhà gái|lại mặt|vu quy|báo hỷ nhà gái/i.test(str)) {
+    return { name: str, party: 'bride', ...PARTY_META.bride };
+  }
+  return { name: str, party: 'both', ...PARTY_META.both };
+}
+
+export function formatCategoryParty(cleanName, party = 'both') {
+  const clean = parseCategoryParty(cleanName).name;
+  return `${PARTY_PREFIX[party] ?? ''}${clean}`;
+}
+
+/**
+ * Ghim 1 mẫu váy / gói dịch vụ / đối tác từ trang Dịch vụ cưới thẳng vào bảng Ngân sách dự kiến của Kế hoạch cưới.
+ * Trả về { plan, category, item, createdPlan }.
+ */
+export async function addServiceToPlanBudget(userId, { vendorCategory, categoryTitle, itemName, price }) {
+  let plan = await getPlan(userId);
+  let createdPlan = false;
+  if (!plan) {
+    plan = await createPlan(userId, {
+      weddingDate: null,
+      region: 'north',
+      totalBudget: 300_000_000,
+      guests: 200,
+      city: 'Hà Nội',
+    });
+    createdPlan = true;
+  }
+  const categories = await listBudget(plan.id);
+  let targetCat = categories.find((c) => c.vendor_category === vendorCategory);
+  if (!targetCat) {
+    const pos = categories.length;
+    targetCat = unwrap(await sb.from('budget_categories').insert({
+      plan_id: plan.id,
+      name: categoryTitle || 'Dịch vụ cưới',
+      vendor_category: vendorCategory || null,
+      position: pos,
+    }).select().single());
+    targetCat.items = [];
+  }
+  const existing = (targetCat.items || []).find((i) => i.name.toLowerCase() === itemName.toLowerCase());
+  if (existing) {
+    await updateItem(existing.id, { estimated: Math.round(Number(price) || 0) });
+    return { plan, category: targetCat, item: { ...existing, estimated: Math.round(Number(price) || 0) }, updated: true, createdPlan };
+  }
+  const pos = (targetCat.items || []).length;
+  const item = unwrap(await sb.from('budget_items').insert({
+    plan_id: plan.id,
+    category_id: targetCat.id,
+    name: itemName.slice(0, 120),
+    estimated: Math.round(Number(price) || 0),
+    position: pos,
+  }).select().single());
+  return { plan, category: targetCat, item, updated: false, createdPlan };
+}
 
 // ---------- Cách chia AI ở trang chủ → mang sang trang Kế hoạch (qua cả bước đăng nhập) ----------
 const DRAFT_KEY = 'tramhy:plan-from-ai';

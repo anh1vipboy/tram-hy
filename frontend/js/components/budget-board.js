@@ -8,6 +8,7 @@ import { makeSortable } from './sortable.js';
 import { trackSave } from './save-status.js';
 import {
   listBudget, addCategory, updateCategory, deleteCategory, addItem, updateItem, deleteItem, savePositions,
+  parseCategoryParty, formatCategoryParty,
 } from '../services/planner.js';
 
 const ACTIVE_BOOKING = (b) => !['cancelled', 'refunded'].includes(b.status);
@@ -48,8 +49,35 @@ export function budgetTotals(categories, bookings, plan) {
   };
 }
 
+/** Tổng hợp ngân sách theo bên phụ trách: Chung (both), Nhà Trai (groom), Nhà Gái (bride) */
+export function partyTotals(categories, bookings) {
+  const { byCategory, unlinked } = linkBookings(categories, bookings);
+  const res = {
+    both:  { estimated: 0, paid: 0, count: 0 },
+    groom: { estimated: 0, paid: 0, count: 0 },
+    bride: { estimated: 0, paid: 0, count: 0 },
+  };
+  for (const c of categories) {
+    const { party } = parseCategoryParty(c.name);
+    const linked = byCategory.get(c) ?? [];
+    const est = c.items.reduce((s, i) => s + i.estimated, 0) + linked.reduce((s, b) => s + b.total_price, 0);
+    const paid = c.items.filter((i) => i.paid).reduce((s, i) => s + (i.actual || i.estimated), 0)
+      + linked.reduce((s, b) => s + bookingPaid(b), 0);
+    res[party].estimated += est;
+    res[party].paid += paid;
+    res[party].count += c.items.length + linked.length;
+  }
+  for (const b of unlinked) {
+    res.both.estimated += b.total_price;
+    res.both.paid += bookingPaid(b);
+    res.both.count += 1;
+  }
+  return res;
+}
+
 export async function mountBudgetBoard(container, plan, { bookings = [], onChange } = {}) {
   let categories = [];
+  let partyFilter = 'all';
   const collapsed = new Set();
   const active = bookings.filter(ACTIVE_BOOKING);
 
@@ -130,14 +158,39 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
       </li>`;
   }
 
+  function partyBar() {
+    const pt = partyTotals(categories, bookings);
+    const chips = [
+      ['all',   'Tất cả hai bên', null],
+      ['both',  '💑 Hai vợ chồng', pt.both.estimated],
+      ['groom', '🤵 Nhà Trai',     pt.groom.estimated],
+      ['bride', '👰 Nhà Gái',      pt.bride.estimated],
+    ];
+    return html`
+      <div class="budget-party-bar">
+        <div class="chips">
+          ${chips.map(([key, label, amount]) => html`
+            <button type="button" class="chip ${partyFilter === key ? 'active' : ''}" data-party-filter="${key}">
+              <span>${label}</span>
+              ${amount !== null ? html`<b class="party-chip-amount">${money(amount)}</b>` : ''}
+            </button>`)}
+        </div>
+        <span class="small muted">💡 Bấm nhãn <b>Chung / Nhà Trai / Nhà Gái</b> trên mỗi danh mục để đổi bên phụ trách</span>
+      </div>`;
+  }
+
   function categoryCard(c) {
     const t = categoryTotals(c);
     const isCollapsed = collapsed.has(c.id);
+    const p = parseCategoryParty(c.name);
+    const hiddenByParty = partyFilter !== 'all' && p.party !== partyFilter;
     return html`
-      <section class="card budget-category ${isCollapsed ? 'collapsed' : ''}" data-id="${c.id}" data-category="${c.id}">
+      <section class="card budget-category ${isCollapsed ? 'collapsed' : ''}" data-id="${c.id}" data-category="${c.id}" ${hiddenByParty ? 'hidden' : ''}>
         <header class="budget-cat-head">
           <button type="button" class="drag-handle" aria-label="Kéo để sắp xếp danh mục">⠿</button>
-          <input class="cat-name" value="${c.name}" maxlength="80" aria-label="Tên danh mục" data-cat-name>
+          <input class="cat-name" value="${p.name}" maxlength="80" aria-label="Tên danh mục" data-cat-name>
+          <button type="button" class="party-pill party-${p.party}" data-toggle-party
+                  title="Bấm để đổi bên phụ trách (Hai vợ chồng / Nhà Trai / Nhà Gái)">${p.badge}</button>
           <span class="cat-total">${money(t.estimated)}</span>
           ${c.vendor_category ? html`<a class="btn btn-outline btn-sm cat-find"
             href="marketplace.html?category=${c.vendor_category}${t.estimated ? `&max=${t.estimated}` : ''}">Tìm đối tác →</a>` : ''}
@@ -157,6 +210,7 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
   function draw() {
     render(container, html`
       ${summary()}
+      ${partyBar()}
       <div class="budget-categories" id="budget-categories">${categories.map(categoryCard)}</div>
       <button type="button" class="btn btn-primary btn-block btn-lg" data-add-cat>+ Thêm danh mục chi tiêu</button>`);
     bind();
@@ -170,6 +224,12 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
     render(holder, fresh);
     container.querySelector('.budget-summary').replaceWith(holder.firstElementChild);
     container.querySelector('[data-edit-budget]').addEventListener('click', editBudget);
+
+    const partyHolder = document.createElement('div');
+    render(partyHolder, partyBar());
+    container.querySelector('.budget-party-bar')?.replaceWith(partyHolder.firstElementChild);
+    bindPartyBar();
+
     for (const c of categories) {
       const card = container.querySelector(`[data-category="${c.id}"]`);
       const t = categoryTotals(c);
@@ -200,9 +260,19 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
     });
   }
 
+  function bindPartyBar() {
+    container.querySelectorAll('[data-party-filter]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        partyFilter = chip.dataset.partyFilter;
+        draw();
+      });
+    });
+  }
+
   function bind() {
     container.querySelector('[data-edit-budget]').addEventListener('click', editBudget);
     container.querySelector('[data-add-cat]').addEventListener('click', addNewCategory);
+    bindPartyBar();
 
     makeSortable(container.querySelector('#budget-categories'), {
       item: '.budget-category', handle: '.budget-cat-head .drag-handle',
@@ -221,10 +291,20 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
         card.querySelector('[data-collapse]').setAttribute('aria-expanded', String(!collapsed.has(category.id)));
       });
       card.querySelector('[data-cat-name]').addEventListener('change', (e) => {
-        const name = e.target.value.trim();
-        if (!name) { e.target.value = category.name; return; }
+        const clean = e.target.value.trim();
+        const cur = parseCategoryParty(category.name);
+        if (!clean) { e.target.value = cur.name; return; }
         const old = category.name;
+        const name = formatCategoryParty(clean, cur.party);
         category.name = name;
+        save(() => updateCategory(category.id, { name }), () => { category.name = old; });
+      });
+      card.querySelector('[data-toggle-party]').addEventListener('click', () => {
+        const cur = parseCategoryParty(category.name);
+        const old = category.name;
+        const name = formatCategoryParty(cur.name, cur.next);
+        category.name = name;
+        draw();
         save(() => updateCategory(category.id, { name }), () => { category.name = old; });
       });
       card.querySelector('[data-delete-cat]').addEventListener('click', () => removeCategory(category));
@@ -292,9 +372,23 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
     const done = await openDialog({
       title: 'Thêm danh mục chi tiêu',
       confirmText: 'Thêm danh mục',
-      content: html`<label class="field"><span>Tên danh mục</span>
-        <input class="input" name="name" required maxlength="80" placeholder="VD: Tuần trăng mật, Lễ vu quy…"></label>`,
-      onConfirm: (form) => addCategory(plan.id, form.get('name').trim(), categories.length),
+      content: html`
+        <div class="stack">
+          <label class="field"><span>Tên danh mục</span>
+            <input class="input" name="name" required maxlength="70" placeholder="VD: Tuần trăng mật, Lễ vu quy…"></label>
+          <label class="field"><span>Bên phụ trách</span>
+            <select class="input" name="party">
+              <option value="both">💑 Hai vợ chồng (Chung)</option>
+              <option value="groom">🤵 Nhà Trai</option>
+              <option value="bride">👰 Nhà Gái</option>
+            </select>
+          </label>
+        </div>`,
+      onConfirm: (form) => addCategory(
+        plan.id,
+        formatCategoryParty(form.get('name').trim(), form.get('party') || 'both'),
+        categories.length,
+      ),
     });
     if (done) {
       categories.push({ ...done, items: [] });
@@ -304,8 +398,9 @@ export async function mountBudgetBoard(container, plan, { bookings = [], onChang
   }
 
   async function removeCategory(category) {
+    const cleanName = parseCategoryParty(category.name).name;
     const ok = await openDialog({
-      title: `Xóa danh mục "${category.name}"?`,
+      title: `Xóa danh mục "${cleanName}"?`,
       danger: true,
       confirmText: 'Xóa danh mục',
       content: html`<p>Danh mục và <strong>${category.items.length} mục chi tiêu</strong> bên trong sẽ bị xóa.

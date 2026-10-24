@@ -256,14 +256,16 @@ function updateHeader() {
   renderActions();
 }
 
-// Nút Chia sẻ + Xuất Excel trên đầu trang: áp dụng cho cả kế hoạch nên đặt ngoài các tab
+// Nút Chia sẻ + Bản In / PDF + Xuất Excel trên đầu trang: áp dụng cho cả kế hoạch nên đặt ngoài các tab
 function renderActions() {
   const box = $('#planner-actions');
   render(box, html`
     <button type="button" class="btn btn-outline btn-sm" data-share-plan>🔗 Chia sẻ</button>
+    <button type="button" class="btn btn-outline btn-sm" data-print-plan>🖨️ Bản In / PDF</button>
     <button type="button" class="btn btn-outline btn-sm" data-export-plan>⬇ Xuất Excel</button>`);
   box.hidden = false;
   box.querySelector('[data-share-plan]').addEventListener('click', openPlanShare);
+  box.querySelector('[data-print-plan]').addEventListener('click', () => window.print());
   box.querySelector('[data-export-plan]').addEventListener('click', (e) => withBusy(e.currentTarget, exportOwnPlan));
 }
 

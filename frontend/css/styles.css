@@ -1173,3 +1173,131 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
   content-visibility: auto;
   contain-intrinsic-size: auto none auto 84px;
 }
+
+/* ---------- Kết nối Dịch vụ cưới ↔ Kế hoạch cưới & Khay so sánh ---------- */
+.plan-sync-bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 10px 16px; margin-bottom: 14px; padding: 11px 16px;
+  border-radius: 14px; border: 1px solid var(--gold-line);
+  background: linear-gradient(135deg, var(--gold-soft), var(--brand-soft));
+  box-shadow: 0 2px 10px rgba(155, 35, 53, .05);
+}
+.plan-sync-text {
+  display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;
+}
+.plan-sync-icon { font-size: 20px; line-height: 1; }
+.btn-pinned {
+  background: var(--green-soft); color: var(--green); border-color: #b7e1c9; font-weight: 700;
+}
+.btn-compare-icon {
+  padding: 6px 10px; min-width: 34px; border: 1px solid var(--gold-line);
+  background: var(--card); color: var(--muted);
+}
+.btn-compare-icon.active {
+  background: var(--gold-soft); border-color: var(--brand); color: var(--brand-dark);
+  box-shadow: 0 0 0 2px var(--brand-soft);
+}
+.card-action-row { gap: 6px; flex-wrap: wrap; }
+
+/* Khay so sánh nổi ở đáy màn hình */
+.compare-tray {
+  position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%); z-index: 55;
+  width: min(920px, calc(100% - 24px));
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 10px 16px; padding: 12px 16px; border-radius: 18px;
+  background: rgba(255, 252, 247, .96); backdrop-filter: blur(12px);
+  border: 1px solid var(--gold-bright);
+  box-shadow: 0 14px 36px rgba(42, 36, 33, .18);
+}
+body.has-tabbar .compare-tray {
+  bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+}
+.compare-tray-items {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 0;
+}
+.compare-pill {
+  display: flex; align-items: center; gap: 8px; padding: 5px 8px 5px 6px;
+  border-radius: 12px; border: 1px solid var(--line); background: var(--bg);
+  max-width: 210px; min-width: 0;
+}
+.compare-pill img {
+  width: 34px; height: 34px; border-radius: 8px; object-fit: cover; flex: none;
+}
+.compare-pill-info {
+  display: flex; flex-direction: column; min-width: 0; font-size: 12px; line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+.compare-remove {
+  appearance: none; border: 0; background: none; color: var(--muted);
+  cursor: pointer; padding: 2px 4px; border-radius: 6px; font-size: 12px;
+}
+.compare-remove:hover { color: var(--red); background: var(--red-soft); }
+.compare-tray-actions {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.compare-table th, .compare-table td {
+  min-width: 140px; font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Phân bổ Ngân sách theo Bên (Chung / Nhà Trai / Nhà Gái) ---------- */
+.budget-party-bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 8px 14px; margin: 14px 0; padding: 10px 14px;
+  border-radius: 14px; background: rgba(255, 253, 249, .82); border: 1px solid var(--line);
+}
+.party-chip-amount {
+  display: inline-block; margin-left: 5px; padding: 1px 7px; border-radius: 999px;
+  background: rgba(155, 35, 53, .08); color: var(--brand-dark);
+  font-size: 11.5px; font-variant-numeric: tabular-nums;
+}
+.party-pill {
+  appearance: none; display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line);
+  font: 600 11.5px var(--font-body); white-space: nowrap; cursor: pointer;
+  transition: transform .15s var(--ease-out), background .18s var(--ease-out), border-color .18s var(--ease-out);
+}
+.party-pill:active { transform: scale(.96); }
+.party-pill.party-both  { background: var(--gold-soft); color: #7a540c; border-color: var(--gold-line); }
+.party-pill.party-groom { background: var(--blue-soft); color: var(--blue); border-color: #c2d7f8; }
+.party-pill.party-bride { background: var(--brand-soft); color: var(--brand-dark); border-color: #e9c2bc; }
+
+@media (max-width: 560px) {
+  .plan-sync-bar { padding: 10px 12px; }
+  .plan-sync-bar .row { width: 100%; }
+  .plan-sync-bar .row .btn { flex: 1; }
+  .compare-tray { padding: 10px 12px; gap: 8px; }
+  .compare-pill { max-width: 100%; flex: 1 1 140px; }
+  .compare-tray-actions { width: 100%; }
+  .compare-tray-actions .btn { flex: 1; }
+  .budget-party-bar { padding: 10px 12px; }
+}
+
+/* ---------- Chế độ Bản In / PDF Sổ tay Cưới Cát Hỷ ---------- */
+@media print {
+  .site-header, .site-footer, .mobile-tabbar, .planner-tabs, .planner-actions,
+  .planner-view-bar, .share-banner, .budget-party-bar, .budget-summary-actions,
+  .add-row, [data-add-cat], .drag-handle, .icon-btn, .row-delete, [data-feedback],
+  .compare-tray, .toast-host {
+    display: none !important;
+  }
+  body {
+    background: #fff !important; color: #1f1a17 !important; font-size: 13px;
+  }
+  main.container {
+    width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important;
+  }
+  .planner-panel[hidden] {
+    display: block !important; margin-top: 18px;
+  }
+  #panel-ai {
+    display: none !important;
+  }
+  .card, details.view-category, .budget-category {
+    box-shadow: none !important; border: 1px solid #d8c7b8 !important;
+    break-inside: avoid; margin-bottom: 10px;
+  }
+  .budget-category.collapsed .budget-cat-body {
+    display: block !important;
+  }
+}
