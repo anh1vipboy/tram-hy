@@ -52,10 +52,20 @@ async function loadTopVendors() {
   try {
     const vendors = (await listVendors()).filter((v) => v.is_verified).slice(0, 5);
     render(container, vendors.map((v) => html`
-      <a class="row" href="vendor.html?slug=${v.slug}" style="color:inherit">
-        ${vendorLogo(v, { size: 32 })}<strong>${v.name}</strong><span class="verified" title="Đối tác Tích Xanh">✓</span>
-        <span class="spacer"></span>
-        <span class="muted small">${VENDOR_CATEGORY[v.category]} · ★ ${v.rating}</span>
+      <a class="top-vendor-row" href="vendor.html?slug=${v.slug}">
+        ${vendorLogo(v, { size: 42 })}
+        <div class="top-vendor-info">
+          <div class="top-vendor-name">
+            <strong>${v.name}</strong>
+            <span class="badge badge-blue" title="Đối tác Tích Xanh">✓ Tích Xanh</span>
+          </div>
+          <div class="muted small ellipsis">${VENDOR_CATEGORY[v.category]}${v.district ? ` · 📍 ${v.district}` : ''}</div>
+        </div>
+        <div class="top-vendor-meta">
+          <span class="vendor-rating small"><span class="stars">★</span> <strong>${v.rating}</strong> <span class="muted">(${v.review_count})</span></span>
+          <span class="small muted">Từ <strong class="price">${money(v.base_price)}</strong>${v.category === 'venue' ? '/bàn' : ''}</span>
+        </div>
+        <span class="top-vendor-arrow" aria-hidden="true">→</span>
       </a>`));
   } catch (error) {
     toastError(error);

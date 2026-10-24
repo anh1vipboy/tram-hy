@@ -19,7 +19,8 @@ export function mountHeroSlider(root) {
   render(root, html`
     ${SLIDES.map((s, i) => html`
       <img class="slide ${i === 0 ? 'active' : ''}" src="${s.src}" alt="Cô dâu thử ${s.label.toLowerCase()} trên Trạm Hỷ"
-           loading="${i === 0 ? 'eager' : 'lazy'}" aria-hidden="${i === 0 ? 'false' : 'true'}">`)}
+           loading="${i === 0 ? 'eager' : 'lazy'}" fetchpriority="${i === 0 ? 'high' : 'auto'}"
+           decoding="${i === 0 ? 'sync' : 'async'}" aria-hidden="${i === 0 ? 'false' : 'true'}">`)}
     <span class="slide-label" aria-live="polite">${SLIDES[0].label}</span>
     <button type="button" class="slide-nav prev" data-step="-1" aria-label="Ảnh trước">‹</button>
     <button type="button" class="slide-nav next" data-step="1" aria-label="Ảnh sau">›</button>
