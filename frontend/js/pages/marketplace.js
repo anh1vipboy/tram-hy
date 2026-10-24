@@ -81,17 +81,17 @@ function bindFilters() {
 }
 
 function renderViewTabs() {
-  const vCount = vendors.length ? ` (${vendors.length})` : '';
-  const dCount = dresses.length ? ` (${dresses.length})` : '';
-  const pCount = packages.length ? ` (${packages.length})` : '';
   const items = [
-    ['vendors',  `🏪 Đối tác${vCount}`],
-    ['dresses',  `👗 Mẫu váy cưới${dCount}`],
-    ['packages', `🎁 Gói dịch vụ${pCount}`],
+    ['vendors',  'Đối tác',      vendors.length],
+    ['dresses',  'Mẫu váy cưới', dresses.length],
+    ['packages', 'Gói dịch vụ',  packages.length],
   ];
-  render($('#view-tabs'), items.map(([key, label]) => html`
+  render($('#view-tabs'), items.map(([key, label, count]) => html`
     <button class="tab ${filters.view === key ? 'active' : ''}" type="button" role="tab"
-            data-view="${key}" aria-selected="${filters.view === key}">${label}</button>`));
+            data-view="${key}" aria-selected="${filters.view === key}">
+      <span>${label}</span>
+      ${count ? html`<span class="tab-badge">${count}</span>` : ''}
+    </button>`));
 }
 
 // Ngân sách tối đa: chọn mốc có sẵn, hoặc "Tự nhập số tiền…" (tối đa 10 tỷ)
@@ -197,12 +197,7 @@ function applyVendorFilters() {
   return list.sort(sorters[filters.sort]);
 }
 
-function renderVendors() {
-  const list = applyVendorFilters();
-  render($('#result-count'), html`${list.length} đối tác · Muốn xem từng mẫu lẻ? Bấm qua mục
-    <button type="button" class="btn-link" style="padding:0;font-weight:700" data-switch-view="dresses">👗 Mẫu váy cưới (${dresses.length})</button>
-    hoặc <button type="button" class="btn-link" style="padding:0;font-weight:700" data-switch-view="packages">🎁 Gói dịch vụ (${packages.length})</button>`);
-
+function bindSwitchButtons() {
   $('#result-count').querySelectorAll('[data-switch-view]').forEach((btn) => {
     btn.addEventListener('click', () => {
       filters.view = btn.dataset.switchView;
@@ -212,6 +207,26 @@ function renderVendors() {
       renderResults();
     });
   });
+}
+
+function renderVendors() {
+  const list = applyVendorFilters();
+  render($('#result-count'), html`
+    <span class="result-count-text">Hiển thị <strong>${list.length}</strong> đối tác bảo chứng</span>
+    <div class="result-switch">
+      <span class="result-switch-label">Khám phá mẫu lẻ:</span>
+      <button type="button" class="result-switch-pill" data-switch-view="dresses">
+        <span>Mẫu váy cưới</span>
+        ${dresses.length ? html`<b>${dresses.length}</b>` : ''}
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+      <button type="button" class="result-switch-pill" data-switch-view="packages">
+        <span>Gói dịch vụ</span>
+        ${packages.length ? html`<b>${packages.length}</b>` : ''}
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+    </div>`);
+  bindSwitchButtons();
 
   if (!list.length) {
     render($('#vendor-grid'), html`<div class="empty">Không có đối tác phù hợp. Thử bỏ bớt bộ lọc.</div>`);
@@ -266,7 +281,21 @@ function applyDressFilters() {
 
 function renderDresses() {
   const list = applyDressFilters();
-  $('#result-count').textContent = `${list.length} mẫu váy cưới · bấm vào ảnh để xem các góc chụp thực tế`;
+  render($('#result-count'), html`
+    <span class="result-count-text">Hiển thị <strong>${list.length}</strong> mẫu váy cưới · bấm vào ảnh để xem các góc chụp thực tế</span>
+    <div class="result-switch">
+      <button type="button" class="result-switch-pill" data-switch-view="packages">
+        <span>Xem Gói dịch vụ</span>
+        ${packages.length ? html`<b>${packages.length}</b>` : ''}
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+      <button type="button" class="result-switch-pill" data-switch-view="vendors">
+        <span>Xem Đối tác</span>
+        ${vendors.length ? html`<b>${vendors.length}</b>` : ''}
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+    </div>`);
+  bindSwitchButtons();
 
   const grid = $('#vendor-grid');
   if (!list.length) {
@@ -315,7 +344,21 @@ function applyPackageFilters() {
 
 function renderPackages() {
   const list = applyPackageFilters();
-  $('#result-count').textContent = `${list.length} gói dịch vụ · đặt lịch giữ cọc 3 đợt trực tiếp qua Trạm Hỷ`;
+  render($('#result-count'), html`
+    <span class="result-count-text">Hiển thị <strong>${list.length}</strong> gói dịch vụ trọn gói · giữ cọc an toàn 3 đợt qua Trạm Hỷ</span>
+    <div class="result-switch">
+      <button type="button" class="result-switch-pill" data-switch-view="dresses">
+        <span>Xem Mẫu váy cưới</span>
+        ${dresses.length ? html`<b>${dresses.length}</b>` : ''}
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+      <button type="button" class="result-switch-pill" data-switch-view="vendors">
+        <span>Xem Đối tác</span>
+        ${vendors.length ? html`<b>${vendors.length}</b>` : ''}
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+    </div>`);
+  bindSwitchButtons();
 
   const grid = $('#vendor-grid');
   if (!list.length) {

@@ -528,8 +528,10 @@ span.cell-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 .btn-danger:hover { background: var(--red-soft); }
 .btn-sm { padding: 6px 12px; font-size: 13px; }
 .btn-block { width: 100%; }
-.btn-link { align-self: center; background: none; color: var(--brand-dark); padding: 4px 8px; }
-.btn-link:hover { text-decoration: underline; }
+.btn-link { align-self: center; appearance: none; background: none; border: 0; font: 600 inherit var(--font-body); color: var(--brand-dark); padding: 4px 8px; border-radius: 8px; cursor: pointer; transition: color .18s var(--ease-out), background .18s var(--ease-out), transform .15s var(--ease-out); }
+.btn-link:hover { color: var(--brand); background: var(--brand-soft); text-decoration: none; }
+.btn-link:active { transform: scale(.97); }
+.btn-link:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; }
 .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 
@@ -568,8 +570,83 @@ input[type=range] { width: 100%; accent-color: var(--brand); }
 .input[aria-invalid="true"] { border-color: var(--red); outline-color: var(--red-soft); }
 
 .tabs { display: flex; gap: 4px; padding: 4px; background: #f3e8e2; border-radius: 999px; width: fit-content; max-width: 100%; overflow-x: auto; }
-.tab { padding: 8px 16px; border: 0; border-radius: 999px; background: transparent; font: 600 14px var(--font-body); color: var(--muted); cursor: pointer; white-space: nowrap; }
+.tab { padding: 8px 16px; border: 0; border-radius: 999px; background: transparent; font: 600 14px var(--font-body); color: var(--muted); cursor: pointer; white-space: nowrap; transition: background .18s var(--ease-out), color .18s var(--ease-out), box-shadow .18s var(--ease-out), transform .15s var(--ease-out); }
 .tab.active { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+
+/* Chợ dịch vụ: Thanh chuyển chế độ xem & thanh kết quả phong cách Cát Hỷ – Soft Luxury */
+.marketplace-tabs {
+  padding: 5px; gap: 6px;
+  background: linear-gradient(180deg, #f6ece1 0%, #efe2d3 100%);
+  border: 1px solid var(--gold-line);
+  box-shadow: inset 0 1px 2px rgba(90, 35, 30, .05);
+}
+.marketplace-tabs .tab {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 40px; padding: 8px 16px; border: 1px solid transparent;
+  color: var(--muted); font-weight: 600;
+}
+.marketplace-tabs .tab.active {
+  background: var(--card); color: var(--brand-dark);
+  border-color: var(--gold-line);
+  box-shadow: 0 3px 10px rgba(122, 22, 38, .09);
+}
+.tab-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 24px; height: 20px; padding: 0 7px; border-radius: 999px;
+  background: rgba(114, 100, 90, .12); color: var(--muted);
+  font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums;
+  transition: background .18s var(--ease-out), color .18s var(--ease-out);
+}
+.marketplace-tabs .tab.active .tab-badge {
+  background: var(--brand-soft); color: var(--brand-dark);
+}
+.result-bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 10px 16px; margin: 0 0 16px; padding: 10px 14px;
+  border-radius: 12px; background: rgba(255, 253, 249, .78);
+  border: 1px solid var(--line);
+}
+.result-count-text {
+  font-size: 13.5px; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.result-count-text strong {
+  color: var(--ink); font-weight: 700;
+}
+.result-switch {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.result-switch-label {
+  font-size: 12.5px; color: var(--muted); font-weight: 500;
+}
+.result-switch-pill {
+  appearance: none; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 34px; padding: 5px 12px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--card), var(--gold-soft));
+  border: 1px solid var(--gold-line);
+  color: var(--brand-dark); font: 600 12.5px var(--font-body);
+  font-variant-numeric: tabular-nums; cursor: pointer;
+  transition: transform .18s var(--ease-out), border-color .18s var(--ease-out), background .18s var(--ease-out), box-shadow .18s var(--ease-out);
+}
+.result-switch-pill b {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 1px 6px; border-radius: 999px;
+  background: var(--brand-soft); color: var(--brand);
+  font-size: 11.5px; font-weight: 700;
+}
+.result-switch-pill .arrow {
+  color: var(--gold); font-size: 13px; transition: transform .18s var(--ease-out);
+}
+.result-switch-pill:active { transform: scale(.97); }
+.result-switch-pill:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) {
+  .marketplace-tabs .tab:not(.active):hover { color: var(--ink); background: rgba(255, 253, 249, .55); }
+  .result-switch-pill:hover {
+    border-color: var(--brand); background: var(--card);
+    box-shadow: 0 4px 12px rgba(155, 35, 53, .10);
+    transform: translateY(-1px);
+  }
+  .result-switch-pill:hover .arrow { transform: translateX(2px); color: var(--brand); }
+}
 
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -1024,7 +1101,12 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
   .eyebrow { font-size: 11px; padding: 3px 9px; }
   /* Phòng thử & Chợ dịch vụ: 3 tab chia đều, không bị cắt chữ */
   .studio .tabs, .marketplace-tabs { width: 100%; }
-  .studio .tab, .marketplace-tabs .tab { flex: 1; padding: 8px 4px; font-size: 13px; white-space: normal; line-height: 1.25; }
+  .studio .tab, .marketplace-tabs .tab { flex: 1; padding: 8px 6px; font-size: 12.5px; white-space: normal; line-height: 1.2; gap: 4px; }
+  .marketplace-tabs .tab-badge { min-width: 20px; height: 18px; padding: 0 5px; font-size: 10.5px; }
+  .result-bar { padding: 10px 12px; gap: 8px; }
+  .result-switch { width: 100%; }
+  .result-switch-label { width: 100%; }
+  .result-switch-pill { flex: 1 1 auto; justify-content: center; min-height: 36px; }
   /* Thẻ tiệm 2 cột trên điện thoại: logo nhỏ trên tên, tên tối đa 2 dòng, chữ gọn */
   .item-card .body { padding: 10px 12px 12px; gap: 4px; }
   .item-card .body .badge { font-size: 11px; padding: 2px 8px; }

@@ -14,8 +14,8 @@
   <link rel="modulepreload" href="js/core/utils.js">
   <link rel="modulepreload" href="js/core/auth.js">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/styles.css?v=2">
-  <script type="module" src="js/pages/marketplace.js?v=2"></script>
+  <link rel="stylesheet" href="css/styles.css?v=3">
+  <script type="module" src="js/pages/marketplace.js?v=3"></script>
 </head>
 <body>
   <header id="app-header"></header>
@@ -28,9 +28,9 @@
         <p>Xem toàn bộ cửa hàng đối tác, các mẫu váy cưới và gói dịch vụ lẻ. Mọi đơn đặt đều giữ cọc an toàn 3 đợt qua Trạm Hỷ.</p>
       </div>
       <div class="tabs marketplace-tabs" id="view-tabs" role="tablist" aria-label="Chế độ xem">
-        <button class="tab active" type="button" role="tab" data-view="vendors" aria-selected="true">🏪 Đối tác</button>
-        <button class="tab" type="button" role="tab" data-view="dresses" aria-selected="false">👗 Mẫu váy cưới</button>
-        <button class="tab" type="button" role="tab" data-view="packages" aria-selected="false">🎁 Gói dịch vụ</button>
+        <button class="tab active" type="button" role="tab" data-view="vendors" aria-selected="true">Đối tác</button>
+        <button class="tab" type="button" role="tab" data-view="dresses" aria-selected="false">Mẫu váy cưới</button>
+        <button class="tab" type="button" role="tab" data-view="packages" aria-selected="false">Gói dịch vụ</button>
       </div>
     </div>
 
@@ -67,7 +67,7 @@
       </div>
     </div>
 
-    <p class="muted small" id="result-count"></p>
+    <div class="result-bar" id="result-count"></div>
     <div class="grid" id="vendor-grid"><div class="empty">Đang tải đối tác…</div></div>
   </main>
 
