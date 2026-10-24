@@ -2,7 +2,7 @@ import { initLayout } from '../core/layout.js';
 import { $, $$, html, render, money, param, initials, sizedImage } from '../core/utils.js';
 import { badge, priceTag, discountPercent, DRESS_THEME, VENDOR_CATEGORY } from '../core/labels.js';
 import { toastError } from '../core/ui.js';
-import { listVendors, listDresses, listAllPackages } from '../services/catalog.js';
+import { listVendors, listDresses, listAllPackages } from '../services/catalog.js?v=2';
 import { bindMoneyInput, MAX_MONEY } from '../components/money-input.js';
 import { vendorLogo } from '../components/vendor-logo.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';

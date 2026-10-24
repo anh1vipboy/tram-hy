@@ -8,7 +8,7 @@ import { $, $$, html, render, money, param, debounce, sizedImage } from '../core
 import { priceTag } from '../core/labels.js';
 import { toast, toastError, openDialog } from '../core/ui.js';
 import { loginUrl } from '../core/auth.js';
-import { listDresses } from '../services/catalog.js';
+import { listDresses } from '../services/catalog.js?v=2';
 import {
   getBodyProfile, saveBodyProfile, uploadBridePhoto, listBridePhotos, deleteBridePhoto,
   MAX_BRIDE_PHOTOS, MAX_GARMENT_PHOTOS,
@@ -19,7 +19,7 @@ import {
 import { openBookingDialog } from '../components/booking-dialog.js';
 import { openDressGallery, realPhotoCount } from '../components/dress-gallery.js';
 import { resultViewer } from '../components/tryon-result.js';
-import { openPersonSheet, openDressSheet, openSettingsSheet, QUALITY_SECONDS } from '../components/tryon-sheets.js';
+import { openPersonSheet, openDressSheet, openSettingsSheet, QUALITY_SECONDS } from '../components/tryon-sheets.js?v=2';
 import { MODELS, dressThumb, fitScore } from '../data/tryon-data.js';
 
 // ---------- TÙY CHỈNH (nhớ trên máy) ----------
