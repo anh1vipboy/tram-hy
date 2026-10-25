@@ -12,6 +12,7 @@ import { subscribeVendorChanges } from '../services/catalog.js';
 import { listMyShops, updateMyShop, resubmitVendor } from '../services/shop.js';
 import { listVendorBookings, vendorSetStatus, openDispute, subscribeBookingChanges } from '../services/bookings.js';
 import { milestonesView, detailsView, openDisputeView, bindDisputeActions } from '../components/booking-card.js';
+import { paginate, paginationView, bindPaginationEvents } from '../components/pagination.js';
 import { shopFields, readShopForm } from '../components/shop-form.js';
 import { mountDressManager } from '../components/dress-manager.js';
 import { mountShopMedia } from '../components/shop-media.js';
@@ -32,6 +33,7 @@ let profile = null;
 let shops = [];
 let bookings = [];
 let orderStageFilter = 'all';
+const orderPagination = { page: 1, pageSize: 10 };
 let unsubscribeBookings = null;
 let activePanel = 'orders';
 let managedShopId = null;    // tiệm đang quản lý mẫu váy / ảnh (khi tài khoản có nhiều tiệm)
@@ -75,6 +77,7 @@ function renderBoard() {
   const filtered = activeFilter.statuses
     ? bookings.filter((b) => activeFilter.statuses.includes(b.status))
     : bookings;
+  const paged = paginate(filtered, orderPagination.page, orderPagination.pageSize);
 
   render($('#board'), html`
     <div class="stack" style="gap:16px">
@@ -93,13 +96,21 @@ function renderBoard() {
       </div>
 
       ${filtered.length
-        ? html`<div class="vendor-order-list">${filtered.map(card)}</div>`
+        ? html`
+            <div class="vendor-order-list">${paged.items.map(card)}</div>
+            ${paginationView({ ...paged, itemLabel: 'đơn' })}`
         : html`<div class="empty">Chưa có đơn hàng nào ở mục "${activeFilter.label}".</div>`}
     </div>`);
+
+  bindPaginationEvents($('#board'), {
+    onPageChange: (p) => { orderPagination.page = p; renderBoard(); },
+    onPageSizeChange: (sz) => { orderPagination.pageSize = sz; orderPagination.page = 1; renderBoard(); },
+  });
 
   $('#board').querySelectorAll('[data-stage-filter]').forEach((btn) => {
     btn.addEventListener('click', () => {
       orderStageFilter = btn.dataset.stageFilter;
+      orderPagination.page = 1;
       renderBoard();
     });
   });

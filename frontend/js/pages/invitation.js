@@ -17,6 +17,7 @@ import { MUSIC_TRACKS, createWeddingMusic, youtubeIdFrom } from '../components/w
 import { openPhotoGallery } from '../components/dress-gallery.js';
 import { makeSortable } from '../components/sortable.js';
 import { qrCanvas, downloadCanvas, shareLink, facebookShareUrl } from '../components/qr-share.js';
+import { paginate, paginationView, bindPaginationEvents } from '../components/pagination.js';
 import {
   getMyInvitation, openInvitation, saveInvitation, listRsvps, submitRsvp, subscribeRsvps,
   uploadInvitationPhoto, removeInvitationPhoto, listWishes, listApprovedWishes, submitWish, setWishStatus, deleteWish, subscribeWishes,
@@ -1340,8 +1341,8 @@ function renderShare(invitation) {
 // Danh sách phản hồi + tự cập nhật khi khách vừa gửi (realtime)
 // ownerInvitation luôn là bản thiệp mới nhất (sau mỗi lần Lưu) → tổng hợp theo đúng danh sách sự kiện / câu hỏi hiện tại
 let ownerInvitation = null;
-const RSVP_PREVIEW = 8;        // danh sách dài → chỉ hiện 8 phản hồi mới nhất, bấm "Xem thêm"
-let rsvpShowAll = false;
+let rsvpPage = 1;
+let rsvpPageSize = 10;
 let redrawRsvps = null;
 
 async function showRsvps(invitation) {
@@ -1384,6 +1385,8 @@ function renderRsvps(invitation, rsvps, newId = null) {
     const tally = q.type === 'choice' ? q.options.map((o) => [o, answered.filter(([, a]) => a === o).length]) : null;
     return { q, answered, tally };
   });
+  const pagedRsvps = paginate(rsvps, rsvpPage, rsvpPageSize);
+
   render($('#rsvps'), html`
     <h3>Phản hồi khách mời</h3>
     <div class="rsvp-stats">
@@ -1402,20 +1405,24 @@ function renderRsvps(invitation, rsvps, newId = null) {
           : html`<span class="small muted">Chưa có câu trả lời.</span>`}
       </div>`)}
     <p class="small muted" style="margin:8px 0 0">● Tự cập nhật khi khách gửi phản hồi</p>
-    ${rsvps.length ? html`<div class="stack">${(rsvpShowAll ? rsvps : rsvps.slice(0, RSVP_PREVIEW)).map((r) => html`
-      <div class="small rsvp-item ${r.id === newId ? 'is-new' : ''}"><strong>${r.guest_name}</strong> –
-        ${r.attending ? `đến (${r.guest_count} người)` : 'không đến'}
-        ${r.attending && (r.event_ids || []).length && events.length > 1
-          ? html`<span class="muted"> · ${(r.event_ids || []).map((id) => eventName[id]).filter(Boolean).join(', ')}</span>` : ''}
-        ${Object.entries(r.answers || {}).map(([id, a]) => {
-          const q = questions.find((x) => x.id === id);
-          return q ? html`<div class="muted">${q.text} <strong>${a}</strong></div>` : '';
-        })}
-        ${r.message ? html`<div class="muted">“${r.message}”</div>` : ''}</div>`)}</div>`
-      : html`<p class="muted small">Chưa có phản hồi nào.</p>`}
-    ${rsvps.length > RSVP_PREVIEW ? html`<button type="button" class="btn btn-light btn-sm" data-rsvp-more style="margin-top:10px">
-      ${rsvpShowAll ? 'Thu gọn' : `Xem thêm ${rsvps.length - RSVP_PREVIEW} phản hồi`}</button>` : ''}`);
-  $('[data-rsvp-more]')?.addEventListener('click', () => { rsvpShowAll = !rsvpShowAll; redrawRsvps?.(); });
+    ${rsvps.length ? html`
+      <div class="stack">${pagedRsvps.items.map((r) => html`
+        <div class="small rsvp-item ${r.id === newId ? 'is-new' : ''}"><strong>${r.guest_name}</strong> –
+          ${r.attending ? `đến (${r.guest_count} người)` : 'không đến'}
+          ${r.attending && (r.event_ids || []).length && events.length > 1
+            ? html`<span class="muted"> · ${(r.event_ids || []).map((id) => eventName[id]).filter(Boolean).join(', ')}</span>` : ''}
+          ${Object.entries(r.answers || {}).map(([id, a]) => {
+            const q = questions.find((x) => x.id === id);
+            return q ? html`<div class="muted">${q.text} <strong>${a}</strong></div>` : '';
+          })}
+          ${r.message ? html`<div class="muted">“${r.message}”</div>` : ''}</div>`)}</div>
+      ${paginationView({ ...pagedRsvps, itemLabel: 'khách' })}`
+      : html`<p class="muted small">Chưa có phản hồi nào.</p>`}`);
+
+  bindPaginationEvents($('#rsvps'), {
+    onPageChange: (p) => { rsvpPage = p; redrawRsvps?.(); },
+    onPageSizeChange: (sz) => { rsvpPageSize = sz; rsvpPage = 1; redrawRsvps?.(); },
+  });
 }
 
 // ---------- KHỞI CHẠY TRANG ----------

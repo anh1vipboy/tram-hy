@@ -9,6 +9,7 @@ import {
   buildAdminFinanceBytes, autoSyncCloudExcel, openCloudExcelSyncDialog,
 } from '../components/finance-export.js';
 import { disputeSlaInfo, bindDisputeActions } from '../components/booking-card.js';
+import { paginate, paginationView, bindPaginationEvents } from '../components/pagination.js';
 import { listAllBookings, subscribeBookingChanges } from '../services/bookings.js';
 import { subscribeVendorChanges } from '../services/catalog.js';
 import {
@@ -18,6 +19,8 @@ import { getTryonSettings, saveTryonSettings } from '../services/tryon-ai.js';
 
 const data = { bookings: [], disputes: [], vendors: [] };
 const bookingFilter = { state: 'all', vendorId: 'all' };
+const bookingPagination = { page: 1, pageSize: 10 };
+const vendorPagination = { page: 1, pageSize: 10 };
 
 async function load() {
   try {
@@ -235,28 +238,43 @@ async function resolve(disputeId, refund) {
 
 // ---------- ĐỐI TÁC ----------
 function renderVendors() {
-  render($('#tab-vendors'), html`
-    <div class="card table-wrap">
-      <table>
-        <thead><tr><th>Đối tác</th><th>Loại</th><th>Chủ tiệm</th><th>Trạng thái</th><th>Tích Xanh</th><th></th></tr></thead>
-        <tbody>
-          ${data.vendors.map((v) => html`
-            <tr data-vendor="${v.id}">
-              <td><a href="vendor.html?slug=${v.slug}">${v.name}</a><div class="small muted">${v.district}</div></td>
-              <td>${VENDOR_CATEGORY[v.category]}</td>
-              <td>${v.owner?.full_name || html`<span class="muted">Chưa gắn</span>`}</td>
-              <td>${statusBadge(VENDOR_STATUS, v.status)}</td>
-              <td>${v.is_verified ? badge('✓ Đã cấp', 'blue') : badge('Chưa')}</td>
-              <td><div class="row">
-                ${v.status === 'approved' ? html`
-                  <button class="btn btn-outline btn-sm" data-verify="${v.is_verified ? 'off' : 'on'}">
-                    ${v.is_verified ? 'Thu hồi' : 'Cấp Tích Xanh'}</button>` : ''}
-                <button class="btn btn-outline btn-sm" data-link-owner>Gắn chủ tiệm</button>
-              </div></td>
-            </tr>`)}
-        </tbody>
-      </table>
+  const container = $('#tab-vendors');
+  if (!data.vendors.length) {
+    render(container, html`<div class="empty">Chưa có đối tác nào.</div>`);
+    return;
+  }
+  const paged = paginate(data.vendors, vendorPagination.page, vendorPagination.pageSize);
+
+  render(container, html`
+    <div class="stack" style="gap:14px">
+      <div class="card table-wrap">
+        <table>
+          <thead><tr><th>Đối tác</th><th>Loại</th><th>Chủ tiệm</th><th>Trạng thái</th><th>Tích Xanh</th><th></th></tr></thead>
+          <tbody>
+            ${paged.items.map((v) => html`
+              <tr data-vendor="${v.id}">
+                <td><a href="vendor.html?slug=${v.slug}">${v.name}</a><div class="small muted">${v.district}</div></td>
+                <td>${VENDOR_CATEGORY[v.category]}</td>
+                <td>${v.owner?.full_name || html`<span class="muted">Chưa gắn</span>`}</td>
+                <td>${statusBadge(VENDOR_STATUS, v.status)}</td>
+                <td>${v.is_verified ? badge('✓ Đã cấp', 'blue') : badge('Chưa')}</td>
+                <td><div class="row">
+                  ${v.status === 'approved' ? html`
+                    <button class="btn btn-outline btn-sm" data-verify="${v.is_verified ? 'off' : 'on'}">
+                      ${v.is_verified ? 'Thu hồi' : 'Cấp Tích Xanh'}</button>` : ''}
+                  <button class="btn btn-outline btn-sm" data-link-owner>Gắn chủ tiệm</button>
+                </div></td>
+              </tr>`)}
+          </tbody>
+        </table>
+      </div>
+      ${paginationView({ ...paged, itemLabel: 'đối tác' })}
     </div>`);
+
+  bindPaginationEvents(container, {
+    onPageChange: (p) => { vendorPagination.page = p; renderVendors(); },
+    onPageSizeChange: (sz) => { vendorPagination.pageSize = sz; vendorPagination.page = 1; renderVendors(); },
+  });
 
   $$('[data-verify]').forEach((btn) => {
     btn.addEventListener('click', () => withBusy(btn, async () => {
@@ -305,6 +323,7 @@ function renderBookings() {
     return;
   }
   const filtered = filterBookingsList();
+  const paged = paginate(filtered, bookingPagination.page, bookingPagination.pageSize);
   const s = summarizeBookingsFinance(filtered);
   const feePct = Math.round(PLATFORM_FEE_RATE * 100);
   const netPct = 100 - feePct;
@@ -360,7 +379,7 @@ function renderBookings() {
               </tr>
             </thead>
             <tbody>
-              ${filtered.map((b) => {
+              ${paged.items.map((b) => {
                 const f = bookingFinance(b);
                 return html`
                   <tr>
@@ -380,7 +399,7 @@ function renderBookings() {
             </tbody>
             <tfoot>
               <tr class="finance-total-row">
-                <td colspan="4"><strong>TỔNG CỘNG (${filtered.length} đơn đang lọc)</strong></td>
+                <td colspan="4"><strong>TỔNG CỘNG (${filtered.length} đơn đang lọc · Trang ${paged.page}/${paged.totalPages})</strong></td>
                 <td class="price"><strong>${money(s.gmv)}</strong></td>
                 <td class="fee-cell"><strong>${money(s.expectedFee)}</strong></td>
                 <td class="net-cell"><strong>${money(s.expectedPartnerNet)}</strong></td>
@@ -390,15 +409,23 @@ function renderBookings() {
               </tr>
             </tfoot>
           </table>
-        </div>` : html`<div class="empty">Không có đơn hàng nào khớp bộ lọc đang chọn.</div>`}
+        </div>
+        ${paginationView({ ...paged, itemLabel: 'đơn' })}` : html`<div class="empty">Không có đơn hàng nào khớp bộ lọc đang chọn.</div>`}
     </div>`);
+
+  bindPaginationEvents(container, {
+    onPageChange: (p) => { bookingPagination.page = p; renderBookings(); },
+    onPageSizeChange: (sz) => { bookingPagination.pageSize = sz; bookingPagination.page = 1; renderBookings(); },
+  });
 
   container.querySelectorAll('[data-bfilter]').forEach((chip) => chip.addEventListener('click', () => {
     bookingFilter.state = chip.dataset.bfilter;
+    bookingPagination.page = 1;
     renderBookings();
   }));
   container.querySelector('[data-vendor-filter]')?.addEventListener('change', (e) => {
     bookingFilter.vendorId = e.target.value;
+    bookingPagination.page = 1;
     renderBookings();
   });
   container.querySelector('[data-export-filtered]')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
