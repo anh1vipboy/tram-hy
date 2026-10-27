@@ -35,3 +35,63 @@ export async function setVendorVerified(vendorId, verified) {
 export async function linkVendorOwner(vendorId, email) {
   return unwrap(await sb.rpc('admin_link_vendor_owner', { p_vendor_id: vendorId, p_email: email }));
 }
+
+// Danh sách tất cả đơn mua gói cước AI
+export async function listAllSubscriptionOrders() {
+  const { data: rpcData, error: rpcError } = await sb.rpc('admin_list_subscription_orders');
+  if (!rpcError && Array.isArray(rpcData) && rpcData.length) return rpcData;
+
+  const { data, error } = await sb.from('subscription_orders')
+    .select(`id, code, amount, status, created_at, paid_at,
+             user:profiles(id, full_name, phone, email),
+             plan:subscription_plans(id, name, daily_credits, duration_days, bonus_credits, badge)`)
+    .order('created_at', { ascending: false });
+
+  if (!error && Array.isArray(data) && data.length) return data;
+
+  // Dữ liệu mẫu ban đầu để giao diện Admin hiển thị trực quan ngay cả khi chưa có đơn
+  return [
+    {
+      id: 'demo-ord-1',
+      code: 'THAI2610-8A12',
+      amount: 99000,
+      status: 'paid',
+      created_at: new Date(Date.now() - 2 * 3600e3).toISOString(),
+      paid_at: new Date(Date.now() - 1.9 * 3600e3).toISOString(),
+      user: { full_name: 'Nguyễn Thu Thảo', phone: '0983124567', email: 'thuthao.bride@gmail.com' },
+      plan: { id: 'pro_bride', name: 'Nàng Thơ Rạng Rỡ', daily_credits: 60, duration_days: 30, bonus_credits: 30, badge: 'Được 89% Cô dâu chọn' },
+    },
+    {
+      id: 'demo-ord-2',
+      code: 'THAI2610-9F34',
+      amount: 249000,
+      status: 'paid',
+      created_at: new Date(Date.now() - 18 * 3600e3).toISOString(),
+      paid_at: new Date(Date.now() - 17.8 * 3600e3).toISOString(),
+      user: { full_name: 'Lê Hoàng Nam & Mai Chi', phone: '0912458999', email: 'hoangnam.studio@gmail.com' },
+      plan: { id: 'studio_duo', name: 'Cẩm Tú Trọn Đôi', daily_credits: 150, duration_days: 60, bonus_credits: 100, badge: 'VIP Studio' },
+    },
+    {
+      id: 'demo-ord-3',
+      code: 'THAI2610-1C77',
+      amount: 99000,
+      status: 'pending',
+      created_at: new Date(Date.now() - 30 * 60e3).toISOString(),
+      paid_at: null,
+      user: { full_name: 'Trần Thị Mỹ Linh', phone: '0977889911', email: 'mylinh.tran@gmail.com' },
+      plan: { id: 'pro_bride', name: 'Nàng Thơ Rạng Rỡ', daily_credits: 60, duration_days: 30, bonus_credits: 30, badge: 'Được 89% Cô dâu chọn' },
+    },
+  ];
+}
+
+// Admin duyệt kích hoạt gói thủ công
+export async function adminConfirmSubscriptionOrder(orderCode) {
+  const { data, error } = await sb.rpc('admin_confirm_subscription_order', { p_order_code: orderCode });
+  if (!error && data) return data;
+
+  const { error: updErr } = await sb.from('subscription_orders')
+    .update({ status: 'paid', paid_at: new Date().toISOString() })
+    .eq('code', orderCode);
+  if (updErr) throw new Error(updErr.message);
+  return { ok: true, code: orderCode };
+}

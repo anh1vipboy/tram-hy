@@ -14,24 +14,28 @@ import { listAllBookings, subscribeBookingChanges } from '../services/bookings.j
 import { subscribeVendorChanges } from '../services/catalog.js';
 import {
   listOpenDisputes, resolveDispute, listVendorsWithOwners, setVendorVerified, linkVendorOwner, reviewVendor,
+  listAllSubscriptionOrders, adminConfirmSubscriptionOrder,
 } from '../services/admin.js';
 import { getTryonSettings, saveTryonSettings } from '../services/tryon-ai.js';
 
-const data = { bookings: [], disputes: [], vendors: [] };
+const data = { bookings: [], disputes: [], vendors: [], aiOrders: [] };
 const bookingFilter = { state: 'all', vendorId: 'all' };
 const bookingPagination = { page: 1, pageSize: 10 };
 const vendorPagination = { page: 1, pageSize: 10 };
+const aiOrderFilter = { state: 'all', planId: 'all' };
+const aiOrderPagination = { page: 1, pageSize: 10 };
 
 async function load() {
   try {
-    [data.bookings, data.disputes, data.vendors] = await Promise.all([
-      listAllBookings(), listOpenDisputes(), listVendorsWithOwners(),
+    [data.bookings, data.disputes, data.vendors, data.aiOrders] = await Promise.all([
+      listAllBookings(), listOpenDisputes(), listVendorsWithOwners(), listAllSubscriptionOrders(),
     ]);
     renderStats();
     renderApprovals();
     renderDisputes();
     renderVendors();
     renderBookings();
+    renderAiOrders();
     autoSyncCloudExcel('admin', () => buildAdminFinanceBytes(data.bookings, data.vendors));
   } catch (error) {
     toastError(error);
@@ -43,12 +47,15 @@ function renderStats() {
   const feePct = Math.round(PLATFORM_FEE_RATE * 100);
   const netPct = 100 - feePct;
   const pendingVendors = data.vendors.filter((v) => v.status === 'pending').length;
+  const aiPaid = (data.aiOrders || []).filter((o) => o.status === 'paid');
+  const aiRevenue = aiPaid.reduce((t, o) => t + (o.amount || 0), 0);
   const stats = [
     ['Tổng giao dịch (GMV 100%)', money(s.gmv), `${s.activeCount}/${s.totalCount} đơn hiệu lực`],
     [`Hoa hồng Sàn dự kiến (${feePct}%)`, money(s.expectedFee), `Tính trên ${s.activeCount} đơn hiệu lực`],
     [`Hoa hồng Sàn thực thu (${feePct}%)`, money(s.earnedFee), `Từ ${money(s.releasedGross)} đã giải ngân`],
     ['Đang giữ hộ trong Escrow', money(s.paidEscrow), `Sẽ trả tiệm ${money(s.partnerEscrowNet)} (${netPct}%)`],
     [`Đã trả Đối tác (${netPct}%)`, money(s.partnerPaidNet), `${s.completedCount} đơn hoàn tất trọn vẹn`],
+    ['Doanh thu Gói cước AI', money(aiRevenue), `${aiPaid.length} khách đã mua gói AI`],
     ['Cần xử lý ngay', `${pendingVendors} tiệm · ${data.disputes.length} đơn`, 'Đối tác chờ duyệt & khiếu nại'],
   ];
   render($('#stats'), stats.map(([label, value, sub]) => html`
@@ -444,6 +451,165 @@ function openAdminCloudSync() {
   });
 }
 
+// ---------- ĐƠN GÓI CƯỚC AI (QUẢN LÝ KHÁCH MUA GÓI) ----------
+function filterAiOrdersList() {
+  return (data.aiOrders || []).filter((o) => {
+    if (aiOrderFilter.state !== 'all' && o.status !== aiOrderFilter.state) return false;
+    if (aiOrderFilter.planId !== 'all' && o.plan?.id !== aiOrderFilter.planId) return false;
+    return true;
+  });
+}
+
+function renderAiOrders() {
+  const container = $('#tab-ai-orders');
+  if (!container) return;
+  const orders = data.aiOrders || [];
+  $('#ai-orders-count').textContent = orders.length;
+
+  if (!orders.length) {
+    render(container, html`<div class="empty">Chưa có khách hàng nào mua gói cước AI.</div>`);
+    return;
+  }
+
+  const filtered = filterAiOrdersList();
+  const paged = paginate(filtered, aiOrderPagination.page, aiOrderPagination.pageSize);
+  const totalRevenue = orders.filter((o) => o.status === 'paid').reduce((t, o) => t + (o.amount || 0), 0);
+  const paidCount = orders.filter((o) => o.status === 'paid').length;
+  const pendingCount = orders.filter((o) => o.status === 'pending').length;
+
+  render(container, html`
+    <div class="stack" style="gap:14px">
+      <div class="card stack" style="padding:14px;gap:12px">
+        <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div class="chips">
+            ${[
+              ['all', `Tất cả (${orders.length})`],
+              ['paid', `Đã kích hoạt (${paidCount})`],
+              ['pending', `Chờ thanh toán (${pendingCount})`],
+            ].map(([k, lbl]) => html`
+              <button type="button" class="chip ${aiOrderFilter.state === k ? 'active' : ''}" data-aifilter="${k}">${lbl}</button>`)}
+          </div>
+          <div class="row" style="gap:8px">
+            <select class="input" style="width:auto;padding:7px 12px;font-size:13px" data-ai-plan-filter aria-label="Lọc theo gói cước">
+              <option value="all">Tất cả gói cước</option>
+              <option value="pro_bride" ${aiOrderFilter.planId === 'pro_bride' ? 'selected' : ''}>Nàng Thơ Rạng Rỡ (99k)</option>
+              <option value="studio_duo" ${aiOrderFilter.planId === 'studio_duo' ? 'selected' : ''}>Cẩm Tú Trọn Đôi (249k)</option>
+            </select>
+          </div>
+        </div>
+        <div class="small muted">
+          💡 Doanh thu các gói AI Studio nhận trực tiếp vào tài khoản <strong>TPBank 0355521617 (PHUNG DUC ANH)</strong>. Với các đơn chuyển khoản chưa quét tự động, Admin có thể bấm <b>Kích hoạt ngay</b> để duyệt thủ công cho khách.
+        </div>
+      </div>
+
+      ${filtered.length ? html`
+        <div class="card table-wrap">
+          <table class="finance-table">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Gói cước</th>
+                <th>Hạn mức AI</th>
+                <th>Tổng đơn</th>
+                <th>Thời hạn</th>
+                <th>Trạng thái</th>
+                <th>Tạo lúc</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${paged.items.map((o) => {
+                const isPaid = o.status === 'paid';
+                return html`
+                  <tr data-order-code="${o.code}">
+                    <td><strong>${o.code}</strong></td>
+                    <td>
+                      <strong>${o.user?.full_name || 'Khách vãng lai'}</strong>
+                      <div class="small muted">${o.user?.phone || o.user?.email || '—'}</div>
+                    </td>
+                    <td>
+                      <strong>${o.plan?.name || o.plan_id}</strong>
+                      ${o.plan?.badge ? html`<div class="small" style="color:var(--brand)">${o.plan.badge}</div>` : ''}
+                    </td>
+                    <td>
+                      <strong style="color:var(--brand)">⚡ ${o.plan?.daily_credits ?? 60} credit/ngày</strong>
+                      ${o.plan?.bonus_credits ? html`<div class="small muted">+${o.plan.bonus_credits} credit thưởng</div>` : ''}
+                    </td>
+                    <td class="price">${money(o.amount)}</td>
+                    <td>${o.plan?.duration_days ?? 30} ngày</td>
+                    <td>
+                      ${isPaid
+                        ? html`<span class="badge badge-green">✓ Đã kích hoạt</span>`
+                        : o.status === 'pending'
+                        ? html`<span class="badge badge-gold">⏳ Chờ thanh toán</span>`
+                        : html`<span class="badge badge-gray">Đã hủy</span>`}
+                    </td>
+                    <td class="small">
+                      ${dateTime(o.created_at)}
+                      ${o.paid_at ? html`<div class="small muted">Duyệt: ${dateTime(o.paid_at)}</div>` : ''}
+                    </td>
+                    <td>
+                      ${!isPaid && o.status === 'pending' ? html`
+                        <button type="button" class="btn btn-primary btn-sm" data-confirm-order="${o.code}">
+                          ✨ Kích hoạt
+                        </button>` : html`
+                        <span class="small muted" style="color:#2e7d32">Hoàn tất</span>`}
+                    </td>
+                  </tr>`;
+              })}
+            </tbody>
+            <tfoot>
+              <tr class="finance-total-row">
+                <td colspan="4"><strong>TỔNG CỘNG DOANH THU GÓI AI (${paidCount} đơn đã thanh toán)</strong></td>
+                <td class="price"><strong>${money(totalRevenue)}</strong></td>
+                <td colspan="4"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        ${paginationView({ ...paged, itemLabel: 'đơn gói AI' })}` : html`<div class="empty">Không có đơn gói AI nào khớp bộ lọc.</div>`}
+    </div>`);
+
+  bindPaginationEvents(container, {
+    onPageChange: (p) => { aiOrderPagination.page = p; renderAiOrders(); },
+    onPageSizeChange: (sz) => { aiOrderPagination.pageSize = sz; aiOrderPagination.page = 1; renderAiOrders(); },
+  });
+
+  container.querySelectorAll('[data-aifilter]').forEach((chip) => chip.addEventListener('click', () => {
+    aiOrderFilter.state = chip.dataset.aifilter;
+    aiOrderPagination.page = 1;
+    renderAiOrders();
+  }));
+
+  container.querySelector('[data-ai-plan-filter]')?.addEventListener('change', (e) => {
+    aiOrderFilter.planId = e.target.value;
+    aiOrderPagination.page = 1;
+    renderAiOrders();
+  });
+
+  container.querySelectorAll('[data-confirm-order]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const code = btn.dataset.confirmOrder;
+      const done = await openDialog({
+        title: `Kích hoạt gói cước cho đơn ${code}?`,
+        confirmText: 'Kích hoạt ngay',
+        content: html`<p>Xác nhận bạn đã nhận đủ tiền chuyển khoản qua TPBank (0355521617) cho đơn này. Hạn mức credit của khách hàng sẽ được mở khóa ngay lập tức.</p>`,
+      });
+      if (!done) return;
+      withBusy(btn, async () => {
+        try {
+          await adminConfirmSubscriptionOrder(code);
+          toast(`Đã kích hoạt thành công đơn ${code}!`, 'success');
+          load();
+        } catch (err) {
+          toastError(err);
+        }
+      });
+    });
+  });
+}
+
 // ---------- THỬ VÁY AI ----------
 // Công tắc mô hình Siêu nét (bật lúc review/demo) + hạn mức credit mỗi người mỗi ngày. Edge Function đọc lại ngay.
 async function renderAiSettings() {
@@ -491,7 +657,7 @@ function initTabs() {
   for (const tab of $$('[data-tab]')) {
     tab.addEventListener('click', () => {
       for (const t of $$('[data-tab]')) t.classList.toggle('active', t === tab);
-      for (const name of ['approvals', 'disputes', 'vendors', 'bookings', 'ai']) $(`#tab-${name}`).hidden = name !== tab.dataset.tab;
+      for (const name of ['approvals', 'disputes', 'vendors', 'bookings', 'ai-orders', 'ai']) $(`#tab-${name}`).hidden = name !== tab.dataset.tab;
     });
   }
 }

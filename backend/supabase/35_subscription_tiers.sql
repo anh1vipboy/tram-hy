@@ -64,7 +64,10 @@ create table if not exists public.user_subscriptions (
 alter table public.user_subscriptions enable row level security;
 drop policy if exists "user_subscriptions_read_own" on public.user_subscriptions;
 create policy "user_subscriptions_read_own" on public.user_subscriptions
-  for select using (auth.uid() = user_id);
+  for select using (auth.uid() = user_id or public.is_admin());
+drop policy if exists "user_subscriptions_admin_all" on public.user_subscriptions;
+create policy "user_subscriptions_admin_all" on public.user_subscriptions
+  for all using (public.is_admin()) with check (public.is_admin());
 
 create table if not exists public.subscription_orders (
   id uuid primary key default gen_random_uuid(),
@@ -80,13 +83,16 @@ create table if not exists public.subscription_orders (
 alter table public.subscription_orders enable row level security;
 drop policy if exists "subscription_orders_read_own" on public.subscription_orders;
 create policy "subscription_orders_read_own" on public.subscription_orders
-  for select using (auth.uid() = user_id);
+  for select using (auth.uid() = user_id or public.is_admin());
 drop policy if exists "subscription_orders_insert_own" on public.subscription_orders;
 create policy "subscription_orders_insert_own" on public.subscription_orders
-  for insert with check (auth.uid() = user_id);
+  for insert with check (auth.uid() = user_id or public.is_admin());
 drop policy if exists "subscription_orders_update_own" on public.subscription_orders;
 create policy "subscription_orders_update_own" on public.subscription_orders
-  for update using (auth.uid() = user_id);
+  for update using (auth.uid() = user_id or public.is_admin());
+drop policy if exists "subscription_orders_admin_all" on public.subscription_orders;
+create policy "subscription_orders_admin_all" on public.subscription_orders
+  for all using (public.is_admin()) with check (public.is_admin());
 
 create or replace function public.get_my_subscription()
 returns jsonb language plpgsql security definer set search_path = public as $$
@@ -191,3 +197,93 @@ end $$;
 
 revoke execute on function public.activate_my_subscription(text) from public, anon;
 grant execute on function public.activate_my_subscription(text) to authenticated;
+
+-- RPC lấy toàn bộ đơn hàng gói AI cho admin
+create or replace function public.admin_list_subscription_orders()
+returns jsonb language plpgsql security definer set search_path = public as $$
+begin
+  if not public.is_admin() then
+    raise exception 'Chỉ quản trị viên mới có quyền xem danh sách đơn gói AI';
+  end if;
+
+  return coalesce((
+    select jsonb_agg(
+      jsonb_build_object(
+        'id', o.id,
+        'code', o.code,
+        'amount', o.amount,
+        'status', o.status,
+        'created_at', o.created_at,
+        'paid_at', o.paid_at,
+        'user', jsonb_build_object(
+          'id', p.id,
+          'full_name', p.full_name,
+          'phone', p.phone,
+          'email', p.email
+        ),
+        'plan', jsonb_build_object(
+          'id', pl.id,
+          'name', pl.name,
+          'daily_credits', pl.daily_credits,
+          'duration_days', pl.duration_days,
+          'bonus_credits', pl.bonus_credits,
+          'badge', pl.badge
+        )
+      ) order by o.created_at desc
+    )
+    from public.subscription_orders o
+    left join public.profiles p on p.id = o.user_id
+    left join public.subscription_plans pl on pl.id = o.plan_id
+  ), '[]'::jsonb);
+end $$;
+
+revoke execute on function public.admin_list_subscription_orders() from public, anon;
+grant execute on function public.admin_list_subscription_orders() to authenticated;
+
+-- RPC duyệt đơn gói AI thủ công
+create or replace function public.admin_confirm_subscription_order(p_order_code text)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare
+  v_order record;
+  v_plan record;
+begin
+  if not public.is_admin() then
+    raise exception 'Chỉ quản trị viên mới có quyền duyệt đơn';
+  end if;
+
+  select * into v_order from public.subscription_orders
+  where code = p_order_code
+  for update;
+
+  if v_order.id is null then
+    raise exception 'Không tìm thấy đơn hàng';
+  end if;
+
+  select * into v_plan from public.subscription_plans where id = v_order.plan_id;
+  if v_plan.id is null then
+    raise exception 'Gói cước không tồn tại';
+  end if;
+
+  update public.user_subscriptions set status = 'cancelled'
+  where user_id = v_order.user_id and status = 'active';
+
+  insert into public.user_subscriptions (user_id, plan_id, bonus_balance, starts_at, expires_at, status)
+  values (
+    v_order.user_id,
+    v_plan.id,
+    v_plan.bonus_credits,
+    now(),
+    now() + (v_plan.duration_days || ' days')::interval,
+    'active'
+  );
+
+  update public.subscription_orders
+  set status = 'paid', paid_at = now()
+  where id = v_order.id;
+
+  return jsonb_build_object('ok', true, 'code', p_order_code);
+end $$;
+
+revoke execute on function public.admin_confirm_subscription_order(text) from public, anon;
+grant execute on function public.admin_confirm_subscription_order(text) to authenticated;
+

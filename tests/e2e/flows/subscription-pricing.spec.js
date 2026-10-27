@@ -2,12 +2,11 @@
 const { test, expect, openAs } = require('../helpers');
 
 test.describe('Gói cước AI Studio & Nâng cấp VietQR', () => {
-  test('tự động hiện dialog quảng cáo gói cước khi tài khoản thường vào tryon', async ({ browser }) => {
-    const bride = await openAs(browser, 'bride');
-    await bride.goto('/tryon.html');
+  test('tự động hiện dialog quảng cáo gói cước khi tài khoản thường vào tryon', async ({ page }) => {
+    await page.goto('/tryon.html');
 
-    // Dialog quảng cáo tự động hiện lên cho tài khoản thường
-    const promo = bride.locator('dialog.promo-dialog');
+    // Dialog quảng cáo tự động hiện lên cho khách / tài khoản thường
+    const promo = page.locator('dialog.promo-dialog');
     await expect(promo).toBeVisible({ timeout: 6000 });
     await expect(promo.locator('.promo-title')).toHaveText(/Nâng Tầm Trải Nghiệm Thử Váy AI/);
 
@@ -18,7 +17,7 @@ test.describe('Gói cước AI Studio & Nâng cấp VietQR', () => {
     // Bấm nút "Xem Bảng Giá & Nâng Cấp Ngay" chuyển sang modal bảng giá
     await promo.locator('[data-upgrade]').click();
     await expect(promo).not.toBeVisible();
-    await expect(bride.locator('.pricing-sheet')).toBeVisible();
+    await expect(page.locator('.pricing-sheet')).toBeVisible();
   });
 
   test('mở modal bảng giá từ thanh composer bar và hiển thị đủ 3 gói', async ({ browser }) => {
@@ -114,5 +113,24 @@ test.describe('Gói cước AI Studio & Nâng cấp VietQR', () => {
       await upgradeCard.locator('[data-open-pricing]').click();
       await expect(bride.locator('.pricing-sheet')).toBeVisible();
     }
+  });
+
+  test('quản trị viên mở tab "Đơn gói AI", xem bảng đơn hàng và KPI doanh thu', async ({ browser }) => {
+    const admin = await openAs(browser, 'admin');
+    await admin.goto('/admin.html');
+
+    const tab = admin.locator('[data-tab="ai-orders"]');
+    await expect(tab).toBeVisible();
+    await tab.click();
+
+    const section = admin.locator('#tab-ai-orders');
+    await expect(section).toBeVisible();
+
+    // Có bảng danh sách đơn gói AI
+    await expect(section.locator('table.finance-table')).toBeVisible();
+    await expect(section.locator('table thead th').first()).toHaveText('Mã đơn');
+
+    // Có các bộ lọc chips
+    await expect(section.locator('[data-aifilter]')).toHaveCount(3);
   });
 });
