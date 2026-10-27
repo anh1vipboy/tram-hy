@@ -200,7 +200,7 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
 
       // Vẽ màn hình thanh toán VietQR
       function renderQrView(order) {
-        const qrUrl = `https://img.vietqr.io/image/MB-0348888999-compact2.png?amount=${order.amount}&addInfo=${encodeURIComponent(order.code)}&accountName=TRAM%20HY`;
+        const qrUrl = `https://img.vietqr.io/image/TPB-0355521617-compact2.png?amount=${order.amount}&addInfo=${encodeURIComponent(order.code)}&accountName=PHUNG%20DUC%20ANH`;
 
         render(body, html`
           <div class="qr-checkout-container">
@@ -211,7 +211,7 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
                 <div class="qr-image-box">
                   <img src="${qrUrl}" alt="Mã thanh toán VietQR" class="qr-img">
                 </div>
-                <div class="qr-note">Hỗ trợ tất cả ứng dụng Ngân hàng & Ví điện tử (MB, VCB, Techcombank, MoMo...)</div>
+                <div class="qr-note">Hỗ trợ tất cả ứng dụng Ngân hàng & Ví điện tử (TPBank, MB, VCB, MoMo...)</div>
               </div>
 
               <div class="qr-col-right">
@@ -223,18 +223,18 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
                 <div class="qr-info-table">
                   <div class="qr-info-row">
                     <span class="info-label">Ngân hàng</span>
-                    <span class="info-val"><strong>MB Bank</strong> (Quân Đội)</span>
+                    <span class="info-val"><strong>TPBank</strong> (Tiên Phong Bank)</span>
                   </div>
                   <div class="qr-info-row">
                     <span class="info-label">Số tài khoản</span>
                     <span class="info-val">
-                      <strong class="copyable" data-copy="0348888999">0348888999</strong>
-                      <button type="button" class="btn-copy" data-copy="0348888999">Sao chép</button>
+                      <strong class="copyable" data-copy="0355521617">0355521617</strong>
+                      <button type="button" class="btn-copy" data-copy="0355521617">Sao chép</button>
                     </span>
                   </div>
                   <div class="qr-info-row">
                     <span class="info-label">Chủ tài khoản</span>
-                    <span class="info-val">TRẠM HỶ</span>
+                    <span class="info-val"><strong>PHUNG DUC ANH</strong></span>
                   </div>
                   <div class="qr-info-row">
                     <span class="info-label">Số tiền</span>

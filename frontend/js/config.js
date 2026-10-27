@@ -15,11 +15,11 @@ export const SUPABASE_ANON_KEY = SUPABASE_KEY;
 // Bật: điền site key ở đây, deploy, RỒI mới bật CAPTCHA trong Supabase (Authentication → Attack Protection).
 export const TURNSTILE_SITE_KEY = testOverride ? '' : '0x4AAAAAAFRG60sMMTC5WQDR';
 
-// Tài khoản nhận tiền cọc Escrow của Trạm Hỷ – dùng để tạo mã VietQR. Thay bằng tài khoản thật khi vận hành.
+// Tài khoản nhận tiền cọc Escrow & nâng cấp gói của Trạm Hỷ – dùng để tạo mã VietQR.
 export const ESCROW_BANK = {
-  bankId: 'MB',
-  accountNo: '0000000000',
-  accountName: 'TRAM HY ESCROW',
+  bankId: 'TPB',
+  accountNo: '0355521617',
+  accountName: 'PHUNG DUC ANH',
 };
 
 // Phí nền tảng trừ vào tiền giải ngân cho đối tác
