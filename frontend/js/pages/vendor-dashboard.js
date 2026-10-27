@@ -42,6 +42,24 @@ let mountedPanels = {};     // { dresses: shopId, media: shopId } – tab đã v
 async function load() {
   try {
     bookings = await listVendorBookings(shops.filter((s) => s.status === 'approved').map((s) => s.id));
+    const focusCode = new URLSearchParams(location.search).get('focus');
+    if (focusCode) {
+      const b = bookings.find((x) => x.code === focusCode);
+      if (b) {
+        if (orderStageFilter !== 'all') {
+          const matchFilter = STAGE_FILTERS.find((f) => f.statuses && f.statuses.includes(b.status));
+          if (matchFilter) orderStageFilter = matchFilter.key;
+        }
+        const activeFilter = STAGE_FILTERS.find((f) => f.key === orderStageFilter) || STAGE_FILTERS[0];
+        const filtered = activeFilter.statuses
+          ? bookings.filter((x) => activeFilter.statuses.includes(x.status))
+          : bookings;
+        const filteredIdx = filtered.findIndex((x) => x.code === focusCode);
+        if (filteredIdx !== -1) {
+          orderPagination.page = Math.floor(filteredIdx / orderPagination.pageSize) + 1;
+        }
+      }
+    }
     renderStats();
     renderBoard();
     focusFromUrl($('#board'));                    // đến từ chuông thông báo → cuộn tới đúng đơn
@@ -77,6 +95,13 @@ function renderBoard() {
   const filtered = activeFilter.statuses
     ? bookings.filter((b) => activeFilter.statuses.includes(b.status))
     : bookings;
+  const focusCode = new URLSearchParams(location.search).get('focus');
+  if (focusCode) {
+    const idx = filtered.findIndex((b) => b.code === focusCode);
+    if (idx !== -1) {
+      orderPagination.page = Math.floor(idx / orderPagination.pageSize) + 1;
+    }
+  }
   const paged = paginate(filtered, orderPagination.page, orderPagination.pageSize);
 
   render($('#board'), html`
@@ -127,7 +152,7 @@ function card(b) {
   const paidDoneCount = (b.milestones || []).filter((m) => ['paid', 'released'].includes(m.status)).length;
   const actions = actionButtons(b);
   return html`
-    <article class="card vendor-order-card ${b.status === 'disputed' ? 'is-disputed' : ''}" data-booking="${b.id}" data-code="${b.code}">
+    <article class="card vendor-order-card kanban-card ${b.status === 'disputed' ? 'is-disputed' : ''}" data-booking="${b.id}" data-code="${b.code}">
       <div class="vendor-order-head">
         <div class="vendor-order-title-group">
           <strong class="vendor-order-service">${serviceName}${b.details?.tables ? ` · ${b.details.tables} bàn` : ''}</strong>

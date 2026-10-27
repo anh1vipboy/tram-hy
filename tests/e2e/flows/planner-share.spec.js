@@ -103,7 +103,7 @@ test('xuất Excel: tải file .xlsx có đủ trang Tổng quan, Ngân sách, C
   const errors = watchErrors(bride);
   await ensurePlan(bride);
 
-  const exportBtn = bride.getByRole('button', { name: '⬇ Xuất Excel' });
+  const exportBtn = bride.getByRole('button', { name: /⬇ (Tải|Xuất) Excel/ });
   await expect(exportBtn).toBeVisible();
   const [download] = await Promise.all([bride.waitForEvent('download'), exportBtn.click()]);
   expect(download.suggestedFilename()).toBe('ke-hoach-cuoi-tram-hy.xlsx');
@@ -115,7 +115,7 @@ test('xuất Excel: tải file .xlsx có đủ trang Tổng quan, Ngân sách, C
   expect(bytes.length).toBeGreaterThan(3000);
 
   const wb = XLSX.read(bytes, { cellNF: true });           // cellNF: đọc cả định dạng số
-  expect(wb.SheetNames.slice(0, 3)).toEqual(['Tổng quan', 'Ngân sách', 'Checklist']);
+  expect(wb.SheetNames.slice(0, 4)).toEqual(['Tổng quan', 'Ngân sách', 'Lịch thanh toán', 'Checklist']);
 
   const overview = XLSX.utils.sheet_to_json(wb.Sheets['Tổng quan'], { header: 1 });
   expect(overview[0][0]).toBe('KẾ HOẠCH CƯỚI – TRẠM HỶ');
@@ -123,12 +123,13 @@ test('xuất Excel: tải file .xlsx có đủ trang Tổng quan, Ngân sách, C
 
   const budget = wb.Sheets['Ngân sách'];
   const budgetRows = XLSX.utils.sheet_to_json(budget, { header: 1 });
-  expect(budgetRows[0]).toEqual(['Danh mục', 'Mục chi tiêu', 'Dự kiến', 'Thực tế', 'Đã trả', 'Ghi chú']);
-  expect(budgetRows.some((r) => r[0] === 'Trang phục' && r[1] === 'Váy cưới')).toBe(true);    // dấu tiếng Việt giữ nguyên
-  expect(budgetRows.some((r) => String(r[1]).startsWith('Cộng: Trang phục'))).toBe(true);     // cộng theo danh mục
+  expect(budgetRows[0]).toEqual(['Danh mục', 'Bên phụ trách', 'Mục chi tiêu', 'Dự kiến', 'Thực tế', 'Đã trả', 'Ghi chú']);
+  expect(budgetRows.some((r) => r[0] === 'Trang phục' && (r[1] === 'Váy cưới' || r[2] === 'Váy cưới'))).toBe(true);    // dấu tiếng Việt giữ nguyên
+  expect(budgetRows.some((r) => String(r[1]).startsWith('Cộng: Trang phục') || String(r[2]).startsWith('Cộng: Trang phục'))).toBe(true);     // cộng theo danh mục
   expect(budgetRows.at(-1)[0] === 'TỔNG CỘNG' || budgetRows.at(-2)[0] === 'TỔNG CỘNG').toBe(true);
-  expect(budget.C2.t).toBe('n');                                  // số tiền là số thật (cộng trừ được), định dạng VNĐ
-  expect(budget.C2.z).toContain('đ');
+  const amountCell = budget.D2 || budget.C2;
+  expect(amountCell.t).toBe('n');                                  // số tiền là số thật (cộng trừ được), định dạng VNĐ
+  expect(amountCell.z).toContain('đ');
 
   const checklist = XLSX.utils.sheet_to_json(wb.Sheets.Checklist, { header: 1 });
   expect(checklist[0]).toEqual(['Mốc thời gian', 'Việc cần làm', 'Hạn', 'Trạng thái', 'Ngày hoàn thành']);
@@ -176,7 +177,7 @@ test('chia sẻ: bật link → người khác mở không cần đăng nhập, 
   await expect(viewer.locator('#planner-actions')).toBeHidden();
 
   await root.getByRole('tab', { name: 'Ngân sách' }).click();
-  await expect(root.locator('.view-category', { hasText: 'Trang phục' })).toContainText('Váy cưới');
+  await expect(root.locator('.view-category').filter({ hasText: 'Trang phục 💑' })).toContainText('Váy cưới');
   await expect(root.locator('.budget-summary')).toContainText('Chi phí dự kiến');
   await root.getByRole('tab', { name: 'Checklist' }).click();
   await expect(root.locator('.checklist-head')).toContainText('việc đã xong');

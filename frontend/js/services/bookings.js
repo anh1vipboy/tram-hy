@@ -73,7 +73,7 @@ export async function listMyBookings(userId) {
 export async function listVendorBookings(vendorIds) {
   if (!vendorIds.length) return [];
   return sortMilestones(unwrap(await sb.from('bookings')
-    .select(BOOKING_FIELDS).in('vendor_id', vendorIds).order('appointment_at', { ascending: true })));
+    .select(BOOKING_FIELDS).in('vendor_id', vendorIds).order('created_at', { ascending: false })));
 }
 
 // Admin: toàn bộ đơn

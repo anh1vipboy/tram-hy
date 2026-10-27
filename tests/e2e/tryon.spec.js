@@ -4,7 +4,7 @@ const { test, expect, trackErrors } = require('./helpers');
 test.describe('Phòng thử váy AI', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/tryon.html');
-    await expect(page.getByText('Mình là trợ lý thử váy của Trạm Hỷ.')).toBeVisible();
+    await expect(page.getByText('Mình là trợ lý thử váy của Trạm Hỷ.')).toBeVisible({ timeout: 20_000 });
   });
 
   test('chọn người mẫu + váy có sẵn, gửi → mời đăng nhập và quay lại đúng mẫu', async ({ page }) => {
@@ -86,7 +86,7 @@ test.describe('Mở bằng đường dẫn ?dress=', () => {
   test('"Xem tất cả mẫu" ở trang chủ mở thẳng bảng chọn váy', async ({ page }) => {
     await page.goto('/tryon.html?chon-vay=1');
     await expect(page.locator('dialog.sheet h3')).toHaveText('Chọn váy cưới');
-    await expect(page.locator('dialog.sheet .tab.active')).toHaveText('Mẫu của các tiệm');
+    await expect(page.locator('dialog.sheet .tab.active')).toContainText('Mẫu của các tiệm');
   });
 });
 

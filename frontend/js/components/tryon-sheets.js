@@ -305,11 +305,11 @@ const PHOTO_TYPE_CHOICES = [['auto', 'AI tự nhận'], ['flat-lay', 'Váy trả
  * Tấm "Tùy chỉnh": mô hình (Siêu nét chỉ khi admin bật), chất lượng, số ảnh, lựa chọn riêng của Tiêu chuẩn, số đo.
  * getOptions() → tùy chọn đang có hiệu lực; setOption(key, value); cost(options) → credit; body: số đo (sửa trực tiếp).
  */
-export function openSettingsSheet({ maxEnabled, ownGarment, getOptions, setOption, cost, remaining, body, loggedIn, onBodyChange }) {
+export function openSettingsSheet({ maxEnabled, ownGarment, getOptions, setOption, cost, remaining, body, loggedIn, onBodyChange, onOpenPricing }) {
   openSheet({
     title: 'Tùy chỉnh ướm thử',
     className: 'settings-sheet',
-    onOpen: (root) => {
+    onOpen: (root, close) => {
       render(root, html`
         <section class="opts"></section>
         <section class="measure">
@@ -347,6 +347,14 @@ export function openSettingsSheet({ maxEnabled, ownGarment, getOptions, setOptio
         const max = o.model === 'max';
         const qualityLabel = ([v, label]) => [v, max ? `${label} · ${cost({ ...o, quality: v, samples: 1 })} credit` : `${label} · ~${QUALITY_SECONDS[v]} giây`];
         render(opts, html`
+          ${!maxEnabled && onOpenPricing ? html`
+            <div class="opt-upgrade-card">
+              <div class="upgrade-info">
+                <strong>✨ Mở khóa Siêu Nét 1K Ultra HD</strong>
+                <small>Thấy rõ chi tiết ren thêu & tăng lên 60 credit/ngày</small>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" data-open-pricing>Nâng cấp</button>
+            </div>` : ''}
           ${maxEnabled ? group('Mô hình AI', 'model', MODEL_CHOICES, o.model, max
             ? 'Siêu nét: ảnh đẹp, chất vải tự nhiên – 1–3 credit mỗi ảnh, nhận ghi chú cách mặc trong tin nhắn.'
             : 'Tiêu chuẩn: nhanh, 1 credit mỗi ảnh – hợp với ảnh đứng thẳng thấy toàn thân.') : ''}
@@ -364,6 +372,12 @@ export function openSettingsSheet({ maxEnabled, ownGarment, getOptions, setOptio
             ? ` · hôm nay còn ${remaining} credit` : ''}</p>`);
       };
       opts.addEventListener('click', (e) => {
+        const upgrade = e.target.closest('[data-open-pricing]');
+        if (upgrade) {
+          close();
+          onOpenPricing?.();
+          return;
+        }
         const chip = e.target.closest('[data-opt]');
         if (!chip) return;
         setOption(chip.dataset.opt, chip.dataset.opt === 'samples' ? Number(chip.dataset.value) : chip.dataset.value);

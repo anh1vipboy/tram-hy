@@ -15,9 +15,10 @@
 //      → Tăng excel_ver của tài khoản để hủy hiệu lực link cũ và cấp link cố định mới.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { SITE_ORIGIN, withCors } from '../_shared/cors.ts';
 
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': SITE_ORIGIN,      // withCors() đổi theo web đang gọi (xem _shared/cors.ts)
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
@@ -247,7 +248,7 @@ function buildPlanCsv(plan: any, categories: any[], bookings: any[]): string {
   return rows.map((r) => r.map(csvCell).join(',')).join('\r\n');
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withCors(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -384,4 +385,4 @@ Deno.serve(async (req: Request) => {
   } catch (err) {
     return json({ error: (err as Error).message || 'Lỗi đồng bộ Cloud Excel' }, 500);
   }
-});
+}));

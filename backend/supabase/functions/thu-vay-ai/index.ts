@@ -37,13 +37,14 @@
 //   SITE_URL            – địa chỉ web để lấy ảnh người mẫu có sẵn
 import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 import { decodeBase64, encodeBase64 } from 'jsr:@std/encoding@1/base64';
+import { SITE_ORIGIN, withCors, isSafeImageUrl } from '../_shared/cors.ts';
 
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': SITE_ORIGIN,      // withCors() đổi theo web đang gọi (xem _shared/cors.ts)
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
-const SITE_URL = Deno.env.get('SITE_URL') ?? 'https://tram-hy-alpha.vercel.app';
+const SITE_URL = Deno.env.get('SITE_URL') ?? SITE_ORIGIN;
 const PROVIDER = Deno.env.get('TRYON_PROVIDER') ?? (Deno.env.get('FASHN_API_KEY') ? 'fashn' : 'gemini');
 const DEFAULT_LIMIT = Number(Deno.env.get('DAILY_LIMIT') ?? 6);
 const SAMPLE_MODELS: Record<string, string> = {
@@ -142,8 +143,9 @@ async function toImg(blob: Blob): Promise<Img> {
 }
 
 async function fetchImg(url: string): Promise<Img> {
+  if (!isSafeImageUrl(url)) throw new Error(`URL ảnh không an toàn: ${url}`);
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Không tải được ảnh ${url}: ${res.status}`);
+  if (!res.ok) throw new Error(`Không tải được ảnh: ${res.status}`);
   return toImg(await res.blob());
 }
 
@@ -242,7 +244,7 @@ async function runFashn(person: Img, garment: Img, body: Body, o: Options, styli
 
 // ---------- XỬ LÝ YÊU CẦU ----------
 
-Deno.serve(async (req) => {
+Deno.serve(withCors(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
 
   const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
@@ -275,7 +277,7 @@ Deno.serve(async (req) => {
   } else {
     const { data } = await admin.from('dresses').select('id, image_url, is_active').eq('id', dressId).maybeSingle();
     if (!data?.is_active) return json({ error: 'Không tìm thấy mẫu váy' }, 404);
-    if (!data.image_url) return fallback('no-dress-photo');
+    if (!data.image_url || !isSafeImageUrl(data.image_url)) return fallback('no-dress-photo');
     dress = data;
   }
 
@@ -312,66 +314,89 @@ Deno.serve(async (req) => {
     garment = await toImg(data);
   }
 
-  const body = readBody(rawBody);
-  // garment_path chỉ ghi khi dùng ảnh váy tự tải (cột có từ SQL 12 – thử mẫu của tiệm không phụ thuộc file này)
-  const baseJob = { user_id: user.id, dress_id: dress?.id ?? null, ...(dress ? {} : { garment_path: garmentPath }) };
-  let usedProvider = provider;
-  let result: Result;
+  // Giữ chỗ credit TRƯỚC khi gọi AI (SQL 34): một lượt chạy tới ~130 giây, nếu chỉ tính credit sau khi xong thì
+  // gửi nhiều lượt cùng lúc sẽ vượt hạn mức. Chưa chạy SQL 34 → bỏ qua, quay về cách tính cũ.
+  let reservationId: string | null = null;
+  if (!unlimited) {
+    const { data: held, error: holdError } = await admin.rpc('reserve_tryon_credits', { p_user: user.id, p_cost: cost, p_limit: settings.limit });
+    if (holdError) {
+      console.warn('Chưa chạy SQL 34 (giữ chỗ credit):', holdError.message);
+    } else if (!held?.ok) {
+      return json({
+        error: `Bạn đang có lượt ướm khác chạy và hôm nay chỉ còn ${held?.left ?? 0} credit – đợi lượt đó xong hoặc giảm số ảnh/chất lượng.`,
+        remaining: held?.left ?? 0,
+        limit: settings.limit,
+      }, 429);
+    } else {
+      reservationId = held.id;
+    }
+  }
+  const release = async () => { if (reservationId) await admin.from('tryon_jobs').delete().eq('id', reservationId); };
+
   try {
-    result = provider === 'fashn' ? await runFashn(person, garment, body, options, styling) : await runGemini(person, garment, body);
-    // FASHN hết credit → vẫn cho người dùng ướm bằng Gemini (1 ảnh) nếu có key
-    if ('unavailable' in result && result.unavailable === 'no-credits' && Deno.env.get('GEMINI_API_KEY')) {
-      console.warn('FASHN hết credit → chuyển sang Gemini');
-      usedProvider = 'gemini';
-      const backup = await runGemini(person, garment, body);
-      if (!('unavailable' in backup)) result = backup;
+    const body = readBody(rawBody);
+    // garment_path chỉ ghi khi dùng ảnh váy tự tải (cột có từ SQL 12 – thử mẫu của tiệm không phụ thuộc file này)
+    const baseJob = { user_id: user.id, dress_id: dress?.id ?? null, ...(dress ? {} : { garment_path: garmentPath }) };
+    let usedProvider = provider;
+    let result: Result;
+    try {
+      result = provider === 'fashn' ? await runFashn(person, garment, body, options, styling) : await runGemini(person, garment, body);
+      // FASHN hết credit → vẫn cho người dùng ướm bằng Gemini (1 ảnh) nếu có key
+      if ('unavailable' in result && result.unavailable === 'no-credits' && Deno.env.get('GEMINI_API_KEY')) {
+        console.warn('FASHN hết credit → chuyển sang Gemini');
+        usedProvider = 'gemini';
+        const backup = await runGemini(person, garment, body);
+        if (!('unavailable' in backup)) result = backup;
+      }
+    } catch (error) {
+      console.error('Thử váy AI lỗi:', error);
+      await admin.from('tryon_jobs').insert({ ...baseJob, provider: usedProvider, status: 'failed', error: String(error).slice(0, 500) });
+      return fallback('provider-error');
     }
-  } catch (error) {
-    console.error('Thử váy AI lỗi:', error);
-    await admin.from('tryon_jobs').insert({ ...baseJob, provider: usedProvider, status: 'failed', error: String(error).slice(0, 500) });
-    return fallback('provider-error');
-  }
-  if ('unavailable' in result) return fallback(result.unavailable);
+    if ('unavailable' in result) return fallback(result.unavailable);
 
-  // Credit thật của từng ảnh (Gemini = 1 cho cả lượt). options ghi kèm ảnh người đã dùng → web dựng lại lịch sử trò chuyện.
-  const perImage = usedProvider === 'fashn' ? cost / result.images.length : 1;
-  const personRef = photoPath ?? `sample:${sampleModel}`;
-  const jobOptions = usedProvider === 'fashn'
-    ? { ...options, person: personRef, ...(options.model === 'max' && styling ? { prompt: styling } : {}) }
-    : { model: 'gemini', person: personRef };
-  const batchId = crypto.randomUUID();                             // 1 lần gửi = 1 lượt, gồm 1–4 ảnh
-  const urls: string[] = [];
-  let charged = 0;
-  for (const [i, img] of result.images.entries()) {
-    const jobId = crypto.randomUUID();
-    const ext = img.mimeType.includes('jpeg') ? 'jpg' : img.mimeType.split('/')[1] ?? 'png';
-    const path = `${user.id}/${jobId}.${ext}`;
-    const upload = await admin.storage.from('tryon-results').upload(path, img.bytes, { contentType: img.mimeType });
-    if (upload.error) {
-      console.error('Lưu ảnh kết quả lỗi:', upload.error);
-      continue;
+    // Credit thật của từng ảnh (Gemini = 1 cho cả lượt). options ghi kèm ảnh người đã dùng → web dựng lại lịch sử trò chuyện.
+    const perImage = usedProvider === 'fashn' ? cost / result.images.length : 1;
+    const personRef = photoPath ?? `sample:${sampleModel}`;
+    const jobOptions = usedProvider === 'fashn'
+      ? { ...options, person: personRef, ...(options.model === 'max' && styling ? { prompt: styling } : {}) }
+      : { model: 'gemini', person: personRef };
+    const batchId = crypto.randomUUID();                             // 1 lần gửi = 1 lượt, gồm 1–4 ảnh
+    const urls: string[] = [];
+    let charged = 0;
+    for (const [i, img] of result.images.entries()) {
+      const jobId = crypto.randomUUID();
+      const ext = img.mimeType.includes('jpeg') ? 'jpg' : img.mimeType.split('/')[1] ?? 'png';
+      const path = `${user.id}/${jobId}.${ext}`;
+      const upload = await admin.storage.from('tryon-results').upload(path, img.bytes, { contentType: img.mimeType });
+      if (upload.error) {
+        console.error('Lưu ảnh kết quả lỗi:', upload.error);
+        continue;
+      }
+      // Gemini: chỉ ảnh đầu tính credit; FASHN: chia đều (làm tròn lên, tổng không vượt cost)
+      const credits = usedProvider === 'fashn' ? Math.min(Math.ceil(perImage), cost - charged) : (i === 0 ? 1 : 0);
+      charged += credits;
+      const job = { ...baseJob, id: jobId, provider: usedProvider, status: 'done', result_path: path };
+      let saved = await admin.from('tryon_jobs')
+        .insert({ ...job, credits, options: jobOptions, batch_id: batchId, message: message || null });
+      if (saved.error) saved = await admin.from('tryon_jobs').insert(job);          // chưa chạy SQL 28
+      if (saved.error) console.error('Ghi tryon_jobs lỗi (đã chạy SQL 12 chưa?):', saved.error);
+      const { data: signed } = await admin.storage.from('tryon-results').createSignedUrl(path, 3600);
+      if (signed?.signedUrl) urls.push(signed.signedUrl);
     }
-    // Gemini: chỉ ảnh đầu tính credit; FASHN: chia đều (làm tròn lên, tổng không vượt cost)
-    const credits = usedProvider === 'fashn' ? Math.min(Math.ceil(perImage), cost - charged) : (i === 0 ? 1 : 0);
-    charged += credits;
-    const job = { ...baseJob, id: jobId, provider: usedProvider, status: 'done', result_path: path };
-    let saved = await admin.from('tryon_jobs')
-      .insert({ ...job, credits, options: jobOptions, batch_id: batchId, message: message || null });
-    if (saved.error) saved = await admin.from('tryon_jobs').insert(job);          // chưa chạy SQL 28
-    if (saved.error) console.error('Ghi tryon_jobs lỗi (đã chạy SQL 12 chưa?):', saved.error);
-    const { data: signed } = await admin.storage.from('tryon-results').createSignedUrl(path, 3600);
-    if (signed?.signedUrl) urls.push(signed.signedUrl);
-  }
-  if (!urls.length) return fallback('provider-error');
+    if (!urls.length) return fallback('provider-error');
 
-  return json({
-    imageUrl: urls[0],
-    images: urls,
-    batchId,
-    remaining: unlimited ? null : Math.max(0, left - charged),
-    limit: settings.limit,
-    unlimited,
-    credits: charged,
-    provider: usedProvider,
-  });
-});
+    return json({
+      imageUrl: urls[0],
+      images: urls,
+      batchId,
+      remaining: unlimited ? null : Math.max(0, left - charged),
+      limit: settings.limit,
+      unlimited,
+      credits: charged,
+      provider: usedProvider,
+    });
+  } finally {
+    await release();   // trả chỗ giữ: ảnh đã ghi dòng 'done' riêng (hoặc lượt lỗi thì credit không bị tính)
+  }
+}));

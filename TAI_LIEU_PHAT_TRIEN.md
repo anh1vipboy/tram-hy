@@ -79,11 +79,15 @@ exe202/
 │   ├── 31_demo_services.sql  9 tiệm demo cho 3 loại mới + gói mẫu (is_demo) cho mọi tiệm demo không bán váy; nhà hàng demo giá theo bàn, số sảnh
 │   ├── 32_welcome_email_signup.sql Email chào mừng cả cho người đăng ký bằng email (gửi lúc vừa xác nhận); bảng welcome_emails chống gửi 2 lần
 │   ├── 33_plan_share.sql     Chia sẻ kế hoạch cưới bằng link chỉ xem: bảng wedding_plan_shares (không mở cho API), RPC my_plan_share / set_plan_share / rotate_plan_share (chủ kế hoạch), get_shared_plan(token) cho khách không đăng nhập
+│   ├── 34_tryon_credit_hold.sql Giữ chỗ credit thử váy AI trước khi gọi API (trạng thái 'pending', RPC reserve_tryon_credits) – chống vượt hạn mức khi mở nhiều tab đồng thời
 │   ├── email-templates/      Mẫu email Supabase Auth tiếng Việt (xác nhận đăng ký, đặt lại mật khẩu, đổi email, magic link) + HUONG_DAN.md cách dán
+│   ├── functions/_shared/cors.ts       CORS và kiểm tra an toàn URL chung (chỉ cho SITE_URL, localhost; chống SSRF isSafeImageUrl)
+│   ├── functions/excel-dong-bo/        Edge Function cấp dữ liệu đồng bộ CSV thời gian thực & lưu bản sao .xlsx
 │   ├── functions/gui-email-chao-mung/  Edge Function gửi mail qua Brevo
-│   ├── functions/thu-vay-ai/  Edge Function thử váy AI thật (FASHN hoặc Gemini)
-│   ├── functions/tro-ly-thu-vay/  Edge Function trợ lý chat ở Phòng thử (Gemini model chữ)
-│   ├── functions/tu-van-ngan-sach/  Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
+│   ├── functions/khieu-nai-sla/        Edge Function xử lý khiếu nại, dời lịch và cơ chế bảo vệ SLA 48h/72h
+│   ├── functions/thu-vay-ai/           Edge Function thử váy AI thật (FASHN hoặc Gemini)
+│   ├── functions/tro-ly-thu-vay/       Edge Function trợ lý chat ở Phòng thử (Gemini model chữ)
+│   ├── functions/tu-van-ngan-sach/     Edge Function AI tư vấn chia ngân sách cưới (Gemini, free tier)
 │   ├── tools/xoa_tai_khoan_test.sql  Xóa tài khoản test kèm dữ liệu
 │   └── tools/xoa_du_lieu_demo.sql    Xóa dữ liệu demo của file 15
 │
@@ -298,6 +302,10 @@ Mở lại trang: các lần ướm đã lưu hiện lại thành đoạn chat (
   `npx supabase secrets set --project-ref vsjdijmuvuetmhmszcrl FASHN_API_KEY=<key>` (không cần deploy lại).
 - Hạn mức tính theo **tổng credit/người/ngày** (giờ Việt Nam, chỉ ảnh thành công). Mỗi ảnh = 1 dòng `tryon_jobs` (`credits`, `options`, `batch_id`, `message` – SQL 28);
   ảnh kết quả ở bucket riêng tư `tryon-results`. Chưa chạy SQL 28 → Siêu nét tắt, hạn mức = secret `DAILY_LIMIT` (mặc định 6), mỗi ảnh tính 1.
+- **Giữ chỗ credit (SQL 34)**: Để chống việc người dùng mở nhiều tab hoặc bấm gửi liên tục vượt hạn mức credit FASHN/Gemini trong ngày trong lúc chờ ảnh tạo xong (~130s), hàm `reserve_tryon_credits` khóa theo người dùng (advisory lock), kiểm tra tổng credit (đã dùng hôm nay + đang giữ chỗ) và ghi dòng `tryon_jobs` trạng thái `pending`. Khối `finally` tự động xóa dòng giữ chỗ khi xong (ảnh thành công ghi dòng `done` riêng; nếu lỗi thì không bị tính credit). Dòng pending quá 5 phút tự động coi như hết hạn.
+- **Bảo mật ảnh & chống SSRF**: `thu-vay-ai` kiểm tra URL ảnh váy bằng `isSafeImageUrl()`, chặn đứng localhost, dải IP nội bộ và endpoint metadata của cloud (`169.254.169.254`).
+- **Trợ lý chat không để khách chờ lâu**: `askGemini` trong `tro-ly-thu-vay` mỗi model chờ tối đa 10 giây, cả lượt tối đa 22 giây (`AbortSignal.timeout`), và dùng `thinkingLevel: 'low'`. Quá hạn / model quá tải (503) → chuyển model kế, hết model thì trả lời theo luật đơn giản (`ruleBased`), đủ ảnh + váy vẫn ướm ngay. Nguyên nhân sửa: log 26/10 cho thấy Gemini quá tải treo 46–150 giây (có lần Supabase cắt ở 150 giây, mã 546/504) trong khi trước đó chỉ vài giây.
+- **Chống spam trợ lý chat**: `tro-ly-thu-vay` áp dụng rate limit ngắn hạn tối thiểu 2 giây giữa 2 tin nhắn của cùng tài khoản (dựa trên index của bảng `ai_usage`).
 - Test (giả lập 2 Edge Function + cài đặt, không tốn credit; ảnh tải lên vẫn lưu/xóa thật trên Storage): `tryon.spec.js` (chưa đăng nhập + trang may đo),
   `flows/own-garment-tryon.spec.js`, `flows/tryon-options.spec.js`, `flows/tryon-assistant.spec.js`, `flows/tryon-history.spec.js`, `flows/bride-photos.spec.js`.
   Bài admin bật/tắt Siêu nét và `pages.spec.js` (trang không lỗi console) cần SQL 28 trên project test.
@@ -459,7 +467,7 @@ Mở lại trang: các lần ướm đã lưu hiện lại thành đoạn chat (
   tổng trước → sau (còn vượt hay đã trong ngân sách), **Áp dụng** rồi **Hoàn tác** được. Không bấm thì không đổi gì.
   Server bỏ đề xuất cho mục đã trả / mã lạ, làm tròn 100.000đ. Nút **✨ Hỏi AI về ngân sách** và **Hỏi AI cách cân đối**
   (khi vượt ngân sách) ở tab Ngân sách mở thẳng tab này.
-- **Giới hạn 20 câu / người / ngày** (giờ Việt Nam) đếm ở server bằng bảng `ai_usage`; chỉ câu trả lời thành công mới bị tính.
+- **Giới hạn 20 câu / người / ngày** (giờ Việt Nam) đếm ở server bằng bảng `ai_usage`; chỉ câu trả lời thành công mới bị tính. Đồng thời có rate limit ngắn hạn tối thiểu 2 giây giữa 2 câu hỏi liên tiếp để chống gửi dồn dập.
 - Deploy lại function sau khi chạy SQL 21: trong `backend/` chạy
   `npx supabase functions deploy tu-van-ngan-sach --project-ref vsjdijmuvuetmhmszcrl --no-verify-jwt`
   (chế độ `plan` tự kiểm tra đăng nhập bằng token gửi lên).
@@ -528,6 +536,10 @@ Mở lại trang: các lần ướm đã lưu hiện lại thành đoạn chat (
 | `detail.html` luôn hiện TuArt cho mọi đối tác | `vendor.html?slug=` đọc đúng đối tác |
 | Tỷ lệ Escrow lệch nhau giữa các trang | Thống nhất 30/50/20 (thuê) – 30/40/30 (may đo), do database quyết định |
 | Chữ 10–11px khó đọc, nhiều thuật ngữ | Cỡ chữ tối thiểu 12–13px, lời văn đời thường |
+| Đơn mới của tiệm bị đẩy về trang 10+ khi tiệm có nhiều đơn | `listVendorBookings` sắp xếp theo `created_at DESC` thay vì `appointment_at ASC` |
+| Bấm thông báo `?focus=code` không thấy đơn ở trang 2+ | `vendor-dashboard.js` tự động tính trang và nhảy đến đúng trang chứa đơn cần highlight |
+| Trợ lý AI thử váy bị treo 46–150s khi Gemini quá tải | Giới hạn timeout 10s/22s, `thinkingLevel: 'low'`, fallback sang rule-based không để khách đợi |
+| Khách muốn dừng AI khi đang trả lời / đang ướm và sửa lại câu chat | Nút Gửi tự đổi thành Dừng (`⏹`) khi AI đang bận; bấm dừng sẽ hủy request (`AbortController`), phục hồi câu chat vào ô nhập kèm nút "Dùng lại" trên từng tin nhắn |
 
 ---
 
@@ -540,7 +552,7 @@ Mở lại trang: các lần ướm đã lưu hiện lại thành đoạn chat (
 | 2 | **Trang "Tài khoản của tôi"**: sửa tên/SĐT, xem số đo (xem/xóa ảnh đã tải: đã có ở Phòng thử) | `frontend/` |
 | 3 | **Thông báo email** khi có đơn mới, đã cọc, chờ nghiệm thu, khiếu nại được xử lý | Edge Function |
 | 4 | **Thanh toán thật** (PayOS): webhook xác nhận chuyển khoản → gọi `pay_milestone` | Edge Function |
-| ✅ | AI thử váy thật (FASHN, dự phòng Gemini) dạng trò chuyện, trợ lý chat, hạn mức credit/người/ngày, admin bật/tắt Siêu nét | Đã xong (SQL 11, 12, 28 + function thu-vay-ai, tro-ly-thu-vay) |
+| ✅ | AI thử váy thật (FASHN, dự phòng Gemini) dạng trò chuyện, trợ lý chat, hạn mức credit/người/ngày, admin bật/tắt Siêu nét, nút Dừng phản hồi (`⏹`) & Dùng lại câu chat | Đã xong (SQL 11, 12, 28, 34 + function thu-vay-ai, tro-ly-thu-vay) |
 | ✅ | AI tư vấn chia ngân sách cưới theo số khách, thành phố, ưu tiên | Đã xong (function tu-van-ngan-sach) |
 | ✅ | Kế hoạch cưới: ngân sách theo nghi lễ, checklist, tổng quan | Đã xong (SQL 20) |
 | ✅ | AI trong Kế hoạch cưới: lưu gợi ý AI thành kế hoạch, trợ lý đề xuất sửa từng mục (Áp dụng / Hoàn tác), 20 câu / ngày | Đã xong (SQL 21) |
@@ -573,3 +585,14 @@ Các mục dùng **Edge Function** là việc bắt buộc chạy ở server (c�
 - `frontend/js/config.js` chứa **publishable key** – được phép công khai, commit lên GitHub không sao.
 - **Không bao giờ** đưa vào code: mật khẩu database, `service_role` / secret key, API key của AI hay cổng thanh toán. Những key đó chỉ đặt trong *Edge Function Secrets* của Supabase.
 - Vai trò `admin` chỉ đổi được bằng SQL trong Supabase – người dùng không tự nâng quyền được.
+
+### Bảo mật Edge Functions & API
+- **Khóa CORS theo Origin (`backend/supabase/functions/_shared/cors.ts`)**: Cả 5 Edge Functions (`thu-vay-ai`, `tro-ly-thu-vay`, `tu-van-ngan-sach`, `excel-dong-bo`, `khieu-nai-sla`) được bọc qua middleware `withCors`. Không còn dùng wildcard `Access-Control-Allow-Origin: *`, mà kiểm tra header `Origin` của trình duyệt:
+  - Chỉ chấp nhận tên miền chính thức của web (mặc định `https://tramhy.id.vn`, `https://www.tramhy.id.vn`, `https://tram-hy-alpha.vercel.app`, hoặc tùy chỉnh qua `SITE_URL` / secret `ALLOWED_ORIGINS`), và môi trường chạy thử cục bộ (`localhost` / `127.0.0.1` mọi cổng).
+  - Trình duyệt từ website lạ gọi lén API của người dùng đã đăng nhập sẽ tự động bị chặn đọc phản hồi (`Vary: Origin` được thiết lập đầy đủ).
+  - Không ảnh hưởng các kết nối server/tool bên ngoài không qua trình duyệt (Excel, Google Sheets IMPORTDATA, webhook database, cron).
+- **Giữ chỗ credit thử váy (SQL 34)**: Edge Function `thu-vay-ai` giải quyết triệt để lỗ hổng race condition (người dùng mở nhiều tab hoặc gửi dồn dập nhiều yêu cầu cùng lúc để vượt hạn mức credit FASHN/Gemini trong thời gian chờ AI ~130 giây):
+  - Hàm database `reserve_tryon_credits` sử dụng `pg_advisory_xact_lock` theo id người dùng, tính tổng credit (`done` hôm nay + `pending` trong 5 phút gần nhất), nếu đủ hạn mức thì ghi một dòng tạm `status = 'pending'` với số credit của lượt.
+  - Sau khi lượt kết thúc (thành công lưu ảnh xong hoặc gặp lỗi), khối `finally` tự động xóa dòng giữ chỗ `pending`. Dòng pending bị treo quá 5 phút sẽ tự động mất hiệu lực tính toán.
+- **Chống tấn công SSRF khi tải ảnh váy (`isSafeImageUrl`)**: `thu-vay-ai` thẩm định mọi URL ảnh váy trước khi server fetch. Chặn đứng các URL trỏ về `localhost`, `127.0.0.1`, `0.0.0.0`, dải IP mạng riêng tư nội bộ (RFC 1918: `10.x`, `192.168.x`, `172.16-31.x`) và các địa chỉ dịch vụ đám mây nhạy cảm (AWS/GCP metadata `169.254.169.254`).
+- **Chống spam liên tục (Rate limit ngắn hạn)**: `tro-ly-thu-vay` và `tu-van-ngan-sach` kiểm tra thời điểm gọi gần nhất trong bảng `ai_usage` (đã có index `ai_usage_user_day_idx`), từ chối ngay bằng mã HTTP 429 nếu 2 câu hỏi/tin nhắn cách nhau dưới 2 giây.

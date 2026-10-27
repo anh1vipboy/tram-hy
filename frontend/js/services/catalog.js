@@ -10,6 +10,7 @@ const FRESH_MS = 30_000;      // < 30 giây: dùng luôn không cần hỏi lạ
 const MAX_AGE_MS = 300_000;   // < 5 phút: trả ngay từ bộ nhớ phiên (0ms) + làm mới ngầm phía sau
 
 function readCache(key) {
+  if (globalThis.__TRAMHY_TEST_SUPABASE__) return null;
   try {
     const raw = sessionStorage.getItem(CACHE_PREFIX + key);
     if (!raw) return null;

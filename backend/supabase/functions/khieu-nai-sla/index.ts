@@ -3,9 +3,10 @@
 // Khôi phục đơn hàng & Cơ chế SLA 48h/72h tự động bảo vệ hai bên cho TẤT CẢ dịch vụ cưới trên Trạm Hỷ.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { SITE_ORIGIN, withCors } from '../_shared/cors.ts';
 
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': SITE_ORIGIN,      // withCors() đổi theo web đang gọi (xem _shared/cors.ts)
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
@@ -74,7 +75,7 @@ async function notifyAdmins(
   }
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withCors(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405);
 
@@ -436,4 +437,4 @@ Deno.serve(async (req: Request) => {
   } catch (err: any) {
     return jsonResponse({ error: err?.message || 'Lỗi xử lý khiếu nại SLA' }, 500);
   }
-});
+}));

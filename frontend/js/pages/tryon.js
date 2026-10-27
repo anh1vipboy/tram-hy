@@ -20,6 +20,8 @@ import { openBookingDialog } from '../components/booking-dialog.js';
 import { openDressGallery, realPhotoCount } from '../components/dress-gallery.js';
 import { resultViewer } from '../components/tryon-result.js';
 import { openPersonSheet, openDressSheet, openSettingsSheet, QUALITY_SECONDS } from '../components/tryon-sheets.js?v=2';
+import { openPricingModal, openPromoDialog } from '../components/pricing-modal.js';
+import { getMySubscription } from '../services/subscription.js';
 import { MODELS, dressThumb, fitScore } from '../data/tryon-data.js';
 
 // ---------- TÙY CHỈNH (nhớ trên máy) ----------
@@ -64,6 +66,7 @@ const state = {
   person: null,             // ảnh người đang chọn: { key, name, photo, path? | sample?, uploading? }
   garment: null,            // váy đang chọn: { kind: 'dress', dress, … } | { kind: 'own', path, … }
   settings: { maxEnabled: false, dailyCredits: 6 },   // admin chỉnh ở trang Quản trị (SQL 28)
+  subscription: null,       // thông tin gói cước hiện tại: { plan_id, plan_name, daily_credits, ... }
   remaining: null,          // credit AI còn lại hôm nay (null = chưa biết)
   options: loadOptions(),
   body: { height: 160, weight: 49, heel: 7, shape: 'hourglass' },
@@ -72,6 +75,37 @@ const state = {
   history: { batches: [], cursor: null },
 };
 const runs = new Map();     // các lần ướm trong phiên → "Thử kiểu khác" dùng lại đúng ảnh + váy của lần đó
+let currentAbortController = null;
+let lastSentPrompt = '';
+let currentPendingBlock = null;
+
+function stopGenerating() {
+  if (!state.busy) return;
+  if (currentAbortController) {
+    try {
+      currentAbortController.abort();
+    } catch (_) {}
+    currentAbortController = null;
+  }
+  if (currentPendingBlock) {
+    currentPendingBlock.remove();
+    currentPendingBlock = null;
+  }
+  state.busy = false;
+  renderComposer();
+
+  if (lastSentPrompt) {
+    const box = $('#composer-text');
+    box.value = lastSentPrompt;
+    autosize();
+    focusComposer();
+    postAi('Đã dừng theo yêu cầu. Câu chat vừa rồi đã được nạp lại vào ô nhập để bạn sửa hoặc gửi lại nhé.');
+    toast('Đã dừng lại & nạp lại câu chat');
+  } else {
+    postAi('Đã dừng theo yêu cầu.');
+    toast('Đã dừng lại');
+  }
+}
 
 const INTRO = 'Mình sẽ ướm chiếc váy lên ảnh của bạn, giữ nguyên khuôn mặt, dáng người và khung cảnh nhé!';
 const FALLBACK_MESSAGES = {
@@ -140,8 +174,8 @@ async function loadDresses() {
 async function loadAccountData() {
   if (!state.profile) return;
   const id = state.profile.id;
-  const [body, photos, garments, used, history] = await Promise.allSettled([
-    getBodyProfile(id), listBridePhotos(id, 'body'), listBridePhotos(id, 'garment'), creditsUsedToday(), listTryonHistory(),
+  const [body, photos, garments, used, history, sub] = await Promise.allSettled([
+    getBodyProfile(id), listBridePhotos(id, 'body'), listBridePhotos(id, 'garment'), creditsUsedToday(), listTryonHistory(), getMySubscription(),
   ]);
   if (body.value) {
     const b = body.value;
@@ -149,6 +183,13 @@ async function loadAccountData() {
   }
   state.myPhotos = photos.value ?? [];
   state.garments = garments.value ?? [];
+  if (sub.status === 'fulfilled' && sub.value) {
+    state.subscription = sub.value;
+    if (sub.value.has_subscription) {
+      state.settings.dailyCredits = sub.value.daily_credits;
+      if (sub.value.allow_max_quality) state.settings.maxEnabled = true;
+    }
+  }
   if (used.status === 'fulfilled' && !isAdmin()) state.remaining = Math.max(0, state.settings.dailyCredits - used.value);
   if (history.value) state.history = history.value;
   for (const failed of [body, photos, garments].filter((r) => r.status === 'rejected')) toastError(failed.reason);
@@ -230,7 +271,14 @@ function postUser({ person, garment, text, time }, container) {
             <figcaption>${a.photo ? a.name : a.gone ?? 'Ảnh đã xóa'}</figcaption>
           </figure>`)}
       </div>` : ''}
-    ${text ? html`<p class="msg-bubble">${text}</p>` : ''}
+    ${text ? html`
+      <div class="msg-user-content">
+        <p class="msg-bubble">${text}</p>
+        <button type="button" class="btn-reuse-msg" data-reuse="${text}" title="Dùng lại câu chat này" aria-label="Dùng lại câu chat này">
+          <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M19 8l-4 4h3c0 3.31-2.69 6-6 6a5.87 5.87 0 0 1-2.8-.7l-1.46 1.46A7.93 7.93 0 0 0 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46A7.93 7.93 0 0 0 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
+          <span>Dùng lại</span>
+        </button>
+      </div>` : ''}
     ${time ? html`<span class="msg-time">${time}</span>` : ''}`);
   if (!container) scrollToEnd();
 }
@@ -387,7 +435,10 @@ function nudgeMissing() {
 
 // preset: câu gửi từ nút gợi ý; không có → lấy chữ trong khung soạn tin
 async function send(preset) {
-  if (state.busy) return;
+  if (state.busy) {
+    stopGenerating();
+    return;
+  }
   const fromComposer = preset === undefined;
   const text = (fromComposer ? $('#composer-text').value : preset).trim();
   const { person, garment } = state;
@@ -403,28 +454,47 @@ async function send(preset) {
     $('#composer-text').value = '';
     autosize();
   }
+  lastSentPrompt = text;
   postUser({ person, garment, text });
   if (!state.profile) {
     postLoginPrompt();
     return;
   }
 
+  currentAbortController = new AbortController();
+  const { signal } = currentAbortController;
+
   let plan = { action: 'tryon', prompt: '', samples: 0 };
   if (text) {
-    plan = await consultAssistant(text, person, garment);
-    if (plan.action !== 'tryon') return;
+    try {
+      plan = await consultAssistant(text, person, garment, signal);
+      if (plan?.action !== 'tryon') return;
+    } catch (err) {
+      if (err.name === 'AbortError' || signal.aborted) return;
+      throw err;
+    }
   } else {
     postAi(INTRO);
   }
   if (!person || !garment) return;                 // trợ lý đã nhắc chọn ảnh / váy
-  await runTryOn({ person, garment, prompt: plan.prompt, samples: plan.samples, message: text });
+  try {
+    await runTryOn({ person, garment, prompt: plan.prompt, samples: plan.samples, message: text }, signal);
+  } catch (err) {
+    if (err.name === 'AbortError' || signal.aborted) return;
+    throw err;
+  } finally {
+    if (currentAbortController?.signal === signal) {
+      currentAbortController = null;
+    }
+  }
 }
 
-async function consultAssistant(text, person, garment) {
+async function consultAssistant(text, person, garment, signal) {
   const ready = Boolean(person && garment);
   state.busy = true;
   renderComposer();
   const stopTyping = postTyping();
+  currentPendingBlock = $('#chat-thread').lastElementChild;
   let plan;
   try {
     plan = await askTryonAssistant({
@@ -434,12 +504,16 @@ async function consultAssistant(text, person, garment) {
       model: effectiveOptions(garment).model,
       body: state.body,
       history: state.chat.slice(-6),
-    });
+    }, signal);
   } catch (error) {
+    if (error.name === 'AbortError' || signal?.aborted) {
+      throw error;
+    }
     // Trợ lý lỗi → vẫn ướm được nếu đã đủ ảnh và váy
     plan = { action: ready ? 'tryon' : 'chat', reply: ready ? INTRO : error.message, prompt: '', samples: 0, theme: '' };
   } finally {
     stopTyping();
+    currentPendingBlock = null;
     state.busy = false;
     renderComposer();
   }
@@ -455,15 +529,17 @@ async function consultAssistant(text, person, garment) {
 }
 
 // Một lần ướm: { person, garment, prompt, samples, message } – prompt/samples do trợ lý đọc từ tin nhắn
-async function runTryOn(run) {
+async function runTryOn(run, signal) {
   const { person, garment } = run;
   const options = { ...effectiveOptions(garment), ...(run.samples ? { samples: run.samples } : {}) };
   const cost = tryonCost(options);
   if (state.remaining !== null && cost > state.remaining) {
     postAi(state.remaining
       ? `Lần ướm này cần ${cost} credit nhưng hôm nay bạn còn ${state.remaining} credit – bạn giảm số ảnh hoặc chất lượng trong Tùy chỉnh nhé.`
-      : `Bạn đã dùng hết ${state.settings.dailyCredits} credit thử váy hôm nay. Mai quay lại ướm tiếp nhé!`,
-    state.remaining ? [{ act: 'settings', label: '⚙️ Mở Tùy chỉnh' }] : []);
+      : `Bạn đã dùng hết ${state.settings.dailyCredits} credit thử váy hôm nay. Nâng cấp gói để nhận 60 credit/ngày và mở khóa Siêu Nét 1K ngay nhé!`,
+    state.remaining
+      ? [{ act: 'pricing', label: '⭐ Nâng cấp nhận thêm credit', primary: true }, { act: 'settings', label: '⚙️ Mở Tùy chỉnh' }]
+      : [{ act: 'pricing', label: '⭐ Nâng cấp mở khóa 60 credit', primary: true }]);
     return;
   }
 
@@ -472,6 +548,7 @@ async function runTryOn(run) {
   state.busy = true;
   renderComposer();
   const body = addRow('ai');
+  currentPendingBlock = body.parentElement;
   const seconds = estimateSeconds(options);
   render(body, html`
     <div class="gen gen-pending">
@@ -496,7 +573,8 @@ async function runTryOn(run) {
       options: { ...options, seed: Math.floor(Math.random() * 2 ** 31) },     // seed mới → mỗi lần một kiểu
       prompt: run.prompt,
       message: run.message,
-    });
+    }, signal);
+    if (signal?.aborted) return;
     if (result.fallback) {
       body.parentElement.remove();
       postAi(FALLBACK_MESSAGES[result.reason] ?? FALLBACK_MESSAGES['provider-error'],
@@ -524,11 +602,16 @@ async function runTryOn(run) {
       ])}`.value);
     scrollToEnd();
   } catch (error) {
+    if (error.name === 'AbortError' || signal?.aborted) {
+      body.parentElement?.remove();
+      return;
+    }
     body.parentElement.remove();
     if (typeof error.remaining === 'number') state.remaining = error.remaining;
     if (/Siêu nét đang tắt/.test(error.message)) state.settings.maxEnabled = false;
     postAi(error.message, state.remaining === 0 ? [] : [{ act: 'again', arg: runId, label: '↻ Thử lại' }]);
   } finally {
+    currentPendingBlock = null;
     state.busy = false;
     renderComposer();
   }
@@ -538,7 +621,10 @@ function runAgain(runId) {
   const run = runs.get(runId);
   if (!run || state.busy) return;
   postUser({ text: '🎲 Thử kiểu khác' });
-  runTryOn({ ...run, message: '' });
+  currentAbortController = new AbortController();
+  runTryOn({ ...run, message: '' }, currentAbortController.signal).finally(() => {
+    currentAbortController = null;
+  });
 }
 
 function bookDress(id) {
@@ -556,6 +642,18 @@ function bookDress(id) {
 }
 
 function onThreadClick(e) {
+  const reuseBtn = e.target.closest('[data-reuse]');
+  if (reuseBtn) {
+    const text = reuseBtn.dataset.reuse;
+    if (text) {
+      const box = $('#composer-text');
+      box.value = text;
+      autosize();
+      focusComposer();
+      toast('Đã nạp câu chat vào ô nhập để bạn chỉnh sửa.');
+    }
+    return;
+  }
   const button = e.target.closest('[data-act]');
   if (!button || button.disabled) return;
   const { act, arg } = button.dataset;
@@ -565,6 +663,7 @@ function onThreadClick(e) {
   else if (act === 'tryon') send('');
   else if (act === 'again') runAgain(arg);
   else if (act === 'settings') openSettings();
+  else if (act === 'pricing') openPricing();
   else if (act === 'login') location.href = loginUrl(returnPath());
   else if (act === 'book') bookDress(arg);
   else if (act === 'photos') openDressGallery(findDress(arg)).catch(toastError);
@@ -706,9 +805,33 @@ function openSettings() {
     remaining: state.remaining,
     body: state.body,
     loggedIn: Boolean(state.profile),
+    onOpenPricing: openPricing,
     onBodyChange: () => {
       persistBody();
       updateFitLines();
+    },
+  });
+}
+
+function openPricing() {
+  state.promoOpenedAlready = true;
+  openPricingModal({
+    currentPlanId: state.subscription?.plan_id || 'basic',
+    onUpgraded: (newSub) => {
+      state.subscription = {
+        has_subscription: true,
+        plan_id: newSub.plan_id,
+        plan_name: newSub.plan_name,
+        daily_credits: newSub.daily_credits,
+        bonus_balance: newSub.bonus_credits,
+        allow_max_quality: true,
+        allow_own_garment: true,
+      };
+      state.settings.dailyCredits = newSub.daily_credits;
+      state.settings.maxEnabled = true;
+      state.remaining = Math.max(state.remaining || 0, newSub.daily_credits);
+      renderComposer();
+      toast(`Đã kích hoạt ${newSub.plan_name}! Hạn mức của bạn hiện là ${newSub.daily_credits} credit/ngày.`, 'success');
     },
   });
 }
@@ -742,10 +865,37 @@ function renderComposer() {
   const cost = tryonCost(o);
   $('#settings-sum').textContent = `${modelName(o.model)} · ${o.samples} ảnh`;
   const costLabel = $('#composer-cost');
+  const upgradeBtn = $('#open-pricing');
+  if (upgradeBtn) {
+    const hasSub = state.subscription?.has_subscription;
+    if (hasSub) {
+      upgradeBtn.textContent = 'Đổi gói';
+      upgradeBtn.title = `Bạn đang dùng gói ${state.subscription.plan_name}`;
+    } else {
+      upgradeBtn.textContent = 'Nâng cấp ⭐';
+      upgradeBtn.title = 'Nâng cấp gói cước AI';
+    }
+  }
+  const planPrefix = state.subscription?.has_subscription ? `⭐ ${state.subscription.plan_name} · ` : '';
   costLabel.textContent = isAdmin() ? `${cost} credit · admin không giới hạn`
-    : state.remaining === null ? `${cost} credit` : `${cost} credit · còn ${state.remaining}/${state.settings.dailyCredits}`;
+    : state.remaining === null ? `${cost} credit` : `${planPrefix}${cost} credit · còn ${state.remaining}/${state.settings.dailyCredits}`;
   costLabel.classList.toggle('short', state.remaining !== null && cost > state.remaining);
-  $('#send-btn').disabled = state.busy || Boolean(state.person?.uploading || state.garment?.uploading);
+
+  const sendBtn = $('#send-btn');
+  if (state.busy) {
+    sendBtn.disabled = false;
+    sendBtn.classList.add('is-stop');
+    sendBtn.title = 'Dừng lại (dùng lại câu chat)';
+    sendBtn.setAttribute('aria-label', 'Dừng lại và dùng lại câu chat');
+    sendBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2.5" fill="currentColor"/></svg>';
+    costLabel.textContent = 'Đang trả lời… Bấm ⏹ để dừng';
+  } else {
+    sendBtn.classList.remove('is-stop');
+    sendBtn.disabled = Boolean(state.person?.uploading || state.garment?.uploading);
+    sendBtn.title = 'Gửi tin nhắn';
+    sendBtn.setAttribute('aria-label', 'Gửi tin nhắn');
+    sendBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3.4 20.4 21 12 3.4 3.6l-.01 6.53L15 12 3.39 13.87z"/></svg>';
+  }
 }
 
 function autosize() {
@@ -757,6 +907,10 @@ function autosize() {
 function initComposer() {
   $('#composer').addEventListener('submit', (e) => {
     e.preventDefault();
+    if (state.busy) {
+      stopGenerating();
+      return;
+    }
     send();
   });
   const box = $('#composer-text');
@@ -767,6 +921,10 @@ function initComposer() {
   box.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && matchMedia('(pointer: fine)').matches) {
       e.preventDefault();
+      if (state.busy) {
+        stopGenerating();
+        return;
+      }
       send();
     }
   });
@@ -786,6 +944,7 @@ function initComposer() {
     else if (target) openDressPicker(state.garment?.kind === 'own' ? 'own' : 'catalog');
   });
   $('#open-settings').addEventListener('click', openSettings);
+  $('#open-pricing')?.addEventListener('click', openPricing);
   thread().addEventListener('click', onThreadClick);
   // Đang ướm mà rời trang thì mất kết quả (AI vẫn chạy và trừ credit) → hỏi lại
   window.addEventListener('beforeunload', (e) => {
@@ -808,6 +967,20 @@ state.settings = settings;
 // Admin dùng thoải mái: không giới hạn credit, luôn có Siêu nét để thử trước khi bật cho mọi người (server cũng kiểm tra)
 if (isAdmin()) state.settings.maxEnabled = true;
 await loadAccountData();
+
+// Nếu tài khoản thường (chưa nâng cấp) và không phải admin:
+// Tự động hiện dialog quảng cáo các gói cước AI khi vào phòng thử đồ
+let promoTimer = null;
+if (!state.subscription?.has_subscription && !isAdmin()) {
+  promoTimer = setTimeout(() => {
+    if (!state.promoOpenedAlready) {
+      state.promoOpenedAlready = true;
+      openPromoDialog({
+        onUpgrade: openPricing,
+      });
+    }
+  }, 400);
+}
 
 const linked = state.dresses.find((d) => d.slug === param('dress'));
 if (linked?.image_url) state.garment = dressGarment(linked);

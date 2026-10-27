@@ -12,9 +12,14 @@ const MAX_CREDITS = { fast: 1, balanced: 2, quality: 3 };
 export const tryonCost = (o) => o.samples * (o.model === 'max' ? MAX_CREDITS[o.quality] : 1);
 
 // Lỗi 4xx của Edge Function có câu tiếng Việt trong body → lấy ra để báo người dùng
-async function invoke(name, body, fallbackMessage) {
-  const { data, error } = await sb.functions.invoke(name, { body });
+async function invoke(name, body, fallbackMessage, signal) {
+  const { data, error } = await sb.functions.invoke(name, { body, signal });
   if (error) {
+    if (signal?.aborted) {
+      const abortErr = new Error('Đã dừng');
+      abortErr.name = 'AbortError';
+      throw abortErr;
+    }
     const detail = await error.context?.json?.().catch(() => null);
     const err = new Error(detail?.error || fallbackMessage);
     if (typeof detail?.remaining === 'number') err.remaining = detail.remaining;
@@ -30,15 +35,15 @@ async function invoke(name, body, fallbackMessage) {
  * Trả về { imageUrl, images, batchId, remaining, limit } hoặc { fallback: true, reason } khi AI chưa chạy được.
  * Lỗi 4xx: Error có .remaining khi hết credit.
  */
-export const aiTryOn = (params) =>
-  invoke('thu-vay-ai', params, 'Không kết nối được dịch vụ thử váy AI, vui lòng thử lại sau');
+export const aiTryOn = (params, signal) =>
+  invoke('thu-vay-ai', params, 'Không kết nối được dịch vụ thử váy AI, vui lòng thử lại sau', signal);
 
 /**
  * Hỏi trợ lý thử váy: { message, hasPerson, garment, model, body, history }
  * → { reply, action: 'tryon'|'chat', prompt, samples, theme, remaining }
  */
-export const askTryonAssistant = (params) =>
-  invoke('tro-ly-thu-vay', params, 'Trợ lý đang bận, bạn thử lại sau ít phút nhé');
+export const askTryonAssistant = (params, signal) =>
+  invoke('tro-ly-thu-vay', params, 'Trợ lý đang bận, bạn thử lại sau ít phút nhé', signal);
 
 /** Cài đặt thử váy AI do admin chỉnh: { maxEnabled, dailyCredits, ready } – ready = false khi chưa chạy SQL 28 */
 export async function getTryonSettings() {

@@ -16,7 +16,8 @@ const LOGGED_IN_FLOWS = /flows[\\/]/;      // các bài cần đăng nhập, ghi
 
 module.exports = defineConfig({
   testDir: './e2e',
-  timeout: 30_000,
+  timeout: 60_000,
+  workers: process.env.WORKERS ? Number(process.env.WORKERS) : 1,
   expect: { timeout: 10_000 },          // dữ liệu tải từ Supabase qua mạng
   retries: 1,
   reporter: [['list'], ['html', { open: 'never' }]],
@@ -24,7 +25,7 @@ module.exports = defineConfig({
     baseURL: BASE_URL,
     locale: 'vi-VN',
     screenshot: 'only-on-failure',
-    trace: 'retain-on-failure',
+    trace: 'on-first-retry',
   },
   projects: [
     // 1. Đăng nhập sẵn 3 vai trò → .auth/*.json

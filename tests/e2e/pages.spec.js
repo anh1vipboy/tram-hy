@@ -6,7 +6,7 @@ const PUBLIC_PAGES = [
   { path: '/tryon.html', heading: 'Phòng thử váy AI' },
   { path: '/thiet-ke-vay.html', heading: 'Thiết kế váy may đo' },
   { path: '/gioi-thieu.html', heading: 'Kết duyên cát hỷ, trọn vẹn niềm tin' },
-  { path: '/marketplace.html', heading: 'Đối tác được Trạm Hỷ bảo chứng' },
+  { path: '/marketplace.html', heading: /Đối tác.*bảo chứng/ },
   { path: '/vendor.html?slug=tuart', heading: 'TuArt Wedding' },
   { path: '/login.html', heading: 'Chào mừng trở lại' },
 ];

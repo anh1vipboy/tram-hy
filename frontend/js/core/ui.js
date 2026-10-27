@@ -127,13 +127,13 @@ export function openSheet({ title, onOpen, onClose, className = '' }) {
 }
 
 // Link từ chuông thông báo (?focus=MÃ ĐƠN): cuộn tới phần tử [data-code="MÃ"] và nháy sáng – chỉ lần đầu vẽ trang
-let focusDone = false;
+let lastFocusedCode = null;
 export function focusFromUrl(root = document) {
   const code = new URLSearchParams(location.search).get('focus');
-  if (!code || focusDone) return;
+  if (!code || code === lastFocusedCode) return;
   const el = root.querySelector(`[data-code="${CSS.escape(code)}"]`);
   if (!el) return;
-  focusDone = true;
+  lastFocusedCode = code;
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   el.classList.add('flash');
 }

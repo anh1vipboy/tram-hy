@@ -15,9 +15,10 @@
 // SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY có sẵn trong mọi Edge Function.
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { SITE_ORIGIN, withCors } from '../_shared/cors.ts';
 
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': SITE_ORIGIN,      // withCors() đổi theo web đang gọi (xem _shared/cors.ts)
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
@@ -199,6 +200,13 @@ async function handlePlan(req: Request, body: Record<string, unknown>) {
   const history = (Array.isArray(body.history) ? body.history : []).slice(-6)
     .map((m: { role?: string; text?: string }) => `${m?.role === 'user' ? 'Cặp đôi' : 'Bạn'}: ${String(m?.text ?? '').slice(0, 600)}`).join('\n');
 
+  // Chặn spam dồn dập (rate limit: tối thiểu 2 giây giữa 2 câu hỏi)
+  const { data: recent } = await admin.from('ai_usage').select('created_at')
+    .eq('user_id', user.id).eq('kind', 'plan').order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (recent && (Date.now() - new Date(recent.created_at).getTime()) < 2000) {
+    return json({ error: 'Bạn gửi câu hỏi hơi nhanh, hãy đợi 2 giây rồi hỏi tiếp nhé' }, 429);
+  }
+
   const { count } = await admin.from('ai_usage').select('id', { count: 'exact', head: true })
     .eq('user_id', user.id).eq('kind', 'plan').gte('created_at', startOfVietnamDay());
   const used = count ?? 0;
@@ -280,7 +288,7 @@ Yêu cầu:
   }
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withCors(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
 
   const body = await req.json().catch(() => ({}));
@@ -336,4 +344,4 @@ Deno.serve(async (req) => {
     console.error('Tư vấn ngân sách lỗi:', error);
     return json({ fallback: true, reason: 'error' });
   }
-});
+}));

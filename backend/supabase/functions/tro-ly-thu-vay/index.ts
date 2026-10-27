@@ -15,9 +15,10 @@
 //
 // Secrets: GEMINI_API_KEY (dùng chung), GEMINI_TEXT_MODEL (không bắt buộc – ưu tiên model này trước)
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { SITE_ORIGIN, withCors } from '../_shared/cors.ts';
 
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': SITE_ORIGIN,      // withCors() đổi theo web đang gọi (xem _shared/cors.ts)
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
@@ -150,22 +151,42 @@ function ruleBased(input: Input): Plan {
 const TEXT_MODELS = [Deno.env.get('GEMINI_TEXT_MODEL'), 'gemini-3.8-flash', 'gemini-3.1-flash-lite', 'gemini-3.7-flash', 'gemini-3-flash-preview']
   .filter((m, i, list): m is string => Boolean(m) && list.indexOf(m) === i);
 
+// Giới hạn thời gian: Gemini lúc quá tải có thể treo kết nối rất lâu (log 26/10: 46 giây, có lần tới 150 giây thì
+// Supabase cắt – khách chờ mãi mới bắt đầu ướm). Mỗi model chờ tối đa ATTEMPT_MS, cả lượt tối đa TOTAL_MS;
+// quá hạn → trả lời theo luật đơn giản (ruleBased), đủ ảnh + váy thì vẫn ướm ngay.
+const ATTEMPT_MS = 10_000;
+const TOTAL_MS = 22_000;
+
 async function askGemini(key: string, prompt: string): Promise<Plan | null> {
+  const deadline = Date.now() + TOTAL_MS;
   for (const model of TEXT_MODELS) {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: 'application/json', responseSchema: SCHEMA, temperature: 0.4 },
-      }),
-    });
+    const budget = Math.min(ATTEMPT_MS, deadline - Date.now());
+    if (budget < 2_000) break;
+    const started = Date.now();
+    let res: Response;
+    try {
+      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: 'application/json', responseSchema: SCHEMA, temperature: 0.4,
+            thinkingConfig: { thinkingLevel: 'low' },     // việc đơn giản (hiểu ý + trả lời ngắn) → nghĩ ít cho nhanh
+          },
+        }),
+        signal: AbortSignal.timeout(budget),
+      });
+    } catch (error) {
+      console.warn(`Model ${model}: quá ${Math.round((Date.now() - started) / 1000)} giây hoặc lỗi mạng – ${String(error).slice(0, 120)}`);
+      continue;
+    }
     if (!res.ok) {
       console.warn(`Model ${model}: ${res.status} ${(await res.text()).slice(0, 200)}`);
       continue;
     }
-    const reply = await res.json();
-    const raw = reply.candidates?.[0]?.content?.parts?.[0]?.text;
+    const reply = await res.json().catch(() => null);
+    const raw = reply?.candidates?.[0]?.content?.parts?.[0]?.text;
     try {
       const plan = JSON.parse(raw);
       return {
@@ -182,7 +203,7 @@ async function askGemini(key: string, prompt: string): Promise<Plan | null> {
   return null;
 }
 
-Deno.serve(async (req) => {
+Deno.serve(withCors(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
 
   const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
@@ -195,9 +216,20 @@ Deno.serve(async (req) => {
 
   // Admin không giới hạn số tin mỗi ngày
   const { data: profile } = await admin.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  const isAdmin = profile?.role === 'admin';
+
+  if (!isAdmin) {
+    // Chặn gửi dồn dập (rate limit: tối thiểu 2 giây giữa 2 lượt)
+    const { data: recent } = await admin.from('ai_usage').select('created_at')
+      .eq('user_id', user.id).eq('kind', 'tryon_chat').order('created_at', { ascending: false }).limit(1).maybeSingle();
+    if (recent && (Date.now() - new Date(recent.created_at).getTime()) < 2000) {
+      return json({ error: 'Bạn gửi tin nhắn quá nhanh, vui lòng đợi 2 giây rồi thử lại nhé' }, 429);
+    }
+  }
+
   const { count } = await admin.from('ai_usage').select('id', { count: 'exact', head: true })
     .eq('user_id', user.id).eq('kind', 'tryon_chat').gte('created_at', startOfVietnamDay());
-  const used = profile?.role === 'admin' ? 0 : count ?? 0;
+  const used = isAdmin ? 0 : count ?? 0;
   if (used >= DAILY_LIMIT) {
     return json({ ...ruleBased(input), fallback: true, limited: true, remaining: 0 });
   }
@@ -215,4 +247,4 @@ Deno.serve(async (req) => {
   const logged = await admin.from('ai_usage').insert({ user_id: user.id, kind: 'tryon_chat' });
   if (logged.error) console.warn('Ghi ai_usage lỗi (đã chạy SQL 28 chưa?):', logged.error.message);
   return json({ ...plan, remaining: DAILY_LIMIT - used - 1 });
-});
+}));

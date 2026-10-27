@@ -27,7 +27,9 @@ test('đặt lịch → cọc → đối tác thực hiện → khiếu nại �
 
   // Đối tác mở Kênh đối tác sẵn để kiểm tra đơn nhảy realtime
   await vendor.goto('/vendor-dashboard.html');
-  await expect(vendor.locator('.kanban-col', { hasText: 'Chờ khách đặt cọc' })).toContainText(code);
+  const vendorCard = vendor.locator('.kanban-card', { hasText: code });
+  await expect(vendorCard).toBeVisible();
+  await expect(vendorCard).toContainText('Chờ đặt cọc');
 
   // ---- 2. Cô dâu trả đợt 1 (30%) ----
   await order.getByRole('button', { name: 'Thanh toán' }).click();
@@ -37,9 +39,8 @@ test('đặt lịch → cọc → đối tác thực hiện → khiếu nại �
   // Chỉ được trả đợt kế tiếp – không có nút trả đợt 3 khi đợt 2 chưa trả
   await expect(order.getByRole('button', { name: 'Thanh toán' })).toHaveCount(1);
 
-  // ---- 3. Đối tác thấy đơn chuyển cột (không tải lại trang) và bắt đầu thực hiện ----
-  const vendorCard = vendor.locator('.kanban-card', { hasText: code });
-  await expect(vendor.locator('.kanban-col', { hasText: 'Đã nhận cọc' }).locator('.kanban-card', { hasText: code })).toBeVisible();
+  // ---- 3. Đối tác thấy đơn chuyển trạng thái (không tải lại trang) và bắt đầu thực hiện ----
+  await expect(vendorCard).toContainText('Đã cọc đợt 1');
   await vendorCard.getByRole('button', { name: 'Bắt đầu thực hiện' }).click();
   await expect(vendorCard).toContainText('Đang thực hiện');
 

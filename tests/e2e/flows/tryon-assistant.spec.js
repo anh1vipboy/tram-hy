@@ -92,3 +92,50 @@ test('trợ lý lỗi mạng mà đã đủ ảnh + váy → vẫn ướm đư�
   expect(tried).toMatchObject({ prompt: '', message: 'thử váy này giúp mình' });
   await bride.context().close();
 });
+
+test('đang chat với AI có thể bấm nút dừng (⏹) để ngắt và dùng lại câu chat đó; nút "Dùng lại" nạp lại tin cũ', async ({ browser }) => {
+  requireAccounts('bride');
+  const bride = await openAs(browser, 'bride');
+  
+  // Trợ lý phản hồi chậm 3 giây để người dùng kịp bấm Dừng
+  await bride.route('**/functions/v1/tro-ly-thu-vay', async (route) => {
+    await new Promise((r) => setTimeout(r, 2000));
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ reply: 'Câu trả lời xong rồi', action: 'chat', prompt: '', samples: 0, theme: '' }),
+    });
+  });
+
+  await bride.goto('/tryon.html');
+  await expect(bride.locator('.msg-row.ai').last()).toBeVisible({ timeout: 30_000 });
+
+  const input = bride.locator('#composer-text');
+  const sendBtn = bride.locator('#send-btn');
+
+  // 1. Nhập câu hỏi và gửi
+  const promptText = 'Tư vấn cho mình váy che bắp tay to với';
+  await input.fill(promptText);
+  await sendBtn.click();
+
+  // 2. Trong khi đang xử lý (busy): nút đổi sang class 'is-stop' và có aria-label 'Dừng lại'
+  await expect(sendBtn).toHaveClass(/is-stop/);
+  await expect(sendBtn).toHaveAttribute('aria-label', /Dừng lại/);
+
+  // 3. Người dùng bấm Dừng (⏹)
+  await sendBtn.click();
+
+  // 4. Kiểm tra: nút trở về trạng thái gửi bình thường, câu chat cũ được nạp lại vào ô nhập
+  await expect(sendBtn).not.toHaveClass(/is-stop/);
+  await expect(input).toHaveValue(promptText);
+  await expect(bride.locator('#chat-thread')).toContainText('Đã dừng theo yêu cầu');
+
+  // 5. Thử nút "Dùng lại" trên bóng chat người dùng
+  await input.fill('Một câu khác');
+  const reuseBtn = bride.locator('.btn-reuse-msg').first();
+  await expect(reuseBtn).toBeVisible();
+  await reuseBtn.click();
+  await expect(input).toHaveValue(promptText);
+
+  await bride.context().close();
+});

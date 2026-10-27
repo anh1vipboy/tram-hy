@@ -131,9 +131,9 @@ test.describe('Dịch vụ cưới', () => {
     await expect(page.getByText('Không có đối tác phù hợp')).toBeVisible();
   });
 
-  test('bấm Xem chi tiết mở đúng trang đối tác', async ({ page }) => {
+  test('bấm Xem tiệm mở đúng trang đối tác', async ({ page }) => {
     await page.locator('#search').fill('TuArt');
-    await page.getByRole('link', { name: 'Xem chi tiết' }).click();
+    await page.getByRole('link', { name: /Xem (tiệm|chi tiết)/ }).click();
     await expect(page).toHaveURL(/vendor\.html\?slug=tuart/);
     await expect(page.getByRole('heading', { level: 1, name: 'TuArt Wedding' })).toBeVisible();
   });

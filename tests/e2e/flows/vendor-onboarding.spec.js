@@ -98,7 +98,7 @@ test('đối tác mới đăng ký → mở tiệm → bị từ chối → gử
   await expect(vendor.locator('#panel-dresses [data-package]')).toHaveCount(1);
 
   // Khách thấy mục "Mẫu rạp & trang trí" trên trang tiệm, có nhãn giảm giá
-  await guest.locator('#vendor-grid article', { hasText: shopName }).getByRole('link', { name: 'Xem chi tiết' }).click();
+  await guest.locator('#vendor-grid article', { hasText: shopName }).getByRole('link', { name: /Xem tiệm|Xem chi tiết/ }).click();
   const shopUrl = guest.url().replace(/^https?:\/\/[^/]+/, '');
   await expect(guest.getByRole('heading', { name: 'Mẫu rạp & trang trí' })).toBeVisible();
   const pkgCard = guest.locator('#packages article', { hasText: pkgName });

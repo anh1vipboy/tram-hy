@@ -14,9 +14,9 @@
   <link rel="modulepreload" href="js/core/utils.js">
   <link rel="modulepreload" href="js/core/auth.js">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/styles.css?v=2">
-  <link rel="stylesheet" href="css/tryon.css?v=2">
-  <script type="module" src="js/pages/tryon.js?v=2"></script>
+  <link rel="stylesheet" href="css/styles.css?v=20261028">
+  <link rel="stylesheet" href="css/tryon.css?v=20261028">
+  <script type="module" src="js/pages/tryon.js?v=20261028"></script>
 </head>
 <body class="page-chat">
   <header id="app-header"></header>
@@ -45,7 +45,10 @@
           <button type="button" class="composer-settings" id="open-settings" aria-label="Tùy chỉnh ướm thử">
             <span aria-hidden="true">⚙️</span><span id="settings-sum">Tùy chỉnh</span>
           </button>
-          <span class="composer-cost" id="composer-cost"></span>
+          <div class="composer-cost-wrap">
+            <span class="composer-cost" id="composer-cost"></span>
+            <button type="button" class="composer-upgrade-btn" id="open-pricing" aria-label="Nâng cấp gói cước AI">Nâng cấp ⭐</button>
+          </div>
           <button type="submit" class="composer-send" id="send-btn" aria-label="Gửi" title="Gửi">
             <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3.4 20.4 21 12 3.4 3.6l-.01 6.53L15 12 3.39 13.87z"/></svg>
           </button>
