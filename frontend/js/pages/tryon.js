@@ -872,6 +872,7 @@ function slot(kind) {
 
 function renderComposer() {
   render($('#composer-slots'), [slot('person'), slot('dress')]);
+  const isMobile = window.innerWidth <= 560;
   const o = effectiveOptions();
   const cost = tryonCost(o);
   $('#settings-sum').textContent = `${modelName(o.model)} · ${o.samples} ảnh`;
@@ -883,16 +884,16 @@ function renderComposer() {
       upgradeBtn.textContent = 'Đổi gói';
       upgradeBtn.title = `Bạn đang dùng gói ${state.subscription.plan_name}`;
     } else {
-      upgradeBtn.textContent = 'Nâng cấp ⭐';
+      upgradeBtn.textContent = isMobile ? 'Nâng cấp' : 'Nâng cấp ⭐';
       upgradeBtn.title = 'Nâng cấp gói cước AI';
     }
   }
-  const planPrefix = state.subscription?.has_subscription ? `⭐ ${state.subscription.plan_name} · ` : '';
+  const planPrefix = state.subscription?.has_subscription ? (isMobile ? `⭐ ${state.subscription.plan_name.replace(' Rạng Rỡ', '').replace(' Trọn Đôi', '')} · ` : `⭐ ${state.subscription.plan_name} · `) : '';
   if (state.settings.enabled === false && !isAdmin()) {
-    costLabel.textContent = '🔴 Thử váy AI đang tạm bảo trì';
+    costLabel.textContent = isMobile ? '🔴 Tạm bảo trì' : '🔴 Thử váy AI đang tạm bảo trì';
     costLabel.classList.add('short');
   } else {
-    costLabel.textContent = isAdmin() ? `${cost} credit · admin không giới hạn`
+    costLabel.textContent = isAdmin() ? (isMobile ? `${cost} credit` : `${cost} credit · admin không giới hạn`)
       : state.remaining === null ? `${cost} credit` : `${planPrefix}${cost} credit · còn ${state.remaining}/${state.settings.dailyCredits}`;
     costLabel.classList.toggle('short', state.remaining !== null && cost > state.remaining);
   }
