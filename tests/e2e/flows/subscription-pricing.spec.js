@@ -133,4 +133,32 @@ test.describe('Gói cước AI Studio & Nâng cấp VietQR', () => {
     // Có các bộ lọc chips
     await expect(section.locator('[data-aifilter]')).toHaveCount(3);
   });
+
+  test('quản trị viên lọc đơn theo loại dịch vụ cưới trong tab "Tất cả đơn"', async ({ browser }) => {
+    const admin = await openAs(browser, 'admin');
+    await admin.goto('/admin.html');
+
+    const tab = admin.locator('[data-tab="bookings"]');
+    await tab.click();
+
+    const section = admin.locator('#tab-bookings');
+    await expect(section).toBeVisible();
+
+    const categorySelect = section.locator('[data-category-filter]');
+    await expect(categorySelect).toBeVisible();
+
+    // Có option "Tất cả dịch vụ"
+    await expect(categorySelect.locator('option[value="all"]')).toContainText('Tất cả dịch vụ');
+
+    // Có các dịch vụ từ VENDOR_CATEGORY
+    await expect(categorySelect.locator('option[value="bridal"]')).toHaveCount(1);
+    await expect(categorySelect.locator('option[value="studio"]')).toHaveCount(1);
+
+    // Chọn lọc theo dịch vụ Váy cưới
+    await categorySelect.selectOption('bridal');
+    await expect(categorySelect).toHaveValue('bridal');
+
+    // Bảng cập nhật mượt mà
+    await expect(section.locator('table.finance-table, .empty')).toBeVisible();
+  });
 });

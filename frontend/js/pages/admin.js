@@ -19,7 +19,7 @@ import {
 import { getTryonSettings, saveTryonSettings } from '../services/tryon-ai.js';
 
 const data = { bookings: [], disputes: [], vendors: [], aiOrders: [] };
-const bookingFilter = { state: 'all', vendorId: 'all' };
+const bookingFilter = { state: 'all', vendorId: 'all', category: 'all' };
 const bookingPagination = { page: 1, pageSize: 10 };
 const vendorPagination = { page: 1, pageSize: 10 };
 const aiOrderFilter = { state: 'all', planId: 'all' };
@@ -311,10 +311,17 @@ function renderVendors() {
 }
 
 // ---------- TẤT CẢ ĐƠN & ĐỐI SOÁT HOA HỒNG ----------
+function getBookingCategory(b) {
+  if (b.vendor?.category) return b.vendor.category;
+  if (b.type === 'rental' || (typeof b.type === 'string' && b.type.startsWith('bespoke'))) return 'bridal';
+  return 'other';
+}
+
 function filterBookingsList() {
   return data.bookings.filter((b) => {
     const f = bookingFinance(b);
     if (bookingFilter.vendorId !== 'all' && String(b.vendor_id || b.vendor?.id) !== bookingFilter.vendorId) return false;
+    if (bookingFilter.category !== 'all' && getBookingCategory(b) !== bookingFilter.category) return false;
     if (bookingFilter.state === 'escrow') return f.paidEscrow > 0;
     if (bookingFilter.state === 'released') return f.releasedGross > 0;
     if (bookingFilter.state === 'pending') return b.status === 'pending';
@@ -335,14 +342,28 @@ function renderBookings() {
   const feePct = Math.round(PLATFORM_FEE_RATE * 100);
   const netPct = 100 - feePct;
 
+  const categoryCounts = {};
+  for (const b of data.bookings) {
+    const cat = getBookingCategory(b);
+    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+  }
+
+  const vendorBookings = bookingFilter.category === 'all'
+    ? data.bookings
+    : data.bookings.filter((b) => getBookingCategory(b) === bookingFilter.category);
+
   const vendorOptions = [...new Map(
-    data.bookings.filter((b) => b.vendor).map((b) => [String(b.vendor_id || b.vendor.id), b.vendor.name]),
+    vendorBookings.filter((b) => b.vendor).map((b) => [String(b.vendor_id || b.vendor.id), b.vendor.name]),
   ).entries()];
+
+  if (bookingFilter.vendorId !== 'all' && !vendorOptions.some(([id]) => id === bookingFilter.vendorId)) {
+    bookingFilter.vendorId = 'all';
+  }
 
   render(container, html`
     <div class="stack" style="gap:14px">
       <div class="card stack" style="padding:14px;gap:12px">
-        <div class="row" style="justify-content:space-between">
+        <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
           <div class="chips">
             ${[
               ['all',       `Tất cả (${data.bookings.length})`],
@@ -353,7 +374,13 @@ function renderBookings() {
             ].map(([k, lbl]) => html`
               <button type="button" class="chip ${bookingFilter.state === k ? 'active' : ''}" data-bfilter="${k}">${lbl}</button>`)}
           </div>
-          <div class="row" style="gap:8px">
+          <div class="row" style="gap:8px;flex-wrap:wrap">
+            <select class="input" style="width:auto;padding:7px 12px;font-size:13px" data-category-filter aria-label="Lọc theo loại dịch vụ">
+              <option value="all">Tất cả dịch vụ</option>
+              ${Object.entries(VENDOR_CATEGORY).map(([k, lbl]) => html`
+                <option value="${k}" ${bookingFilter.category === k ? 'selected' : ''}>${lbl} (${categoryCounts[k] || 0})</option>
+              `)}
+            </select>
             <select class="input" style="width:auto;padding:7px 12px;font-size:13px" data-vendor-filter aria-label="Lọc theo tiệm đối tác">
               <option value="all">Tất cả đối tác (${vendorOptions.length})</option>
               ${vendorOptions.map(([id, name]) => html`<option value="${id}" ${bookingFilter.vendorId === id ? 'selected' : ''}>${name}</option>`)}
@@ -430,6 +457,11 @@ function renderBookings() {
     bookingPagination.page = 1;
     renderBookings();
   }));
+  container.querySelector('[data-category-filter]')?.addEventListener('change', (e) => {
+    bookingFilter.category = e.target.value;
+    bookingPagination.page = 1;
+    renderBookings();
+  });
   container.querySelector('[data-vendor-filter]')?.addEventListener('change', (e) => {
     bookingFilter.vendorId = e.target.value;
     bookingPagination.page = 1;
