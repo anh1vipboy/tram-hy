@@ -30,11 +30,11 @@ function injectSpeculationRules() {
 const NAV_ITEMS = [
   { page: 'home',        href: 'index.html',            label: 'Trang chủ' },
   { page: 'about',       href: 'gioi-thieu.html',       label: 'Giới thiệu' },
-  { page: 'tryon',      href: 'tryon.html',            label: 'Thử váy AI' },
+  { page: 'tryon',       href: 'tryon.html',            label: 'Thử váy AI' },
+  { page: 'bespoke',     href: 'thiet-ke-vay.html',     label: '✂️ Tự thiết kế váy', className: 'nav-bespoke' },
   { page: 'marketplace', href: 'marketplace.html',      label: 'Dịch vụ', suffix: ' cưới' },
-  { page: 'invitation',  href: 'invitation.html',       label: 'Thiệp', suffix: ' cưới' },
   { page: 'planner',     href: 'ke-hoach.html',         label: 'Kế hoạch', suffix: ' cưới' },
-  { page: 'bookings',    href: 'bookings.html',         label: 'Đơn của tôi', roles: ['bride', 'vendor'] },   // admin xem đơn ở Quản trị
+  { page: 'bookings',    href: 'bookings.html',         label: 'Đơn của tôi', roles: ['bride'] },
   { page: 'vendor',      href: 'vendor-dashboard.html', label: 'Kênh đối tác', roles: ['vendor'] },
   { page: 'admin',       href: 'admin.html',            label: 'Quản trị', roles: ['admin'] },
 ];
@@ -73,8 +73,8 @@ const avatar = (profile, size = '') => html`
 
 function accountMenu(profile, activePage) {
   const links = [
-    ...(profile.role !== 'admin' ? [{ page: 'planner', href: 'ke-hoach.html', label: '📒 Kế hoạch cưới' }] : []),
-    ...(profile.role !== 'admin' ? [{ page: 'bookings', href: 'bookings.html', label: '📋 Đơn của tôi' }] : []),
+    { page: 'planner', href: 'ke-hoach.html', label: '📒 Kế hoạch cưới' },
+    { page: 'bookings', href: 'bookings.html', label: '📋 Đơn của tôi' },
     { page: 'invitation', href: 'invitation.html', label: '💌 Thiệp cưới' },
     ...(profile.role === 'vendor' ? [{ page: 'vendor', href: 'vendor-dashboard.html', label: '🏪 Kênh đối tác' }] : []),
     ...(profile.role === 'admin' ? [{ page: 'admin', href: 'admin.html', label: '🛡️ Quản trị' }] : []),
@@ -138,7 +138,7 @@ function paintLayout(activePage, profile, onAccountOpen) {
       </a>
       <nav class="nav" aria-label="Điều hướng chính">
         ${NAV_ITEMS.filter((item) => canSee(item, profile)).map((item) => html`
-          <a href="${item.href}" class="${item.page === activePage ? 'active' : ''}">${item.label}${item.suffix
+          <a href="${item.href}" class="${item.page === activePage ? 'active' : ''}${item.className ? ` ${item.className}` : ''}">${item.label}${item.suffix
             ? html`<span class="nav-suffix">${item.suffix}</span>` : ''}</a>`)}
       </nav>
       <div class="user-area">

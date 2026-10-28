@@ -403,6 +403,6 @@ function renderSummary() {
 initControls();
 if (param('tu') === 'anh-vay') $('#bespoke-notes').value = FROM_TRYON_NOTE;
 renderAll();                       // hiện ngay ảnh minh họa trong lúc chờ tải dữ liệu
-state.profile = await initLayout('tryon');
+state.profile = await initLayout('bespoke');
 await Promise.all([loadVendor(), loadBodyProfile()]);
 renderAll();

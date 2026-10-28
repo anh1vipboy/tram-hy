@@ -116,9 +116,8 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
         render(body, html`
           <div class="pricing-container">
             <header class="pricing-header">
-              <h2 class="pricing-title">Tỏa Sáng Trong Ngày Hỷ</h2>
               <p class="pricing-subtitle">
-                Mở khóa hạn mức <strong>60 – 150 credit/ngày</strong>, chế độ <strong>Siêu Nét 1K</strong> và tự do thử mọi mẫu váy mơ ước suốt mùa cưới.
+                Mở khóa <strong>60 – 150 credit/ngày</strong>, chế độ <strong>Siêu Nét 1K</strong> và tự do thử mọi mẫu váy mơ ước suốt mùa cưới.
               </p>
             </header>
 
@@ -126,9 +125,12 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
               ${plans.map((p) => {
                 const isCurrent = p.id === currentPlanId;
                 const isHero = p.id === 'pro_bride';
+                const badgeText = p.badge
+                  ? (isHero && !p.badge.includes('⭐') ? `⭐ ${p.badge}` : p.badge)
+                  : '';
                 return html`
                   <div class="pricing-card ${isHero ? 'hero-card' : ''} ${isCurrent ? 'current-card' : ''}">
-                    ${p.badge ? html`<div class="pricing-badge">${p.badge}</div>` : ''}
+                    ${badgeText ? html`<div class="pricing-badge">${badgeText}</div>` : ''}
                     <div class="card-head">
                       <h3 class="card-name">${p.name}</h3>
                       <p class="card-desc">${p.description}</p>
