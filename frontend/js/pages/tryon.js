@@ -421,6 +421,11 @@ function buildThread() {
   postWelcome();
   const linked = param('dress') && state.dresses.find((d) => d.slug === param('dress'));
   if (linked) postDressIntro(linked);
+  if (state.settings.enabled === false && !isAdmin()) {
+    postAi('⚠️ Phòng Thử Váy AI đang tạm dừng để bảo trì hạ tầng và hạn mức token. Bạn vẫn có thể xem mẫu và đặt lịch thử váy trực tiếp với các tiệm đối tác nhé!', [
+      { act: 'dress', label: '👗 Xem mẫu váy cưới' },
+    ]);
+  }
 }
 
 // ---------- GỬI TIN ----------
@@ -444,6 +449,12 @@ async function send(preset) {
   const { person, garment } = state;
   if (person?.uploading || garment?.uploading) {
     toast('Đợi ảnh tải lên xong nhé…');
+    return;
+  }
+  if (state.settings.enabled === false && !isAdmin()) {
+    postAi('Dạ hiện tại tính năng Thử Váy AI đang tạm dừng để bảo trì và bảo toàn token API. Bạn vui lòng quay lại sau ít phút hoặc xem mẫu và đặt lịch thử váy trực tiếp với các tiệm đối tác nhé!', [
+      { act: 'dress', label: '👗 Xem mẫu váy cưới' },
+    ]);
     return;
   }
   if (!text && !(person && garment)) {
@@ -877,9 +888,14 @@ function renderComposer() {
     }
   }
   const planPrefix = state.subscription?.has_subscription ? `⭐ ${state.subscription.plan_name} · ` : '';
-  costLabel.textContent = isAdmin() ? `${cost} credit · admin không giới hạn`
-    : state.remaining === null ? `${cost} credit` : `${planPrefix}${cost} credit · còn ${state.remaining}/${state.settings.dailyCredits}`;
-  costLabel.classList.toggle('short', state.remaining !== null && cost > state.remaining);
+  if (state.settings.enabled === false && !isAdmin()) {
+    costLabel.textContent = '🔴 Thử váy AI đang tạm bảo trì';
+    costLabel.classList.add('short');
+  } else {
+    costLabel.textContent = isAdmin() ? `${cost} credit · admin không giới hạn`
+      : state.remaining === null ? `${cost} credit` : `${planPrefix}${cost} credit · còn ${state.remaining}/${state.settings.dailyCredits}`;
+    costLabel.classList.toggle('short', state.remaining !== null && cost > state.remaining);
+  }
 
   const sendBtn = $('#send-btn');
   if (state.busy) {

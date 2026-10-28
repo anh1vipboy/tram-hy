@@ -163,4 +163,24 @@ test.describe('Gói cước AI Studio & Nâng cấp VietQR', () => {
     // Bảng cập nhật mượt mà
     await expect(section.locator('table.finance-table, .empty')).toBeVisible();
   });
+
+  test('quản trị viên mở tab "Thử váy AI" có công tắc Bật/Tắt toàn bộ tính năng AI', async ({ browser }) => {
+    const admin = await openAs(browser, 'admin');
+    await admin.goto('/admin.html');
+
+    const tab = admin.locator('[data-tab="ai"]');
+    await tab.click();
+
+    const form = admin.locator('#ai-settings');
+    await expect(form).toBeVisible();
+
+    const enableCheckbox = form.locator('input[name="enabled"]');
+    await expect(enableCheckbox).toBeVisible();
+
+    // Có badge trạng thái
+    await expect(form.locator('.badge')).toBeVisible();
+
+    // Có nút Lưu cài đặt
+    await expect(form.getByRole('button', { name: 'Lưu cài đặt' })).toBeVisible();
+  });
 });

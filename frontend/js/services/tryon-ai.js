@@ -3,7 +3,7 @@
 import { sb } from '../core/supabase.js';
 
 // Mặc định khi chưa chạy SQL 28 – phải khớp DAILY_LIMIT của Edge Function
-const DEFAULT_SETTINGS = { maxEnabled: false, dailyCredits: 6 };
+const DEFAULT_SETTINGS = { enabled: true, maxEnabled: false, dailyCredits: 6 };
 const MISSING_SQL = 'Database chưa có phần cài đặt này – hãy chạy file backend/supabase/28_tryon_settings.sql '
   + 'trong Supabase (SQL Editor) rồi thử lại.';
 
@@ -45,21 +45,47 @@ export const aiTryOn = (params, signal) =>
 export const askTryonAssistant = (params, signal) =>
   invoke('tro-ly-thu-vay', params, 'Trợ lý đang bận, bạn thử lại sau ít phút nhé', signal);
 
-/** Cài đặt thử váy AI do admin chỉnh: { maxEnabled, dailyCredits, ready } – ready = false khi chưa chạy SQL 28 */
+/** Cài đặt thử váy AI do admin chỉnh: { enabled, maxEnabled, dailyCredits, ready } – ready = false khi chưa chạy SQL 28 */
 export async function getTryonSettings() {
   const { data, error } = await sb.from('app_settings').select('value').eq('key', 'tryon').maybeSingle();
   if (error || !data) return { ...DEFAULT_SETTINGS, ready: !error };
   return {
+    enabled: data.value.enabled !== false,
     maxEnabled: data.value.max_enabled === true,
     dailyCredits: Number(data.value.daily_credits) || DEFAULT_SETTINGS.dailyCredits,
     ready: true,
   };
 }
 
-/** Admin bật/tắt Siêu nét và đổi hạn mức credit/người/ngày */
-export async function saveTryonSettings({ maxEnabled, dailyCredits }) {
-  const { error } = await sb.rpc('set_tryon_settings', { p_max_enabled: maxEnabled, p_daily_credits: dailyCredits });
-  if (error) throw new Error(error.code === 'PGRST202' ? MISSING_SQL : error.message);
+/** Admin bật/tắt toàn bộ AI, bật/tắt Siêu nét và đổi hạn mức credit/người/ngày */
+export async function saveTryonSettings({ enabled = true, maxEnabled, dailyCredits }) {
+  // 1. Thử gọi RPC với 3 tham số (có p_enabled)
+  const { error: rpcErr } = await sb.rpc('set_tryon_settings', {
+    p_enabled: Boolean(enabled),
+    p_max_enabled: Boolean(maxEnabled),
+    p_daily_credits: Number(dailyCredits),
+  });
+  if (!rpcErr) return;
+
+  // 2. Thử cập nhật trực tiếp bảng app_settings
+  const v = {
+    enabled: Boolean(enabled),
+    max_enabled: Boolean(maxEnabled),
+    daily_credits: Number(dailyCredits) || DEFAULT_SETTINGS.dailyCredits,
+  };
+  const { error: tblErr } = await sb.from('app_settings').upsert({
+    key: 'tryon',
+    value: v,
+    updated_at: new Date().toISOString(),
+  });
+  if (!tblErr) return;
+
+  // 3. Fallback: gọi RPC cũ (2 tham số)
+  const { error: oldErr } = await sb.rpc('set_tryon_settings', {
+    p_max_enabled: Boolean(maxEnabled),
+    p_daily_credits: Number(dailyCredits),
+  });
+  if (oldErr) throw new Error(oldErr.code === 'PGRST202' ? MISSING_SQL : oldErr.message);
 }
 
 // 0 giờ hôm nay theo giờ Việt Nam (UTC+7)

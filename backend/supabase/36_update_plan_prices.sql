@@ -66,7 +66,42 @@ $$;
 revoke execute on function public.admin_list_subscription_orders() from public, anon;
 grant execute on function public.admin_list_subscription_orders() to authenticated;
 
--- 4. Kiểm tra các đơn cước AI hiện có trong database
+-- 4. Bổ sung hỗ trợ Bật/Tắt toàn bộ tính năng Thử Váy AI (bảo toàn token khi nhiều người truy cập)
+create or replace function public.set_tryon_settings(
+  p_max_enabled boolean,
+  p_daily_credits int,
+  p_enabled boolean default true
+)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare v jsonb;
+begin
+  if not public.is_admin() then
+    raise exception 'Chỉ quản trị viên được đổi cài đặt thử váy AI';
+  end if;
+  if p_daily_credits is null or p_daily_credits < 1 or p_daily_credits > 50 then
+    raise exception 'Hạn mức phải từ 1 đến 50 credit/người/ngày';
+  end if;
+  v := jsonb_build_object(
+    'enabled', coalesce(p_enabled, true),
+    'max_enabled', coalesce(p_max_enabled, false),
+    'daily_credits', p_daily_credits
+  );
+  insert into public.app_settings (key, value, updated_at, updated_by)
+  values ('tryon', v, now(), auth.uid())
+  on conflict (key) do update set value = excluded.value, updated_at = now(), updated_by = auth.uid();
+  return v;
+end $$;
+
+revoke execute on function public.set_tryon_settings(boolean, int, boolean) from public, anon;
+grant execute on function public.set_tryon_settings(boolean, int, boolean) to authenticated;
+
+-- Cho phép admin thêm/sửa trực tiếp app_settings
+drop policy if exists "app_settings_admin_all" on public.app_settings;
+create policy "app_settings_admin_all" on public.app_settings
+  for all using (public.is_admin()) with check (public.is_admin());
+grant insert, update, delete on public.app_settings to authenticated;
+
+-- 5. Kiểm tra các đơn cước AI hiện có trong database
 select o.id, o.code, o.amount, o.status, o.created_at, o.paid_at,
        coalesce(p.full_name, u.raw_user_meta_data->>'full_name') as customer_name,
        u.email as customer_email,

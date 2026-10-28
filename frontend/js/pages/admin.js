@@ -644,19 +644,44 @@ function renderAiOrders() {
 }
 
 // ---------- THỬ VÁY AI ----------
-// Công tắc mô hình Siêu nét (bật lúc review/demo) + hạn mức credit mỗi người mỗi ngày. Edge Function đọc lại ngay.
+// Công tắc Bật/Tắt toàn bộ thử váy AI + Mô hình Siêu nét (bật lúc review/demo) + hạn mức credit. Edge Function đọc lại ngay.
 async function renderAiSettings() {
   const container = $('#tab-ai');
   const settings = await getTryonSettings();
+  const isEnabled = settings.enabled !== false;
+
   render(container, html`
     <form class="card stack" style="max-width:640px" id="ai-settings">
-      <h3>Thử váy bằng AI (FASHN)</h3>
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Thử váy bằng AI (FASHN)</h3>
+        <span class="badge ${isEnabled ? 'badge-green' : 'badge-red'}">
+          ${isEnabled ? '🟢 Đang hoạt động' : '🔴 Đang tạm dừng'}
+        </span>
+      </div>
+
       ${settings.ready ? '' : html`
         <div class="notice notice-error" role="alert">
           <strong>Database chưa có phần cài đặt này</strong>
           Mở Supabase → SQL Editor, chạy file <code>backend/supabase/28_tryon_settings.sql</code> rồi tải lại trang.
           Trong lúc chờ, web dùng mô hình Tiêu chuẩn và 6 credit/người/ngày.
         </div>`}
+
+      <div class="card stack" style="background:${isEnabled ? 'rgba(46, 125, 50, 0.05)' : 'rgba(211, 47, 47, 0.06)'};padding:14px;border:1px solid ${isEnabled ? 'rgba(46, 125, 50, 0.25)' : 'rgba(211, 47, 47, 0.3)'};border-radius:10px;gap:8px">
+        <label class="row" style="cursor:pointer;gap:12px;align-items:flex-start">
+          <input type="checkbox" name="enabled" ${isEnabled ? 'checked' : ''} ${settings.ready ? '' : 'disabled'} style="width:20px;height:20px;margin-top:2px;accent-color:var(--brand)">
+          <div>
+            <strong style="font-size:15px;color:${isEnabled ? '#2e7d32' : '#c62828'}">
+              ${isEnabled ? 'Bật tính năng Thử Váy AI cho toàn bộ người dùng' : 'ĐÃ TẮT: Tạm ngưng tính năng Thử Váy AI (Chống ngốn token)'}
+            </strong>
+            <p class="small muted" style="margin:4px 0 0">
+              ${isEnabled
+                ? 'Tính năng đang mở cho khách thử nghiệm bình thường. Bỏ tích ô này nếu bạn muốn tạm dừng để bảo vệ token API khi lượng truy cập tăng đột biến.'
+                : 'Hệ thống đang chặn toàn bộ lượt gọi AI (FASHN & Gemini) đối với người dùng thường. Bạn có thể bật lại bất cứ lúc nào.'}
+            </p>
+          </div>
+        </label>
+      </div>
+
       <label class="row" style="cursor:pointer">
         <input type="checkbox" name="maxEnabled" ${settings.maxEnabled ? 'checked' : ''} ${settings.ready ? '' : 'disabled'}>
         <strong>Bật mô hình Siêu nét (Max) cho người dùng</strong>
@@ -664,21 +689,32 @@ async function renderAiSettings() {
       <p class="small muted" style="margin:0">Siêu nét là mô hình FASHN dùng trên chính web của họ: ảnh đẹp, giống thật, ướm được cả
         ảnh selfie và váy xòe phồng – tốn 1–3 credit mỗi ảnh (Tiêu chuẩn luôn 1 credit). Bật lên thì Phòng thử tự dùng Siêu nét;
         nên chỉ bật lúc review / demo rồi tắt.</p>
+
       <label class="field"><span>Hạn mức mỗi người mỗi ngày (credit)</span>
         <input class="input" type="number" name="dailyCredits" min="1" max="50" required value="${settings.dailyCredits}"
                style="max-width:160px"></label>
       <p class="small muted" style="margin:0">VD 6 credit = 6 ảnh Tiêu chuẩn, hoặc 2 ảnh Siêu nét "Đẹp nhất".
         Người dùng chọn chất lượng / số ảnh, web tự trừ đúng số credit.</p>
-      <div class="row"><button class="btn btn-primary btn-sm" type="submit" ${settings.ready ? '' : 'disabled'}>Lưu cài đặt</button></div>
+
+      <div class="row">
+        <button class="btn btn-primary btn-sm" type="submit" ${settings.ready ? '' : 'disabled'}>Lưu cài đặt</button>
+      </div>
     </form>`);
+
   const form = $('#ai-settings');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     withBusy(form.querySelector('[type=submit]'), async () => {
       try {
         const formData = new FormData(form);
-        await saveTryonSettings({ maxEnabled: formData.has('maxEnabled'), dailyCredits: Number(formData.get('dailyCredits')) });
-        toast(formData.has('maxEnabled') ? 'Đã lưu – Siêu nét đang BẬT.' : 'Đã lưu – Siêu nét đang tắt.', 'success');
+        const enabled = formData.has('enabled');
+        const maxEnabled = formData.has('maxEnabled');
+        const dailyCredits = Number(formData.get('dailyCredits'));
+        await saveTryonSettings({ enabled, maxEnabled, dailyCredits });
+        toast(enabled
+          ? (maxEnabled ? 'Đã lưu – Thử AI đang BẬT (kèm Siêu nét).' : 'Đã lưu – Thử AI đang BẬT.')
+          : 'Đã lưu – ĐÃ TẮT tính năng Thử AI để bảo vệ token.', 'success');
+        renderAiSettings();
       } catch (error) {
         toastError(error);
       }
