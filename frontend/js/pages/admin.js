@@ -6,7 +6,7 @@ import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { PLATFORM_FEE_RATE } from '../config.js';
 import {
   bookingFinance, summarizeBookingsFinance, serviceTitle, exportAdminFinanceExcel,
-  buildAdminFinanceBytes, autoSyncCloudExcel, openCloudExcelSyncDialog,
+  buildAdminFinanceBytes, exportAiOrdersExcel, autoSyncCloudExcel, openCloudExcelSyncDialog,
 } from '../components/finance-export.js';
 import { disputeSlaInfo, bindDisputeActions } from '../components/booking-card.js';
 import { paginate, paginationView, bindPaginationEvents } from '../components/pagination.js';
@@ -14,7 +14,7 @@ import { listAllBookings, subscribeBookingChanges } from '../services/bookings.j
 import { subscribeVendorChanges } from '../services/catalog.js';
 import {
   listOpenDisputes, resolveDispute, listVendorsWithOwners, setVendorVerified, linkVendorOwner, reviewVendor,
-  listAllSubscriptionOrders, adminConfirmSubscriptionOrder,
+  listAllSubscriptionOrders, adminConfirmSubscriptionOrder, subscribeSubscriptionOrderChanges,
 } from '../services/admin.js';
 import { getTryonSettings, saveTryonSettings } from '../services/tryon-ai.js';
 
@@ -36,7 +36,7 @@ async function load() {
     renderVendors();
     renderBookings();
     renderAiOrders();
-    autoSyncCloudExcel('admin', () => buildAdminFinanceBytes(data.bookings, data.vendors));
+    autoSyncCloudExcel('admin', () => buildAdminFinanceBytes(data.bookings, data.vendors, data.aiOrders));
   } catch (error) {
     toastError(error);
   }
@@ -468,7 +468,7 @@ function renderBookings() {
     renderBookings();
   });
   container.querySelector('[data-export-filtered]')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
-    await exportAdminFinanceExcel(filtered, data.vendors);
+    await exportAdminFinanceExcel(filtered, data.vendors, 'doi-soat-doanh-thu-tram-hy.xlsx', data.aiOrders);
     toast(`Đã xuất file Excel đối soát (${filtered.length} đơn).`, 'success');
   }));
   container.querySelector('[data-sync-filtered]')?.addEventListener('click', () => openAdminCloudSync());
@@ -478,8 +478,8 @@ function openAdminCloudSync() {
   return openCloudExcelSyncDialog({
     scope: 'admin',
     title: '☁️ File Excel Cloud Cố Định – Đối Soát Toàn Sàn (Admin)',
-    getBytes: () => buildAdminFinanceBytes(data.bookings, data.vendors),
-    onDownloadLocal: () => exportAdminFinanceExcel(data.bookings, data.vendors),
+    getBytes: () => buildAdminFinanceBytes(data.bookings, data.vendors, data.aiOrders),
+    onDownloadLocal: () => exportAdminFinanceExcel(data.bookings, data.vendors, 'doi-soat-doanh-thu-tram-hy.xlsx', data.aiOrders),
   });
 }
 
@@ -497,11 +497,6 @@ function renderAiOrders() {
   if (!container) return;
   const orders = data.aiOrders || [];
   $('#ai-orders-count').textContent = orders.length;
-
-  if (!orders.length) {
-    render(container, html`<div class="empty">Chưa có khách hàng nào mua gói cước AI.</div>`);
-    return;
-  }
 
   const filtered = filterAiOrdersList();
   const paged = paginate(filtered, aiOrderPagination.page, aiOrderPagination.pageSize);
@@ -521,12 +516,13 @@ function renderAiOrders() {
             ].map(([k, lbl]) => html`
               <button type="button" class="chip ${aiOrderFilter.state === k ? 'active' : ''}" data-aifilter="${k}">${lbl}</button>`)}
           </div>
-          <div class="row" style="gap:8px">
+          <div class="row" style="gap:8px;flex-wrap:wrap">
             <select class="input" style="width:auto;padding:7px 12px;font-size:13px" data-ai-plan-filter aria-label="Lọc theo gói cước">
               <option value="all">Tất cả gói cước</option>
-              <option value="pro_bride" ${aiOrderFilter.planId === 'pro_bride' ? 'selected' : ''}>Nàng Thơ Rạng Rỡ (99k)</option>
-              <option value="studio_duo" ${aiOrderFilter.planId === 'studio_duo' ? 'selected' : ''}>Cẩm Tú Trọn Đôi (249k)</option>
+              <option value="pro_bride" ${aiOrderFilter.planId === 'pro_bride' ? 'selected' : ''}>Nàng Thơ Rạng Rỡ (149k)</option>
+              <option value="studio_duo" ${aiOrderFilter.planId === 'studio_duo' ? 'selected' : ''}>Cẩm Tú Trọn Đôi (299k)</option>
             </select>
+            <button type="button" class="btn btn-primary btn-sm" data-export-ai-excel>⬇ Tải Excel (${filtered.length} đơn)</button>
           </div>
         </div>
         <div class="small muted">
@@ -620,6 +616,11 @@ function renderAiOrders() {
     renderAiOrders();
   });
 
+  container.querySelector('[data-export-ai-excel]')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
+    await exportAiOrdersExcel(filtered);
+    toast(`Đã xuất file Excel đơn gói AI (${filtered.length} đơn).`, 'success');
+  }));
+
   container.querySelectorAll('[data-confirm-order]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const code = btn.dataset.confirmOrder;
@@ -697,8 +698,8 @@ function initTabs() {
 // ---------- KHỞI CHẠY TRANG ----------
 initTabs();                    // gắn sự kiện tab ngay, không chờ kiểm tra đăng nhập (bấm sớm vẫn ăn)
 $('#btn-export-admin')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
-  await exportAdminFinanceExcel(data.bookings, data.vendors);
-  toast('Đã tải file Excel đối soát doanh thu & hoa hồng toàn sàn.', 'success');
+  await exportAdminFinanceExcel(data.bookings, data.vendors, 'doi-soat-doanh-thu-tram-hy.xlsx', data.aiOrders);
+  toast('Đã tải file Excel đối soát doanh thu & hoa hồng toàn sàn (kèm Sheet Đơn gói AI).', 'success');
 }));
 $('#btn-live-sync')?.addEventListener('click', () => openAdminCloudSync());
 // Đến từ chuông thông báo (admin.html?tab=disputes) → mở đúng tab
@@ -709,3 +710,4 @@ await Promise.all([load(), renderAiSettings().catch(toastError)]);
 const reload = debounce(load, 500);
 subscribeBookingChanges('admin-bookings', reload);
 subscribeVendorChanges('admin-vendors', reload);
+subscribeSubscriptionOrderChanges('admin-ai-orders', reload);

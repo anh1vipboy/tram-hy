@@ -39,17 +39,17 @@ export async function linkVendorOwner(vendorId, email) {
 // Danh sách tất cả đơn mua gói cước AI
 export async function listAllSubscriptionOrders() {
   const { data: rpcData, error: rpcError } = await sb.rpc('admin_list_subscription_orders');
-  if (!rpcError && Array.isArray(rpcData) && rpcData.length) return rpcData;
+  if (!rpcError && Array.isArray(rpcData)) return rpcData;
 
   const { data, error } = await sb.from('subscription_orders')
-    .select(`id, code, amount, status, created_at, paid_at,
-             user:profiles(id, full_name, phone, email),
+    .select(`id, code, amount, status, created_at, paid_at, user_id, plan_id,
+             user:profiles(id, full_name, phone),
              plan:subscription_plans(id, name, daily_credits, duration_days, bonus_credits, badge)`)
     .order('created_at', { ascending: false });
 
-  if (!error && Array.isArray(data) && data.length) return data;
+  if (!error && Array.isArray(data)) return data;
 
-  // Dữ liệu mẫu ban đầu để giao diện Admin hiển thị trực quan ngay cả khi chưa có đơn
+  // Dữ liệu mẫu chỉ hiển thị nếu xảy ra lỗi kết nối nghiêm trọng
   return [
     {
       id: 'demo-ord-1',
@@ -82,6 +82,14 @@ export async function listAllSubscriptionOrders() {
       plan: { id: 'pro_bride', name: 'Nàng Thơ Rạng Rỡ', daily_credits: 60, duration_days: 30, bonus_credits: 30, badge: 'Được 89% Cô dâu chọn' },
     },
   ];
+}
+
+// Lắng nghe thay đổi đơn gói AI realtime
+export function subscribeSubscriptionOrderChanges(channelName, onChange) {
+  const channel = sb.channel(channelName);
+  channel.on('postgres_changes', { event: '*', schema: 'public', table: 'subscription_orders' }, onChange);
+  channel.subscribe();
+  return () => sb.removeChannel(channel);
 }
 
 // Admin duyệt kích hoạt gói thủ công

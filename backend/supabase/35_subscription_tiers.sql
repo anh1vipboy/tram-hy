@@ -216,10 +216,10 @@ begin
         'created_at', o.created_at,
         'paid_at', o.paid_at,
         'user', jsonb_build_object(
-          'id', p.id,
-          'full_name', p.full_name,
-          'phone', p.phone,
-          'email', p.email
+          'id', coalesce(p.id, o.user_id),
+          'full_name', coalesce(p.full_name, u.raw_user_meta_data->>'full_name', 'Khách vãng lai'),
+          'phone', coalesce(p.phone, ''),
+          'email', coalesce(u.email, '')
         ),
         'plan', jsonb_build_object(
           'id', pl.id,
@@ -233,6 +233,7 @@ begin
     )
     from public.subscription_orders o
     left join public.profiles p on p.id = o.user_id
+    left join auth.users u on u.id = o.user_id
     left join public.subscription_plans pl on pl.id = o.plan_id
   ), '[]'::jsonb);
 end $$;

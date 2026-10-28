@@ -175,7 +175,7 @@ function downloadBytes(bytes, filename) {
 }
 
 // ---------- 1. DỰNG WORKBOOK & XUẤT EXCEL ĐỐI SOÁT SÀN (ADMIN) ----------
-export async function buildAdminFinanceBytes(bookings, vendors = []) {
+export async function buildAdminFinanceBytes(bookings, vendors = [], aiOrders = []) {
   const XLSX = await loadXlsx();
   const wb = XLSX.utils.book_new();
   wb.Props = { Title: 'Đối soát Doanh thu & Hoa hồng – Trạm Hỷ', Author: 'Trạm Hỷ', CreatedDate: new Date() };
@@ -184,12 +184,15 @@ export async function buildAdminFinanceBytes(bookings, vendors = []) {
   const feePct = Math.round(PLATFORM_FEE_RATE * 100);
   const netPct = 100 - feePct;
 
+  const aiPaidOrders = (aiOrders || []).filter((o) => o.status === 'paid');
+  const aiTotalPaidRevenue = aiPaidOrders.reduce((sum, o) => sum + (Number(o.amount) || 0), 0);
+
   const overviewRows = [
     ['BÁO CÁO ĐỐI SOÁT DOANH THU & HOA HỒNG NỀN TẢNG – TRẠM HỶ'],
     ['Xuất báo cáo lúc', dateCell(new Date().toISOString())],
     ['Tỷ lệ hoa hồng sàn áp dụng', `${feePct}% / đơn thành công (Miễn phí 0đ cho Cô dâu Chú rể)`],
     [],
-    ['1. THỐNG KÊ ĐƠN HÀNG', 'Số lượng'],
+    ['1. THỐNG KÊ ĐƠN HÀNG DỊCH VỤ CƯỚI', 'Số lượng'],
     ['Tổng số đơn trên hệ thống', s.totalCount],
     ['Đơn đang hiệu lực (tính doanh số)', s.activeCount],
     ['Đơn đã hoàn tất trọn vẹn', s.completedCount],
@@ -208,6 +211,11 @@ export async function buildAdminFinanceBytes(bookings, vendors = []) {
     ['Tổng tiền các đợt đã giải ngân (Gộp 100%)', moneyCell(s.releasedGross)],
     [`→ HOA HỒNG SÀN ĐÃ THU THỰC TẾ (${feePct}% đã giải ngân)`, moneyCell(s.earnedFee)],
     [`→ ĐÃ CHUYỂN TRẢ ĐỐI TÁC (${netPct}% đã giải ngân)`, moneyCell(s.partnerPaidNet)],
+    [],
+    ['4. DOANH THU GÓI CƯỚC AI STUDIO (100% VỀ SÀN TRẠM HỶ)', 'Số tiền / Số lượng'],
+    ['Tổng đơn đăng ký gói AI', (aiOrders || []).length],
+    ['Đơn gói AI đã kích hoạt / thanh toán', aiPaidOrders.length],
+    ['TỔNG DOANH THU GÓI AI THỰC THU', moneyCell(aiTotalPaidRevenue)],
   ];
   const wsOverview = XLSX.utils.aoa_to_sheet(overviewRows);
   wsOverview['!cols'] = [{ wch: 48 }, { wch: 24 }];
@@ -342,11 +350,103 @@ export async function buildAdminFinanceBytes(bookings, vendors = []) {
   if (msRows.length > 1) wsMs['!autofilter'] = { ref: `A1:J${msRows.length}` };
   XLSX.utils.book_append_sheet(wb, wsMs, 'Đợt thanh toán 30-50-20');
 
+  // Sheet 5: Đơn mua gói cước AI Studio (100% doanh thu về sàn Trạm Hỷ)
+  const aiHeader = [
+    'Mã đơn', 'Ngày tạo', 'Khách hàng', 'Số điện thoại', 'Email',
+    'Gói cước AI', 'Thời hạn (ngày)', 'Hạn mức (credit/ngày)', 'Giá gói (100% sàn)',
+    'Trạng thái', 'Ngày kích hoạt',
+  ];
+  const aiRows = [aiHeader];
+  for (const o of (aiOrders || [])) {
+    const isPaid = o.status === 'paid';
+    const amt = Number(o.amount) || 0;
+    aiRows.push([
+      o.code,
+      dateCell(o.created_at),
+      o.user?.full_name || 'Khách vãng lai',
+      o.user?.phone || '',
+      o.user?.email || '',
+      o.plan?.name || o.plan_id || '',
+      o.plan?.duration_days ?? 30,
+      o.plan?.daily_credits ?? 60,
+      moneyCell(amt),
+      isPaid ? 'Đã kích hoạt' : (o.status === 'pending' ? 'Chờ thanh toán' : 'Đã hủy'),
+      dateCell(o.paid_at),
+    ]);
+  }
+  const endAiRow = aiRows.length;
+  if ((aiOrders || []).length) {
+    aiRows.push([
+      `TỔNG DOANH THU ĐÃ THU (${aiPaidOrders.length} đơn)`, '', '', '', '', '', '', '',
+      subtotal('I', 2, endAiRow, aiTotalPaidRevenue),
+      '', '',
+    ]);
+  }
+  const wsAiOrders = XLSX.utils.aoa_to_sheet(aiRows);
+  wsAiOrders['!cols'] = [
+    { wch: 18 }, { wch: 17 }, { wch: 22 }, { wch: 14 }, { wch: 26 },
+    { wch: 22 }, { wch: 15 }, { wch: 22 }, { wch: 20 }, { wch: 18 }, { wch: 17 },
+  ];
+  if ((aiOrders || []).length) wsAiOrders['!autofilter'] = { ref: `A1:K${endAiRow}` };
+  XLSX.utils.book_append_sheet(wb, wsAiOrders, 'Đơn gói cước AI');
+
   return new Uint8Array(XLSX.write(wb, { bookType: 'xlsx', type: 'array', compression: true }));
 }
 
-export async function exportAdminFinanceExcel(bookings, vendors = [], filename = 'doi-soat-doanh-thu-tram-hy.xlsx') {
-  const bytes = await buildAdminFinanceBytes(bookings, vendors);
+export async function exportAdminFinanceExcel(bookings, vendors = [], filename = 'doi-soat-doanh-thu-tram-hy.xlsx', aiOrders = []) {
+  const bytes = await buildAdminFinanceBytes(bookings, vendors, aiOrders);
+  downloadBytes(bytes, filename);
+}
+
+/** Xuất file Excel riêng cho danh sách Đơn gói cước AI */
+export async function exportAiOrdersExcel(aiOrders = [], filename = 'don-hang-goi-cuoc-ai-tram-hy.xlsx') {
+  const XLSX = await loadXlsx();
+  const wb = XLSX.utils.book_new();
+  wb.Props = { Title: 'Danh sách Đơn mua Gói Cước AI – Trạm Hỷ', Author: 'Trạm Hỷ', CreatedDate: new Date() };
+
+  const aiPaidOrders = (aiOrders || []).filter((o) => o.status === 'paid');
+  const aiTotalPaidRevenue = aiPaidOrders.reduce((sum, o) => sum + (Number(o.amount) || 0), 0);
+
+  const aiHeader = [
+    'Mã đơn', 'Ngày tạo', 'Khách hàng', 'Số điện thoại', 'Email',
+    'Gói cước AI', 'Thời hạn (ngày)', 'Hạn mức (credit/ngày)', 'Giá gói (100% sàn)',
+    'Trạng thái', 'Ngày kích hoạt',
+  ];
+  const aiRows = [aiHeader];
+  for (const o of (aiOrders || [])) {
+    const isPaid = o.status === 'paid';
+    const amt = Number(o.amount) || 0;
+    aiRows.push([
+      o.code,
+      dateCell(o.created_at),
+      o.user?.full_name || 'Khách vãng lai',
+      o.user?.phone || '',
+      o.user?.email || '',
+      o.plan?.name || o.plan_id || '',
+      o.plan?.duration_days ?? 30,
+      o.plan?.daily_credits ?? 60,
+      moneyCell(amt),
+      isPaid ? 'Đã kích hoạt' : (o.status === 'pending' ? 'Chờ thanh toán' : 'Đã hủy'),
+      dateCell(o.paid_at),
+    ]);
+  }
+  const endAiRow = aiRows.length;
+  if ((aiOrders || []).length) {
+    aiRows.push([
+      `TỔNG DOANH THU ĐÃ THU (${aiPaidOrders.length} đơn)`, '', '', '', '', '', '', '',
+      subtotal('I', 2, endAiRow, aiTotalPaidRevenue),
+      '', '',
+    ]);
+  }
+  const wsAiOrders = XLSX.utils.aoa_to_sheet(aiRows);
+  wsAiOrders['!cols'] = [
+    { wch: 18 }, { wch: 17 }, { wch: 22 }, { wch: 14 }, { wch: 26 },
+    { wch: 22 }, { wch: 15 }, { wch: 22 }, { wch: 20 }, { wch: 18 }, { wch: 17 },
+  ];
+  if ((aiOrders || []).length) wsAiOrders['!autofilter'] = { ref: `A1:K${endAiRow}` };
+  XLSX.utils.book_append_sheet(wb, wsAiOrders, 'Đơn gói cước AI');
+
+  const bytes = new Uint8Array(XLSX.write(wb, { bookType: 'xlsx', type: 'array', compression: true }));
   downloadBytes(bytes, filename);
 }
 

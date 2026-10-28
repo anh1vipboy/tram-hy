@@ -126,9 +126,11 @@ test.describe('Gói cước AI Studio & Nâng cấp VietQR', () => {
     const section = admin.locator('#tab-ai-orders');
     await expect(section).toBeVisible();
 
-    // Có bảng danh sách đơn gói AI
-    await expect(section.locator('table.finance-table')).toBeVisible();
-    await expect(section.locator('table thead th').first()).toHaveText('Mã đơn');
+    // Có bảng danh sách đơn gói AI hoặc empty state
+    await expect(section.locator('table.finance-table, .empty')).toBeVisible();
+
+    // Có nút tải Excel đơn gói AI
+    await expect(section.locator('[data-export-ai-excel]')).toBeVisible();
 
     // Có các bộ lọc chips
     await expect(section.locator('[data-aifilter]')).toHaveCount(3);
