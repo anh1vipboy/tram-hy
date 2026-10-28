@@ -433,7 +433,7 @@ function renderBookings() {
             ].map(([k, lbl]) => html`
               <button type="button" class="chip ${bookingFilter.state === k ? 'active' : ''}" data-bfilter="${k}">${lbl}</button>`)}
           </div>
-          <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">
+          <div class="row admin-toolbar-actions" style="gap:8px;flex-wrap:wrap;align-items:center">
             <select class="input" style="width:auto;padding:7px 12px;font-size:13px" data-category-filter aria-label="Lọc theo loại dịch vụ">
               <option value="all">Tất cả dịch vụ</option>
               ${Object.entries(VENDOR_CATEGORY).map(([k, lbl]) => html`
@@ -444,23 +444,27 @@ function renderBookings() {
               <option value="all">Tất cả đối tác (${vendorOptions.length})</option>
               ${vendorOptions.map(([id, name]) => html`<option value="${id}" ${bookingFilter.vendorId === id ? 'selected' : ''}>${name}</option>`)}
             </select>
-            <div class="row date-filter-pill" style="gap:6px;align-items:center;background:var(--bg,#faf5ef);padding:3px 8px;border-radius:6px;border:1px solid var(--line,#e8ded5)">
-              <span class="small muted" style="white-space:nowrap;font-size:12px">📅 Ngày:</span>
-              <select class="input input-sm" style="width:auto;padding:4px 6px;font-size:12px;border:none;background:transparent" data-booking-date-preset aria-label="Khoảng thời gian">
-                <option value="all" ${bookingFilter.datePreset === 'all' ? 'selected' : ''}>Tất cả ngày</option>
-                <option value="today" ${bookingFilter.datePreset === 'today' ? 'selected' : ''}>Hôm nay</option>
-                <option value="yesterday" ${bookingFilter.datePreset === 'yesterday' ? 'selected' : ''}>Hôm qua</option>
-                <option value="last7" ${bookingFilter.datePreset === 'last7' ? 'selected' : ''}>7 ngày qua</option>
-                <option value="last30" ${bookingFilter.datePreset === 'last30' ? 'selected' : ''}>30 ngày qua</option>
-                <option value="this_month" ${bookingFilter.datePreset === 'this_month' ? 'selected' : ''}>Tháng này</option>
-                <option value="custom" ${bookingFilter.datePreset === 'custom' ? 'selected' : ''}>Tùy chọn...</option>
-              </select>
-              <input type="date" class="input input-sm" style="width:auto;padding:3px 6px;font-size:12px" data-booking-date-from value="${bookingFilter.dateFrom}" title="Từ ngày" aria-label="Từ ngày">
-              <span class="small muted" style="font-size:12px">–</span>
-              <input type="date" class="input input-sm" style="width:auto;padding:3px 6px;font-size:12px" data-booking-date-to value="${bookingFilter.dateTo}" title="Đến ngày" aria-label="Đến ngày">
-              ${(bookingFilter.dateFrom || bookingFilter.dateTo || bookingFilter.datePreset !== 'all') ? html`
-                <button type="button" class="btn btn-outline btn-sm" style="padding:2px 6px;font-size:11px;min-height:22px" data-booking-clear-date title="Xóa bộ lọc ngày">✕</button>
-              ` : ''}
+            <div class="date-filter-group">
+              <div class="date-preset-row">
+                <span class="small muted" style="white-space:nowrap;font-size:12px">📅 Ngày:</span>
+                <select class="date-preset-select" data-booking-date-preset aria-label="Khoảng thời gian">
+                  <option value="all" ${bookingFilter.datePreset === 'all' ? 'selected' : ''}>Tất cả ngày</option>
+                  <option value="today" ${bookingFilter.datePreset === 'today' ? 'selected' : ''}>Hôm nay</option>
+                  <option value="yesterday" ${bookingFilter.datePreset === 'yesterday' ? 'selected' : ''}>Hôm qua</option>
+                  <option value="last7" ${bookingFilter.datePreset === 'last7' ? 'selected' : ''}>7 ngày qua</option>
+                  <option value="last30" ${bookingFilter.datePreset === 'last30' ? 'selected' : ''}>30 ngày qua</option>
+                  <option value="this_month" ${bookingFilter.datePreset === 'this_month' ? 'selected' : ''}>Tháng này</option>
+                  <option value="custom" ${bookingFilter.datePreset === 'custom' ? 'selected' : ''}>Tùy chọn...</option>
+                </select>
+              </div>
+              <div class="date-inputs-wrap">
+                <input type="date" data-booking-date-from value="${bookingFilter.dateFrom}" title="Từ ngày" aria-label="Từ ngày">
+                <span class="small muted" style="font-size:12px">–</span>
+                <input type="date" data-booking-date-to value="${bookingFilter.dateTo}" title="Đến ngày" aria-label="Đến ngày">
+                ${(bookingFilter.dateFrom || bookingFilter.dateTo || bookingFilter.datePreset !== 'all') ? html`
+                  <button type="button" class="btn btn-outline btn-sm btn-clear-date" data-booking-clear-date title="Xóa bộ lọc ngày">✕</button>
+                ` : ''}
+              </div>
             </div>
             <button type="button" class="btn btn-outline btn-sm" data-sync-filtered>☁️ File Excel Cloud & Link Tự Đồng Bộ</button>
             <button type="button" class="btn btn-primary btn-sm" data-export-filtered>⬇ Tải Excel (${filtered.length} đơn)</button>
@@ -621,29 +625,33 @@ function renderAiOrders() {
             ].map(([k, lbl]) => html`
               <button type="button" class="chip ${aiOrderFilter.state === k ? 'active' : ''}" data-aifilter="${k}">${lbl}</button>`)}
           </div>
-          <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">
+          <div class="row admin-toolbar-actions" style="gap:8px;flex-wrap:wrap;align-items:center">
             <select class="input" style="width:auto;padding:7px 12px;font-size:13px" data-ai-plan-filter aria-label="Lọc theo gói cước">
               <option value="all">Tất cả gói cước</option>
               <option value="pro_bride" ${aiOrderFilter.planId === 'pro_bride' ? 'selected' : ''}>Nàng Thơ Rạng Rỡ (149k)</option>
               <option value="studio_duo" ${aiOrderFilter.planId === 'studio_duo' ? 'selected' : ''}>Cẩm Tú Trọn Đôi (299k)</option>
             </select>
-            <div class="row date-filter-pill" style="gap:6px;align-items:center;background:var(--bg,#faf5ef);padding:3px 8px;border-radius:6px;border:1px solid var(--line,#e8ded5)">
-              <span class="small muted" style="white-space:nowrap;font-size:12px">📅 Ngày:</span>
-              <select class="input input-sm" style="width:auto;padding:4px 6px;font-size:12px;border:none;background:transparent" data-ai-date-preset aria-label="Khoảng thời gian gói AI">
-                <option value="all" ${aiOrderFilter.datePreset === 'all' ? 'selected' : ''}>Tất cả ngày</option>
-                <option value="today" ${aiOrderFilter.datePreset === 'today' ? 'selected' : ''}>Hôm nay</option>
-                <option value="yesterday" ${aiOrderFilter.datePreset === 'yesterday' ? 'selected' : ''}>Hôm qua</option>
-                <option value="last7" ${aiOrderFilter.datePreset === 'last7' ? 'selected' : ''}>7 ngày qua</option>
-                <option value="last30" ${aiOrderFilter.datePreset === 'last30' ? 'selected' : ''}>30 ngày qua</option>
-                <option value="this_month" ${aiOrderFilter.datePreset === 'this_month' ? 'selected' : ''}>Tháng này</option>
-                <option value="custom" ${aiOrderFilter.datePreset === 'custom' ? 'selected' : ''}>Tùy chọn...</option>
-              </select>
-              <input type="date" class="input input-sm" style="width:auto;padding:3px 6px;font-size:12px" data-ai-date-from value="${aiOrderFilter.dateFrom}" title="Từ ngày" aria-label="Từ ngày">
-              <span class="small muted" style="font-size:12px">–</span>
-              <input type="date" class="input input-sm" style="width:auto;padding:3px 6px;font-size:12px" data-ai-date-to value="${aiOrderFilter.dateTo}" title="Đến ngày" aria-label="Đến ngày">
-              ${(aiOrderFilter.dateFrom || aiOrderFilter.dateTo || aiOrderFilter.datePreset !== 'all') ? html`
-                <button type="button" class="btn btn-outline btn-sm" style="padding:2px 6px;font-size:11px;min-height:22px" data-ai-clear-date title="Xóa bộ lọc ngày">✕</button>
-              ` : ''}
+            <div class="date-filter-group">
+              <div class="date-preset-row">
+                <span class="small muted" style="white-space:nowrap;font-size:12px">📅 Ngày:</span>
+                <select class="date-preset-select" data-ai-date-preset aria-label="Khoảng thời gian gói AI">
+                  <option value="all" ${aiOrderFilter.datePreset === 'all' ? 'selected' : ''}>Tất cả ngày</option>
+                  <option value="today" ${aiOrderFilter.datePreset === 'today' ? 'selected' : ''}>Hôm nay</option>
+                  <option value="yesterday" ${aiOrderFilter.datePreset === 'yesterday' ? 'selected' : ''}>Hôm qua</option>
+                  <option value="last7" ${aiOrderFilter.datePreset === 'last7' ? 'selected' : ''}>7 ngày qua</option>
+                  <option value="last30" ${aiOrderFilter.datePreset === 'last30' ? 'selected' : ''}>30 ngày qua</option>
+                  <option value="this_month" ${aiOrderFilter.datePreset === 'this_month' ? 'selected' : ''}>Tháng này</option>
+                  <option value="custom" ${aiOrderFilter.datePreset === 'custom' ? 'selected' : ''}>Tùy chọn...</option>
+                </select>
+              </div>
+              <div class="date-inputs-wrap">
+                <input type="date" data-ai-date-from value="${aiOrderFilter.dateFrom}" title="Từ ngày" aria-label="Từ ngày">
+                <span class="small muted" style="font-size:12px">–</span>
+                <input type="date" data-ai-date-to value="${aiOrderFilter.dateTo}" title="Đến ngày" aria-label="Đến ngày">
+                ${(aiOrderFilter.dateFrom || aiOrderFilter.dateTo || aiOrderFilter.datePreset !== 'all') ? html`
+                  <button type="button" class="btn btn-outline btn-sm btn-clear-date" data-ai-clear-date title="Xóa bộ lọc ngày">✕</button>
+                ` : ''}
+              </div>
             </div>
             <button type="button" class="btn btn-primary btn-sm" data-export-ai-excel>⬇ Tải Excel (${filtered.length} đơn)</button>
             ${pendingCount > 0 ? html`
