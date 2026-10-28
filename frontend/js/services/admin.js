@@ -54,7 +54,7 @@ export async function listAllSubscriptionOrders() {
     {
       id: 'demo-ord-1',
       code: 'THAI2610-8A12',
-      amount: 99000,
+      amount: 149000,
       status: 'paid',
       created_at: new Date(Date.now() - 2 * 3600e3).toISOString(),
       paid_at: new Date(Date.now() - 1.9 * 3600e3).toISOString(),
@@ -64,7 +64,7 @@ export async function listAllSubscriptionOrders() {
     {
       id: 'demo-ord-2',
       code: 'THAI2610-9F34',
-      amount: 249000,
+      amount: 299000,
       status: 'paid',
       created_at: new Date(Date.now() - 18 * 3600e3).toISOString(),
       paid_at: new Date(Date.now() - 17.8 * 3600e3).toISOString(),
@@ -74,7 +74,7 @@ export async function listAllSubscriptionOrders() {
     {
       id: 'demo-ord-3',
       code: 'THAI2610-1C77',
-      amount: 99000,
+      amount: 149000,
       status: 'pending',
       created_at: new Date(Date.now() - 30 * 60e3).toISOString(),
       paid_at: null,

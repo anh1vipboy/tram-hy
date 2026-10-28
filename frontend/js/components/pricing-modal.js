@@ -49,14 +49,14 @@ export function openPromoDialog({ onUpgrade } = {}) {
         <div class="promo-plan-item popular">
           <div class="ppi-badge popular-badge">⭐ Được 89% Cô dâu chọn</div>
           <div class="ppi-name">Nàng Thơ Rạng Rỡ</div>
-          <div class="ppi-price">99.000đ <small>/ 30 ngày</small></div>
+          <div class="ppi-price">149.000đ <small>/ 30 ngày</small></div>
           <div class="ppi-feat">⚡ 60 credit/ngày · Mở Siêu Nét 1K · Tải váy riêng</div>
         </div>
 
         <div class="promo-plan-item vip">
           <div class="ppi-badge vip-badge">👑 VIP Studio</div>
           <div class="ppi-name">Cẩm Tú Trọn Đôi</div>
-          <div class="ppi-price">249.000đ <small>/ 60 ngày</small></div>
+          <div class="ppi-price">299.000đ <small>/ 60 ngày</small></div>
           <div class="ppi-feat">150 credit/ngày · Thử Đôi Váy & Vest · AI Stylist</div>
         </div>
       </div>

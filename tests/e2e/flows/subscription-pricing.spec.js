@@ -74,7 +74,7 @@ test.describe('Gói cước AI Studio & Nâng cấp VietQR', () => {
     // Màn hình VietQR hiển thị
     await expect(bride.locator('.qr-checkout-card')).toBeVisible();
     await expect(bride.locator('.qr-img')).toBeVisible();
-    await expect(bride.locator('.highlight-price')).toContainText('99.000');
+    await expect(bride.locator('.highlight-price')).toContainText('149.000');
     await expect(bride.locator('.code-txt')).toBeVisible();
 
     // Bấm nút "Tôi đã chuyển khoản thành công"

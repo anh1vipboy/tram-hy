@@ -29,7 +29,7 @@
 
 ### 1.2. Đặc Thù Ngành Cưới (Bridal Tech vs SaaS Thông Thường)
 - **Chu kỳ "Cửa sổ chuẩn bị cưới" (Wedding Window):** Kéo dài từ **1 đến 3 tháng cao điểm**. Khác với dịch vụ stream nhạc/phim (người dùng trả phí cả năm), cô dâu chú rể chỉ có nhu cầu bùng nổ trong vài tháng này.
-- **Tâm lý sẵn sàng chi trả (Willingness to Pay):** Trong tổng chi phí chuẩn bị cưới từ 80 đến 300 triệu đồng, một khoản phí từ **99.000đ đến 249.000đ** là cực kỳ nhỏ bé (chỉ bằng tiền 1–2 cốc trà sữa), miễn là giải quyết được bài toán:
+- **Tâm lý sẵn sàng chi trả (Willingness to Pay):** Trong tổng chi phí chuẩn bị cưới từ 80 đến 300 triệu đồng, một khoản phí từ **149.000đ đến 299.000đ** là cực kỳ nhỏ bé (chỉ bằng tiền 1–2 cốc trà sữa), miễn là giải quyết được bài toán:
   - Thử được nhiều kiểu dáng váy/vest tại nhà trước khi đi tiệm thử thực tế.
   - Ảnh phải đủ nét, chi tiết ren thêu sắc sảo để khoe gia đình, bạn bè hoặc gửi tiệm may.
   - Thử được cả các mẫu váy họ tự tìm trên Pinterest, Instagram hoặc TikTok.
@@ -42,7 +42,7 @@ Chiến lược định giá áp dụng nguyên lý **Neo giá tâm lý (Price A
 
 ```
 [ Gói 1: Khởi Điểm ]         [ Gói 2: Nàng Thơ Rạng Rỡ ⭐ ]         [ Gói 3: Cẩm Tú Trọn Đôi 👑 ]
-      0đ / mãi mãi                   99.000đ / 30 ngày                     249.000đ / 60 ngày
+      0đ / mãi mãi                   149.000đ / 30 ngày                    299.000đ / 60 ngày
    (Phễu trải nghiệm)             (Gói chủ lực - 85% chọn)              (Gói cao cấp cho cặp đôi)
 ```
 
@@ -58,7 +58,7 @@ Chiến lược định giá áp dụng nguyên lý **Neo giá tâm lý (Price A
   - Ảnh có watermark nhỏ "Trạm Hỷ AI".
 
 ### 2.2. Gói 2: Nàng Thơ Rạng Rỡ (Pro Bride) ⭐ *(Gói Khuyên Dùng)*
-- **Mức giá:** **`99.000đ` / 30 ngày** (tương đương chỉ ~3.300đ/ngày).
+- **Mức giá:** **`149.000đ` / 30 ngày** (tương đương chỉ ~5.000đ/ngày).
 - **Hạn mức hàng ngày:** **60 credit / ngày** (gấp 10 lần gói thường, thỏa sức tạo 20–60 ảnh/ngày).
 - **Thưởng kích hoạt:** Tặng ngay **+30 credit linh hoạt** vào ví để thử tẹt ga ngay trong ngày đầu tiên.
 - **Quyền lợi độc quyền:**
@@ -69,7 +69,7 @@ Chiến lược định giá áp dụng nguyên lý **Neo giá tâm lý (Price A
   - **Xóa sạch Watermark:** Tải ảnh sắc nét, sạch đẹp lưu làm kỷ niệm hoặc chia sẻ mạng xã hội.
 
 ### 2.3. Gói 3: Cẩm Tú Trọn Đôi (VIP Studio & Duo Pass) 👑
-- **Mức giá:** **`249.000đ` / 60 ngày** (trọn gói 2 tháng cao điểm mùa cưới).
+- **Mức giá:** **`299.000đ` / 60 ngày** (trọn gói 2 tháng cao điểm mùa cưới).
 - **Hạn mức hàng ngày:** **150 credit / ngày** (Fair Use) + Tặng ngay **+100 credit linh hoạt**.
 - **Đối tượng:** Cặp đôi kỹ tính, cô dâu chuẩn bị nhiều lễ (Lễ hỏi, Lễ vu quy, Tiệc cưới), hoặc Wedding Stylist / Studio ảnh cưới tư vấn cho khách.
 - **Quyền lợi đỉnh cao:**
@@ -83,9 +83,9 @@ Chiến lược định giá áp dụng nguyên lý **Neo giá tâm lý (Price A
 
 ## 3. MA TRẬN TÍNH NĂNG SO SÁNH (FEATURE MATRIX)
 
-| Tiêu chí | Gói Khởi Điểm (0đ) | Gói Nàng Thơ Rạng Rỡ (99k) ⭐ | Gói Cẩm Tú Trọn Đôi (249k) 👑 |
+| Tiêu chí | Gói Khởi Điểm (0đ) | Gói Nàng Thơ Rạng Rỡ (149k) ⭐ | Gói Cẩm Tú Trọn Đôi (299k) 👑 |
 | :--- | :---: | :---: | :---: |
-| **Giá thanh toán** | 0đ | 99.000 đ | 249.000 đ |
+| **Giá thanh toán** | 0đ | 149.000 đ | 299.000 đ |
 | **Thời gian hiệu lực** | Vĩnh viễn | 30 ngày | 60 ngày |
 | **Hạn mức Credit/ngày** | 6 credit | 60 credit | 150 credit |
 | **Credit tặng kèm khi kích hoạt** | 0 | +30 credit | +100 credit |
@@ -106,7 +106,7 @@ Tuân thủ nghiêm ngặt quy tắc giao diện **Soft Luxury / Bridal Tech** t
 - **Bảng màu:** Đỏ đô thương hiệu (`--brand: #9b2335`), Nền kem ấm (`--bg: #faf5ef`), Viền mảnh sang trọng (`--line: #e8ded4`), Chữ nâu trầm (`--ink: #2a2421`).
 - **Typography:**
   - Tiêu đề dùng font `Playfair Display`, bật `text-wrap: balance` tránh rớt chữ lẻ.
-  - Các con số giá tiền (`99.000 đ`, `249.000 đ`), phần trăm (`%`), ngày đếm ngược bắt buộc sử dụng `font-variant-numeric: tabular-nums` để canh cột ngay ngắn.
+  - Các con số giá tiền (`149.000 đ`, `299.000 đ`), phần trăm (`%`), ngày đếm ngược bắt buộc sử dụng `font-variant-numeric: tabular-nums` để canh cột ngay ngắn.
 - **Bố cục Thẻ giá (Pricing Cards Layout):**
   - **Thẻ trung tâm (Gói Nàng Thơ):** Được thiết kế là "Hero Card", kích thước nổi bật hơn, viền vàng ánh kim nhạt (`#d4af37`), đổ bóng tinh tế `box-shadow: 0 16px 36px rgba(155, 35, 53, 0.12)`.
   - Phía trên có badge đính kèm: *"Được 89% Cô dâu lựa chọn"*.
@@ -133,7 +133,7 @@ flowchart TD
 1. **Trigger 1 – Khi chạm trần 6 credit:**
    - Thay vì báo lỗi khô khan: *"Bạn đã hết credit, vui lòng quay lại ngày mai"*, hệ thống mở một Bottom Sheet mềm mại:
    > *"Hôm nay bạn đã ướm thử rất xuất sắc! Đừng để nguồn cảm hứng ngắt quãng — Mở khóa ngay **60 credit/ngày** và chế độ **Siêu Nét 1K** để tiếp tục chọn chiếc váy mơ ước."*
-   > `[ Nâng Cấp Gói Nàng Thơ – Chỉ 99.000đ ]`
+   > `[ Nâng Cấp Gói Nàng Thơ – Chỉ 149.000đ ]`
 2. **Trigger 2 – Khi người dùng bấm thử chế độ "Siêu Nét 1K":**
    - Hiện thanh trượt so sánh ảnh tương tác (Before/After Slider): Kéo sang trái thấy ảnh thường 768p, kéo sang phải thấy ảnh Siêu nét thấy rõ từng hạt cườm đính và hoa văn thêu.
 3. **Trigger 3 – Khi bấm tải váy cá nhân:**
@@ -155,7 +155,7 @@ sequenceDiagram
     participant Webhook as Payment Gateway (PayOS/SePay)
     participant DB as Supabase DB (Realtime)
 
-    Bride->>UI: Bấm chọn "Nâng cấp Gói Nàng Thơ (99.000đ)"
+    Bride->>UI: Bấm chọn "Nâng cấp Gói Nàng Thơ (149.000đ)"
     UI->>Edge: Gửi yêu cầu khởi tạo đơn hàng
     Edge->>DB: Tạo bản ghi order: status = 'pending', code = 'TH99_XXXX'
     Edge-->>UI: Trả về link ảnh VietQR động (chứa số tiền & nội dung chuyển khoản)
@@ -196,8 +196,8 @@ create table if not exists public.subscription_plans (
 insert into public.subscription_plans (id, name, price, duration_days, daily_credits, bonus_credits, max_saved_photos, allow_own_garment, allow_max_quality, badge)
 values
   ('basic', 'Khởi Điểm', 0, 3650, 6, 0, 3, false, false, null),
-  ('pro_bride', 'Nàng Thơ Rạng Rỡ', 99000, 30, 60, 30, 15, true, true, 'Khuyên Dùng'),
-  ('studio_duo', 'Cẩm Tú Trọn Đôi', 249000, 60, 150, 100, 999, true, true, 'VIP Studio')
+  ('pro_bride', 'Nàng Thơ Rạng Rỡ', 149000, 30, 60, 30, 15, true, true, 'Khuyên Dùng'),
+  ('studio_duo', 'Cẩm Tú Trọn Đôi', 299000, 60, 150, 100, 999, true, true, 'VIP Studio')
 on conflict (id) do nothing;
 ```
 

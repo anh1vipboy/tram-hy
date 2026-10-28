@@ -25,7 +25,7 @@ export const DEFAULT_PLANS = [
   {
     id: 'pro_bride',
     name: 'Nàng Thơ Rạng Rỡ',
-    price: 99000,
+    price: 149000,
     duration_days: 30,
     daily_credits: 60,
     bonus_credits: 30,
@@ -47,7 +47,7 @@ export const DEFAULT_PLANS = [
   {
     id: 'studio_duo',
     name: 'Cẩm Tú Trọn Đôi',
-    price: 249000,
+    price: 299000,
     duration_days: 60,
     daily_credits: 150,
     bonus_credits: 100,
@@ -68,14 +68,18 @@ export const DEFAULT_PLANS = [
   },
 ];
 
-/** Lấy danh sách 3 gói cước từ Supabase (có fallback mặc định khi chưa chạy SQL 35) */
+/** Lấy danh sách 3 gói cước từ Supabase (có fallback mặc định khi chưa chạy SQL 35 hoặc DB chưa chạy SQL 36) */
 export async function listSubscriptionPlans() {
   const { data, error } = await sb.from('subscription_plans').select('*').order('price', { ascending: true });
   if (error || !data?.length) return DEFAULT_PLANS;
-  return data.map((p) => ({
-    ...p,
-    features: Array.isArray(p.features) ? p.features : JSON.parse(p.features || '[]'),
-  }));
+  return data.map((p) => {
+    const fallback = DEFAULT_PLANS.find((d) => d.id === p.id);
+    return {
+      ...p,
+      price: fallback ? fallback.price : p.price,
+      features: Array.isArray(p.features) ? p.features : JSON.parse(p.features || '[]'),
+    };
+  });
 }
 
 /** Lấy thông tin gói đang hoạt động của người dùng hiện tại */

@@ -33,9 +33,9 @@ insert into public.subscription_plans (id, name, price, duration_days, daily_cre
 values
   ('basic', 'Khởi Điểm', 0, 3650, 6, 0, 3, false, false, null, 'Trải nghiệm thử váy cơ bản mỗi ngày',
    '["6 credit thử váy mỗi ngày", "Chất lượng chuẩn (Fast / 768p)", "Kho váy có sẵn của tiệm", "Lưu tối đa 3 ảnh người mẫu"]'::jsonb),
-  ('pro_bride', 'Nàng Thơ Rạng Rỡ', 99000, 30, 60, 30, 15, true, true, 'Được 89% Cô dâu chọn', 'Thỏa sức tìm chiếc váy mơ ước suốt mùa chuẩn bị cưới',
+  ('pro_bride', 'Nàng Thơ Rạng Rỡ', 149000, 30, 60, 30, 15, true, true, 'Được 89% Cô dâu chọn', 'Thỏa sức tìm chiếc váy mơ ước suốt mùa chuẩn bị cưới',
    '["60 credit mỗi ngày (gấp 10 lần)", "Tặng ngay +30 credit tức thì", "Mở khóa Siêu Nét 1K Ultra HD", "Tự do tải váy riêng từ Pinterest / TikTok", "Lưu 15 ảnh cá nhân nhiều góc chụp", "Hàng đợi xử lý ưu tiên (8-12s)", "Xóa sạch Watermark"]'::jsonb),
-  ('studio_duo', 'Cẩm Tú Trọn Đôi', 249000, 60, 150, 100, 999, true, true, 'VIP Studio & Duo', 'Trọn gói cao cấp cho cặp đôi & chuyên gia tư vấn',
+  ('studio_duo', 'Cẩm Tú Trọn Đôi', 299000, 60, 150, 100, 999, true, true, 'VIP Studio & Duo', 'Trọn gói cao cấp cho cặp đôi & chuyên gia tư vấn',
    '["150 credit mỗi ngày (Fair Use)", "Tặng ngay +100 credit tức thì", "Tính năng Thử Đôi (Váy & Vest cùng lúc)", "Trợ lý AI Stylist phân tích dáng & màu sắc", "Xuất file ảnh gốc in ấn album", "Không giới hạn lưu trữ ảnh", "Hỗ trợ 1:1 qua Zalo VIP"]'::jsonb)
 on conflict (id) do update set
   name = excluded.name,
