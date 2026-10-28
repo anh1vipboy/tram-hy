@@ -76,6 +76,7 @@ test.describe('Gói cước AI Studio & Nâng cấp VietQR', () => {
     await expect(bride.locator('.qr-img')).toBeVisible();
     await expect(bride.locator('.highlight-price')).toContainText('149.000');
     await expect(bride.locator('.code-txt')).toBeVisible();
+    await expect(bride.locator('.code-txt')).toContainText('Trạm Hỷ-Gói AI 149k');
 
     // Bấm nút "Tôi đã chuyển khoản thành công"
     const confirmBtn = bride.locator('[data-confirm-paid]');

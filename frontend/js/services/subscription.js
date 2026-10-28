@@ -138,8 +138,9 @@ export async function createSubscriptionOrder(planId) {
   const plan = plans.find((p) => p.id === planId);
   if (!plan) throw new Error('Gói cước không hợp lệ');
 
-  const randomSuffix = Math.random().toString(36).slice(2, 7).toUpperCase();
-  const code = `THAI${user.user.id.slice(0, 4).toUpperCase()}${randomSuffix}`;
+  const priceK = Math.round((plan.price || 149000) / 1000);
+  const randomSuffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+  const code = `Trạm Hỷ-Gói AI ${priceK}k ${randomSuffix}`;
 
   const { data, error } = await sb.from('subscription_orders').insert({
     user_id: user.user.id,
