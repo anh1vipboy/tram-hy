@@ -103,3 +103,27 @@ export async function adminConfirmSubscriptionOrder(orderCode) {
   if (updErr) throw new Error(updErr.message);
   return { ok: true, code: orderCode };
 }
+
+// Admin xóa một đơn hàng (đơn rác / hủy)
+export async function adminDeleteSubscriptionOrder(orderCode) {
+  const { data, error } = await sb.rpc('admin_delete_subscription_order', { p_order_code: orderCode });
+  if (!error && data) return data;
+
+  const { error: delErr } = await sb.from('subscription_orders')
+    .delete()
+    .eq('code', orderCode);
+  if (delErr) throw new Error(delErr.message);
+  return { ok: true, code: orderCode };
+}
+
+// Admin xóa sạch toàn bộ đơn đang chờ thanh toán (pending)
+export async function adminClearPendingSubscriptionOrders() {
+  const { data, error } = await sb.rpc('admin_clear_pending_subscription_orders');
+  if (!error && data) return data;
+
+  const { error: delErr } = await sb.from('subscription_orders')
+    .delete()
+    .eq('status', 'pending');
+  if (delErr) throw new Error(delErr.message);
+  return { ok: true };
+}

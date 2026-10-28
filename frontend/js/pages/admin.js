@@ -14,7 +14,8 @@ import { listAllBookings, subscribeBookingChanges } from '../services/bookings.j
 import { subscribeVendorChanges } from '../services/catalog.js';
 import {
   listOpenDisputes, resolveDispute, listVendorsWithOwners, setVendorVerified, linkVendorOwner, reviewVendor,
-  listAllSubscriptionOrders, adminConfirmSubscriptionOrder, subscribeSubscriptionOrderChanges,
+  listAllSubscriptionOrders, adminConfirmSubscriptionOrder, adminDeleteSubscriptionOrder, adminClearPendingSubscriptionOrders,
+  subscribeSubscriptionOrderChanges,
 } from '../services/admin.js';
 import { getTryonSettings, saveTryonSettings } from '../services/tryon-ai.js';
 
@@ -523,6 +524,10 @@ function renderAiOrders() {
               <option value="studio_duo" ${aiOrderFilter.planId === 'studio_duo' ? 'selected' : ''}>Cẩm Tú Trọn Đôi (299k)</option>
             </select>
             <button type="button" class="btn btn-primary btn-sm" data-export-ai-excel>⬇ Tải Excel (${filtered.length} đơn)</button>
+            ${pendingCount > 0 ? html`
+              <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger, #c62828); border-color:#f0b2b2" data-clear-pending-orders title="Xóa toàn bộ các đơn đang chờ thanh toán">
+                🗑 Dọn sạch ${pendingCount} đơn chờ
+              </button>` : ''}
           </div>
         </div>
         <div class="small muted">
@@ -579,9 +584,14 @@ function renderAiOrders() {
                     </td>
                     <td>
                       ${!isPaid && o.status === 'pending' ? html`
-                        <button type="button" class="btn btn-primary btn-sm" data-confirm-order="${o.code}">
-                          ✨ Kích hoạt
-                        </button>` : html`
+                        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                          <button type="button" class="btn btn-primary btn-sm" data-confirm-order="${o.code}">
+                            ✨ Kích hoạt
+                          </button>
+                          <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger, #c62828);border-color:#f0b2b2;padding:4px 8px" data-delete-order="${o.code}" title="Xóa đơn này">
+                            🗑 Xóa
+                          </button>
+                        </div>` : html`
                         <span class="small muted" style="color:#2e7d32">Hoàn tất</span>`}
                     </td>
                   </tr>`;
@@ -639,6 +649,46 @@ function renderAiOrders() {
           toastError(err);
         }
       });
+    });
+  });
+
+  container.querySelectorAll('[data-delete-order]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const code = btn.dataset.deleteOrder;
+      const done = await openDialog({
+        title: `Xóa đơn hàng ${code}?`,
+        confirmText: 'Xác nhận xóa',
+        content: html`<p>Đơn hàng này chưa thanh toán. Bạn có chắc chắn muốn xóa bản ghi này khỏi cơ sở dữ liệu không?</p>`,
+      });
+      if (!done) return;
+      withBusy(btn, async () => {
+        try {
+          await adminDeleteSubscriptionOrder(code);
+          toast(`Đã xóa đơn ${code}!`, 'success');
+          load();
+        } catch (err) {
+          toastError(err);
+        }
+      });
+    });
+  });
+
+  container.querySelector('[data-clear-pending-orders]')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const done = await openDialog({
+      title: `Dọn sạch ${pendingCount} đơn chờ thanh toán?`,
+      confirmText: 'Xóa toàn bộ',
+      content: html`<p>Tất cả các đơn hàng chưa thanh toán sẽ được xóa sạch khỏi cơ sở dữ liệu. Thao tác này không thể hoàn tác.</p>`,
+    });
+    if (!done) return;
+    withBusy(btn, async () => {
+      try {
+        await adminClearPendingSubscriptionOrders();
+        toast(`Đã dọn sạch ${pendingCount} đơn chờ thanh toán!`, 'success');
+        load();
+      } catch (err) {
+        toastError(err);
+      }
     });
   });
 }
