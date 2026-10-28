@@ -135,6 +135,16 @@ test.describe('Gói cước AI Studio & Nâng cấp VietQR', () => {
 
     // Có các bộ lọc chips
     await expect(section.locator('[data-aifilter]')).toHaveCount(3);
+
+    // Có bộ lọc ngày / khoảng ngày cho gói AI
+    const datePreset = section.locator('[data-ai-date-preset]');
+    await expect(datePreset).toBeVisible();
+    await expect(section.locator('[data-ai-date-from]')).toBeVisible();
+    await expect(section.locator('[data-ai-date-to]')).toBeVisible();
+
+    // Chọn lọc Hôm nay
+    await datePreset.selectOption('today');
+    await expect(section.locator('table.finance-table, .empty')).toBeVisible();
   });
 
   test('quản trị viên lọc đơn theo loại dịch vụ cưới trong tab "Tất cả đơn"', async ({ browser }) => {
@@ -162,6 +172,16 @@ test.describe('Gói cước AI Studio & Nâng cấp VietQR', () => {
     await expect(categorySelect).toHaveValue('bridal');
 
     // Bảng cập nhật mượt mà
+    await expect(section.locator('table.finance-table, .empty')).toBeVisible();
+
+    // Có bộ lọc ngày / khoảng ngày cho đơn dịch vụ
+    const bookingDatePreset = section.locator('[data-booking-date-preset]');
+    await expect(bookingDatePreset).toBeVisible();
+    await expect(section.locator('[data-booking-date-from]')).toBeVisible();
+    await expect(section.locator('[data-booking-date-to]')).toBeVisible();
+
+    // Chọn lọc 30 ngày qua
+    await bookingDatePreset.selectOption('last30');
     await expect(section.locator('table.finance-table, .empty')).toBeVisible();
   });
 

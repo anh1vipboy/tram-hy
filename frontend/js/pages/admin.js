@@ -20,11 +20,68 @@ import {
 import { getTryonSettings, saveTryonSettings } from '../services/tryon-ai.js';
 
 const data = { bookings: [], disputes: [], vendors: [], aiOrders: [] };
-const bookingFilter = { state: 'all', vendorId: 'all', category: 'all' };
+const bookingFilter = { state: 'all', vendorId: 'all', category: 'all', datePreset: 'all', dateFrom: '', dateTo: '' };
 const bookingPagination = { page: 1, pageSize: 10 };
 const vendorPagination = { page: 1, pageSize: 10 };
-const aiOrderFilter = { state: 'all', planId: 'all' };
+const aiOrderFilter = { state: 'all', planId: 'all', datePreset: 'all', dateFrom: '', dateTo: '' };
 const aiOrderPagination = { page: 1, pageSize: 10 };
+
+function getDateRangeFromPreset(preset) {
+  const now = new Date();
+  const formatYMD = (dt) => {
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, '0');
+    const d = String(dt.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
+
+  if (preset === 'today') {
+    const todayStr = formatYMD(now);
+    return { dateFrom: todayStr, dateTo: todayStr };
+  }
+  if (preset === 'yesterday') {
+    const yest = new Date(now);
+    yest.setDate(yest.getDate() - 1);
+    const yestStr = formatYMD(yest);
+    return { dateFrom: yestStr, dateTo: yestStr };
+  }
+  if (preset === 'last7') {
+    const past = new Date(now);
+    past.setDate(past.getDate() - 6);
+    return { dateFrom: formatYMD(past), dateTo: formatYMD(now) };
+  }
+  if (preset === 'last30') {
+    const past = new Date(now);
+    past.setDate(past.getDate() - 29);
+    return { dateFrom: formatYMD(past), dateTo: formatYMD(now) };
+  }
+  if (preset === 'this_month') {
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    return { dateFrom: formatYMD(firstDay), dateTo: formatYMD(now) };
+  }
+  return { dateFrom: '', dateTo: '' };
+}
+
+function matchDateFilter(dateStr, { dateFrom, dateTo }) {
+  if (!dateFrom && !dateTo) return true;
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return true;
+
+  if (dateFrom) {
+    const [y, m, day] = dateFrom.split('-').map(Number);
+    const from = new Date(y, m - 1, day, 0, 0, 0, 0);
+    if (d < from) return false;
+  }
+
+  if (dateTo) {
+    const [y, m, day] = dateTo.split('-').map(Number);
+    const to = new Date(y, m - 1, day, 23, 59, 59, 999);
+    if (d > to) return false;
+  }
+
+  return true;
+}
 
 async function load() {
   try {
@@ -327,6 +384,7 @@ function filterBookingsList() {
     if (bookingFilter.state === 'released') return f.releasedGross > 0;
     if (bookingFilter.state === 'pending') return b.status === 'pending';
     if (bookingFilter.state === 'cancelled') return f.isCancelled;
+    if (!matchDateFilter(b.created_at, bookingFilter)) return false;
     return true;
   });
 }
@@ -375,7 +433,7 @@ function renderBookings() {
             ].map(([k, lbl]) => html`
               <button type="button" class="chip ${bookingFilter.state === k ? 'active' : ''}" data-bfilter="${k}">${lbl}</button>`)}
           </div>
-          <div class="row" style="gap:8px;flex-wrap:wrap">
+          <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">
             <select class="input" style="width:auto;padding:7px 12px;font-size:13px" data-category-filter aria-label="Lọc theo loại dịch vụ">
               <option value="all">Tất cả dịch vụ</option>
               ${Object.entries(VENDOR_CATEGORY).map(([k, lbl]) => html`
@@ -386,6 +444,24 @@ function renderBookings() {
               <option value="all">Tất cả đối tác (${vendorOptions.length})</option>
               ${vendorOptions.map(([id, name]) => html`<option value="${id}" ${bookingFilter.vendorId === id ? 'selected' : ''}>${name}</option>`)}
             </select>
+            <div class="row date-filter-pill" style="gap:6px;align-items:center;background:var(--bg,#faf5ef);padding:3px 8px;border-radius:6px;border:1px solid var(--line,#e8ded5)">
+              <span class="small muted" style="white-space:nowrap;font-size:12px">📅 Ngày:</span>
+              <select class="input input-sm" style="width:auto;padding:4px 6px;font-size:12px;border:none;background:transparent" data-booking-date-preset aria-label="Khoảng thời gian">
+                <option value="all" ${bookingFilter.datePreset === 'all' ? 'selected' : ''}>Tất cả ngày</option>
+                <option value="today" ${bookingFilter.datePreset === 'today' ? 'selected' : ''}>Hôm nay</option>
+                <option value="yesterday" ${bookingFilter.datePreset === 'yesterday' ? 'selected' : ''}>Hôm qua</option>
+                <option value="last7" ${bookingFilter.datePreset === 'last7' ? 'selected' : ''}>7 ngày qua</option>
+                <option value="last30" ${bookingFilter.datePreset === 'last30' ? 'selected' : ''}>30 ngày qua</option>
+                <option value="this_month" ${bookingFilter.datePreset === 'this_month' ? 'selected' : ''}>Tháng này</option>
+                <option value="custom" ${bookingFilter.datePreset === 'custom' ? 'selected' : ''}>Tùy chọn...</option>
+              </select>
+              <input type="date" class="input input-sm" style="width:auto;padding:3px 6px;font-size:12px" data-booking-date-from value="${bookingFilter.dateFrom}" title="Từ ngày" aria-label="Từ ngày">
+              <span class="small muted" style="font-size:12px">–</span>
+              <input type="date" class="input input-sm" style="width:auto;padding:3px 6px;font-size:12px" data-booking-date-to value="${bookingFilter.dateTo}" title="Đến ngày" aria-label="Đến ngày">
+              ${(bookingFilter.dateFrom || bookingFilter.dateTo || bookingFilter.datePreset !== 'all') ? html`
+                <button type="button" class="btn btn-outline btn-sm" style="padding:2px 6px;font-size:11px;min-height:22px" data-booking-clear-date title="Xóa bộ lọc ngày">✕</button>
+              ` : ''}
+            </div>
             <button type="button" class="btn btn-outline btn-sm" data-sync-filtered>☁️ File Excel Cloud & Link Tự Đồng Bộ</button>
             <button type="button" class="btn btn-primary btn-sm" data-export-filtered>⬇ Tải Excel (${filtered.length} đơn)</button>
           </div>
@@ -468,6 +544,33 @@ function renderBookings() {
     bookingPagination.page = 1;
     renderBookings();
   });
+  container.querySelector('[data-booking-date-preset]')?.addEventListener('change', (e) => {
+    bookingFilter.datePreset = e.target.value;
+    const { dateFrom, dateTo } = getDateRangeFromPreset(bookingFilter.datePreset);
+    bookingFilter.dateFrom = dateFrom;
+    bookingFilter.dateTo = dateTo;
+    bookingPagination.page = 1;
+    renderBookings();
+  });
+  container.querySelector('[data-booking-date-from]')?.addEventListener('change', (e) => {
+    bookingFilter.dateFrom = e.target.value;
+    bookingFilter.datePreset = 'custom';
+    bookingPagination.page = 1;
+    renderBookings();
+  });
+  container.querySelector('[data-booking-date-to]')?.addEventListener('change', (e) => {
+    bookingFilter.dateTo = e.target.value;
+    bookingFilter.datePreset = 'custom';
+    bookingPagination.page = 1;
+    renderBookings();
+  });
+  container.querySelector('[data-booking-clear-date]')?.addEventListener('click', () => {
+    bookingFilter.datePreset = 'all';
+    bookingFilter.dateFrom = '';
+    bookingFilter.dateTo = '';
+    bookingPagination.page = 1;
+    renderBookings();
+  });
   container.querySelector('[data-export-filtered]')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
     await exportAdminFinanceExcel(filtered, data.vendors, 'doi-soat-doanh-thu-tram-hy.xlsx', data.aiOrders);
     toast(`Đã xuất file Excel đối soát (${filtered.length} đơn).`, 'success');
@@ -489,6 +592,7 @@ function filterAiOrdersList() {
   return (data.aiOrders || []).filter((o) => {
     if (aiOrderFilter.state !== 'all' && o.status !== aiOrderFilter.state) return false;
     if (aiOrderFilter.planId !== 'all' && o.plan?.id !== aiOrderFilter.planId) return false;
+    if (!matchDateFilter(o.created_at, aiOrderFilter)) return false;
     return true;
   });
 }
@@ -517,12 +621,30 @@ function renderAiOrders() {
             ].map(([k, lbl]) => html`
               <button type="button" class="chip ${aiOrderFilter.state === k ? 'active' : ''}" data-aifilter="${k}">${lbl}</button>`)}
           </div>
-          <div class="row" style="gap:8px;flex-wrap:wrap">
+          <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">
             <select class="input" style="width:auto;padding:7px 12px;font-size:13px" data-ai-plan-filter aria-label="Lọc theo gói cước">
               <option value="all">Tất cả gói cước</option>
               <option value="pro_bride" ${aiOrderFilter.planId === 'pro_bride' ? 'selected' : ''}>Nàng Thơ Rạng Rỡ (149k)</option>
               <option value="studio_duo" ${aiOrderFilter.planId === 'studio_duo' ? 'selected' : ''}>Cẩm Tú Trọn Đôi (299k)</option>
             </select>
+            <div class="row date-filter-pill" style="gap:6px;align-items:center;background:var(--bg,#faf5ef);padding:3px 8px;border-radius:6px;border:1px solid var(--line,#e8ded5)">
+              <span class="small muted" style="white-space:nowrap;font-size:12px">📅 Ngày:</span>
+              <select class="input input-sm" style="width:auto;padding:4px 6px;font-size:12px;border:none;background:transparent" data-ai-date-preset aria-label="Khoảng thời gian gói AI">
+                <option value="all" ${aiOrderFilter.datePreset === 'all' ? 'selected' : ''}>Tất cả ngày</option>
+                <option value="today" ${aiOrderFilter.datePreset === 'today' ? 'selected' : ''}>Hôm nay</option>
+                <option value="yesterday" ${aiOrderFilter.datePreset === 'yesterday' ? 'selected' : ''}>Hôm qua</option>
+                <option value="last7" ${aiOrderFilter.datePreset === 'last7' ? 'selected' : ''}>7 ngày qua</option>
+                <option value="last30" ${aiOrderFilter.datePreset === 'last30' ? 'selected' : ''}>30 ngày qua</option>
+                <option value="this_month" ${aiOrderFilter.datePreset === 'this_month' ? 'selected' : ''}>Tháng này</option>
+                <option value="custom" ${aiOrderFilter.datePreset === 'custom' ? 'selected' : ''}>Tùy chọn...</option>
+              </select>
+              <input type="date" class="input input-sm" style="width:auto;padding:3px 6px;font-size:12px" data-ai-date-from value="${aiOrderFilter.dateFrom}" title="Từ ngày" aria-label="Từ ngày">
+              <span class="small muted" style="font-size:12px">–</span>
+              <input type="date" class="input input-sm" style="width:auto;padding:3px 6px;font-size:12px" data-ai-date-to value="${aiOrderFilter.dateTo}" title="Đến ngày" aria-label="Đến ngày">
+              ${(aiOrderFilter.dateFrom || aiOrderFilter.dateTo || aiOrderFilter.datePreset !== 'all') ? html`
+                <button type="button" class="btn btn-outline btn-sm" style="padding:2px 6px;font-size:11px;min-height:22px" data-ai-clear-date title="Xóa bộ lọc ngày">✕</button>
+              ` : ''}
+            </div>
             <button type="button" class="btn btn-primary btn-sm" data-export-ai-excel>⬇ Tải Excel (${filtered.length} đơn)</button>
             ${pendingCount > 0 ? html`
               <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger, #c62828); border-color:#f0b2b2" data-clear-pending-orders title="Xóa toàn bộ các đơn đang chờ thanh toán">
@@ -622,6 +744,34 @@ function renderAiOrders() {
 
   container.querySelector('[data-ai-plan-filter]')?.addEventListener('change', (e) => {
     aiOrderFilter.planId = e.target.value;
+    aiOrderPagination.page = 1;
+    renderAiOrders();
+  });
+
+  container.querySelector('[data-ai-date-preset]')?.addEventListener('change', (e) => {
+    aiOrderFilter.datePreset = e.target.value;
+    const { dateFrom, dateTo } = getDateRangeFromPreset(aiOrderFilter.datePreset);
+    aiOrderFilter.dateFrom = dateFrom;
+    aiOrderFilter.dateTo = dateTo;
+    aiOrderPagination.page = 1;
+    renderAiOrders();
+  });
+  container.querySelector('[data-ai-date-from]')?.addEventListener('change', (e) => {
+    aiOrderFilter.dateFrom = e.target.value;
+    aiOrderFilter.datePreset = 'custom';
+    aiOrderPagination.page = 1;
+    renderAiOrders();
+  });
+  container.querySelector('[data-ai-date-to]')?.addEventListener('change', (e) => {
+    aiOrderFilter.dateTo = e.target.value;
+    aiOrderFilter.datePreset = 'custom';
+    aiOrderPagination.page = 1;
+    renderAiOrders();
+  });
+  container.querySelector('[data-ai-clear-date]')?.addEventListener('click', () => {
+    aiOrderFilter.datePreset = 'all';
+    aiOrderFilter.dateFrom = '';
+    aiOrderFilter.dateTo = '';
     aiOrderPagination.page = 1;
     renderAiOrders();
   });
