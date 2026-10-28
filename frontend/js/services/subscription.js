@@ -129,7 +129,7 @@ export async function getMySubscription() {
   };
 }
 
-/** Tạo đơn hàng nâng cấp gói (tạo mã VietQR) */
+/** Tạo thông tin đơn hàng nâng cấp gói (tạo mã VietQR, không ghi log vào DB khi khách chưa chuyển khoản) */
 export async function createSubscriptionOrder(planId) {
   const { data: user } = await sb.auth.getUser();
   if (!user?.user) throw new Error('Vui lòng đăng nhập để nâng cấp gói cước');
@@ -142,37 +142,60 @@ export async function createSubscriptionOrder(planId) {
   const randomSuffix = Math.random().toString(36).slice(2, 6).toUpperCase();
   const code = `Trạm Hỷ-Gói AI ${priceK}k ${randomSuffix}`;
 
-  const { data, error } = await sb.from('subscription_orders').insert({
-    user_id: user.user.id,
-    plan_id: plan.id,
+  // Không ghi log vào DB lúc này để tránh phát sinh đơn "Chờ thanh toán" khi khách chỉ mới xem mã QR
+  return {
     code,
     amount: plan.price,
-    status: 'pending',
-  }).select().single();
-
-  if (error) {
-    // Nếu chưa có bảng subscription_orders (môi trường demo / client-side)
-    return { code, amount: plan.price, plan };
-  }
-
-  return { ...data, plan };
+    plan_id: plan.id,
+    plan,
+    user_id: user.user.id,
+  };
 }
 
-/** Kích hoạt gói sau khi quét QR chuyển khoản */
-export async function activateSubscription(orderCode) {
-  const { data, error } = await sb.rpc('activate_my_subscription', { p_order_code: orderCode });
-  if (!error && data) return data;
-
-  // Fallback mô phỏng nếu chưa có RPC trên remote
+/** Kích hoạt gói sau khi khách bấm "Tôi đã chuyển khoản thành công" (lúc này mới ghi log vào DB) */
+export async function activateSubscription(orderOrCode) {
   const { data: user } = await sb.auth.getUser();
   if (!user?.user) throw new Error('Chưa đăng nhập');
 
+  const orderCode = typeof orderOrCode === 'string' ? orderOrCode : orderOrCode?.code;
+  const orderObj = typeof orderOrCode === 'object' ? orderOrCode : null;
+
+  const plans = await listSubscriptionPlans();
+  const plan = orderObj?.plan || (orderCode.includes('299k')
+    ? (plans.find((p) => p.id === 'studio_duo') || DEFAULT_PLANS[2])
+    : (plans.find((p) => p.id === 'pro_bride') || DEFAULT_PLANS[1]));
+
+  // 1. Ghi log đơn hàng vào subscription_orders khi người dùng xác nhận đã chuyển khoản
+  const { data: existing } = await sb.from('subscription_orders')
+    .select('id, status')
+    .eq('code', orderCode)
+    .maybeSingle();
+
+  if (!existing) {
+    await sb.from('subscription_orders').insert({
+      user_id: user.user.id,
+      plan_id: plan.id,
+      code: orderCode,
+      amount: orderObj?.amount || plan.price,
+      status: 'pending',
+    });
+  }
+
+  // 2. Kích hoạt gói qua RPC activate_my_subscription (chuyển sang 'paid' và cộng credit)
+  const { data: rpcData, error: rpcError } = await sb.rpc('activate_my_subscription', { p_order_code: orderCode });
+  if (!rpcError && rpcData) return rpcData;
+
+  // Fallback nếu remote DB chưa chạy RPC
+  await sb.from('subscription_orders')
+    .update({ status: 'paid', paid_at: new Date().toISOString() })
+    .eq('code', orderCode);
+
   return {
     ok: true,
-    plan_id: 'pro_bride',
-    plan_name: 'Nàng Thơ Rạng Rỡ',
-    daily_credits: 60,
-    bonus_credits: 30,
-    expires_at: new Date(Date.now() + 30 * 86400e3).toISOString(),
+    plan_id: plan.id,
+    plan_name: plan.name,
+    daily_credits: plan.daily_credits,
+    bonus_credits: plan.bonus_credits,
+    expires_at: new Date(Date.now() + (plan.duration_days || 30) * 86400e3).toISOString(),
   };
 }

@@ -275,7 +275,7 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
           confirmBtn.disabled = true;
           confirmBtn.textContent = 'Đang kiểm tra giao dịch...';
           try {
-            const res = await activateSubscription(order.code);
+            const res = await activateSubscription(order);
             renderSuccessView(res);
           } catch (err) {
             toastError(err);
