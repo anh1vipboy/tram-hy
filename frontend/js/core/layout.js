@@ -31,7 +31,7 @@ const NAV_ITEMS = [
   { page: 'home',        href: 'index.html',            label: 'Trang chủ' },
   { page: 'about',       href: 'gioi-thieu.html',       label: 'Giới thiệu' },
   { page: 'tryon',       href: 'tryon.html',            label: 'Thử váy AI' },
-  { page: 'bespoke',     href: 'thiet-ke-vay.html',     label: '✂️ Tự thiết kế váy', className: 'nav-bespoke' },
+  { page: 'bespoke',     href: 'thiet-ke-vay.html',     label: 'Tự thiết kế', suffix: ' váy' },
   { page: 'marketplace', href: 'marketplace.html',      label: 'Dịch vụ', suffix: ' cưới' },
   { page: 'planner',     href: 'ke-hoach.html',         label: 'Kế hoạch', suffix: ' cưới' },
   { page: 'bookings',    href: 'bookings.html',         label: 'Đơn của tôi', roles: ['bride'] },

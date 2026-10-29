@@ -114,35 +114,6 @@ main.container { padding-block: 28px 56px; flex: 1 0 auto; }
 .nav a { padding: 8px 10px; border-radius: 999px; color: var(--muted); font-weight: 600; font-size: 14px; white-space: nowrap; text-decoration: none; border: 1px solid transparent; transition: background .18s var(--ease-out), color .18s var(--ease-out), border-color .18s var(--ease-out); }
 .nav a:hover { color: var(--ink); background: #f6ece4; }
 .nav a.active { color: var(--brand-dark); background: linear-gradient(135deg, var(--brand-soft), var(--gold-soft)); border-color: var(--gold-line); }
-.nav a.nav-bespoke {
-  padding: 5px 12px;
-  border: 1px solid var(--gold-line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .75);
-  color: var(--brand-dark);
-  box-shadow: 0 1px 3px rgba(122, 22, 38, .04);
-  transition: background .18s var(--ease-out), color .18s var(--ease-out), border-color .18s var(--ease-out), transform .18s var(--ease-out), box-shadow .18s var(--ease-out);
-}
-.nav a.nav-bespoke:hover {
-  background: #ffffff;
-  border-color: var(--brand);
-  color: var(--brand-dark);
-}
-@media (hover: hover) and (pointer: fine) {
-  .nav a.nav-bespoke:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(155, 35, 53, .12);
-  }
-}
-.nav a.nav-bespoke:active {
-  transform: scale(.97);
-}
-.nav a.nav-bespoke.active {
-  background: linear-gradient(135deg, var(--brand-soft), var(--gold-soft));
-  border-color: var(--brand);
-  color: var(--brand-dark);
-  box-shadow: 0 2px 6px rgba(155, 35, 53, .1);
-}
 /* Menu nhiều mục (đối tác có 9 mục): laptop → ẩn tên tài khoản (còn ảnh đại diện); màn hình vừa → rút gọn chữ */
 @media (max-width: 1400px) {
   .user-name { display: none; }
@@ -150,7 +121,6 @@ main.container { padding-block: 28px 56px; flex: 1 0 auto; }
 }
 @media (max-width: 1240px) {
   .nav a { padding: 8px 9px; font-size: 13.5px; }
-  .nav a.nav-bespoke { padding: 5px 10px; font-size: 13.5px; }
   .nav-suffix, .hy-seal { display: none; }
 }
 @media (max-width: 820px) {
@@ -159,7 +129,6 @@ main.container { padding-block: 28px 56px; flex: 1 0 auto; }
 @media (max-width: 1000px) {
   .nav { gap: 2px; }
   .nav a { padding: 8px 7px; font-size: 13px; }
-  .nav a.nav-bespoke { padding: 5px 8px; font-size: 13px; }
 }
 .user-area { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 .user-name { font-weight: 600; font-size: 14px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
@@ -1192,7 +1161,7 @@ dialog.lightbox { width: min(760px, calc(100% - 20px)); background: #1d1815; col
   .sheet-head { position: relative; padding-top: 20px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .btn, .chip, .item-card, .item-card .thumb, .budget-bar span, .top-vendor-row, .top-vendor-arrow, .nav a, .nav a.nav-bespoke { transition: none !important; }
+  .btn, .chip, .item-card, .item-card .thumb, .budget-bar span, .top-vendor-row, .top-vendor-arrow, .nav a { transition: none !important; }
 }
 
 /* Hoãn dựng các khối nằm sâu dưới màn hình đầu để tăng tốc hiển thị lần đầu */
