@@ -207,8 +207,9 @@ GROUP BY device
 ORDER BY "Số phiên" DESC;
 
 
--- VIEW 4: BẢNG CHI TIẾT 128 NGƯỜI DÙNG & THỜI GIAN SỬ DỤNG (QUALIFIED DETAIL)
-CREATE OR REPLACE VIEW public.view_chi_tiet_128_users_thoi_gian AS
+-- VIEW 4: BẢNG CHI TIẾT THỜI GIAN SỬ DỤNG CỦA NGƯỜI DÙNG (QUALIFIED DETAIL)
+DROP VIEW IF EXISTS public.view_chi_tiet_128_users_thoi_gian CASCADE;
+CREATE OR REPLACE VIEW public.user_time AS
 SELECT
   s.full_name AS "Họ và Tên",
   s.email AS "Email",
