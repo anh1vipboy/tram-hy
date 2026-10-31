@@ -8,7 +8,7 @@
 
 DO $$
 DECLARE
-  u RECORD;
+  cur_user RECORD;
   v_num_sessions INT;
   v_session_idx INT;
   v_start TIMESTAMPTZ;
@@ -24,36 +24,36 @@ BEGIN
   DELETE FROM public.user_sessions;
 
   -- 2. Sinh từ 3 đến 8 phiên hoạt động cho từng tài khoản cô dâu
-  FOR u IN 
+  FOR cur_user IN 
     SELECT p.id, p.full_name, usr.email 
     FROM public.profiles p
     JOIN auth.users usr ON usr.id = p.id
     WHERE p.role = 'bride'
   LOOP
     -- Mỗi tài khoản có từ 3 đến 8 phiên (trung bình ~5.5 phiên / người)
-    v_num_sessions := 3 + (abs(hashtext(u.id::text)) % 6);
+    v_num_sessions := 3 + (abs(hashtext(cur_user.id::text)) % 6);
     v_last_login := v_base_time;
 
     FOR v_session_idx IN 1..v_num_sessions LOOP
       -- Các phiên rải đều từ 14 ngày trước đến nay
-      v_start := v_base_time - (((abs(hashtext(u.id::text || v_session_idx::text)) % 320) + 3) || ' hours')::interval;
+      v_start := v_base_time - (((abs(hashtext(cur_user.id::text || v_session_idx::text)) % 320) + 3) || ' hours')::interval;
       
       -- Thời lượng mỗi phiên từ 10 đến 28 phút (600 - 1680 giây)
-      v_duration := 600 + (abs(hashtext(u.email || v_session_idx::text)) % 1080);
+      v_duration := 600 + (abs(hashtext(cur_user.email || v_session_idx::text)) % 1080);
 
       -- Phân bổ thiết bị: 72% Mobile, 28% Desktop
-      IF (abs(hashtext(u.id::text || 'dev' || v_session_idx)) % 10) < 5 THEN
+      IF (abs(hashtext(cur_user.id::text || 'dev' || v_session_idx)) % 10) < 5 THEN
         v_device := 'Mobile Safari (iPhone)';
-      ELSIF (abs(hashtext(u.id::text || 'dev' || v_session_idx)) % 10) < 7 THEN
+      ELSIF (abs(hashtext(cur_user.id::text || 'dev' || v_session_idx)) % 10) < 7 THEN
         v_device := 'Mobile Chrome (Android)';
-      ELSIF (abs(hashtext(u.id::text || 'dev' || v_session_idx)) % 10) < 9 THEN
+      ELSIF (abs(hashtext(cur_user.id::text || 'dev' || v_session_idx)) % 10) < 9 THEN
         v_device := 'Desktop Chrome (Windows)';
       ELSE
         v_device := 'Desktop Safari (macOS)';
       END IF;
 
       -- Phân bổ tính năng
-      CASE (abs(hashtext(u.email || 'feat' || v_session_idx)) % 10)
+      CASE (abs(hashtext(cur_user.email || 'feat' || v_session_idx)) % 10)
         WHEN 0, 1, 2, 3 THEN
           v_feature := 'Phòng Thử Váy AI & Thiết Kế';
           v_pages := ARRAY['index.html', 'tryon.html', 'thiet-ke-vay.html'];
@@ -85,9 +85,9 @@ BEGIN
         actions_count,
         created_at
       ) VALUES (
-        u.id,
-        u.email,
-        u.full_name,
+        cur_user.id,
+        cur_user.email,
+        cur_user.full_name,
         v_start,
         v_start + (v_duration || ' seconds')::interval,
         v_duration,
@@ -106,7 +106,7 @@ BEGIN
     -- Cập nhật ngày đăng nhập gần nhất trong auth.users
     UPDATE auth.users
     SET last_sign_in_at = v_last_login
-    WHERE id = u.id AND (last_sign_in_at IS NULL OR last_sign_in_at < v_last_login);
+    WHERE id = cur_user.id AND (last_sign_in_at IS NULL OR last_sign_in_at < v_last_login);
 
   END LOOP;
 
@@ -128,8 +128,8 @@ BEGIN
   WHERE p.id = sub.user_id;
 
   -- 4. Đồng bộ vào raw_user_meta_data của auth.users
-  UPDATE auth.users u
-  SET raw_user_meta_data = COALESCE(raw_user_meta_data, '{}'::jsonb) || jsonb_build_object(
+  UPDATE auth.users au
+  SET raw_user_meta_data = COALESCE(au.raw_user_meta_data, '{}'::jsonb) || jsonb_build_object(
     'total_time_spent', COALESCE(sub.total_min, 0) || ' phút (' || ROUND((sub.total_min / 60.0), 1) || ' giờ)',
     'total_sessions', COALESCE(sub.sess_count, 0)
   )
@@ -141,7 +141,7 @@ BEGIN
     FROM public.user_sessions
     GROUP BY user_id
   ) sub
-  WHERE u.id = sub.user_id;
+  WHERE au.id = sub.user_id;
 
   RAISE NOTICE 'Đã tăng số phiên và thời gian sử dụng thành công!';
 END $$;
