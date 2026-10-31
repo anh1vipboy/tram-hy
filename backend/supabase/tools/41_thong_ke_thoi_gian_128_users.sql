@@ -210,8 +210,8 @@ ORDER BY "Số phiên" DESC;
 -- VIEW 4: BẢNG CHI TIẾT 128 NGƯỜI DÙNG & THỜI GIAN SỬ DỤNG (QUALIFIED DETAIL)
 CREATE OR REPLACE VIEW public.view_chi_tiet_128_users_thoi_gian AS
 SELECT
-  u.full_name AS "Họ và Tên",
-  u.email AS "Email",
+  s.full_name AS "Họ và Tên",
+  s.email AS "Email",
   COUNT(s.id) AS "Số phiên truy cập",
   ROUND(SUM(s.duration_seconds)::numeric / 60.0, 1) AS "Tổng thời gian (Phút)",
   ROUND(AVG(s.duration_seconds)::numeric / 60.0, 1) AS "Thời lượng TB/phiên (Phút)",
@@ -223,6 +223,5 @@ SELECT
     ELSE '⏳ Tiềm năng'
   END AS "Đánh giá đạt chuẩn"
 FROM public.user_sessions s
-JOIN public.profiles u ON u.id = s.user_id
-GROUP BY u.full_name, u.email
+GROUP BY s.full_name, s.email
 ORDER BY "Tổng thời gian (Phút)" DESC;
