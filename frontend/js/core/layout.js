@@ -4,6 +4,7 @@ import { $, html, render, initials } from './utils.js';
 import { sb } from './supabase.js';
 import { mountNotificationBell } from '../components/notification-bell.js';
 import { getUrgentBookingAlert } from '../services/bookings.js';
+import { startUserSessionTracking } from '../services/tracking.js';
 
 // Tải trước trang đích khi người dùng rê chuột (máy tính) hoặc chạm tay (điện thoại) vào liên kết điều hướng
 function injectSpeculationRules() {
@@ -209,6 +210,7 @@ export async function initLayout(activePage) {
   }
   if (profile && activePage !== 'login') {
     mountUrgentAlertBanner(profile, activePage);
+    startUserSessionTracking(profile, activePage);
   }
   if (activePage !== 'login') watchAccountSwitch(profile);
 
