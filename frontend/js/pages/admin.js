@@ -612,6 +612,7 @@ function renderAiOrders() {
   const totalRevenue = orders.filter((o) => o.status === 'paid').reduce((t, o) => t + (o.amount || 0), 0);
   const paidCount = orders.filter((o) => o.status === 'paid').length;
   const pendingCount = orders.filter((o) => o.status === 'pending').length;
+  const cancelledCount = orders.filter((o) => o.status === 'cancelled').length;
 
   render(container, html`
     <div class="stack" style="gap:14px">
@@ -622,6 +623,7 @@ function renderAiOrders() {
               ['all', `Tất cả (${orders.length})`],
               ['paid', `Đã kích hoạt (${paidCount})`],
               ['pending', `Chờ thanh toán (${pendingCount})`],
+              ['cancelled', `Thất bại / Hết hạn (${cancelledCount})`],
             ].map(([k, lbl]) => html`
               <button type="button" class="chip ${aiOrderFilter.state === k ? 'active' : ''}" data-aifilter="${k}">${lbl}</button>`)}
           </div>
@@ -706,17 +708,17 @@ function renderAiOrders() {
                         ? html`<span class="badge badge-green">✓ Đã kích hoạt</span>`
                         : o.status === 'pending'
                         ? html`<span class="badge badge-gold">⏳ Chờ thanh toán</span>`
-                        : html`<span class="badge badge-gray">Đã hủy</span>`}
+                        : html`<span class="badge" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;font-weight:600">✕ Thất bại (Hết hạn)</span>`}
                     </td>
                     <td class="small">
                       ${dateTime(o.created_at)}
                       ${o.paid_at ? html`<div class="small muted">Duyệt: ${dateTime(o.paid_at)}</div>` : ''}
                     </td>
                     <td>
-                      ${!isPaid && o.status === 'pending' ? html`
+                      ${!isPaid ? html`
                         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
                           <button type="button" class="btn btn-primary btn-sm" data-confirm-order="${o.code}">
-                            ✨ Kích hoạt
+                            ${o.status === 'cancelled' ? '✨ Kích hoạt bù' : '✨ Kích hoạt'}
                           </button>
                           <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger, #c62828);border-color:#f0b2b2;padding:4px 8px" data-delete-order="${o.code}" title="Xóa đơn này">
                             🗑 Xóa

@@ -1,7 +1,14 @@
 // Modal Bảng Giá & Nâng Cấp Gói AI Studio (Chuẩn Soft Luxury & Editorial)
 import { $, html, render, money } from '../core/utils.js';
 import { openSheet, toast, toastError } from '../core/ui.js';
-import { listSubscriptionPlans, createSubscriptionOrder, activateSubscription, getMySubscription } from '../services/subscription.js';
+import {
+  listSubscriptionPlans,
+  createSubscriptionOrder,
+  activateSubscription,
+  watchSubscriptionOrder,
+  cancelSubscriptionOrder,
+  getMySubscription,
+} from '../services/subscription.js';
 
 // Hiệu ứng pháo hoa ăn mừng (Pure CSS/DOM, không phụ thuộc thư viện)
 function fireConfetti(root) {
@@ -105,14 +112,31 @@ export function openPromoDialog({ onUpgrade } = {}) {
 export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } = {}) {
   const plans = await listSubscriptionPlans();
 
+  let activeOrder = null;
+  let unsubscribeWatch = null;
+  let countdownTimer = null;
+
+  function stopListeners() {
+    if (countdownTimer) {
+      clearInterval(countdownTimer);
+      countdownTimer = null;
+    }
+    if (unsubscribeWatch) {
+      unsubscribeWatch();
+      unsubscribeWatch = null;
+    }
+  }
+
   openSheet({
     title: 'Gói Cước AI Thử Váy Cưới',
     className: 'pricing-sheet',
+    onClose: () => {
+      stopListeners();
+    },
     onOpen: (body, close) => {
-      let activeOrder = null;
-
       // Vẽ màn hình danh sách gói
       function renderPlansView() {
+        stopListeners();
         render(body, html`
           <div class="pricing-container">
             <header class="pricing-header">
@@ -171,7 +195,7 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
 
             <div class="pricing-trust">
               <span class="trust-item">🔒 Thanh toán bảo mật qua VietQR ngân hàng</span>
-              <span class="trust-item">⚡ Tự động kích hoạt ngay trong 5 giây</span>
+              <span class="trust-item">⚡ Tự động kích hoạt ngay trong 3–5 giây</span>
               <span class="trust-item">💖 Hỗ trợ tận tâm từ Trạm Hỷ</span>
             </div>
           </div>
@@ -188,7 +212,7 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
           }
 
           btn.disabled = true;
-          btn.textContent = 'Đang khởi tạo...';
+          btn.textContent = 'Đang khởi tạo mã QR...';
           try {
             activeOrder = await createSubscriptionOrder(planId);
             renderQrView(activeOrder);
@@ -200,8 +224,10 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
         });
       }
 
-      // Vẽ màn hình thanh toán VietQR
+      // Vẽ màn hình thanh toán VietQR với kênh Realtime & đồng hồ 15 phút
       function renderQrView(order) {
+        stopListeners();
+
         const qrUrl = `https://img.vietqr.io/image/TPB-0355521617-compact2.png?amount=${order.amount}&addInfo=${encodeURIComponent(order.code)}&accountName=PHUNG%20DUC%20ANH`;
 
         render(body, html`
@@ -209,11 +235,11 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
             <button type="button" class="btn-back" data-back-to-plans>← Chọn gói khác</button>
             <div class="qr-checkout-card">
               <div class="qr-col-left">
-                <div class="qr-badge">Quét mã VietQR để kích hoạt ngay</div>
+                <div class="qr-badge">Quét mã VietQR để kích hoạt tự động</div>
                 <div class="qr-image-box">
                   <img src="${qrUrl}" alt="Mã thanh toán VietQR" class="qr-img">
                 </div>
-                <div class="qr-note">Hỗ trợ tất cả ứng dụng Ngân hàng & Ví điện tử (TPBank, MB, VCB, MoMo...)</div>
+                <div class="qr-note">Mở App ngân hàng bất kỳ (TPBank, Vietcombank, MB, Techcombank, MoMo...) quét mã</div>
               </div>
 
               <div class="qr-col-right">
@@ -252,44 +278,135 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
                 </div>
 
                 <div class="qr-actions">
-                  <button type="button" class="btn btn-primary btn-confirm-pay" data-confirm-paid>
-                    ✨ Tôi đã chuyển khoản thành công
-                  </button>
-                  <p class="qr-hint">Hệ thống sẽ cộng credit và mở khóa ngay lập tức</p>
+                  <div class="qr-auto-status" data-auto-status>
+                    <div class="qr-status-indicator">
+                      <div class="radar-pulse" aria-hidden="true">
+                        <span class="radar-circle"></span>
+                        <span class="radar-circle"></span>
+                        <span class="radar-dot"></span>
+                      </div>
+                      <div class="qr-status-details">
+                        <div class="qr-status-headline">Đang tự động nhận diện thanh toán...</div>
+                        <div class="qr-status-subline">
+                          Hệ thống sẽ tự động nổ pháo hoa và kích hoạt gói cước ngay khi nhận được chuyển khoản từ App ngân hàng.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="qr-timer-pill">
+                      <span class="timer-icon" aria-hidden="true">⏱️</span>
+                      <span>Mã QR có hiệu lực trong: <strong class="qr-countdown" data-countdown>15:00</strong></span>
+                    </div>
+                  </div>
+
+                  <div class="qr-footer-actions" data-footer-actions>
+                    <button type="button" class="btn-troubleshoot-check" data-confirm-paid>
+                      Đã chuyển tiền nhưng chưa thấy kích hoạt? Bấm vào đây để kiểm tra lại
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         `);
 
-        // Gắn sự kiện màn hình QR
-        body.querySelector('[data-back-to-plans]')?.addEventListener('click', renderPlansView);
-
+        // Gắn sự kiện chép nội dung & số tài khoản
         body.querySelectorAll('[data-copy]').forEach((el) => {
           el.addEventListener('click', () => {
             const val = el.dataset.copy;
-            navigator.clipboard.writeText(val).then(() => toast('Đã sao chép vào bộ nhớ tạm!'));
+            navigator.clipboard.writeText(val).then(() => toast(`Đã sao chép: ${val}`));
           });
         });
 
+        // Nút quay lại chọn gói
+        body.querySelector('[data-back-to-plans]')?.addEventListener('click', () => {
+          renderPlansView();
+        });
+
+        // 1. Khởi động đồng hồ đếm ngược 15 phút (900 giây)
+        let secondsLeft = 15 * 60;
+        const countdownEl = body.querySelector('[data-countdown]');
+        const statusBox = body.querySelector('[data-auto-status]');
+        const footerActions = body.querySelector('[data-footer-actions]');
         const confirmBtn = body.querySelector('[data-confirm-paid]');
+
+        countdownTimer = setInterval(async () => {
+          secondsLeft--;
+          if (secondsLeft <= 0) {
+            stopListeners();
+            // Cập nhật trạng thái đơn thành 'cancelled' (Thất bại / Hết hạn) trong DB
+            await cancelSubscriptionOrder(order.code);
+            if (countdownEl) countdownEl.textContent = '00:00';
+            if (statusBox) {
+              statusBox.classList.add('status-expired');
+              render(statusBox, html`
+                <div class="qr-status-indicator">
+                  <span style="font-size: 22px;" aria-hidden="true">⏱️</span>
+                  <div class="qr-status-details">
+                    <div class="qr-status-headline" style="color: var(--danger, #c62828);">Mã QR đã hết hạn (15 phút)</div>
+                    <div class="qr-status-subline">Giao dịch chưa hoàn tất đã tự động chuyển sang trạng thái <strong>Thất bại (Hết hạn)</strong> trên hệ thống.</div>
+                  </div>
+                </div>
+              `);
+            }
+            if (footerActions) {
+              render(footerActions, html`
+                <button type="button" class="btn btn-recreate-qr" data-recreate-qr>
+                  🔄 Tạo mã QR thanh toán mới
+                </button>
+              `);
+              footerActions.querySelector('[data-recreate-qr]')?.addEventListener('click', async () => {
+                try {
+                  activeOrder = await createSubscriptionOrder(order.plan.id);
+                  renderQrView(activeOrder);
+                } catch (err) {
+                  toastError(err);
+                }
+              });
+            }
+            return;
+          }
+
+          const m = Math.floor(secondsLeft / 60);
+          const s = secondsLeft % 60;
+          if (countdownEl) {
+            countdownEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+          }
+        }, 1000);
+
+        // 2. Kênh lắng nghe Supabase Realtime (nhận webhook biến động ngân hàng tự động)
+        unsubscribeWatch = watchSubscriptionOrder(order.code, async () => {
+          stopListeners();
+          toast('Thanh toán thành công! Gói cước đã được kích hoạt ✨');
+          const freshSub = await getMySubscription();
+          renderSuccessView(freshSub?.has_subscription ? freshSub : {
+            plan_id: order.plan.id,
+            plan_name: order.plan.name,
+            daily_credits: order.plan.daily_credits,
+            bonus_credits: order.plan.bonus_credits,
+          });
+        });
+
+        // 3. Nút kiểm tra thủ công phụ (dành cho trường hợp khách chuyển tiền muộn hoặc kiểm tra lại)
         confirmBtn?.addEventListener('click', async () => {
           confirmBtn.disabled = true;
-          confirmBtn.textContent = 'Đang kiểm tra giao dịch...';
+          confirmBtn.textContent = 'Đang kiểm tra biến động số dư ngân hàng...';
           try {
             const res = await activateSubscription(order);
-            renderSuccessView(res);
+            stopListeners();
+            const freshSub = await getMySubscription();
+            renderSuccessView(freshSub?.has_subscription ? freshSub : res);
           } catch (err) {
             toastError(err);
             confirmBtn.disabled = false;
-            confirmBtn.textContent = '✨ Tôi đã chuyển khoản thành công';
+            confirmBtn.textContent = 'Đã chuyển tiền nhưng chưa thấy kích hoạt? Bấm vào đây để kiểm tra lại';
           }
         });
       }
 
       // Vẽ màn hình chúc mừng nâng cấp thành công
       function renderSuccessView(res) {
-        fireConfetti(body);
+        stopListeners();
         render(body, html`
           <div class="pricing-success-view">
             <div class="success-icon" aria-hidden="true">🎉</div>
@@ -308,10 +425,12 @@ export async function openPricingModal({ currentPlanId = 'basic', onUpgraded } =
             </button>
           </div>
         `);
+        fireConfetti(body);
 
-        body.querySelector('[data-start-tryon]')?.addEventListener('click', () => {
+        body.querySelector('[data-start-tryon]')?.addEventListener('click', async () => {
           close();
-          onUpgraded?.(res);
+          const freshSub = await getMySubscription();
+          onUpgraded?.(freshSub?.has_subscription ? freshSub : res);
         });
       }
 

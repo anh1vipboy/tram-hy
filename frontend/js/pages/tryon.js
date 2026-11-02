@@ -1006,3 +1006,43 @@ renderComposer();
 scrollToEnd('auto');
 if (param('chon-vay')) openDressPicker('catalog');
 else if (param('mode') === 'own') openDressPicker('own');
+
+// Lắng nghe tự động cập nhật gói cước khi đơn hàng được duyệt hoặc thanh toán thành công
+if (state.profile?.id) {
+  import('../core/supabase.js').then(({ sb }) => {
+    sb.channel(`sub-sync-${state.profile.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'user_subscriptions',
+        filter: `user_id=eq.${state.profile.id}`,
+      }, async () => {
+        const freshSub = await getMySubscription();
+        if (freshSub?.has_subscription) {
+          state.subscription = freshSub;
+          state.settings.dailyCredits = freshSub.daily_credits;
+          state.settings.maxEnabled = true;
+          state.remaining = Math.max(state.remaining || 0, freshSub.daily_credits);
+          renderComposer();
+        }
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'subscription_orders',
+        filter: `user_id=eq.${state.profile.id}`,
+      }, async (payload) => {
+        if (payload.new?.status === 'paid') {
+          const freshSub = await getMySubscription();
+          if (freshSub?.has_subscription) {
+            state.subscription = freshSub;
+            state.settings.dailyCredits = freshSub.daily_credits;
+            state.settings.maxEnabled = true;
+            state.remaining = Math.max(state.remaining || 0, freshSub.daily_credits);
+            renderComposer();
+          }
+        }
+      })
+      .subscribe();
+  });
+}

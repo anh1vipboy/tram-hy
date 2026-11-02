@@ -736,9 +736,145 @@ dialog.promo-dialog::backdrop {
 .btn-copy:hover { border-color: var(--brand); color: var(--brand); }
 .btn-copy:active { transform: scale(0.96); }
 
-.qr-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
-.btn-confirm-pay { width: 100%; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 12px; }
-.qr-hint { font-size: 11.5px; color: var(--muted); text-align: center; margin: 0; }
+.qr-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+
+.qr-auto-status {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(155, 35, 53, 0.05) 0%, rgba(155, 35, 53, 0.02) 100%);
+  border: 1px solid rgba(155, 35, 53, 0.16);
+  transition: all 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.qr-auto-status.status-expired {
+  background: rgba(42, 36, 33, 0.04);
+  border-color: var(--line);
+}
+
+.qr-status-indicator {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.radar-pulse {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radar-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brand);
+  z-index: 2;
+}
+
+.radar-circle {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--brand);
+  animation: radar-sweep 2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.radar-circle:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+@keyframes radar-sweep {
+  0% { transform: scale(0.4); opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+.qr-status-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.qr-status-headline {
+  font: 700 13.5px var(--font-body);
+  color: var(--brand);
+  margin-bottom: 3px;
+  letter-spacing: -0.1px;
+}
+
+.qr-status-subline {
+  font: 400 12px/1.45 var(--font-body);
+  color: var(--muted);
+}
+
+.qr-timer-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(155, 35, 53, 0.06);
+  font: 500 12px var(--font-body);
+  color: var(--ink);
+}
+
+.qr-countdown {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--brand);
+  letter-spacing: 0.5px;
+}
+
+.btn-troubleshoot-check {
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  font: 500 12px var(--font-body);
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: rgba(125, 110, 103, 0.4);
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.18s ease;
+  width: 100%;
+}
+
+.btn-troubleshoot-check:hover {
+  color: var(--brand);
+  text-decoration-color: var(--brand);
+}
+
+.btn-troubleshoot-check:active {
+  transform: scale(0.98);
+}
+
+.btn-recreate-qr {
+  width: 100%;
+  padding: 11px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--brand);
+  color: var(--brand);
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-recreate-qr:hover {
+  background: rgba(155, 35, 53, 0.06);
+}
+
+.btn-recreate-qr:active {
+  transform: scale(0.98);
+}
 
 /* ---------- MÀN HÌNH CHÚC MỪNG NÂNG CẤP THÀNH CÔNG ---------- */
 .pricing-success-view { text-align: center; padding: 36px 20px; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px; }
