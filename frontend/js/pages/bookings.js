@@ -3,11 +3,11 @@ import { requireAuth } from '../core/auth.js';
 import { $, html, render, money, param, dateTime, debounce } from '../core/utils.js';
 import { BOOKING_STATUS, BOOKING_TYPE, VENDOR_CATEGORY, statusBadge } from '../core/labels.js';
 import { openDialog, toast, toastError, focusFromUrl } from '../core/ui.js';
-import { ESCROW_BANK } from '../config.js';
 import {
   listMyBookings, payMilestone, releaseMilestone, openDispute, addReview, subscribeBookingChanges,
 } from '../services/bookings.js';
 import { milestonesView, detailsView, openDisputeView, bindDisputeActions } from '../components/booking-card.js';
+import { openEscrowPaymentModal } from '../components/escrow-modal.js';
 
 const CLOSED = ['disputed', 'cancelled', 'refunded', 'completed'];
 const DISPUTABLE = ['confirmed', 'in_progress', 'ready_for_review'];
@@ -74,24 +74,15 @@ function milestoneAction(booking, milestone) {
 }
 
 const ACTIONS = {
-  async pay(booking, stage) {
-    const milestone = booking.milestones.find((m) => m.stage === stage);
-    const transferNote = `${booking.code} D${stage}`;
-    const qr = `https://img.vietqr.io/image/${ESCROW_BANK.bankId}-${ESCROW_BANK.accountNo}-compact2.png`
-      + `?amount=${milestone.amount}&addInfo=${encodeURIComponent(transferNote)}&accountName=${encodeURIComponent(ESCROW_BANK.accountName)}`;
-    const done = await openDialog({
-      title: `Thanh toán đợt ${stage} – ${money(milestone.amount)}`,
-      confirmText: 'Tôi đã chuyển khoản',
-      content: html`
-        <div class="stack center">
-          <img src="${qr}" alt="Mã VietQR" style="width:220px;margin:0 auto;border-radius:12px">
-          <div>Nội dung chuyển khoản: <strong>${transferNote}</strong></div>
-          <p class="small muted">Tiền chuyển vào tài khoản bảo chứng của Trạm Hỷ, chưa chuyển cho đối tác.
-            (Bản demo: bấm xác nhận để ghi nhận thanh toán. Khi tích hợp cổng thanh toán, hệ thống tự xác nhận.)</p>
-        </div>`,
-      onConfirm: () => payMilestone(booking.id, stage),
+  pay(booking, stage) {
+    openEscrowPaymentModal({
+      booking,
+      stage,
+      onPaid: () => {
+        toast(`Đã xác nhận thanh toán đợt ${stage}. Trạm Hỷ đang bảo chứng an toàn.`, 'success');
+        load();
+      },
     });
-    if (done) { toast(`Đã ghi nhận thanh toán đợt ${stage}. Trạm Hỷ đang giữ tiền.`, 'success'); load(); }
   },
 
   async release(booking, stage) {
