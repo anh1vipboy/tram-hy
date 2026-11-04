@@ -1330,7 +1330,12 @@ function renderAiOrders() {
                             🗑 Xóa
                           </button>
                         </div>` : html`
-                        <span class="small muted" style="color:#2e7d32">Hoàn tất</span>`}
+                        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                          <span class="small muted" style="color:#2e7d32">Hoàn tất</span>
+                          <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger, #c62828);border-color:#f0b2b2;padding:2px 8px;font-size:11.5px" data-delete-order="${o.code}" title="Xóa đơn test này">
+                            🗑 Xóa
+                          </button>
+                        </div>`}
                     </td>
                   </tr>`;
               })}
@@ -1421,10 +1426,13 @@ function renderAiOrders() {
   container.querySelectorAll('[data-delete-order]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const code = btn.dataset.deleteOrder;
+      const order = (data.aiOrders || []).find((o) => o.code === code);
+      const isPaid = order?.status === 'paid';
       const done = await openDialog({
         title: `Xóa đơn hàng ${code}?`,
         confirmText: 'Xác nhận xóa',
-        content: html`<p>Đơn hàng này chưa thanh toán. Bạn có chắc chắn muốn xóa bản ghi này khỏi cơ sở dữ liệu không?</p>`,
+        content: html`<p>Bạn có chắc chắn muốn xóa đơn hàng <strong>${code}</strong> (${order?.user?.full_name || 'Khách'}, ${money(order?.amount || 0)}) khỏi cơ sở dữ liệu không?</p>
+          ${isPaid ? html`<p class="small text-danger" style="color:#c62828">⚠️ Lưu ý: Đây là đơn đã kích hoạt. Xóa đơn này sẽ loại bỏ bản ghi này khỏi danh sách và cập nhật lại doanh thu.</p>` : ''}`,
       });
       if (!done) return;
       withBusy(btn, async () => {
