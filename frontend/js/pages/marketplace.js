@@ -174,14 +174,15 @@ function bindFilters() {
 
 function renderViewTabs() {
   const items = [
-    ['vendors',  'Đối tác',      vendors.length],
-    ['dresses',  'Mẫu váy cưới', dresses.length],
-    ['packages', 'Gói dịch vụ',  packages.length],
+    ['vendors',  'Đối tác',      vendors.length,  'Đối tác'],
+    ['dresses',  'Mẫu váy cưới', dresses.length,  'Váy cưới'],
+    ['packages', 'Gói dịch vụ',  packages.length, 'Dịch vụ'],
   ];
-  render($('#view-tabs'), items.map(([key, label, count]) => html`
+  render($('#view-tabs'), items.map(([key, label, count, shortLabel]) => html`
     <button class="tab ${filters.view === key ? 'active' : ''}" type="button" role="tab"
             data-view="${key}" aria-selected="${filters.view === key}">
-      <span>${label}</span>
+      <span class="tab-label-full">${label}</span>
+      <span class="tab-label-short">${shortLabel}</span>
       ${count ? html`<span class="tab-badge">${count}</span>` : ''}
     </button>`));
 }
