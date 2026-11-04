@@ -80,6 +80,14 @@ exe202/
 │   ├── 32_welcome_email_signup.sql Email chào mừng cả cho người đăng ký bằng email (gửi lúc vừa xác nhận); bảng welcome_emails chống gửi 2 lần
 │   ├── 33_plan_share.sql     Chia sẻ kế hoạch cưới bằng link chỉ xem: bảng wedding_plan_shares (không mở cho API), RPC my_plan_share / set_plan_share / rotate_plan_share (chủ kế hoạch), get_shared_plan(token) cho khách không đăng nhập
 │   ├── 34_tryon_credit_hold.sql Giữ chỗ credit thử váy AI trước khi gọi API (trạng thái 'pending', RPC reserve_tryon_credits) – chống vượt hạn mức khi mở nhiều tab đồng thời
+│   ├── 35_subscription_tiers.sql Gói cước AI Studio (Cơ bản, Nâng cao, VIP) + lịch sử nạp gói
+│   ├── 36_update_plan_prices.sql Cập nhật giá gói cước AI Studio chuẩn thương mại
+│   ├── 37_ai_tryon_toggle.sql Công tắc Admin bật/tắt toàn bộ tính năng thử váy AI
+│   ├── 38_admin_delete_subscription_order.sql Hàm xóa đơn gói cước test cho Admin
+│   ├── 39_subscription_realtime.sql Realtime kích hoạt gói cước tức thì
+│   ├── 40_fix_subscription_auto_activation.sql Tự động kích hoạt khi webhook chuyển khoản thành công
+│   ├── 41_booking_payment_realtime.sql Đồng bộ thanh toán cọc Escrow realtime
+│   ├── 42_shopping_cart.sql  Giỏ hàng dịch vụ cưới: bảng cart_items, RLS cá nhân hóa, cascade xóa theo váy/gói/user
 │   ├── email-templates/      Mẫu email Supabase Auth tiếng Việt (xác nhận đăng ký, đặt lại mật khẩu, đổi email, magic link) + HUONG_DAN.md cách dán
 │   ├── functions/_shared/cors.ts       CORS và kiểm tra an toàn URL chung (chỉ cho SITE_URL, localhost; chống SSRF isSafeImageUrl)
 │   ├── functions/excel-dong-bo/        Edge Function cấp dữ liệu đồng bộ CSV thời gian thực & lưu bản sao .xlsx
@@ -620,4 +628,75 @@ Các mục dùng **Edge Function** là việc bắt buộc chạy ở server (c�
    * Xuất file `thong-ke-thoi-gian-276-users-tram-hy.xlsx` (276 dòng).
    * Xuất file `bang-tong-hop-kpi-user-tram-hy.xlsx` (bảng KPI môn học).
    * Tích hợp Sheet 6 vào sổ cái tài chính toàn sàn `doi-soat-doanh-thu-tram-hy.xlsx`.
+
+---
+
+## 11. Hệ Thống Giỏ Hàng Cưới, Tinh Chỉnh Giao Diện Thẻ Sản Phẩm Mobile & Căn Chỉnh Header
+
+> *Cập nhật ngày 05/11/2026 – Hoàn thiện tính năng thương mại điện tử, tối ưu trải nghiệm di động (Mobile UX) và chuẩn hóa thẩm mỹ Soft Luxury theo quy tắc AGENTS.md.*
+
+### 1. Tính năng Giỏ hàng cưới (Shopping Cart) & Đặt lịch gộp (Batch Booking)
+- **Database (`backend/supabase/42_shopping_cart.sql`)**:
+  - Bảng `public.cart_items`: lưu trữ món hàng trong giỏ của người dùng (`item_type`: `dress`, `package`, `vendor`), liên kết khóa ngoại với bảng sản phẩm tương ứng.
+  - Phân quyền Row Level Security (RLS): người dùng chỉ xem, thêm, sửa, xóa các món trong giỏ của chính mình (`auth.uid() = user_id`).
+  - Hỗ trợ ràng buộc khóa ngoại `ON DELETE CASCADE`: khi tiệm xóa váy hoặc gói dịch vụ, món hàng tương ứng tự động được dọn dẹp khỏi giỏ hàng.
+- **Service (`frontend/js/services/cart.js`)**:
+  - Cơ chế Dual-Storage linh hoạt: Người dùng chưa đăng nhập lưu giỏ tạm trên `sessionStorage`. Khi đăng nhập, hệ thống tự động đồng bộ gộp các món tạm vào tài khoản Supabase.
+  - Phát sự kiện tùy biến toàn cục `tramhy:cart-change` và `tramhy:cart-added` để cập nhật huy hiệu số lượng trên Header và các nút trạng thái trên thẻ ngay tức thì.
+- **Thành phần giao diện Giỏ hàng (`frontend/js/components/cart-drawer.js`)**:
+  - Panel trượt mượt mà cạnh phải (Desktop) hoặc tấm trượt từ đáy màn hình (Mobile) với `backdrop-filter: blur(10px)`.
+  - Hiển thị danh sách món đã thêm: ảnh thu nhỏ, tên dịch vụ, tên tiệm cưới, giá tiền định dạng `tabular-nums`, ô điều chỉnh số lượng.
+  - Tính tổng thanh toán và ghi chú bảo chứng Escrow 3 đợt minh bạch.
+  - Hỗ trợ **Đặt lịch từng món** hoặc **Đặt lịch gộp thông minh (Batch Booking)**: tự động điền chung Ngày/Giờ hẹn, SĐT liên hệ, chia đơn bảo chứng tương ứng cho từng tiệm đối tác và xóa khỏi giỏ sau khi đặt thành công.
+- **Nút Giỏ hàng trên Header (`frontend/js/core/layout.js`)**:
+  - Icon giỏ hàng SVG `fill="currentColor"` đồng nhất với icon chuông thông báo.
+  - Huy hiệu số lượng màu đỏ nổi bật với hiệu ứng nhịp tim `badge-pop` khi thêm món mới.
+- **Nút Chốt đơn trực tiếp trên thẻ sản phẩm**:
+  - Bổ sung nút `[ Đặt thuê ngay ]` / `[ Đặt may ngay ]` / `[ Đặt gói này ]` ngay trên thẻ váy cưới và gói dịch vụ (`marketplace.js`, `vendor.js`). Khách hàng có thể đặt cọc bảo chứng trực tiếp mà không bắt buộc phải qua bước thử váy AI.
+
+### 2. Tinh chỉnh Thẻ sản phẩm & Chống vỡ giao diện trên Điện thoại (Mobile 2 cột)
+- **Cấu trúc nút 2 hàng cố định (`.card-actions`)**:
+  - Khắc phục triệt để lỗi 4 nút bấm (`Đặt thuê`, `🛒`, `+ Ngân sách`, `⚖`) bị vỡ thành 4 tầng riêng biệt trên cột hẹp mobile (~160px–175px).
+  - Tái cấu trúc thành 2 hàng cố định dùng `flex-wrap: nowrap`:
+    - **Hàng 1 (Chốt đơn & Giỏ hàng):** Nút chính `[ Đặt thuê ngay ]` (`flex: 1`, bo tròn 999px) + Nút `[ 🛒 ]` (`flex: none`, rộng 34px–38px).
+    - **Hàng 2 (Tiện ích & So sánh):** Nút `[ + Ngân sách ]` (`flex: 1`, viền mảnh) + Nút `[ ⚖ ]` (`flex: none`, rộng 28px–32px).
+    - Chiều cao cụm nút giảm từ hơn **160px** xuống chỉ còn **~66px**, giữ khoảng thở thanh lịch chuẩn Soft Luxury.
+- **Tách biệt 3 góc trên ảnh thẻ váy cưới**:
+  - Góc trên bên trái: Huy hiệu `Giảm N%` (màu đỏ đô thương hiệu `#9b2335`).
+  - Góc trên bên phải: Nhãn số lượng ảnh `N ảnh` (kính mờ nâu trầm `rgba(42, 36, 33, .72)`).
+  - Góc dưới bên trái: Nút nổi `✨ Thử AI` (trên mobile tự động rút ngắn thành `✨ Thử AI`, font `10.5px`, padding `3px 8px`).
+  - Góc dưới bên phải: Hoàn toàn thông thoáng, không còn hiện tượng nút nổi đè lên chữ số ảnh.
+- **Tối ưu nhãn thẻ (Badges)**:
+  - Bỏ nhãn `Thuê sẵn` mặc định trên toàn bộ thẻ váy cưới (chỉ giữ `May đo` cho các mẫu bespoke).
+  - Giảm khoảng cách và kích thước badge trên mobile (`gap: 3px`, `font-size: 10px`), triệt tiêu hiện tượng nhãn rớt thành 3–4 dòng làm phình thẻ.
+  - Bảo vệ chống rớt chữ đơn lẻ (`white-space: nowrap !important; word-break: keep-all;`), xóa bỏ lỗi rớt chữ "AI" xuống dòng thứ hai trên Desktop.
+
+### 3. Tối ưu Thanh chuyển chế độ xem (`#view-tabs`) & Giải phóng diện tích hiển thị Mobile
+- **Khóa cố định vị trí (`position: static !important`)**:
+  - Đảm bảo thanh tab 3 chế độ xem (`Đối tác`, `Váy cưới`, `Gói dịch vụ`) trôi tự nhiên theo nội dung trang khi cuộn, **tuyệt đối không dính theo / không scroll theo màn hình** trên cả máy tính và điện thoại.
+- **Segmented Control siêu mỏng nhẹ trên Mobile**:
+  - Chiều cao thanh tab giảm từ gần **60px** xuống chỉ còn **~34px**, bo tròn mềm mại `999px`, nền kem `#f4ece3`.
+  - Nhãn tab thích ứng thông minh: Trên mobile hiển thị ngắn gọn `Đối tác 47` · `Váy cưới 21` · `Dịch vụ 86`, không bao giờ bị bẻ dòng thành `Mẫu váy` / `cưới`.
+- **Dải Chips danh mục dịch vụ cưới cuộn ngang 1 dòng**:
+  - 8 danh mục dịch vụ (`Tất cả`, `Váy cưới`, `Chụp ảnh cưới`...) chuyển từ việc rớt thành 4 dòng (chiếm 150px) sang **cuộn ngang cảm ứng 1 dòng mượt mà (`height: 30px`)**, tiết kiệm hơn 110px chiều cao màn hình.
+- **Thu gọn phần giới thiệu đầu trang (`section-head`)**:
+  - Giảm font tiêu đề `h1` xuống `19px`, thu gọn đoạn mô tả và giảm padding đỉnh trang.
+  - Giải phóng hơn **60% diện tích choán chỗ trên màn hình điện thoại**, giúp sản phẩm xuất hiện ngay trong khung hình đầu tiên (Above The Fold) khi mở trang.
+
+### 4. Sửa lỗi mất chữ trên Header Desktop & Căn chỉnh cân đối
+- **Nguyên nhân lỗi cũ**:
+  - Khung Header dùng chung class `.container` bị giới hạn ở `1.180px`.
+  - Khi người dùng đăng nhập tài khoản có tên dài (*"Phạm Hoàng Nam"*) kèm mục *"Đơn của tôi"* và nút Giỏ hàng mới thêm, tổng chiều rộng vượt quá 1.220px, khiến thẻ menu nav bị cắt cụt đuôi chữ mục cuối cùng thành *"Đơn củ"*.
+- **Cải tiến và căn chỉnh lại**:
+  - **Mở rộng khung Header lên `1.360px`**: Cho phép `.site-header .container` đạt `width: min(1360px, 100%)`, tạo không gian rộng rãi cho toàn bộ 7 mục menu và cụm công cụ.
+  - **Bố cục cân đối (`justify-content: space-between`)**: Brand cố định bên trái, User-area cố định bên phải, Menu nav căn giữa hoàn hảo. Chữ *"Đơn của tôi"* hiển thị trọn vẹn 100%.
+  - **Cơ chế Responsive 4 tầng linh hoạt**:
+    - `≥ 1.340px`: Hiển thị đầy đủ menu và tên tài khoản.
+    - `1.160px – 1.340px`: Tự động ẩn các hậu tố dài (`váy`, `cưới`), thu gọn tên nhẹ nhàng.
+    - `< 1.160px`: Thu gọn tên người dùng thành Avatar tròn `[PH]` tinh tế (chuẩn Shopee/Google).
+    - `< 820px`: Menu nav chuyển thành thanh tabbar đáy di động.
+
+### 5. Kết quả Kiểm thử Tự động (Playwright E2E)
+- Toàn bộ **67 bài kiểm thử E2E** (`cart.spec.js`, `catalog.spec.js`, `pages.spec.js`): **100% PASSED** trên cả thiết bị di động (Pixel 7 / iPhone 14) và máy tính (Desktop Chrome).
+- Không có lỗi tràn màn hình ngang (No horizontal overflow) và không có lỗi Console trên toàn bộ các trang.
 
