@@ -11,9 +11,11 @@ import { vendorLogo } from '../components/vendor-logo.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
 import { packageThumbButton, bindPackageGalleries, packagePrice } from '../components/package-card.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
+import { isInCart, toggleCartItem, subscribeCart } from '../services/cart.js';
+import { dressThumb } from '../data/tryon-data.js';
 
 const HOT_DRESS_REGEX = /alina|song hỷ|hàn quốc|pha lê royal|camile|bellis|triều nguyễn|mikado/i;
-const isHotDress = (d) => (d.photos?.[0]?.count ?? 0) >= 3 || discountPercent(d) >= 20 || HOT_DRESS_REGEX.test(d.name);
+const isHotDress = (d) => (d.photos?.[0]?.count ?? d.photos?.length ?? 0) >= 3 || discountPercent(d) >= 20 || HOT_DRESS_REGEX.test(d.name);
 
 const CATEGORY_ICON = {
   bridal: '👗', studio: '📸', decor: '🌸', makeup: '💄',
@@ -69,6 +71,7 @@ renderPlanSyncBar();
 renderViewTabs();
 renderCategories();
 renderResults();
+subscribeCart(() => renderResults());
 
 async function loadUserPlanBudget(userId) {
   userPlan = await getPlan(userId);
@@ -329,6 +332,7 @@ function renderVendors() {
     const planItemName = `${VENDOR_CATEGORY[v.category] ?? 'Dịch vụ'} – ${v.name}`;
     const pinned = isPinned(planItemName);
     const compared = isCompared(`vendor:${v.id}`);
+    const inCart = isInCart(`vendor:${v.id}`);
     return html`
       <article class="card item-card">
         ${v.cover_url
@@ -347,7 +351,13 @@ function renderVendors() {
                    <div class="small muted">≈ ${money(estPrice)} cho tiệc ${TYPICAL_TABLES} bàn</div>`
             : html`<div>Từ <span class="price">${money(v.base_price)}</span></div>`}
           <div class="row card-action-row" style="margin-top:auto;padding-top:6px">
-            <a class="btn btn-outline btn-sm" style="flex:1" href="vendor.html?slug=${v.slug}">Xem tiệm</a>
+            <a class="btn btn-outline btn-sm card-primary-cta" style="flex:1" href="vendor.html?slug=${v.slug}">Xem tiệm</a>
+            <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
+                    data-cart-vendor="${v.id}"
+                    title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
+                    aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
+              ${inCart ? '✓ 🛒' : '🛒'}
+            </button>
             <button type="button" class="btn btn-sm ${pinned ? 'btn-pinned' : 'btn-outline'}"
                     data-pin-category="${v.category}"
                     data-pin-cat-title="${VENDOR_CATEGORY[v.category] ?? 'Dịch vụ cưới'}"
@@ -405,6 +415,18 @@ function applyDressFilters() {
   return [...list].sort(sorters[filters.sort]);
 }
 
+function bookDress(dress) {
+  if (!dress) return;
+  openBookingDialog({
+    vendorId: dress.vendor?.id ?? dress.vendor_id,
+    vendorName: dress.vendor?.name ?? '',
+    dressId: dress.id,
+    title: dress.name,
+    price: dress.price,
+    type: dress.type === 'bespoke' ? 'bespoke_manual' : 'rental',
+  }, 'marketplace.html?view=dresses').catch(toastError);
+}
+
 function renderDresses() {
   const list = applyDressFilters();
   render($('#result-count'), html`
@@ -432,6 +454,7 @@ function renderDresses() {
     const planItemName = `Váy cưới ${dress.name} (${dress.vendor?.name ?? ''})`;
     const pinned = isPinned(planItemName);
     const compared = isCompared(`dress:${dress.id}`);
+    const inCart = isInCart(`dress:${dress.id}`);
     return html`
       <article class="card item-card">
         ${dressThumbButton(dress)}
@@ -448,7 +471,15 @@ function renderDresses() {
           </a>
           <div>${priceTag(dress)}</div>
           <div class="row card-action-row" style="margin-top:auto;padding-top:6px">
-            <a class="btn btn-primary btn-sm" style="flex:1" href="tryon.html?dress=${dress.slug}">✨ Thử váy AI</a>
+            <button class="btn btn-primary btn-sm card-primary-cta" type="button" style="flex:1" data-book-dress="${dress.id}">
+              ${dress.type === 'bespoke' ? 'Đặt may ngay' : 'Đặt thuê ngay'}
+            </button>
+            <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
+                    data-cart-dress="${dress.id}"
+                    title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
+                    aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
+              ${inCart ? '✓ 🛒' : '🛒'}
+            </button>
             <button type="button" class="btn btn-sm ${pinned ? 'btn-pinned' : 'btn-outline'}"
                     data-pin-category="bridal"
                     data-pin-cat-title="Váy cưới &amp; Áo dài"
@@ -478,7 +509,7 @@ function renderDresses() {
         </div>
       </article>`;
   }));
-  bindDressGalleries(grid, list);
+  bindDressGalleries(grid, list, { onBook: bookDress });
 }
 
 // ---------- 3. CHẾ ĐỘ XEM TOÀN BỘ GÓI DỊCH VỤ LẺ ----------
@@ -528,6 +559,7 @@ function renderPackages() {
     const planItemName = `${pkg.name} (${pkg.vendor?.name ?? ''})`;
     const pinned = isPinned(planItemName);
     const compared = isCompared(`pkg:${pkg.id}`);
+    const inCart = isInCart(`pkg:${pkg.id}`);
     return html`
       <article class="card item-card">
         ${packageThumbButton(pkg, icon)}
@@ -544,7 +576,13 @@ function renderPackages() {
           ${pkg.description ? html`<p class="muted small package-desc" style="margin:0">${pkg.description}</p>` : ''}
           <div>${packagePrice(pkg, isVenue)}</div>
           <div class="row card-action-row" style="margin-top:auto;padding-top:6px">
-            <button class="btn btn-primary btn-sm" type="button" style="flex:1" data-book-pkg="${pkg.id}">Đặt gói này</button>
+            <button class="btn btn-primary btn-sm card-primary-cta" type="button" style="flex:1" data-book-pkg="${pkg.id}">Đặt gói này</button>
+            <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
+                    data-cart-pkg="${pkg.id}"
+                    title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
+                    aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
+              ${inCart ? '✓ 🛒' : '🛒'}
+            </button>
             <button type="button" class="btn btn-sm ${pinned ? 'btn-pinned' : 'btn-outline'}"
                     data-pin-category="${pkg.vendor?.category ?? ''}"
                     data-pin-cat-title="${VENDOR_CATEGORY[pkg.vendor?.category] ?? 'Dịch vụ cưới'}"
@@ -601,6 +639,92 @@ function renderPackages() {
 // ---------- 4. GHIM VÀO NGÂN SÁCH KẾ HOẠCH & SO SÁNH BÁO GIÁ ----------
 function bindCardActions() {
   const grid = $('#vendor-grid');
+
+  grid.querySelectorAll('[data-book-dress]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const dress = dresses.find((d) => d.id === btn.dataset.bookDress);
+      if (dress) bookDress(dress);
+    });
+  });
+
+  grid.querySelectorAll('[data-cart-dress]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const dress = dresses.find((d) => d.id === btn.dataset.cartDress);
+      if (!dress) return;
+      await withBusy(btn, async () => {
+        const res = await toggleCartItem({
+          key: `dress:${dress.id}`,
+          itemType: 'dress',
+          vendorId: dress.vendor?.id ?? dress.vendor_id,
+          vendorName: dress.vendor?.name ?? '',
+          vendorSlug: dress.vendor?.slug ?? '',
+          vendorCategory: 'bridal',
+          dressId: dress.id,
+          title: dress.name,
+          price: dress.price,
+          originalPrice: dress.original_price ?? 0,
+          imageUrl: dress.image_url || dressThumb(dress),
+          dressSlug: dress.slug,
+          dressType: dress.type,
+        });
+        toast(res.added ? `🛒 Đã thêm "${dress.name}" vào Giỏ hàng cưới!` : `Đã bỏ "${dress.name}" khỏi Giỏ hàng.`, res.added ? 'success' : 'info');
+      });
+    });
+  });
+
+  grid.querySelectorAll('[data-cart-pkg]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const pkg = packages.find((p) => p.id === btn.dataset.cartPkg);
+      if (!pkg) return;
+      const isVenue = pkg.vendor?.category === 'venue';
+      await withBusy(btn, async () => {
+        const res = await toggleCartItem({
+          key: `pkg:${pkg.id}`,
+          itemType: 'package',
+          vendorId: pkg.vendor_id,
+          vendorName: pkg.vendor?.name ?? '',
+          vendorSlug: pkg.vendor?.slug ?? '',
+          vendorCategory: pkg.vendor?.category ?? 'studio',
+          packageId: pkg.id,
+          title: pkg.name,
+          price: pkg.price,
+          originalPrice: pkg.original_price ?? 0,
+          imageUrl: pkg.image_url || '',
+          isVenue,
+          minQty: pkg.min_qty,
+          maxQty: pkg.max_qty,
+        });
+        toast(res.added ? `🛒 Đã thêm "${pkg.name}" vào Giỏ hàng cưới!` : `Đã bỏ "${pkg.name}" khỏi Giỏ hàng.`, res.added ? 'success' : 'info');
+      });
+    });
+  });
+
+  grid.querySelectorAll('[data-cart-vendor]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const v = vendors.find((x) => x.id === btn.dataset.cartVendor);
+      if (!v) return;
+      const estPrice = comparableVendorPrice(v);
+      const isVenue = v.category === 'venue';
+      await withBusy(btn, async () => {
+        const res = await toggleCartItem({
+          key: `vendor:${v.id}`,
+          itemType: 'vendor',
+          vendorId: v.id,
+          vendorName: v.name,
+          vendorSlug: v.slug,
+          vendorCategory: v.category,
+          title: isVenue ? `Tiệc cưới tại ${v.name}` : `Dịch vụ tại ${v.name}`,
+          price: v.base_price,
+          imageUrl: v.cover_url || '',
+          isVenue,
+          minQty: 5,
+          maxQty: 300,
+        });
+        toast(res.added ? `🛒 Đã thêm "${v.name}" vào Giỏ hàng cưới!` : `Đã bỏ "${v.name}" khỏi Giỏ hàng.`, res.added ? 'success' : 'info');
+      });
+    });
+  });
+
   grid.querySelectorAll('[data-pin-name]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       if (!currentUser) {

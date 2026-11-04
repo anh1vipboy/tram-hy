@@ -2,10 +2,10 @@
 import { sb, unwrap } from '../core/supabase.js';
 
 export const VENDOR_FIELDS = 'id, slug, name, category, district, address, phone, base_price, rating, review_count, is_verified, cover_url, logo_url, description, status, review_note, created_at';
-// photos: số ảnh các góc (để hiện nhãn "N ảnh" và nút xem ảnh)
-const DRESS_FIELDS = 'id, slug, name, type, theme, price, original_price, image_url, tryon_slug, photos:dress_photos(count), vendor:vendors(id, slug, name, district, is_verified)';
+// photos: danh sách ảnh các góc (để hiện nhãn "N ảnh", bảng xem nhanh khi rê chuột và trình xem ảnh)
+const DRESS_FIELDS = 'id, slug, name, type, theme, price, original_price, image_url, tryon_slug, photos:dress_photos(id, url), vendor:vendors(id, slug, name, district, is_verified)';
 
-const CACHE_PREFIX = 'tramhy.catalog.';
+const CACHE_PREFIX = 'tramhy.catalog.v2.';
 const FRESH_MS = 30_000;      // < 30 giây: dùng luôn không cần hỏi lại
 const MAX_AGE_MS = 300_000;   // < 5 phút: trả ngay từ bộ nhớ phiên (0ms) + làm mới ngầm phía sau
 

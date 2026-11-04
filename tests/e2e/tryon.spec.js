@@ -1,10 +1,19 @@
 // Phòng thử váy AI (dạng trò chuyện) + trang Thiết kế váy may đo – khi chưa đăng nhập
 const { test, expect, trackErrors } = require('./helpers');
 
+async function dismissPromo(page) {
+  const promoClose = page.locator('dialog.promo-dialog [data-close], dialog.promo-dialog .promo-close');
+  try {
+    await promoClose.waitFor({ state: 'visible', timeout: 1200 });
+    await promoClose.click();
+  } catch (_) {}
+}
+
 test.describe('Phòng thử váy AI', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/tryon.html');
     await expect(page.getByText('Mình là trợ lý thử váy của Trạm Hỷ.')).toBeVisible({ timeout: 20_000 });
+    await dismissPromo(page);
   });
 
   test('chọn người mẫu + váy có sẵn, gửi → mời đăng nhập và quay lại đúng mẫu', async ({ page }) => {
@@ -18,6 +27,8 @@ test.describe('Phòng thử váy AI', () => {
     const firstDress = page.locator('dialog.sheet .pick-grid.dresses .pick-main').first();
     const dressName = (await firstDress.locator('.pick-name').textContent()).trim();
     await firstDress.click();
+    await expect(page.locator('dialog.dress-detail-modal')).toBeVisible();
+    await page.locator('dialog.dress-detail-modal [data-confirm-pick]').click();
     await expect(page.locator('[data-slot="dress"]')).toContainText(dressName);
     await expect(page).toHaveURL(/tryon\.html\?dress=/);
 
@@ -28,6 +39,64 @@ test.describe('Phòng thử váy AI', () => {
     const slug = new URL(page.url()).searchParams.get('dress');
     await page.getByRole('button', { name: '🔑 Đăng nhập' }).click();
     await expect(page).toHaveURL(new RegExp(`login\\.html\\?next=tryon\\.html%3Fdress%3D${slug}`));
+    await tracker.expectNoErrors();
+  });
+
+  test('rê chuột hiện bảng nhỏ tự chuyển ảnh & bấm vào mở bảng lớn 2 nút (không có nút đặt lịch)', async ({ page, isMobile }) => {
+    const tracker = trackErrors(page);
+    await page.locator('[data-slot="dress"]').click();
+    const sheet = page.locator('dialog.sheet');
+    await expect(sheet).toBeVisible();
+
+    const firstTile = sheet.locator('.pick-grid.dresses .pick-tile[data-dress-id]').first();
+    await expect(firstTile).toBeVisible();
+
+    // 1. Kiểm tra trên desktop (khi có hover / chuột): rê chuột vào thẻ hiện popover
+    if (!isMobile) {
+      await firstTile.hover();
+      const popover = page.locator('.dress-hover-popover');
+      await expect(popover).toBeVisible({ timeout: 3000 });
+      await expect(popover.locator('.hover-pop-img')).toBeVisible();
+      await expect(popover.locator('.hover-pop-name')).toBeVisible();
+      await expect(popover.locator('.hover-pop-hint')).toContainText('Bấm để xem chi tiết');
+    }
+
+    // 2. Bấm vào mẫu váy: mở bảng to dress-detail-modal
+    await firstTile.locator('.pick-main').click();
+    const detailModal = page.locator('dialog.dress-detail-modal');
+    await expect(detailModal).toBeVisible();
+
+    // 3. Kiểm tra các thành phần của bảng lớn
+    await expect(detailModal.locator('.detail-main-img')).toBeVisible();
+    await expect(detailModal.locator('#dress-detail-title')).toBeVisible();
+    await expect(detailModal.locator('.detail-fit-badge')).toContainText('Độ tôn dáng');
+
+    // 4. Kiểm tra đúng 2 nút hành động ở chân bảng: "← Xem mẫu khác" và "✨ Chọn thử mẫu váy này"
+    const backBtn = detailModal.locator('[data-back]');
+    const pickBtn = detailModal.locator('[data-confirm-pick]');
+    await expect(backBtn).toBeVisible();
+    await expect(backBtn).toHaveText('← Xem mẫu khác');
+    await expect(pickBtn).toBeVisible();
+    await expect(pickBtn).toContainText('Chọn thử mẫu váy này');
+
+    // Tuyệt đối KHÔNG có nút đặt lịch thử tại tiệm theo đúng yêu cầu
+    await expect(detailModal.locator('[data-act="book"], [data-book]')).toHaveCount(0);
+    await expect(detailModal.getByRole('button', { name: /Đặt lịch/ })).toHaveCount(0);
+
+    // 5. Thử bấm "← Xem mẫu khác": bảng to đóng lại, giữ nguyên bảng chọn váy
+    await backBtn.click();
+    await expect(detailModal).toHaveCount(0);
+    await expect(sheet).toBeVisible();
+
+    // 6. Bấm lại vào mẫu váy và chọn "✨ Chọn thử mẫu váy này"
+    await firstTile.locator('.pick-main').click();
+    await expect(detailModal).toBeVisible();
+    await detailModal.locator('[data-confirm-pick]').click();
+
+    // Cả 2 bảng đều đóng, ô soạn tin đã có váy
+    await expect(detailModal).toHaveCount(0);
+    await expect(sheet).toHaveCount(0);
+    await expect(page.locator('[data-slot="dress"]')).not.toHaveClass(/empty/);
     await tracker.expectNoErrors();
   });
 
@@ -65,8 +134,13 @@ test.describe('Phòng thử váy AI', () => {
 });
 
 test.describe('Mở bằng đường dẫn ?dress=', () => {
+  test.beforeEach(async ({ page }) => {
+    await dismissPromo(page);
+  });
+
   test('giới thiệu đúng mẫu, độ tôn dáng đổi theo dáng người', async ({ page }) => {
     await page.goto('/tryon.html?dress=korean-satin');
+    await dismissPromo(page);
     const card = page.locator('.dress-card');
     await expect(card).toContainText('Váy Satin Lụa Trơn Hàn Quốc');
     const fit = card.locator('[data-fit]');

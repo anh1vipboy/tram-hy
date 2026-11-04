@@ -1,13 +1,15 @@
 import { initLayout } from '../core/layout.js';
 import { $, html, render, money, param, date, sizedImage } from '../core/utils.js';
 import { badge, priceTag, packageLabel, lowerLabel, DRESS_THEME, VENDOR_CATEGORY, VENDOR_STATUS } from '../core/labels.js';
-import { toastError } from '../core/ui.js';
+import { toast, toastError, withBusy } from '../core/ui.js';
 import { getVendorBySlug, listDresses, listPackages, listReviews, listVendorPhotos } from '../services/catalog.js';
 import { packageThumbButton, bindPackageGalleries, packagePrice, tableRange } from '../components/package-card.js';
 import { CATEGORY_CHOICES } from '../components/shop-form.js';
 import { dressThumbButton, bindDressGalleries } from '../components/dress-gallery.js';
 import { openBookingDialog } from '../components/booking-dialog.js';
 import { vendorLogo } from '../components/vendor-logo.js';
+import { isInCart, toggleCartItem, subscribeCart } from '../services/cart.js';
+import { dressThumb } from '../data/tryon-data.js';
 
 const page = $('#vendor-page');
 const slug = param('slug');
@@ -28,6 +30,7 @@ try {
       vendor.category === 'bridal' ? [] : listPackages(vendor.id).catch((error) => { console.warn(error); return []; }),
     ]);
     renderPage(vendor, dresses, reviews, photos, packages);
+    subscribeCart(() => renderPage(vendor, dresses, reviews, photos, packages));
   }
 } catch (error) {
   render(page, html`<div class="empty">Không tải được thông tin đối tác.</div>`);
@@ -47,6 +50,15 @@ function renderPage(vendor, dresses, reviews, photos, packages) {
     title: pkg.name,
     price: pkg.price,
     ...(isVenue ? { isVenue, unitPrice: pkg.price, minQty: pkg.min_qty, maxQty: pkg.max_qty } : {}),
+  }, `vendor.html?slug=${vendor.slug}`).catch(toastError);
+
+  const bookDress = (dress) => openBookingDialog({
+    vendorId: vendor.id,
+    vendorName: vendor.name,
+    type: dress.type === 'bespoke' ? 'bespoke_manual' : 'rental',
+    dressId: dress.id,
+    title: dress.name,
+    price: dress.price,
   }, `vendor.html?slug=${vendor.slug}`).catch(toastError);
   render(page, html`
     <a href="marketplace.html" class="small">← Dịch vụ cưới</a>
@@ -87,7 +99,7 @@ function renderPage(vendor, dresses, reviews, photos, packages) {
       </section>` : ''}
 
     ${isBridal ? html`
-      <section class="section" style="margin-top:32px">
+      <section class="section" id="dresses" style="margin-top:32px">
         <h2>Mẫu váy của tiệm</h2>
         ${dresses.length ? html`<div class="grid">${dresses.map(dressCard)}</div>`
                          : html`<div class="empty">Tiệm chưa đăng mẫu váy.</div>`}
@@ -101,7 +113,7 @@ function renderPage(vendor, dresses, reviews, photos, packages) {
                        : html`<div class="empty">Chưa có đánh giá xác thực nào.</div>`}
     </section>`);
 
-  bindDressGalleries(page, dresses);
+  bindDressGalleries(page, dresses, { onBook: bookDress });
   bindPackageGalleries(page, packages, (pkg) => ({
     subtitle: isVenue ? `${vendor.name} · giá mỗi bàn, nhận ${tableRange(pkg).min}–${tableRange(pkg).max} bàn` : vendor.name,
     action: vendor.status === 'approved' ? { label: `Đặt ${label.item} này`, onClick: () => bookPackage(pkg) } : null,
@@ -109,7 +121,70 @@ function renderPage(vendor, dresses, reviews, photos, packages) {
   page.querySelectorAll('[data-book-package]').forEach((btn) => {
     btn.addEventListener('click', () => bookPackage(packages.find((p) => p.id === btn.dataset.bookPackage)));
   });
+  page.querySelectorAll('[data-book-dress]').forEach((btn) => {
+    btn.addEventListener('click', () => bookDress(dresses.find((d) => d.id === btn.dataset.bookDress)));
+  });
+  page.querySelectorAll('[data-cart-dress]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const dress = dresses.find((d) => d.id === btn.dataset.cartDress);
+      if (!dress) return;
+      await withBusy(btn, async () => {
+        const res = await toggleCartItem({
+          key: `dress:${dress.id}`,
+          itemType: 'dress',
+          vendorId: vendor.id,
+          vendorName: vendor.name,
+          vendorSlug: vendor.slug,
+          vendorCategory: 'bridal',
+          dressId: dress.id,
+          title: dress.name,
+          price: dress.price,
+          originalPrice: dress.original_price ?? 0,
+          imageUrl: dress.image_url || dressThumb(dress),
+          dressSlug: dress.slug,
+          dressType: dress.type,
+        });
+        toast(res.added ? `🛒 Đã thêm "${dress.name}" vào Giỏ hàng cưới!` : `Đã bỏ "${dress.name}" khỏi Giỏ hàng.`, res.added ? 'success' : 'info');
+      });
+    });
+  });
+  page.querySelectorAll('[data-cart-package]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const pkg = packages.find((p) => p.id === btn.dataset.cartPackage);
+      if (!pkg) return;
+      await withBusy(btn, async () => {
+        const res = await toggleCartItem({
+          key: `pkg:${pkg.id}`,
+          itemType: 'package',
+          vendorId: vendor.id,
+          vendorName: vendor.name,
+          vendorSlug: vendor.slug,
+          vendorCategory: vendor.category,
+          packageId: pkg.id,
+          title: pkg.name,
+          price: pkg.price,
+          originalPrice: pkg.original_price ?? 0,
+          imageUrl: pkg.image_url || '',
+          isVenue,
+          minQty: pkg.min_qty,
+          maxQty: pkg.max_qty,
+        });
+        toast(res.added ? `🛒 Đã thêm "${pkg.name}" vào Giỏ hàng cưới!` : `Đã bỏ "${pkg.name}" khỏi Giỏ hàng.`, res.added ? 'success' : 'info');
+      });
+    });
+  });
   $('#see-packages')?.addEventListener('click', () => $('#packages').scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  $('#see-dresses')?.addEventListener('click', () => $('#dresses').scrollIntoView({ behavior: 'smooth', block: 'start' }));
+
+  $('#book-bridal-consult')?.addEventListener('click', () => {
+    openBookingDialog({
+      vendorId: vendor.id,
+      vendorName: vendor.name,
+      type: 'rental',
+      title: `Thử váy cưới tại ${vendor.name}`,
+      price: vendor.base_price,
+    }, `vendor.html?slug=${vendor.slug}`).catch(toastError);
+  });
 
   $('#book-service')?.addEventListener('click', () => {
     openBookingDialog({
@@ -154,6 +229,7 @@ function serviceBox(vendor, packages, label) {
 }
 
 function packageCard(pkg, label, icon, isVenue) {
+  const inCart = isInCart(`pkg:${pkg.id}`);
   return html`
     <article class="card item-card">
       ${packageThumbButton(pkg, icon)}
@@ -161,7 +237,15 @@ function packageCard(pkg, label, icon, isVenue) {
         <h3>${pkg.name}</h3>
         <div>${packagePrice(pkg, isVenue)}</div>
         ${pkg.description ? html`<div class="small muted package-desc">${pkg.description}</div>` : ''}
-        <button class="btn btn-primary btn-sm" type="button" data-book-package="${pkg.id}">Đặt ${label.item} này</button>
+        <div class="row card-action-row" style="margin-top:auto;padding-top:6px">
+          <button class="btn btn-primary btn-sm card-primary-cta" type="button" style="flex:1" data-book-package="${pkg.id}">Đặt ${label.item} này</button>
+          <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
+                  data-cart-package="${pkg.id}"
+                  title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
+                  aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
+            ${inCart ? '✓ 🛒' : '🛒'}
+          </button>
+        </div>
       </div>
     </article>`;
 }
@@ -169,13 +253,17 @@ function packageCard(pkg, label, icon, isVenue) {
 function bridalBox(vendor) {
   return html`
     <aside class="card stack">
-      <div class="eyebrow">Thử trước khi thuê</div>
-      <p>Mỗi mẫu váy của ${vendor.name} đều thử được trên ảnh của bạn tại Phòng thử AI trước khi đặt lịch.</p>
+      <div class="eyebrow">Đặt thuê &amp; May đo an toàn</div>
+      <p>Mỗi mẫu váy của ${vendor.name} đều có thể đặt thuê/may trực tiếp bảo chứng Escrow 3 đợt, hoặc ướm thử lên ảnh của bạn bằng AI.</p>
       <div>Váy từ <span class="price" style="font-size:22px">${money(vendor.base_price)}</span></div>
+      <button class="btn btn-primary btn-block" id="see-dresses" type="button">Xem các mẫu váy &amp; Đặt lịch</button>
+      <button class="btn btn-link btn-sm" id="book-bridal-consult" type="button">Hoặc đặt lịch tư vấn thử váy tại tiệm</button>
+      <p class="small muted">Tiền cọc được Trạm Hỷ giữ an toàn. Đối tác sai cam kết → hoàn 100%.</p>
     </aside>`;
 }
 
 function dressCard(dress) {
+  const inCart = isInCart(`dress:${dress.id}`);
   return html`
     <article class="card item-card">
       ${dressThumbButton(dress)}
@@ -184,7 +272,17 @@ function dressCard(dress) {
           ${dress.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê sẵn')}</div>
         <h3>${dress.name}</h3>
         <div>${priceTag(dress)}</div>
-        <a class="btn btn-primary btn-sm" href="tryon.html?dress=${dress.slug}">Thử váy này</a>
+        <div class="row card-action-row" style="margin-top:auto;padding-top:6px">
+          <button class="btn btn-primary btn-sm card-primary-cta" type="button" style="flex:1" data-book-dress="${dress.id}">
+            ${dress.type === 'bespoke' ? 'Đặt may ngay' : 'Đặt thuê ngay'}
+          </button>
+          <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
+                  data-cart-dress="${dress.id}"
+                  title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
+                  aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
+            ${inCart ? '✓ 🛒' : '🛒'}
+          </button>
+        </div>
       </div>
     </article>`;
 }

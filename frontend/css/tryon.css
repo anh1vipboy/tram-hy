@@ -202,6 +202,15 @@
 }
 
 /* ---------- 5. TẤM CHỌN (ảnh, váy, tùy chỉnh) ---------- */
+dialog.sheet.pick-sheet {
+  overflow: visible;
+}
+dialog.sheet.pick-sheet .sheet-head {
+  border-radius: 20px 20px 0 0;
+}
+dialog.sheet.pick-sheet .sheet-body {
+  border-radius: 0 0 20px 20px;
+}
 .upload-tile { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1.5px dashed #d9c2b5; border-radius: 16px;
   background: var(--bg); color: inherit; cursor: pointer; }
 .upload-tile:hover { border-color: var(--brand); text-decoration: none; }
@@ -233,6 +242,11 @@
   position: absolute; left: 6px; bottom: 6px; padding: 2px 7px; border-radius: 999px;
   background: rgba(34, 26, 22, .68); backdrop-filter: blur(4px);
   color: #fff8e7; font: 600 10.5px/1.3 var(--font-body); font-variant-numeric: tabular-nums; pointer-events: none;
+}
+.pick-photos-badge {
+  position: absolute; right: 6px; bottom: 6px; padding: 2px 6px; border-radius: 999px;
+  background: rgba(34, 26, 22, .72); backdrop-filter: blur(4px);
+  color: #fff; font: 600 10px/1.3 var(--font-body); font-variant-numeric: tabular-nums; pointer-events: none;
 }
 .pick-name { font-size: 12.5px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .pick-sub { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -945,6 +959,588 @@ dialog.promo-dialog::backdrop {
   .qr-image-box {
     width: 200px;
     height: 200px;
+  }
+}
+
+/* ---------- 8. MODAL CONTAINMENT & LIGHT-DISMISS (MODERN WEB GUIDANCE) ---------- */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/* ---------- 9. BẢNG NHỎ KHI RÊ CHUỘT (DRESS HOVER POPOVER) ---------- */
+.dress-hover-popover {
+  position: fixed;
+  z-index: 120;
+  width: 256px;
+  background: var(--card, #fff);
+  border: 1px solid var(--line, #e8ded4);
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(42, 36, 33, 0.22), 0 2px 8px rgba(155, 35, 53, 0.08);
+  overflow: hidden;
+  pointer-events: none;
+  animation: hoverPopIn 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes hoverPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hover-pop-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: var(--brand-soft);
+  overflow: hidden;
+}
+
+.hover-pop-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  transition: opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hover-pop-count {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(34, 26, 22, 0.72);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font: 600 10.5px/1.3 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.hover-pop-fit {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(155, 35, 53, 0.9);
+  color: #fff;
+  font: 600 10.5px/1.3 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 6px rgba(155, 35, 53, 0.3);
+}
+
+.hover-pop-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.hover-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: background 0.18s cubic-bezier(0.22, 1, 0.36, 1), transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hover-dot.active {
+  background: #fff;
+  transform: scale(1.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.hover-pop-body {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: var(--card);
+}
+
+.hover-pop-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hover-pop-vendor {
+  font-size: 11.5px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hover-pop-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hover-pop-price {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+
+.hover-pop-old {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.hover-pop-hint {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--line);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--brand);
+  text-align: center;
+}
+
+/* ---------- 10. BẢNG LỚN XEM CHI TIẾT MẪU VÁY (DRESS DETAIL MODAL) ---------- */
+dialog.dress-detail-modal {
+  border: 0;
+  padding: 0;
+  border-radius: 24px;
+  background: var(--bg);
+  max-width: 760px;
+  width: calc(100% - 32px);
+  box-shadow: 0 24px 64px rgba(42, 36, 33, 0.32);
+  overflow: hidden;
+  margin: auto;
+}
+
+dialog.dress-detail-modal::backdrop {
+  background: rgba(42, 36, 33, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.dress-detail-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  min-height: 500px;
+  max-height: min(88vh, 640px);
+  background: var(--card);
+}
+
+.detail-gallery {
+  background: #f4ede4;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-right: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.detail-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #ede3d7;
+}
+
+.detail-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+
+.detail-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(42, 36, 33, 0.65);
+  color: #fff;
+  font-size: 20px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  z-index: 2;
+}
+
+.detail-nav:hover {
+  background: var(--brand);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.detail-nav:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.detail-nav.prev {
+  left: 10px;
+}
+
+.detail-nav.next {
+  right: 10px;
+}
+
+.detail-photo-count {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(42, 36, 33, 0.72);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font: 600 11px var(--font-body);
+  font-variant-numeric: tabular-nums;
+  z-index: 2;
+}
+
+.detail-thumbs {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  overflow-x: auto;
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  scrollbar-width: thin;
+  flex: none;
+}
+
+.detail-thumb {
+  flex: none;
+  width: 44px;
+  height: 58px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  overflow: hidden;
+  padding: 0;
+  background: var(--brand-soft);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.detail-thumb.active {
+  border-color: var(--brand);
+  transform: scale(1.04);
+}
+
+.detail-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+
+.detail-info {
+  padding: 24px 26px 20px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.detail-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.detail-pill {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font: 600 11px/1.3 var(--font-body);
+}
+
+.detail-pill.theme {
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+}
+
+.detail-pill.hot {
+  background: linear-gradient(135deg, #e65c00, #f9d423);
+  color: #fff;
+}
+
+.detail-pill.sale {
+  background: var(--red);
+  color: #fff;
+}
+
+.detail-pill.type {
+  background: var(--purple-soft);
+  color: var(--purple);
+}
+
+.detail-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  flex: none;
+}
+
+.detail-close:hover {
+  color: var(--brand);
+  background: #fff;
+}
+
+.detail-title {
+  font: 700 21px/1.3 var(--font-title);
+  color: var(--ink);
+  margin: 0 0 6px;
+  text-wrap: balance;
+}
+
+.detail-vendor {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.detail-vendor strong {
+  color: var(--ink);
+}
+
+.detail-price-box {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+.detail-price-label {
+  font-size: 11.5px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.detail-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-price {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--brand);
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-old-price {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.detail-save-pill {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--red-soft);
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.detail-fit-card {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(155, 35, 53, 0.05);
+  border: 1px solid rgba(155, 35, 53, 0.15);
+  margin-bottom: 14px;
+}
+
+.detail-fit-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.detail-fit-badge {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--brand);
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-fit-tag {
+  font-size: 10.5px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.detail-fit-tip {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.detail-angles-note {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--ink);
+  margin-bottom: 16px;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.detail-angles-note small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.detail-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.detail-back-btn {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.detail-back-btn:active {
+  transform: scale(0.97);
+}
+
+.detail-pick-btn {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--brand);
+  color: #fff;
+  border: 0;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 4px 14px rgba(155, 35, 53, 0.3);
+  text-align: center;
+}
+
+.detail-pick-btn:hover {
+  background: var(--brand-dark);
+  transform: translateY(-1px);
+}
+
+.detail-pick-btn:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 680px) {
+  dialog.dress-detail-modal {
+    width: calc(100% - 20px);
+    border-radius: 20px;
+  }
+  .dress-detail-layout {
+    grid-template-columns: 1fr;
+    max-height: 85vh;
+  }
+  .detail-gallery {
+    height: 280px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .detail-info {
+    padding: 16px 14px 16px;
+  }
+  .detail-title {
+    font-size: 18px;
+  }
+  .detail-actions {
+    gap: 8px;
+  }
+  .detail-back-btn {
+    padding: 9px 12px;
+    font-size: 12.5px;
+  }
+  .detail-pick-btn {
+    padding: 9px 14px;
+    font-size: 13.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.dress-detail-modal,
+  .dress-hover-popover,
+  .hover-dot,
+  .detail-thumb,
+  .detail-nav {
+    animation: none !important;
+    transition: none !important;
   }
 }
 

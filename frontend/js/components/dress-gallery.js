@@ -12,23 +12,30 @@ export function realPhotoCount(dress) {
 }
 
 /** Ảnh trên thẻ váy: bấm vào mở trình xem ảnh. Dùng cùng bindDressGalleries(). */
-export function dressThumbButton(dress) {
+export function dressThumbButton(dress, { showTryonPill = true } = {}) {
   const count = realPhotoCount(dress);
   return html`
-    <button class="thumb-button" type="button" data-gallery="${dress.id}" aria-label="Xem ảnh ${dress.name}">
-      <img class="thumb" src="${sizedImage(dressThumb(dress), 640)}" alt="${dress.name}" loading="lazy">
-      ${count > 1 ? html`<span class="photo-count">${count} ảnh</span>` : ''}
-      ${discountPercent(dress) ? html`<span class="sale-ribbon">Giảm ${discountPercent(dress)}%</span>` : ''}
-    </button>`;
+    <div class="thumb-wrap">
+      <button class="thumb-button" type="button" data-gallery="${dress.id}" aria-label="Xem ảnh thực tế ${dress.name}">
+        <img class="thumb" src="${sizedImage(dressThumb(dress), 640)}" alt="${dress.name}" loading="lazy" decoding="async">
+        ${count > 1 ? html`<span class="photo-count">${count} ảnh</span>` : ''}
+        ${discountPercent(dress) ? html`<span class="sale-ribbon">Giảm ${discountPercent(dress)}%</span>` : ''}
+      </button>
+      ${showTryonPill && dress.slug ? html`
+        <a class="tryon-float-pill" href="tryon.html?dress=${dress.slug}" title="Ướm thử mẫu váy này lên ảnh của bạn bằng AI">
+          <span aria-hidden="true">✨</span> Thử váy AI
+        </a>` : ''}
+    </div>`;
 }
 
-export function bindDressGalleries(container, dresses) {
+export function bindDressGalleries(container, dresses, options = {}) {
   container.querySelectorAll('[data-gallery]').forEach((btn) => {
-    btn.addEventListener('click', () => openDressGallery(dresses.find((d) => d.id === btn.dataset.gallery)));
+    const dress = dresses.find((d) => d.id === btn.dataset.gallery);
+    if (dress) btn.addEventListener('click', () => openDressGallery(dress, options));
   });
 }
 
-export async function openDressGallery(dress) {
+export async function openDressGallery(dress, { onBook = null } = {}) {
   let images;
   try {
     const angles = Array.isArray(dress.photos) && dress.photos[0]?.url
@@ -39,13 +46,19 @@ export async function openDressGallery(dress) {
     toastError(error);
     return;
   }
+  const hasBook = typeof onBook === 'function';
   openPhotoGallery({
     title: dress.name,
     subtitle: dress.vendor?.name ?? '',
     price: dress.price,
     images,
     note: !dress.image_url && images.length === 1 ? 'Tiệm chưa đăng ảnh thật – đây là ảnh minh họa cùng kiểu váy.' : '',
-    action: dress.slug ? { label: 'Thử váy này', href: `tryon.html?dress=${dress.slug}` } : null,
+    secondaryAction: hasBook && dress.slug
+      ? { label: 'Thử váy này', href: `tryon.html?dress=${dress.slug}` }
+      : null,
+    action: hasBook
+      ? { label: dress.type === 'bespoke' ? 'Đặt may mẫu này' : 'Đặt thuê mẫu này', onClick: () => onBook(dress) }
+      : (dress.slug ? { label: 'Thử váy này', href: `tryon.html?dress=${dress.slug}` } : null),
   });
 }
 
@@ -64,8 +77,8 @@ export async function openPackageGallery(pkg, { subtitle = '', action = null } =
 }
 
 /** Trình xem ảnh dùng chung (váy, gói dịch vụ, album thiệp cưới). price / action không bắt buộc; start = ảnh mở đầu tiên.
- *  action: { label, href } hoặc { label, onClick } */
-export function openPhotoGallery({ title, subtitle, price, images, note, action, start = 0 }) {
+ *  action / secondaryAction: { label, href } hoặc { label, onClick } */
+export function openPhotoGallery({ title, subtitle, price, images, note, action, secondaryAction = null, start = 0 }) {
   let index = start;
 
   const dialog = document.createElement('dialog');
@@ -93,8 +106,12 @@ export function openPhotoGallery({ title, subtitle, price, images, note, action,
           <div class="small muted">${subtitle || ''}${subtitle && price ? ' · ' : ''}${price ? html`<span class="price">${money(price)}</span>` : ''}</div>
           ${note ? html`<div class="small muted lightbox-note">${note}</div>` : ''}
         </div>
-        ${action?.href ? html`<a class="btn btn-primary btn-sm" href="${action.href}">${action.label}</a>` : ''}
-        ${action?.onClick ? html`<button class="btn btn-primary btn-sm" type="button" data-action>${action.label}</button>` : ''}
+        <div class="row" style="gap:8px;flex-wrap:wrap">
+          ${secondaryAction?.href ? html`<a class="btn btn-outline btn-sm" href="${secondaryAction.href}">${secondaryAction.label}</a>` : ''}
+          ${secondaryAction?.onClick ? html`<button class="btn btn-outline btn-sm" type="button" data-secondary-action>${secondaryAction.label}</button>` : ''}
+          ${action?.href ? html`<a class="btn btn-primary btn-sm" href="${action.href}">${action.label}</a>` : ''}
+          ${action?.onClick ? html`<button class="btn btn-primary btn-sm" type="button" data-action>${action.label}</button>` : ''}
+        </div>
       </div>`);
   }
 
@@ -108,7 +125,8 @@ export function openPhotoGallery({ title, subtitle, price, images, note, action,
     if (target?.dataset.step) go(index + Number(target.dataset.step));
     else if (target?.dataset.go) go(Number(target.dataset.go));
     else if (target?.hasAttribute('data-close') || e.target === dialog) dialog.close();
-    if (e.target.closest('[data-action]')) { dialog.close(); action.onClick(); }
+    if (e.target.closest('[data-secondary-action]') && secondaryAction?.onClick) { dialog.close(); secondaryAction.onClick(); }
+    if (e.target.closest('[data-action]') && action?.onClick) { dialog.close(); action.onClick(); }
   });
   dialog.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') go(index - 1);

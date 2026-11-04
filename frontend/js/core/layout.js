@@ -3,6 +3,7 @@ import { getCachedProfile, getProfile, signOut } from './auth.js';
 import { $, html, render, initials } from './utils.js';
 import { sb } from './supabase.js';
 import { mountNotificationBell } from '../components/notification-bell.js';
+import { mountCartDrawer } from '../components/cart-drawer.js';
 import { getUrgentBookingAlert } from '../services/bookings.js';
 import { startUserSessionTracking } from '../services/tracking.js';
 
@@ -143,6 +144,13 @@ function paintLayout(activePage, profile, onAccountOpen) {
             ? html`<span class="nav-suffix">${item.suffix}</span>` : ''}</a>`)}
       </nav>
       <div class="user-area">
+        <button type="button" class="cart-button" data-cart aria-haspopup="dialog" aria-expanded="false" aria-label="Giỏ hàng dịch vụ cưới">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0" />
+          </svg>
+          <span class="cart-badge" hidden>0</span>
+        </button>
         ${profile
           ? html`<button type="button" class="notif-button" data-notif aria-haspopup="dialog" aria-expanded="false" aria-label="Thông báo">
                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-1.7 1.7A1 1 0 0 0 4 19.4h16a1 1 0 0 0 .7-1.7L19 16Z"/></svg>
@@ -196,17 +204,39 @@ export async function initLayout(activePage) {
   injectSpeculationRules();
 
   let closeBell = () => {};
+  let closeCart = () => {};
   const cached = getCachedProfile();
-  let closeAccount = paintLayout(activePage, cached, () => closeBell());
+  let closeAccount = paintLayout(activePage, cached, () => {
+    closeBell();
+    closeCart();
+  });
 
   const profile = await getProfile().catch(() => null);
   if (!sameProfileSnapshot(cached, profile)) {
-    closeAccount = paintLayout(activePage, profile, () => closeBell());
+    closeAccount = paintLayout(activePage, profile, () => {
+      closeBell();
+      closeCart();
+    });
+  }
+
+  const cartButton = $('#app-header [data-cart]');
+  if (cartButton) {
+    closeCart = mountCartDrawer(cartButton, profile, {
+      onOpen: () => {
+        closeBell();
+        closeAccount();
+      },
+    }).close;
   }
 
   const bellButton = $('#app-header [data-notif]');
   if (profile && bellButton) {
-    closeBell = mountNotificationBell(bellButton, profile, { onOpen: () => closeAccount() }).close;
+    closeBell = mountNotificationBell(bellButton, profile, {
+      onOpen: () => {
+        closeAccount();
+        closeCart();
+      },
+    }).close;
   }
   if (profile && activePage !== 'login') {
     mountUrgentAlertBanner(profile, activePage);
