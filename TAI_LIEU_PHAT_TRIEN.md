@@ -1,7 +1,7 @@
 # TRẠM HỶ – TÀI LIỆU PHÁT TRIỂN
 
 > Ghi lại những gì đã làm khi chuyển Trạm Hỷ từ bản demo (localStorage) sang **web chạy thật có database**.
-> Cập nhật: 03/10/2026 · Người thực hiện: Phùng Đức Anh (Fullstack) cùng Claude Code
+> Cập nhật: 05/11/2026 · Người thực hiện: Phùng Đức Anh (Fullstack) cùng AI Assistant Antigravity
 
 ---
 
@@ -596,3 +596,28 @@ Các mục dùng **Edge Function** là việc bắt buộc chạy ở server (c�
   - Sau khi lượt kết thúc (thành công lưu ảnh xong hoặc gặp lỗi), khối `finally` tự động xóa dòng giữ chỗ `pending`. Dòng pending bị treo quá 5 phút sẽ tự động mất hiệu lực tính toán.
 - **Chống tấn công SSRF khi tải ảnh váy (`isSafeImageUrl`)**: `thu-vay-ai` thẩm định mọi URL ảnh váy trước khi server fetch. Chặn đứng các URL trỏ về `localhost`, `127.0.0.1`, `0.0.0.0`, dải IP mạng riêng tư nội bộ (RFC 1918: `10.x`, `192.168.x`, `172.16-31.x`) và các địa chỉ dịch vụ đám mây nhạy cảm (AWS/GCP metadata `169.254.169.254`).
 - **Chống spam liên tục (Rate limit ngắn hạn)**: `tro-ly-thu-vay` và `tu-van-ngan-sach` kiểm tra thời điểm gọi gần nhất trong bảng `ai_usage` (đã có index `ai_usage_user_day_idx`), từ chối ngay bằng mã HTTP 429 nếu 2 câu hỏi/tin nhắn cách nhau dưới 2 giây.
+
+---
+
+## 10. Bảng Tổng Hợp 276 User, Thời Gian Sử Dụng & Chỉ Số KPI Môn Học (EXE202)
+
+> *Cập nhật ngày 04/11/2026 – Phục vụ nghiệm thu môn học Khởi nghiệp & Đổi mới Sáng tạo.*  
+> *Chi tiết đầy đủ xem tại file [NHAT_KY_DASHBOARD_VA_KPI.md](file:///d:/exe202/NHAT_KY_DASHBOARD_VA_KPI.md).*
+
+### Tóm tắt các nâng cấp chính:
+1. **Dữ liệu thực từ Supabase View `public.user_time`:**
+   * Hiển thị đầy đủ **276 tài khoản**, **1.285 phiên truy cập**, **10.410,0 phút** (~**173,5 Giờ** tương tác thực tế).
+   * Đánh giá người dùng Đạt chuẩn: **159 Qualified Users ($\ge 10.0$ phút)** đạt tỷ lệ **57,6%**.
+   * Bộ lọc nhanh theo tên/email, trạng thái Qualified, loại thiết bị, sắp xếp, phân trang (25/50/100/Tất cả).
+2. **Khớp chuẩn 100% KPI môn học:**
+   * Visits $\ge 2.000$ (2.380 · 119%), Clicks $\ge 300$ (412 · 137%), Sign-ups $\ge 200$ (218 · 109%), Active Users $\ge 50$ (78 · 156%), Gói AI (40 khách · 6.360.000đ), Escrow $\ge 1$ đơn (6 đơn · 22.800.000đ · 400%).
+   * Chuyển đổi linh hoạt giữa 6 chỉ số nghiệm thu và 7 chỉ số (kèm 164 lượt AR Try-on).
+   * Hộp thoại danh sách 218 tài khoản đăng ký với tìm kiếm và lọc vai trò.
+3. **Quản lý đơn gói cước AI & Dọn dẹp đơn test:**
+   * Thêm nút `🗑 Xóa` trực tiếp trên web cho Admin để xóa các đơn test (kể cả đơn đã kích hoạt).
+   * Cung cấp câu lệnh SQL an toàn trong Supabase để xóa theo mã đơn chọn lọc.
+4. **Hệ thống xuất Excel:**
+   * Xuất file `thong-ke-thoi-gian-276-users-tram-hy.xlsx` (276 dòng).
+   * Xuất file `bang-tong-hop-kpi-user-tram-hy.xlsx` (bảng KPI môn học).
+   * Tích hợp Sheet 6 vào sổ cái tài chính toàn sàn `doi-soat-doanh-thu-tram-hy.xlsx`.
+

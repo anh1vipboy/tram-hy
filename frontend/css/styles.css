@@ -100,8 +100,18 @@ main.container { padding-block: 28px 56px; flex: 1 0 auto; }
   content: ""; display: block; height: 3px;
   background: linear-gradient(90deg, var(--brand-dark), var(--brand-light), var(--gold-bright), var(--brand-light), var(--brand-dark));
 }
-.site-header .container { display: flex; align-items: center; gap: 16px; min-height: 64px; }
-.brand { display: flex; align-items: center; gap: 9px; color: var(--ink); text-decoration: none !important; }
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  width: min(1360px, 100%);
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.brand { flex: none; display: flex; align-items: center; gap: 9px; color: var(--ink); text-decoration: none !important; white-space: nowrap; }
 .brand img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brand); box-shadow: 0 0 0 2px var(--gold-soft), 0 0 0 3px var(--gold-line); }
 .brand strong { font-family: var(--font-title); font-size: 21px; font-style: italic; color: var(--brand-dark); }
 .hy-seal {
@@ -110,31 +120,56 @@ main.container { padding-block: 28px 56px; flex: 1 0 auto; }
   border: 1px solid var(--gold-bright); box-shadow: 0 2px 6px rgba(155, 35, 53, .22);
   color: #ffe8a3; font-size: 12px; font-weight: 800; line-height: 1; flex: none;
 }
-.nav { display: flex; align-items: center; gap: 4px; overflow-x: auto; flex: 1; scrollbar-width: none; }
-.nav a { padding: 8px 10px; border-radius: 999px; color: var(--muted); font-weight: 600; font-size: 14px; white-space: nowrap; text-decoration: none; border: 1px solid transparent; transition: background .18s var(--ease-out), color .18s var(--ease-out), border-color .18s var(--ease-out); }
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.nav a {
+  padding: 7px 10px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: -0.01em;
+  white-space: nowrap !important;
+  word-break: keep-all;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background .18s var(--ease-out), color .18s var(--ease-out), border-color .18s var(--ease-out);
+}
 .nav a:hover { color: var(--ink); background: #f6ece4; }
 .nav a.active { color: var(--brand-dark); background: linear-gradient(135deg, var(--brand-soft), var(--gold-soft)); border-color: var(--gold-line); }
-/* Menu nhiều mục (đối tác có 9 mục): laptop → ẩn tên tài khoản (còn ảnh đại diện); màn hình vừa → rút gọn chữ */
-@media (max-width: 1400px) {
+
+/* Menu header responsive mượt mà: thu gọn hậu tố, rút gọn tên, giữ chữ không bao giờ bị cắt */
+@media (max-width: 1340px) {
+  .nav-suffix, .hy-seal { display: none; }
+  .nav a { padding: 7px 8px; font-size: 13px; }
+  .user-name { max-width: 110px; }
+}
+@media (max-width: 1160px) {
   .user-name { display: none; }
   .account-button { padding: 3px; }
+  .nav a { padding: 6px 8px; font-size: 12.5px; }
+  .nav { gap: 2px; }
 }
-@media (max-width: 1240px) {
-  .nav a { padding: 8px 9px; font-size: 13.5px; }
-  .nav-suffix, .hy-seal { display: none; }
+@media (max-width: 960px) {
+  .nav a { padding: 6px 6px; font-size: 12px; }
+  .site-header .container { gap: 8px; padding: 0 12px; }
 }
 @media (max-width: 820px) {
+  .nav { display: none; }
+  .user-name { display: none; }
+  .account-button { padding: 3px; }
   .hy-seal { display: inline-grid; }
 }
-@media (max-width: 1000px) {
-  .nav { gap: 2px; }
-  .nav a { padding: 8px 7px; font-size: 13px; }
-}
-.user-area { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-.user-name { font-weight: 600; font-size: 14px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+.user-area { flex: none; display: flex; align-items: center; gap: 8px; white-space: nowrap; position: relative; }
+.user-name { font-weight: 600; font-size: 13.5px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ellipsis { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Avatar + menu tài khoản */
-.user-area { position: relative; }
 .account-button { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); cursor: pointer; color: var(--ink); font: inherit; }
 .account-button:hover, .account-button[aria-expanded="true"] { border-color: var(--brand); }
 .avatar { flex: none; display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--brand-light), var(--brand-dark)); color: #fff; font-weight: 700; font-size: 13px; }
