@@ -314,7 +314,16 @@ export function openDressPreviewModal(dress, { userBody, onConfirmPick }) {
     render(dialog, html`
       <div class="dress-detail-layout">
         <div class="detail-gallery">
-          <div class="detail-stage">
+          <div class="detail-stage" data-image-stage>
+            <div class="detail-overlay-top">
+              <div class="detail-badges">
+                <span class="detail-pill theme">${DRESS_THEME[dress.theme] || 'Váy cưới'}</span>
+                ${hot ? html`<span class="detail-pill hot">🔥 Hot</span>` : ''}
+                ${off ? html`<span class="detail-pill sale">-${off}%</span>` : ''}
+                <span class="detail-pill type">${dress.type === 'bespoke' ? 'May đo' : 'Thuê sẵn'}</span>
+              </div>
+              <button type="button" class="detail-close" data-close aria-label="Đóng">✕</button>
+            </div>
             <img class="detail-main-img" src="${sizedImage(images[safeIdx], 720)}"
                  alt="${dress.name} – ảnh ${safeIdx + 1}" decoding="async">
             ${images.length > 1 ? html`
@@ -333,45 +342,31 @@ export function openDressPreviewModal(dress, { userBody, onConfirmPick }) {
         </div>
 
         <div class="detail-info">
-          <div class="detail-top-bar">
-            <div class="detail-badges">
-              <span class="detail-pill theme">${DRESS_THEME[dress.theme] || 'Váy cưới'}</span>
-              ${hot ? html`<span class="detail-pill hot">🔥 Hot</span>` : ''}
-              ${off ? html`<span class="detail-pill sale">-${off}%</span>` : ''}
-              <span class="detail-pill type">${dress.type === 'bespoke' ? 'May đo' : 'Thuê sẵn'}</span>
+          <div class="detail-header-row">
+            <div class="detail-title-col">
+              <h3 id="dress-detail-title" class="detail-title">${dress.name}</h3>
+              <div class="detail-vendor">
+                <span>🏪 <strong>${dress.vendor.name}</strong></span>
+                ${dress.vendor.is_verified ? html`<b class="verified" title="Đối tác Tích Xanh">✓</b>` : ''}
+                ${dress.vendor.district ? html`<span class="muted">· ${dress.vendor.district}</span>` : ''}
+              </div>
             </div>
-            <button type="button" class="detail-close" data-close aria-label="Đóng">✕</button>
-          </div>
-
-          <h3 id="dress-detail-title" class="detail-title">${dress.name}</h3>
-
-          <div class="detail-vendor">
-            <span>🏪 <strong>${dress.vendor.name}</strong></span>
-            ${dress.vendor.is_verified ? html`<b class="verified" title="Đối tác Tích Xanh">✓</b>` : ''}
-            ${dress.vendor.district ? html`<span class="muted">· ${dress.vendor.district}</span>` : ''}
-          </div>
-
-          <div class="detail-price-box">
-            <span class="detail-price-label">${dress.type === 'bespoke' ? 'Giá may đo thiết kế' : 'Giá thuê tại tiệm'}</span>
-            <div class="detail-price-row">
-              <strong class="detail-price">${money(dress.price)}</strong>
-              ${off ? html`
-                <s class="detail-old-price">${money(dress.original_price)}</s>
-                <span class="detail-save-pill">Tiết kiệm ${money(dress.original_price - dress.price)}</span>` : ''}
+            <div class="detail-price-col">
+              <span class="detail-price-label">${dress.type === 'bespoke' ? 'Giá may đo' : 'Giá thuê'}</span>
+              <div class="detail-price-numbers">
+                <strong class="detail-price">${money(dress.price)}</strong>
+                ${off ? html`<s class="detail-old-price">${money(dress.original_price)}</s>` : ''}
+              </div>
+              ${off ? html`<span class="detail-save-pill">Tiết kiệm ${money(dress.original_price - dress.price)}</span>` : ''}
             </div>
           </div>
 
           <div class="detail-fit-card">
             <div class="detail-fit-head">
               <span class="detail-fit-badge">✨ Độ tôn dáng: ${fitInfo.score}%</span>
-              <span class="detail-fit-tag">Tư vấn theo dáng người</span>
+              <span class="detail-fit-tag">Tư vấn vóc dáng AI</span>
             </div>
             <p class="detail-fit-tip">${fitInfo.tip}</p>
-          </div>
-
-          <div class="detail-angles-note">
-            <span>📷 <strong>${images.length} ảnh góc chụp thực tế</strong></span>
-            ${images.length > 1 ? html`<small class="muted">Bấm mũi tên hoặc chọn ảnh nhỏ để xem chi tiết từng góc váy</small>` : ''}
           </div>
 
           <div class="detail-actions">

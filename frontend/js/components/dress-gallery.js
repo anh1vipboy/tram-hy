@@ -23,7 +23,9 @@ export function dressThumbButton(dress, { showTryonPill = true } = {}) {
       </button>
       ${showTryonPill && dress.slug ? html`
         <a class="tryon-float-pill" href="tryon.html?dress=${dress.slug}" title="Ướm thử mẫu váy này lên ảnh của bạn bằng AI">
-          <span aria-hidden="true">✨</span> Thử váy AI
+          <span aria-hidden="true">✨</span>
+          <span class="tryon-label-full">Thử váy AI</span>
+          <span class="tryon-label-short">Thử AI</span>
         </a>` : ''}
     </div>`;
 }

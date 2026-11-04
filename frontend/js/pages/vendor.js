@@ -237,14 +237,16 @@ function packageCard(pkg, label, icon, isVenue) {
         <h3>${pkg.name}</h3>
         <div>${packagePrice(pkg, isVenue)}</div>
         ${pkg.description ? html`<div class="small muted package-desc">${pkg.description}</div>` : ''}
-        <div class="row card-action-row" style="margin-top:auto;padding-top:6px">
-          <button class="btn btn-primary btn-sm card-primary-cta" type="button" style="flex:1" data-book-package="${pkg.id}">Đặt ${label.item} này</button>
-          <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
-                  data-cart-package="${pkg.id}"
-                  title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
-                  aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
-            ${inCart ? '✓ 🛒' : '🛒'}
-          </button>
+        <div class="card-actions">
+          <div class="card-action-row primary">
+            <button class="btn btn-primary btn-sm card-primary-cta" type="button" data-book-package="${pkg.id}">Đặt ${label.item} này</button>
+            <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
+                    data-cart-package="${pkg.id}"
+                    title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
+                    aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
+              ${inCart ? '✓ 🛒' : '🛒'}
+            </button>
+          </div>
         </div>
       </div>
     </article>`;
@@ -268,20 +270,24 @@ function dressCard(dress) {
     <article class="card item-card">
       ${dressThumbButton(dress)}
       <div class="body">
-        <div class="row">${badge(DRESS_THEME[dress.theme] ?? dress.theme, 'gold')}
-          ${dress.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê sẵn')}</div>
+        <div class="card-tags">
+          ${badge(DRESS_THEME[dress.theme] ?? dress.theme, 'gold')}
+          ${dress.type === 'bespoke' ? badge('May đo', 'purple') : ''}
+        </div>
         <h3>${dress.name}</h3>
         <div>${priceTag(dress)}</div>
-        <div class="row card-action-row" style="margin-top:auto;padding-top:6px">
-          <button class="btn btn-primary btn-sm card-primary-cta" type="button" style="flex:1" data-book-dress="${dress.id}">
-            ${dress.type === 'bespoke' ? 'Đặt may ngay' : 'Đặt thuê ngay'}
-          </button>
-          <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
-                  data-cart-dress="${dress.id}"
-                  title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
-                  aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
-            ${inCart ? '✓ 🛒' : '🛒'}
-          </button>
+        <div class="card-actions">
+          <div class="card-action-row primary">
+            <button class="btn btn-primary btn-sm card-primary-cta" type="button" data-book-dress="${dress.id}">
+              ${dress.type === 'bespoke' ? 'Đặt may ngay' : 'Đặt thuê ngay'}
+            </button>
+            <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
+                    data-cart-dress="${dress.id}"
+                    title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
+                    aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
+              ${inCart ? '✓ 🛒' : '🛒'}
+            </button>
+          </div>
         </div>
       </div>
     </article>`;

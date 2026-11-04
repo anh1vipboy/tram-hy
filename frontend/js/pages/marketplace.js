@@ -350,39 +350,44 @@ function renderVendors() {
             ? html`<div>Từ <span class="price">${money(v.base_price)}</span>/bàn</div>
                    <div class="small muted">≈ ${money(estPrice)} cho tiệc ${TYPICAL_TABLES} bàn</div>`
             : html`<div>Từ <span class="price">${money(v.base_price)}</span></div>`}
-          <div class="row card-action-row" style="margin-top:auto;padding-top:6px">
-            <a class="btn btn-outline btn-sm card-primary-cta" style="flex:1" href="vendor.html?slug=${v.slug}">Xem tiệm</a>
-            <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
-                    data-cart-vendor="${v.id}"
-                    title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
-                    aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
-              ${inCart ? '✓ 🛒' : '🛒'}
-            </button>
-            <button type="button" class="btn btn-sm ${pinned ? 'btn-pinned' : 'btn-outline'}"
-                    data-pin-category="${v.category}"
-                    data-pin-cat-title="${VENDOR_CATEGORY[v.category] ?? 'Dịch vụ cưới'}"
-                    data-pin-name="${planItemName}"
-                    data-pin-price="${estPrice}"
-                    title="Đưa vào dự kiến Ngân sách trong Kế hoạch cưới">
-              ${pinned ? '✓ Trong kế hoạch' : '+ Ngân sách'}
-            </button>
-            <button type="button" class="btn btn-sm btn-compare-icon ${compared ? 'active' : ''}"
-                    data-compare-id="vendor:${v.id}"
-                    data-compare-type="${VENDOR_CATEGORY[v.category] ?? 'Đối tác'}"
-                    data-compare-title="${v.name}"
-                    data-compare-vendor="${v.name}"
-                    data-compare-district="${v.district ?? ''}"
-                    data-compare-verified="${v.is_verified ? '1' : ''}"
-                    data-compare-rating="${v.rating ?? ''}"
-                    data-compare-price="${estPrice}"
-                    data-compare-orig="0"
-                    data-compare-cat="${v.category}"
-                    data-compare-thumb="${v.cover_url || ''}"
-                    data-compare-note="${v.category === 'venue' ? `${money(v.base_price)}/bàn (quy đổi ${TYPICAL_TABLES} bàn)` : 'Giá khởi điểm tại tiệm'}"
-                    data-compare-url="${new URL(`vendor.html?slug=${v.slug}`, location.href).href}"
-                    title="Thêm vào khay so sánh báo giá">
-              ⚖
-            </button>
+          <div class="card-actions">
+            <div class="card-action-row primary">
+              <a class="btn btn-outline btn-sm card-primary-cta" href="vendor.html?slug=${v.slug}">Xem tiệm</a>
+              <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
+                      data-cart-vendor="${v.id}"
+                      title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
+                      aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
+                ${inCart ? '✓ 🛒' : '🛒'}
+              </button>
+            </div>
+            <div class="card-action-row secondary">
+              <button type="button" class="btn btn-sm btn-pin-plan ${pinned ? 'btn-pinned' : 'btn-outline'}"
+                      data-pin-category="${v.category}"
+                      data-pin-cat-title="${VENDOR_CATEGORY[v.category] ?? 'Dịch vụ cưới'}"
+                      data-pin-name="${planItemName}"
+                      data-pin-price="${estPrice}"
+                      title="Đưa vào dự kiến Ngân sách trong Kế hoạch cưới">
+                ${pinned ? '✓ Đã ghim' : '+ Ngân sách'}
+              </button>
+              <button type="button" class="btn btn-sm btn-compare-icon ${compared ? 'active' : ''}"
+                      data-compare-id="vendor:${v.id}"
+                      data-compare-type="${VENDOR_CATEGORY[v.category] ?? 'Đối tác'}"
+                      data-compare-title="${v.name}"
+                      data-compare-vendor="${v.name}"
+                      data-compare-district="${v.district ?? ''}"
+                      data-compare-verified="${v.is_verified ? '1' : ''}"
+                      data-compare-rating="${v.rating ?? ''}"
+                      data-compare-price="${estPrice}"
+                      data-compare-orig="0"
+                      data-compare-cat="${v.category}"
+                      data-compare-thumb="${v.cover_url || ''}"
+                      data-compare-note="${v.category === 'venue' ? `${money(v.base_price)}/bàn (quy đổi ${TYPICAL_TABLES} bàn)` : 'Giá khởi điểm tại tiệm'}"
+                      data-compare-url="${new URL(`vendor.html?slug=${v.slug}`, location.href).href}"
+                      title="Thêm vào khay so sánh báo giá"
+                      aria-label="So sánh đối tác">
+                ⚖
+              </button>
+            </div>
           </div>
         </div>
       </article>`;
@@ -459,10 +464,10 @@ function renderDresses() {
       <article class="card item-card">
         ${dressThumbButton(dress)}
         <div class="body">
-          <div class="row">
+          <div class="card-tags">
             ${isHotDress(dress) ? badge('🔥 Hot', 'red') : ''}
             ${badge(DRESS_THEME[dress.theme] ?? dress.theme, 'gold')}
-            ${dress.type === 'bespoke' ? badge('May đo', 'purple') : badge('Thuê sẵn')}
+            ${dress.type === 'bespoke' ? badge('May đo', 'purple') : ''}
             ${budgetMatchBadge('bridal', dress.price)}
           </div>
           <h3>${dress.name}</h3>
@@ -470,41 +475,46 @@ function renderDresses() {
             🏪 ${dress.vendor.name}${dress.vendor.is_verified ? html` <b class="verified" title="Đối tác Tích Xanh">✓</b>` : ''}${dress.vendor.district ? ` · ${dress.vendor.district}` : ''}
           </a>
           <div>${priceTag(dress)}</div>
-          <div class="row card-action-row" style="margin-top:auto;padding-top:6px">
-            <button class="btn btn-primary btn-sm card-primary-cta" type="button" style="flex:1" data-book-dress="${dress.id}">
-              ${dress.type === 'bespoke' ? 'Đặt may ngay' : 'Đặt thuê ngay'}
-            </button>
-            <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
-                    data-cart-dress="${dress.id}"
-                    title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
-                    aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
-              ${inCart ? '✓ 🛒' : '🛒'}
-            </button>
-            <button type="button" class="btn btn-sm ${pinned ? 'btn-pinned' : 'btn-outline'}"
-                    data-pin-category="bridal"
-                    data-pin-cat-title="Váy cưới &amp; Áo dài"
-                    data-pin-name="${planItemName}"
-                    data-pin-price="${dress.price}"
-                    title="Đưa mẫu váy này vào dự kiến Ngân sách trong Kế hoạch cưới">
-              ${pinned ? '✓ Đã ghim' : '+ Ngân sách'}
-            </button>
-            <button type="button" class="btn btn-sm btn-compare-icon ${compared ? 'active' : ''}"
-                    data-compare-id="dress:${dress.id}"
-                    data-compare-type="Mẫu váy cưới (${DRESS_THEME[dress.theme] ?? dress.theme})"
-                    data-compare-title="${dress.name}"
-                    data-compare-vendor="${dress.vendor?.name ?? ''}"
-                    data-compare-district="${dress.vendor?.district ?? ''}"
-                    data-compare-verified="${dress.vendor?.is_verified ? '1' : ''}"
-                    data-compare-rating="${dress.vendor?.rating ?? ''}"
-                    data-compare-price="${dress.price}"
-                    data-compare-orig="${dress.original_price ?? 0}"
-                    data-compare-cat="bridal"
-                    data-compare-thumb="${dress.image_url || ''}"
-                    data-compare-note="${dress.type === 'bespoke' ? 'May đo thiết kế riêng' : 'Thuê sẵn tại tiệm'}"
-                    data-compare-url="${new URL(`tryon.html?dress=${dress.slug}`, location.href).href}"
-                    title="Thêm vào khay so sánh báo giá">
-              ⚖
-            </button>
+          <div class="card-actions">
+            <div class="card-action-row primary">
+              <button class="btn btn-primary btn-sm card-primary-cta" type="button" data-book-dress="${dress.id}">
+                ${dress.type === 'bespoke' ? 'Đặt may ngay' : 'Đặt thuê ngay'}
+              </button>
+              <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
+                      data-cart-dress="${dress.id}"
+                      title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
+                      aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
+                ${inCart ? '✓ 🛒' : '🛒'}
+              </button>
+            </div>
+            <div class="card-action-row secondary">
+              <button type="button" class="btn btn-sm btn-pin-plan ${pinned ? 'btn-pinned' : 'btn-outline'}"
+                      data-pin-category="bridal"
+                      data-pin-cat-title="Váy cưới &amp; Áo dài"
+                      data-pin-name="${planItemName}"
+                      data-pin-price="${dress.price}"
+                      title="Đưa mẫu váy này vào dự kiến Ngân sách trong Kế hoạch cưới">
+                ${pinned ? '✓ Đã ghim' : '+ Ngân sách'}
+              </button>
+              <button type="button" class="btn btn-sm btn-compare-icon ${compared ? 'active' : ''}"
+                      data-compare-id="dress:${dress.id}"
+                      data-compare-type="Mẫu váy cưới (${DRESS_THEME[dress.theme] ?? dress.theme})"
+                      data-compare-title="${dress.name}"
+                      data-compare-vendor="${dress.vendor?.name ?? ''}"
+                      data-compare-district="${dress.vendor?.district ?? ''}"
+                      data-compare-verified="${dress.vendor?.is_verified ? '1' : ''}"
+                      data-compare-rating="${dress.vendor?.rating ?? ''}"
+                      data-compare-price="${dress.price}"
+                      data-compare-orig="${dress.original_price ?? 0}"
+                      data-compare-cat="bridal"
+                      data-compare-thumb="${dress.image_url || ''}"
+                      data-compare-note="${dress.type === 'bespoke' ? 'May đo thiết kế riêng' : 'Thuê sẵn tại tiệm'}"
+                      data-compare-url="${new URL(`tryon.html?dress=${dress.slug}`, location.href).href}"
+                      title="Thêm vào khay so sánh báo giá"
+                      aria-label="So sánh mẫu váy">
+                ⚖
+              </button>
+            </div>
           </div>
         </div>
       </article>`;
@@ -564,7 +574,7 @@ function renderPackages() {
       <article class="card item-card">
         ${packageThumbButton(pkg, icon)}
         <div class="body">
-          <div class="row">
+          <div class="card-tags">
             ${badge(VENDOR_CATEGORY[pkg.vendor?.category] ?? 'Dịch vụ', 'gold')}
             ${pkg.vendor?.is_verified ? badge('✓ Tích Xanh', 'blue') : ''}
             ${budgetMatchBadge(pkg.vendor?.category, estPrice)}
@@ -575,39 +585,44 @@ function renderPackages() {
           </a>
           ${pkg.description ? html`<p class="muted small package-desc" style="margin:0">${pkg.description}</p>` : ''}
           <div>${packagePrice(pkg, isVenue)}</div>
-          <div class="row card-action-row" style="margin-top:auto;padding-top:6px">
-            <button class="btn btn-primary btn-sm card-primary-cta" type="button" style="flex:1" data-book-pkg="${pkg.id}">Đặt gói này</button>
-            <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
-                    data-cart-pkg="${pkg.id}"
-                    title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
-                    aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
-              ${inCart ? '✓ 🛒' : '🛒'}
-            </button>
-            <button type="button" class="btn btn-sm ${pinned ? 'btn-pinned' : 'btn-outline'}"
-                    data-pin-category="${pkg.vendor?.category ?? ''}"
-                    data-pin-cat-title="${VENDOR_CATEGORY[pkg.vendor?.category] ?? 'Dịch vụ cưới'}"
-                    data-pin-name="${planItemName}"
-                    data-pin-price="${estPrice}"
-                    title="Đưa gói này vào dự kiến Ngân sách trong Kế hoạch cưới">
-              ${pinned ? '✓ Đã ghim' : '+ Ngân sách'}
-            </button>
-            <button type="button" class="btn btn-sm btn-compare-icon ${compared ? 'active' : ''}"
-                    data-compare-id="pkg:${pkg.id}"
-                    data-compare-type="Gói ${VENDOR_CATEGORY[pkg.vendor?.category] ?? 'Dịch vụ'}"
-                    data-compare-title="${pkg.name}"
-                    data-compare-vendor="${pkg.vendor?.name ?? ''}"
-                    data-compare-district="${pkg.vendor?.district ?? ''}"
-                    data-compare-verified="${pkg.vendor?.is_verified ? '1' : ''}"
-                    data-compare-rating="${pkg.vendor?.rating ?? ''}"
-                    data-compare-price="${estPrice}"
-                    data-compare-orig="${pkg.original_price ? (isVenue ? pkg.original_price * TYPICAL_TABLES : pkg.original_price) : 0}"
-                    data-compare-cat="${pkg.vendor?.category ?? ''}"
-                    data-compare-thumb="${pkg.image_url || ''}"
-                    data-compare-note="${pkg.description ?? ''}"
-                    data-compare-url="${new URL(`vendor.html?slug=${pkg.vendor?.slug ?? ''}`, location.href).href}"
-                    title="Thêm vào khay so sánh báo giá">
-              ⚖
-            </button>
+          <div class="card-actions">
+            <div class="card-action-row primary">
+              <button class="btn btn-primary btn-sm card-primary-cta" type="button" data-book-pkg="${pkg.id}">Đặt gói này</button>
+              <button type="button" class="btn btn-sm btn-cart-icon ${inCart ? 'active' : ''}"
+                      data-cart-pkg="${pkg.id}"
+                      title="${inCart ? 'Đã trong giỏ hàng (bấm để bỏ)' : 'Thêm vào giỏ hàng cưới'}"
+                      aria-label="${inCart ? 'Đã trong giỏ hàng' : 'Thêm vào giỏ hàng'}">
+                ${inCart ? '✓ 🛒' : '🛒'}
+              </button>
+            </div>
+            <div class="card-action-row secondary">
+              <button type="button" class="btn btn-sm btn-pin-plan ${pinned ? 'btn-pinned' : 'btn-outline'}"
+                      data-pin-category="${pkg.vendor?.category ?? ''}"
+                      data-pin-cat-title="${VENDOR_CATEGORY[pkg.vendor?.category] ?? 'Dịch vụ cưới'}"
+                      data-pin-name="${planItemName}"
+                      data-pin-price="${estPrice}"
+                      title="Đưa gói này vào dự kiến Ngân sách trong Kế hoạch cưới">
+                ${pinned ? '✓ Đã ghim' : '+ Ngân sách'}
+              </button>
+              <button type="button" class="btn btn-sm btn-compare-icon ${compared ? 'active' : ''}"
+                      data-compare-id="pkg:${pkg.id}"
+                      data-compare-type="Gói ${VENDOR_CATEGORY[pkg.vendor?.category] ?? 'Dịch vụ'}"
+                      data-compare-title="${pkg.name}"
+                      data-compare-vendor="${pkg.vendor?.name ?? ''}"
+                      data-compare-district="${pkg.vendor?.district ?? ''}"
+                      data-compare-verified="${pkg.vendor?.is_verified ? '1' : ''}"
+                      data-compare-rating="${pkg.vendor?.rating ?? ''}"
+                      data-compare-price="${estPrice}"
+                      data-compare-orig="${pkg.original_price ? (isVenue ? pkg.original_price * TYPICAL_TABLES : pkg.original_price) : 0}"
+                      data-compare-cat="${pkg.vendor?.category ?? ''}"
+                      data-compare-thumb="${pkg.image_url || ''}"
+                      data-compare-note="${pkg.description ?? ''}"
+                      data-compare-url="${new URL(`vendor.html?slug=${pkg.vendor?.slug ?? ''}`, location.href).href}"
+                      title="Thêm vào khay so sánh báo giá"
+                      aria-label="So sánh gói dịch vụ">
+                ⚖
+              </button>
+            </div>
           </div>
         </div>
       </article>`;

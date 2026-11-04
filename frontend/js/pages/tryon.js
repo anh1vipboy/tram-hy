@@ -19,7 +19,7 @@ import {
 import { openBookingDialog } from '../components/booking-dialog.js';
 import { openDressGallery, realPhotoCount } from '../components/dress-gallery.js';
 import { resultViewer } from '../components/tryon-result.js';
-import { openPersonSheet, openDressSheet, openSettingsSheet, QUALITY_SECONDS } from '../components/tryon-sheets.js?v=3';
+import { openPersonSheet, openDressSheet, openSettingsSheet, QUALITY_SECONDS } from '../components/tryon-sheets.js?v=4';
 import { openPricingModal, openPromoDialog } from '../components/pricing-modal.js';
 import { getMySubscription } from '../services/subscription.js';
 import { MODELS, dressThumb, fitScore } from '../data/tryon-data.js';
