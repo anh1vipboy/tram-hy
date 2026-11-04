@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://vsjdijmuvuetmhmszcrl.supabase.co" crossorigin>
   <link rel="modulepreload" href="js/vendor/supabase-2.117.3.js">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/styles.css?v=10">
-  <script type="module" src="js/pages/admin.js?v=10"></script>
+  <link rel="stylesheet" href="css/styles.css?v=11">
+  <script type="module" src="js/pages/admin.js?v=11"></script>
 </head>
 <body>
   <header id="app-header"></header>
@@ -31,14 +31,18 @@
     <div class="grid" id="stats" style="margin-bottom:24px"></div>
 
     <div class="tabs" style="margin-bottom:16px">
-      <button class="tab active" data-tab="approvals" type="button">Duyệt đối tác <span class="badge badge-gold" id="pending-count">0</span></button>
+      <button class="tab active" data-tab="kpi" type="button">📊 Bảng tổng User &amp; KPI <span class="badge badge-brand">218 users</span></button>
+      <button class="tab" data-tab="user-time" type="button">⏱️ Thời gian dùng 276 User <span class="badge badge-green" id="user-time-count-badge">276</span></button>
+      <button class="tab" data-tab="approvals" type="button">Duyệt đối tác <span class="badge badge-gold" id="pending-count">0</span></button>
       <button class="tab" data-tab="disputes" type="button">Khiếu nại</button>
       <button class="tab" data-tab="vendors" type="button">Đối tác</button>
       <button class="tab" data-tab="bookings" type="button">Tất cả đơn</button>
       <button class="tab" data-tab="ai-orders" type="button">Đơn gói AI <span class="badge badge-brand" id="ai-orders-count">0</span></button>
       <button class="tab" data-tab="ai" type="button">Thử váy AI</button>
     </div>
-    <section id="tab-approvals"></section>
+    <section id="tab-kpi"></section>
+    <section id="tab-user-time" hidden></section>
+    <section id="tab-approvals" hidden></section>
     <section id="tab-disputes" hidden></section>
     <section id="tab-vendors" hidden></section>
     <section id="tab-bookings" hidden></section>

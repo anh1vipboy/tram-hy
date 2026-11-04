@@ -10,6 +10,7 @@ const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'application/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.png': 'image/png',
   '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
 };
 
 const server = http.createServer((req, res) => {
@@ -25,7 +26,13 @@ const server = http.createServer((req, res) => {
         return;
       }
       if (!res.headersSent) {
-        res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream' }).end(data);
+        const headers = { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream' };
+        if (!urlPath.startsWith('/js/vendor/') && !urlPath.startsWith('/assets/')) {
+          headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+          headers['Pragma'] = 'no-cache';
+          headers['Expires'] = '0';
+        }
+        res.writeHead(200, headers).end(data);
       }
     });
   } catch {
