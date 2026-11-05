@@ -3,3 +3,5 @@
 *.log
 graphify-out/
 backend/supabase/.temp/
+*.bak
+
