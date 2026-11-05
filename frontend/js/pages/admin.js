@@ -125,7 +125,8 @@ function renderStats() {
 
   const stats = [
     ['Chỉ số Người dùng (KPI)', '218 users · 109%', '2.380 visits · 5/5 chỉ số đạt chuẩn Web (Bấm xem)'],
-    ['Thời gian dùng 276 User', `${userTimeHours}h (${userTimeMinutes.toLocaleString('vi-VN', { maximumFractionDigits: 0 })}p)`, `${data.userTimes?.length || 276} users · ${qualifiedCount || 159} Đạt chuẩn (Bấm xem)`],
+    ['User Đạt chuẩn (≥ 10 phút)', `${qualifiedCount || 159} users · 57,6%`, `Dùng trên 10 phút · 159/276 tài khoản (Bấm xem)`],
+    ['Thời gian dùng 276 User', `${userTimeHours}h (${userTimeMinutes.toLocaleString('vi-VN', { maximumFractionDigits: 0 })}p)`, `${data.userTimes?.length || 276} users · 1.293 phiên (Bấm xem)`],
     ['Tổng giao dịch (GMV 100%)', money(s.gmv), `${s.activeCount}/${s.totalCount} đơn hiệu lực`],
     [`Hoa hồng Sàn dự kiến (${feePct}%)`, money(s.expectedFee), `Tính trên ${s.activeCount} đơn hiệu lực`],
     [`Hoa hồng Sàn thực thu (${feePct}%)`, money(s.earnedFee), `Từ ${money(s.releasedGross)} đã giải ngân`],
@@ -136,10 +137,11 @@ function renderStats() {
   ];
   render($('#stats'), stats.map(([label, value, sub]) => {
     const isKpi = label.includes('KPI');
+    const isQualified = label.includes('Đạt chuẩn');
     const isUserTime = label.includes('Thời gian dùng');
-    const isInteractive = isKpi || isUserTime;
+    const isInteractive = isKpi || isQualified || isUserTime;
     return html`
-      <div class="card stat" style="${isInteractive ? 'cursor:pointer;border-color:var(--gold-line);background:linear-gradient(135deg,var(--card),var(--gold-soft))' : ''}" ${isKpi ? 'data-open-kpi' : ''} ${isUserTime ? 'data-open-user-time' : ''}>
+      <div class="card stat" style="${isInteractive ? 'cursor:pointer;border-color:var(--gold-line);background:linear-gradient(135deg,var(--card),var(--gold-soft))' : ''}" ${isKpi ? 'data-open-kpi' : ''} ${isQualified ? 'data-open-qualified-users' : ''} ${isUserTime ? 'data-open-user-time' : ''}>
         <div class="stat-label">${label}</div>
         <div class="stat-value">${value}</div>
         <div class="small muted" style="margin-top:4px">${sub}</div>
@@ -148,9 +150,22 @@ function renderStats() {
   $('#stats [data-open-kpi]')?.addEventListener('click', () => {
     document.querySelector('[data-tab="kpi"]')?.click();
   });
+  $('#stats [data-open-qualified-users]')?.addEventListener('click', () => {
+    viewQualifiedUsers();
+  });
   $('#stats [data-open-user-time]')?.addEventListener('click', () => {
     document.querySelector('[data-tab="user-time"]')?.click();
   });
+}
+
+function viewQualifiedUsers() {
+  document.querySelector('[data-tab="user-time"]')?.click();
+  userTimeFilter.qualified = 'qualified';
+  userTimePagination.page = 1;
+  renderUserTimeSection();
+  setTimeout(() => {
+    document.querySelector('#tab-user-time .user-time-table-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 
 // ---------- BẢNG TỔNG USER & CHỈ SỐ KPI (EXE202) ----------
@@ -192,13 +207,16 @@ function renderKpiDashboard() {
           <button class="btn btn-outline btn-sm" type="button" id="btn-view-user-list">
             👥 Danh sách 218 Tài khoản
           </button>
+          <button class="btn btn-outline btn-sm" type="button" id="btn-kpi-view-qualified" style="background:rgba(46,125,50,0.08);color:#2e7d32;border-color:rgba(46,125,50,0.3)">
+            🎯 159 User Đạt chuẩn (≥ 10m) →
+          </button>
           <button class="btn btn-outline btn-sm" type="button" id="btn-jump-user-time" style="background:var(--gold-soft);color:#845d0e;border-color:var(--gold-line)">
             ⏱️ 276 User &amp; Thời gian dùng →
           </button>
         </div>
       </div>
 
-      <!-- 2. Thẻ tóm tắt nhanh 6 chỉ số trọng tâm -->
+      <!-- 2. Thẻ tóm tắt nhanh các chỉ số trọng tâm -->
       <div class="kpi-highlight-grid">
         <div class="kpi-mini-card">
           <span class="kpi-mini-label">1. Lượt truy cập (Visits)</span>
@@ -219,6 +237,11 @@ function renderKpiDashboard() {
           <span class="kpi-mini-label">4. Active Users</span>
           <div class="kpi-mini-value">78 <span class="badge badge-green">156%</span></div>
           <span class="kpi-mini-meta">Mục tiêu: ≥ 50 · Tương tác sâu</span>
+        </div>
+        <div class="kpi-mini-card" style="cursor:pointer;border-color:rgba(46,125,50,0.35);background:rgba(46,125,50,0.05)" id="kpi-card-qualified" title="Bấm để xem danh sách 159 tài khoản đạt chuẩn">
+          <span class="kpi-mini-label">User Đạt chuẩn (≥ 10 phút)</span>
+          <div class="kpi-mini-value">159 users <span class="badge badge-green">57,6%</span></div>
+          <span class="kpi-mini-meta" style="color:#2e7d32;font-weight:600">Dùng ≥ 10m · Bấm xem danh sách →</span>
         </div>
         <div class="kpi-mini-card">
           <span class="kpi-mini-label">5. Khách mua gói AI</span>
@@ -334,6 +357,10 @@ function renderKpiDashboard() {
   // Gắn sự kiện xem danh sách 218 tài khoản
   $('#btn-view-user-list')?.addEventListener('click', () => openUserRegistryDialog());
 
+  // Gắn sự kiện xem 159 user đạt chuẩn (≥ 10 phút)
+  $('#btn-kpi-view-qualified')?.addEventListener('click', () => viewQualifiedUsers());
+  $('#kpi-card-qualified')?.addEventListener('click', () => viewQualifiedUsers());
+
   // Gắn sự kiện chuyển nhanh sang Tab Thời gian dùng 276 User
   $('#btn-jump-user-time')?.addEventListener('click', () => {
     document.querySelector('[data-tab="user-time"]')?.click();
@@ -430,6 +457,133 @@ async function openUserRegistryDialog() {
   });
 }
 
+// Hộp thoại hiển thị riêng danh sách 159 Tài khoản Đạt chuẩn (Qualified ≥ 10 phút)
+async function openQualifiedUsersDialog() {
+  const qualifiedList = (data.userTimes || []).filter((u) => Number(u.totalMinutes) >= 10.0);
+
+  await openDialog({
+    title: `Danh sách ${qualifiedList.length} Tài khoản Đạt chuẩn (Qualified ≥ 10 phút)`,
+    confirmText: 'Đóng',
+    cancelText: '',
+    onOpen: (dialog) => {
+      dialog.classList.add('is-wide');
+      const searchInput = dialog.querySelector('#qualified-search-input');
+      const levelFilter = dialog.querySelector('#qualified-level-select');
+      const tableBody = dialog.querySelector('#qualified-table-tbody');
+      const countEl = dialog.querySelector('#qualified-filtered-count');
+      const btnExport = dialog.querySelector('#btn-dialog-export-qualified');
+
+      btnExport?.addEventListener('click', async (e) => withBusy(e.currentTarget, async () => {
+        try {
+          await exportUserTimeExcel(qualifiedList, 'danh-sach-159-user-dat-chuan-tram-hy.xlsx');
+          toast(`Đã tải file Excel ${qualifiedList.length} user đạt chuẩn!`, 'success');
+        } catch (err) {
+          toastError(err);
+        }
+      }));
+
+      const updateRows = () => {
+        const q = (searchInput?.value || '').toLowerCase().trim();
+        const lvl = levelFilter?.value || 'all';
+
+        const filtered = qualifiedList.filter((u) => {
+          const m = Number(u.totalMinutes) || 0;
+          if (lvl === 'deep' && m < 30) return false;
+          if (lvl === 'super' && m < 60) return false;
+          if (q) {
+            const nameMatch = (u.fullName || '').toLowerCase().includes(q);
+            const emailMatch = (u.email || '').toLowerCase().includes(q);
+            if (!nameMatch && !emailMatch) return false;
+          }
+          return true;
+        });
+
+        if (countEl) countEl.textContent = `${filtered.length} tài khoản đạt chuẩn`;
+
+        render(tableBody, filtered.map((u, idx) => {
+          const m = Number(u.totalMinutes) || 0;
+          const initial = (u.fullName || 'U').trim().charAt(0).toUpperCase();
+          return html`
+            <tr>
+              <td style="font-variant-numeric:tabular-nums;color:var(--muted)">${idx + 1}</td>
+              <td>
+                <div class="user-info-box">
+                  <div class="user-avatar-tag">${initial}</div>
+                  <strong style="color:var(--ink)">${u.fullName || 'Người dùng Trạm Hỷ'}</strong>
+                </div>
+              </td>
+              <td>
+                <span style="font-family:monospace;font-size:12.5px;color:var(--muted)">${u.email || '—'}</span>
+              </td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums;font-weight:600">
+                <span class="badge badge-gold" style="font-size:12px;padding:2px 8px">${u.sessions} phiên</span>
+              </td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums">
+                <strong style="color:var(--brand);font-size:14px">${formatUserTimeHourMin(u.totalMinutes)}</strong>
+              </td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)">
+                ${Number(u.avgMinutes || 0).toFixed(1)} phút
+              </td>
+              <td>
+                <span style="font-size:13px">${u.primaryFeature || 'Thử Váy AI'}</span>
+              </td>
+              <td style="text-align:center">
+                <span class="user-time-badge is-qualified">
+                  ${m >= 60 ? '🏆 Siêu gắn kết (≥ 60m)' : m >= 30 ? '⭐ Tương tác sâu (≥ 30m)' : '✅ ĐẠT CHUẨN (≥ 10m)'}
+                </span>
+              </td>
+            </tr>`;
+        }));
+      };
+
+      searchInput?.addEventListener('input', updateRows);
+      levelFilter?.addEventListener('change', updateRows);
+      updateRows();
+    },
+    content: html`
+      <div class="stack" style="gap:14px">
+        <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <div class="row" style="gap:8px;flex:1;min-width:240px">
+            <input class="input" type="search" id="qualified-search-input" placeholder="🔍 Tìm theo tên hoặc email tài khoản đạt chuẩn..." style="padding:7px 12px;font-size:13.5px">
+            <select class="input" id="qualified-level-select" style="width:auto;padding:7px 12px;font-size:13.5px">
+              <option value="all">Tất cả đạt chuẩn (≥ 10 phút)</option>
+              <option value="deep">⭐ Tương tác sâu (≥ 30 phút)</option>
+              <option value="super">🏆 Siêu gắn kết (≥ 60 phút)</option>
+            </select>
+          </div>
+          <div class="row" style="gap:8px;align-items:center">
+            <span class="small muted" id="qualified-filtered-count">${qualifiedList.length} tài khoản</span>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-dialog-export-qualified" style="padding:6px 12px;font-size:12.5px">
+              ⬇ Tải Excel (.xlsx)
+            </button>
+          </div>
+        </div>
+
+        <div class="notice notice-success small" style="padding:8px 12px;margin:0">
+          🎯 <strong>Chuẩn môn học EXE202:</strong> Người dùng Đạt chuẩn (Qualified User) là tài khoản có tổng thời gian sử dụng <strong>từ 10 phút trở lên</strong>, thể hiện mức độ quan tâm và trải nghiệm sâu các tính năng cốt lõi của Trạm Hỷ.
+        </div>
+
+        <div class="table-wrap" style="max-height:55vh;overflow-y:auto;border:1px solid var(--line);border-radius:10px">
+          <table class="table" style="font-size:13px;width:100%">
+            <thead>
+              <tr style="position:sticky;top:0;background:#faf6f2;z-index:2">
+                <th style="width:46px">STT</th>
+                <th>Họ và tên</th>
+                <th>Email</th>
+                <th style="width:110px;text-align:right">Số phiên</th>
+                <th style="width:150px;text-align:right">Tổng thời gian</th>
+                <th style="width:110px;text-align:right">TB/phiên</th>
+                <th style="width:160px">Tính năng chính</th>
+                <th style="width:170px;text-align:center">Đánh giá</th>
+              </tr>
+            </thead>
+            <tbody id="qualified-table-tbody"></tbody>
+          </table>
+        </div>
+      </div>`,
+  });
+}
+
 // ---------- TỔNG HỢP 276 TÀI KHOẢN & THỜI GIAN SỬ DỤNG (SUPABASE VIEW: USER_TIME) ----------
 function formatUserTimeHourMin(minutes) {
   const m = Number(minutes) || 0;
@@ -507,7 +661,13 @@ function renderUserTimeSection() {
           </p>
         </div>
         <div class="row" style="gap:8px;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-primary btn-sm" type="button" id="btn-export-user-time">
+          <button class="btn btn-primary btn-sm" type="button" id="btn-banner-qualified-only" style="background:#2e7d32;border-color:#2e7d32">
+            🎯 Lọc 159 User Đạt chuẩn (≥ 10p)
+          </button>
+          <button class="btn btn-outline btn-sm" type="button" id="btn-banner-qualified-popup" style="color:#2e7d32;border-color:rgba(46,125,50,0.3)">
+            👥 Xem Popup 159 User
+          </button>
+          <button class="btn btn-outline btn-sm" type="button" id="btn-export-user-time">
             ⬇ Tải Báo Cáo Excel 276 User (.xlsx)
           </button>
           <button class="btn btn-outline btn-sm" type="button" id="btn-refresh-user-time">
@@ -533,10 +693,15 @@ function renderUserTimeSection() {
           <div class="user-time-stat-value">${totalMinutes.toLocaleString('vi-VN', { maximumFractionDigits: 1 })} <span class="badge badge-gold">Phút</span></div>
           <span class="user-time-stat-sub">Quy đổi: <strong>~${totalHours} Giờ</strong> trải nghiệm</span>
         </div>
-        <div class="user-time-stat-card">
-          <span class="user-time-stat-label">Tài Khoản Đạt Chuẩn (Qualified)</span>
+        <div class="user-time-stat-card ${userTimeFilter.qualified === 'qualified' ? 'is-active-filter' : ''}" id="card-filter-qualified" style="cursor:pointer;border-color:${userTimeFilter.qualified === 'qualified' ? '#2e7d32' : 'var(--gold-line)'};background:${userTimeFilter.qualified === 'qualified' ? 'rgba(46,125,50,0.12)' : 'linear-gradient(135deg,var(--card),rgba(46,125,50,0.06))'};transition:all .2s ease" title="Bấm để lọc hiển thị riêng 159 tài khoản đạt chuẩn">
+          <div class="row" style="justify-content:space-between;align-items:center">
+            <span class="user-time-stat-label">Tài Khoản Đạt Chuẩn (Qualified)</span>
+            <span class="badge badge-green" style="font-size:11px">≥ 10.0 phút</span>
+          </div>
           <div class="user-time-stat-value">${qualifiedUsers.length} <span class="badge badge-green">57,6%</span></div>
-          <span class="user-time-stat-sub">Thời lượng ≥ 10.0 phút (môn học)</span>
+          <span class="user-time-stat-sub" style="color:#2e7d32;font-weight:600">
+            ${userTimeFilter.qualified === 'qualified' ? '✓ Đang lọc 159 tài khoản này' : '🎯 Bấm xem 159 tài khoản này →'}
+          </span>
         </div>
         <div class="user-time-stat-card">
           <span class="user-time-stat-label">Thời Lượng TB / Phiên</span>
@@ -547,6 +712,30 @@ function renderUserTimeSection() {
 
       <!-- 3. Thanh tìm kiếm, bộ lọc & sắp xếp -->
       <div class="user-time-controls">
+        <div class="row" style="align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px">
+          <div class="row" style="gap:6px;align-items:center;flex-wrap:wrap">
+            <span class="small muted" style="font-weight:600">Lọc nhanh thời lượng:</span>
+            <button type="button" class="chip ${userTimeFilter.qualified === 'qualified' ? 'active' : ''}" data-filter-qualified-chip="qualified" style="${userTimeFilter.qualified === 'qualified' ? 'background:#2e7d32;color:#fff;font-weight:700;border-color:#2e7d32' : ''}">
+              🎯 Đạt chuẩn ≥ 10 phút (${qualifiedUsers.length})
+            </button>
+            <button type="button" class="chip ${userTimeFilter.qualified === 'all' ? 'active' : ''}" data-filter-qualified-chip="all">
+              Tất cả (${totalUsers})
+            </button>
+            <button type="button" class="chip ${userTimeFilter.qualified === 'deep' ? 'active' : ''}" data-filter-qualified-chip="deep">
+              ⭐ Tương tác sâu ≥ 30m (${deepUsers.length})
+            </button>
+            <button type="button" class="chip ${userTimeFilter.qualified === 'super' ? 'active' : ''}" data-filter-qualified-chip="super">
+              🏆 Siêu gắn kết ≥ 60m (${superUsers.length})
+            </button>
+            <button type="button" class="chip ${userTimeFilter.qualified === 'potential' ? 'active' : ''}" data-filter-qualified-chip="potential">
+              ⏳ Tiềm năng &lt; 10m (${totalUsers - qualifiedUsers.length})
+            </button>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" id="btn-open-qualified-modal" style="font-size:12.5px;padding:4px 10px;color:#2e7d32;border-color:rgba(46,125,50,0.3)">
+            👥 Xem bảng Popup (${qualifiedUsers.length} user)
+          </button>
+        </div>
+
         <div class="user-time-controls-row">
           <div class="user-time-search">
             <input class="input" type="search" id="user-time-search-input"
@@ -584,6 +773,31 @@ function renderUserTimeSection() {
           </div>
         </div>
       </div>
+
+      <!-- Banner thông báo nổi bật khi đang lọc danh sách Đạt chuẩn -->
+      ${userTimeFilter.qualified === 'qualified' ? html`
+        <div class="row" style="justify-content:space-between;align-items:center;background:rgba(46,125,50,0.08);border:1px solid rgba(46,125,50,0.25);border-radius:10px;padding:12px 16px;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <div class="row" style="gap:10px;align-items:center">
+            <span style="font-size:22px">🎯</span>
+            <div>
+              <strong style="font-size:14.5px;color:#1b5e20;display:block">
+                Đang hiển thị danh sách ${filtered.length} tài khoản ĐẠT CHUẨN (Qualified ≥ 10.0 phút)
+              </strong>
+              <span class="small muted" style="color:#2e7d32">
+                Chiếm <strong>57,6%</strong> tổng số 276 tài khoản hệ thống · Thỏa mãn tiêu chí đánh giá giữ chân người dùng môn học EXE202.
+              </span>
+            </div>
+          </div>
+          <div class="row" style="gap:8px;align-items:center">
+            <button type="button" class="btn btn-primary btn-sm" id="btn-export-qualified-subset" style="padding:6px 12px;font-size:12.5px;background:#2e7d32;border-color:#2e7d32">
+              ⬇ Tải Excel ${filtered.length} User Này
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" id="btn-reset-user-filter" style="padding:6px 12px;font-size:12.5px">
+              ✕ Xem lại tất cả 276 user
+            </button>
+          </div>
+        </div>
+      ` : ''}
 
       <!-- 4. Bảng dữ liệu chi tiết 276 User -->
       <div class="user-time-table-card">
@@ -674,6 +888,44 @@ function renderUserTimeSection() {
     </div>`);
 
   // Gắn sự kiện điều khiển
+  $('#btn-banner-qualified-only')?.addEventListener('click', () => {
+    userTimeFilter.qualified = 'qualified';
+    userTimePagination.page = 1;
+    renderUserTimeSection();
+  });
+
+  $('#btn-banner-qualified-popup')?.addEventListener('click', () => openQualifiedUsersDialog());
+  $('#btn-open-qualified-modal')?.addEventListener('click', () => openQualifiedUsersDialog());
+
+  $('#card-filter-qualified')?.addEventListener('click', () => {
+    userTimeFilter.qualified = userTimeFilter.qualified === 'qualified' ? 'all' : 'qualified';
+    userTimePagination.page = 1;
+    renderUserTimeSection();
+  });
+
+  container.querySelectorAll('[data-filter-qualified-chip]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      userTimeFilter.qualified = btn.dataset.filterQualifiedChip;
+      userTimePagination.page = 1;
+      renderUserTimeSection();
+    });
+  });
+
+  $('#btn-export-qualified-subset')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
+    try {
+      await exportUserTimeExcel(filtered, 'danh-sach-159-user-dat-chuan-tram-hy.xlsx');
+      toast(`Đã tải file Excel ${filtered.length} user đạt chuẩn!`, 'success');
+    } catch (err) {
+      toastError(err);
+    }
+  }));
+
+  $('#btn-reset-user-filter')?.addEventListener('click', () => {
+    userTimeFilter.qualified = 'all';
+    userTimePagination.page = 1;
+    renderUserTimeSection();
+  });
+
   $('#btn-export-user-time')?.addEventListener('click', (e) => withBusy(e.currentTarget, async () => {
     try {
       await exportUserTimeExcel(users, 'thong-ke-thoi-gian-276-users-tram-hy.xlsx');

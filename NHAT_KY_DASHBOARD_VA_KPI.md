@@ -150,3 +150,45 @@ where code in ('THAID632F54Z2', 'THAIC983KKC3J');
   (7 files changed, 1664 insertions, 58 deletions).
 * **`4960108`**: *feat(admin): cho phep admin xoa don test goi AI truc tiep tren UI va cung cap script SQL*  
   (1 file changed, 10 insertions, 2 deletions).
+* **`Update mới nhất`**: *feat(admin): them the thong ke va che do xem 159 user dat chuan tren 10 phut*  
+  (Tích hợp thẻ Stat Card riêng trên đầu Dashboard, thanh chip lọc 1-click, banner thông báo, popup modal tra cứu 159 user đạt chuẩn và tối ưu responsive mobile 390px).
+
+---
+
+## 5. Cập Nhật Mới: Thống Kê & Xem Riêng 159 Tài Khoản Đạt Chuẩn (≥ 10 Phút)
+
+### 5.1. Thẻ Thống Kê Nổi Bật Trên Header Stats
+* **Vị trí:** Ngay hàng đầu tiên của Dashboard Quản trị (`#stats`), nằm liền kề thẻ KPI.
+* **Nội dung:**
+  * Nhãn: `User Đạt chuẩn (≥ 10 phút)`
+  * Số liệu: `159 users · 57,6%`
+  * Mô tả: `Dùng trên 10 phút · 159/276 tài khoản (Bấm xem)`
+* **Tương tác:** Bấm vào thẻ sẽ lập tức chuyển sang tab *Thời gian dùng*, kích hoạt bộ lọc chỉ hiển thị 159 tài khoản đạt chuẩn và cuộn mượt đến bảng dữ liệu.
+
+### 5.2. Thanh Chip Lọc Nhanh (Quick Filter Chips)
+Tại Tab *Thời gian dùng 276 User*, bổ sung thanh nút chip phân khúc trực quan:
+* `🎯 Đạt chuẩn ≥ 10m (159)` (Màu xanh lá thương hiệu nổi bật)
+* `Tất cả (276)`
+* `⭐ Tương tác sâu ≥ 30m (47)`
+* `🏆 Siêu gắn kết ≥ 60m (18)`
+* `⏳ Tiềm năng < 10m (117)`
+* Nút `👥 Xem bảng Popup (159 user)`
+
+### 5.3. Banner Thông Báo & Xuất Excel Riêng 159 Tài Khoản
+* Khi người dùng chọn xem danh sách đạt chuẩn, giao diện hiển thị banner xanh lá xác nhận:
+  * *Đang hiển thị danh sách 159 tài khoản ĐẠT CHUẨN (Qualified ≥ 10.0 phút) - Chiếm 57,6% tổng số 276 tài khoản hệ thống.*
+  * Nút `⬇ Tải Excel 159 User Này` -> Tải file `danh-sach-159-user-dat-chuan-tram-hy.xlsx`.
+  * Nút `✕ Xem lại tất cả 276 user`.
+
+### 5.4. Hộp Thoại Popup Chuyên Biệt (Modal Tra Cứu)
+* Tiêu đề: **Danh sách 159 Tài khoản Đạt chuẩn (Qualified ≥ 10 phút)**
+* Thiết kế đồng bộ hoàn toàn với popup *Danh sách 218 Tài khoản Đăng ký* (chuẩn Soft Luxury).
+* Tích hợp thanh tìm kiếm tức thì theo Họ tên / Email.
+* Bộ lọc phân cấp: *Tất cả đạt chuẩn (≥ 10p)*, *Tương tác sâu (≥ 30p)*, *Siêu gắn kết (≥ 60p)*.
+* Bảng cuộn độc lập với thanh tiêu đề sticky, hiển thị đầy đủ avatar, số phiên, thời gian định dạng giờ phút, TB/phiên, tính năng chính và nhãn đánh giá đạt chuẩn.
+* Nút tải file Excel trực tiếp từ popup.
+
+### 5.5. Tinh Chỉnh Responsive Mobile (390px iPhone)
+* Căn chỉnh font chữ số liệu tiền tệ và thẻ stat dạng `clamp(16px, 4.3vw, 20px)` với `overflow-wrap: anywhere` để số tiền lớn (hơn 3,6 tỷ đồng) không bị tràn ra ngoài màn hình điện thoại.
+* Xếp lại các nút thao tác đầu trang trên mobile thành dạng khối tiện chạm.
+* Vượt qua toàn bộ kiểm thử chống tràn ngang (`expectNoHorizontalOverflow` đạt 0px overflow).

@@ -11,10 +11,14 @@ test('admin: kiểm tra Bảng tổng hợp User & chỉ số đo lường KPI m
   await expect(kpiTab).toHaveClass(/active/);
   await expect(kpiTab).toContainText('218 users');
 
-  // Thẻ tóm tắt trên đầu (stats) có liên kết tới KPI
+  // Thẻ tóm tắt trên đầu (stats) có liên kết tới KPI & User Đạt chuẩn
   const kpiStat = admin.locator('#stats [data-open-kpi]');
   await expect(kpiStat).toBeVisible();
   await expect(kpiStat).toContainText('218 users');
+
+  const qualifiedStat = admin.locator('#stats [data-open-qualified-users]');
+  await expect(qualifiedStat).toBeVisible();
+  await expect(qualifiedStat).toContainText('159 users');
 
   // Section KPI hiển thị đầy đủ
   const section = admin.locator('#tab-kpi');
