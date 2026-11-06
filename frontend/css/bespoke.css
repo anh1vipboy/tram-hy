@@ -48,7 +48,7 @@
 .budget-card.nudge { animation: budget-nudge 1.4s ease; }
 @keyframes budget-nudge { 0%, 60% { box-shadow: 0 0 0 3px var(--brand); } 100% { box-shadow: var(--shadow); } }
 
-/* Bước 4 – tóm tắt: thông số, ngân sách dự kiến, 3 đợt cọc (chỉ tỉ lệ, không số tiền) */
+/* Bước 4 – tóm tắt: thông số, ngân sách dự kiến, 3 đợt cọc (tỉ lệ + số tiền tạm tính khi đã chọn ngân sách) */
 .bespoke-specs { margin-top: 6px; color: var(--ink); }
 .bespoke-budget { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; background: var(--brand-soft); }
 .bespoke-budget strong { font: 700 22px/1.3 var(--font-title); color: var(--brand-dark); }
@@ -76,3 +76,44 @@
 .mirror-ai-actions .btn:not(:disabled):active { transform: scale(0.97); }
 .mirror-ai-actions .btn:focus-visible { outline: 2px solid #f3ead9; outline-offset: 2px; }
 .mirror-ai-status { margin: 0; color: #d9cbb8; text-wrap: pretty; }
+
+/* Ô "Ảnh của bạn" đầu hàng người mẫu: chưa có ảnh → biểu tượng máy ảnh cùng cỡ ảnh người mẫu */
+.model-add { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 10px; border: 1.5px dashed var(--line); background: var(--bg); font-size: 24px; }
+.model:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Ảnh tham khảo gửi Atelier (tối đa 3) */
+.ref-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.ref-item { position: relative; margin: 0; min-width: 0; }
+.ref-item img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; object-position: top; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); }
+.ref-item figcaption { margin-top: 4px; color: var(--muted); }
+.ref-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ref-actions .btn { min-height: 40px; }
+.ref-actions .btn:not(:disabled):active { transform: scale(0.97); }
+.ref-actions .is-disabled { opacity: .5; pointer-events: none; }
+.ref-note { margin: 0; text-wrap: pretty; }
+
+/* Tấm chọn ảnh dùng chung với Phòng thử (tryon-sheets.js)
+   shortcut: chép từ tryon.css vì trang này không nạp tryon.css; trang thứ ba cần thì chuyển hẳn sang styles.css */
+.upload-tile { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1.5px dashed #d9c2b5; border-radius: 16px; background: var(--bg); color: inherit; cursor: pointer; }
+.upload-tile:hover { border-color: var(--brand); text-decoration: none; }
+.upload-icon { flex: none; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; background: var(--brand-soft); font-size: 22px; }
+.upload-text { display: flex; flex-direction: column; }
+.upload-text small { font-size: 12.5px; color: var(--muted); }
+.pick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+.pick-tile { position: relative; }
+.pick-main { width: 100%; display: flex; flex-direction: column; gap: 3px; padding: 5px; border: 2px solid transparent; border-radius: 14px;
+  background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: background .18s var(--ease-out), border-color .18s var(--ease-out), transform .15s var(--ease-out); }
+.pick-main:hover { background: var(--bg); }
+.pick-main:active { transform: scale(.98); }
+.pick-main:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.pick-tile.active .pick-main { border-color: var(--brand); background: #fffaf8; }
+.pick-main img { width: 100%; aspect-ratio: 3 / 4; border-radius: 10px; object-fit: cover; object-position: top; background: var(--brand-soft); }
+.pick-name { font-size: 12.5px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pick-remove { position: absolute; top: -2px; right: -2px; width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 50%;
+  background: var(--card); color: var(--red); font: 700 15px/1 var(--font-body); cursor: pointer; box-shadow: var(--shadow); }
+.pick-remove:hover { background: var(--red-soft); }
+@media (max-width: 560px) { .pick-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Số tiền từng đợt (khi đã chọn ngân sách) */
+.bespoke-step-amount { margin-top: auto; font: 700 15px/1.3 var(--font-title); color: var(--brand-dark); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+@media (max-width: 560px) { .bespoke-steps li .bespoke-step-amount { margin: 0 0 0 auto; white-space: nowrap; } }

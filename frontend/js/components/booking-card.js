@@ -5,9 +5,34 @@ import { MILESTONE_STATUS, VENDOR_CATEGORY, statusBadge } from '../core/labels.j
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { BODY_SHAPES } from '../data/tryon-data.js';
 import { SUPABASE_URL } from '../config.js';
+import { signReferenceUrls } from '../services/profile.js';
 
 // Ảnh váy may đo AI vẽ (Edge Function thu-vay-ai, mode design) – bucket công khai, chỉ nhận mã hash hợp lệ
 const aiDesignUrl = (hash) => `${SUPABASE_URL}/storage/v1/object/public/dress-images/bespoke/${hash}`;
+
+// Ảnh tham khảo riêng tư của đơn may đo (trang Thiết kế váy) – chỉ nhận đúng 2 kho ảnh, tối đa 3
+const REF_BUCKETS = ['bride-photos', 'tryon-results'];
+const refsOf = (design) => (Array.isArray(design?.references) ? design.references : [])
+  .filter((r) => REF_BUCKETS.includes(r?.bucket) && typeof r.path === 'string').slice(0, 3);
+
+// Ký link tạm khi mở "Hồ sơ số đo & thiết kế" (sự kiện toggle không nổi bọt → bắt ở pha capture).
+// Không có quyền (đơn đã hủy – SQL 43) hoặc ảnh đã xóa → ẩn ô ảnh.
+document.addEventListener('toggle', async (e) => {
+  const box = e.target;
+  if (!(box instanceof HTMLDetailsElement) || !box.open) return;
+  const links = [...box.querySelectorAll('a[data-ref-path]:not([href])')];
+  if (!links.length) return;
+  const urls = await signReferenceUrls(links.map((a) => ({ bucket: a.dataset.refBucket, path: a.dataset.refPath }))).catch(() => new Map());
+  for (const a of links) {
+    const url = urls.get(`${a.dataset.refBucket}/${a.dataset.refPath}`);
+    if (url) {
+      a.href = url;
+      a.querySelector('img').src = url;
+    } else {
+      a.hidden = true;
+    }
+  }
+}, true);
 import {
   respondDisputeAsBride,
   respondDisputeAsVendor,
@@ -118,7 +143,14 @@ export function detailsView(details) {
                 <a href="${aiDesignUrl(design.ai_design_hash)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px">
                   <img src="${aiDesignUrl(design.ai_design_hash)}" alt="Ảnh AI theo thiết kế khách chọn" loading="lazy" decoding="async"
                        style="width:120px;aspect-ratio:3/4;object-fit:cover;border-radius:8px;border:1px solid var(--line)"></a>
-                <div>Ảnh AI vẽ theo đúng thông số khách chọn (minh họa).</div>` : ''}` : ''}
+                <div>Ảnh AI vẽ theo đúng thông số khách chọn (minh họa).</div>` : ''}
+              ${refsOf(design).length ? html`
+                <div style="margin-top:6px">Ảnh tham khảo khách gửi:</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+                  ${refsOf(design).map((r) => html`<a target="_blank" rel="noopener" data-ref-bucket="${r.bucket}" data-ref-path="${r.path}">
+                    <img alt="Ảnh tham khảo của khách" decoding="async"
+                         style="width:84px;aspect-ratio:3/4;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:var(--bg)"></a>`)}
+                </div>` : ''}` : ''}
           </div>
         </details>` : ''}
       ${hasHistory ? html`

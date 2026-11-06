@@ -162,12 +162,15 @@ export async function listTryonHistory({ before = null, limit = 24 } = {}) {
   const batches = groups.map(({ key, jobs: list }) => {
     const first = list.at(-1);                       // ảnh đầu tiên của lần gửi (danh sách đang mới → cũ)
     const person = personOf(first);
+    const shots = list.slice().reverse().filter((j) => resultUrls.has(j.result_path));
     return {
       id: key,
       createdAt: first.created_at,
       message: first.message ?? '',
       model: first.options?.model ?? null,
-      images: list.slice().reverse().map((j) => resultUrls.get(j.result_path)).filter(Boolean),
+      images: shots.map((j) => resultUrls.get(j.result_path)),
+      resultPaths: shots.map((j) => j.result_path),    // trang Thiết kế váy đính ảnh vào đơn theo đường dẫn
+      garmentPath: first.garment_path && photoUrls.has(first.garment_path) ? first.garment_path : null,
       personUrl: person && !person.startsWith('sample:') ? photoUrls.get(person) ?? null : null,
       personSample: person?.startsWith('sample:') ? person.slice(7) : null,
       personDeleted: Boolean(person) && !person.startsWith('sample:') && !photoUrls.has(person),

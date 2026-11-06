@@ -474,6 +474,7 @@ Deno.serve(withCors(async (req) => {
       : { model: 'gemini', person: personRef };
     const batchId = crypto.randomUUID();                             // 1 lần gửi = 1 lượt, gồm 1–4 ảnh
     const urls: string[] = [];
+    const paths: string[] = [];                                    // trang Thiết kế váy đính ảnh vào đơn theo đường dẫn
     let charged = 0;
     for (const [i, img] of result.images.entries()) {
       const jobId = crypto.randomUUID();
@@ -493,13 +494,17 @@ Deno.serve(withCors(async (req) => {
       if (saved.error) saved = await admin.from('tryon_jobs').insert(job);          // chưa chạy SQL 28
       if (saved.error) console.error('Ghi tryon_jobs lỗi (đã chạy SQL 12 chưa?):', saved.error);
       const { data: signed } = await admin.storage.from('tryon-results').createSignedUrl(path, 3600);
-      if (signed?.signedUrl) urls.push(signed.signedUrl);
+      if (signed?.signedUrl) {
+        urls.push(signed.signedUrl);
+        paths.push(path);
+      }
     }
     if (!urls.length) return fallback('provider-error');
 
     return json({
       imageUrl: urls[0],
       images: urls,
+      paths,
       batchId,
       remaining: unlimited ? null : Math.max(0, left - charged),
       limit: settings.limit,

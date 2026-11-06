@@ -7,13 +7,15 @@
 // Ảnh vẽ chỉ gửi kèm đơn khi còn khớp thiết kế hiện tại (đổi chip → phải vẽ lại).
 import { initLayout } from '../core/layout.js';
 import { loginUrl } from '../core/auth.js';
-import { aiDesignDress, aiTryOn, getTryonSettings, creditsUsedToday } from '../services/tryon-ai.js';
+import { aiDesignDress, aiTryOn, getTryonSettings, creditsUsedToday, listTryonHistory } from '../services/tryon-ai.js';
 import { $, $$, html, render, money, param, debounce, sleep } from '../core/utils.js';
-import { DRESS_THEME } from '../core/labels.js';
-import { toast, toastError } from '../core/ui.js';
+import { toast, toastError, openDialog } from '../core/ui.js';
 import { BESPOKE_VENDOR_SLUG } from '../config.js';
 import { getVendorBySlug } from '../services/catalog.js';
-import { getBodyProfile, saveBodyProfile } from '../services/profile.js';
+import {
+  getBodyProfile, saveBodyProfile, listBridePhotos, uploadBridePhoto, deleteBridePhoto, MAX_BRIDE_PHOTOS,
+} from '../services/profile.js';
+import { openPersonSheet, openShotSheet } from '../components/tryon-sheets.js?v=6';
 import { openBookingDialog } from '../components/booking-dialog.js';
 import { parseMoney } from '../components/money-input.js';
 import {
@@ -34,7 +36,11 @@ const state = {
   budget: null,
   budgetError: '',
   ai: { enabled: false, busy: '', remaining: null },   // busy: '' | 'draw' | 'tryon'
+  wearer: null,                 // ảnh của chính khách { path, url } để AI ướm – null = người mẫu state.model
+  myPhotos: [],                 // ảnh toàn thân khách đã lưu (riêng tư) [{ path, url }]
+  refs: [],                     // ảnh tham khảo gửi Atelier cùng đơn [{ bucket, path, url, name }] – tối đa MAX_REFS
 };
+const MAX_REFS = 3;              // khớp lời hứa với khách; Atelier xem được nhờ policy SQL 43
 
 // Ảnh AI đã vẽ trong phiên, theo thông số: specKey → { url, hash, tryons: { [modelKey]: url } }
 const aiDraws = new Map();
@@ -63,6 +69,7 @@ const STEPS = [
 
 // Đến từ Phòng thử ("Đặt may theo mẫu này") → ghi chú sẵn để thợ may xem ảnh váy khi tư vấn
 const FROM_TRYON_NOTE = 'May theo ảnh váy mẫu tôi đã ướm thử bằng AI trên Trạm Hỷ (sẽ gửi ảnh khi tư vấn).';
+const FROM_TRYON_NOTE_ATTACHED = 'May theo ảnh váy mẫu tôi đã ướm thử bằng AI trên Trạm Hỷ (ảnh trong mục Ảnh tham khảo).';
 
 // ---------- TẢI DỮ LIỆU ----------
 async function loadVendor() {
@@ -229,6 +236,7 @@ function initControls() {
     if (btn && !btn.disabled) runAi(btn.dataset.ai);
   });
   $('#bespoke-notes').addEventListener('input', debounce(renderSummary, 300));
+  initRefs();
   $('#book-btn').addEventListener('click', book);
   $('#cta-book').addEventListener('click', book);
   initBudget();
@@ -250,15 +258,15 @@ const AI_FALLBACK = 'AI chưa vẽ được lúc này – bạn vẫn đặt l�
 async function runAi(kind) {
   if (state.ai.busy) return;
   if (!state.profile) {
-    const back = `thiet-ke-vay.html?${new URLSearchParams({ [DESIGN_PARAM]: JSON.stringify(state.design) })}`;
-    location.href = loginUrl(back);
+    location.href = loginUrl(backToHere());
     return;
   }
   const key = specKey(state.design);
-  const model = state.model;
+  const wearer = state.wearer;
+  const who = wearerKey();
   state.ai.busy = kind;
   const scan = $('#mirror-scan');
-  scan.textContent = kind === 'draw' ? 'AI đang vẽ váy theo thiết kế của bạn… (khoảng 20 giây)' : `AI đang ướm váy lên ${model.name}…`;
+  scan.textContent = kind === 'draw' ? 'AI đang vẽ váy theo thiết kế của bạn… (khoảng 20 giây)' : `AI đang ướm váy lên ${wearerName()}…`;
   scan.hidden = false;
   renderAiBar();
   try {
@@ -266,7 +274,7 @@ async function runAi(kind) {
       ? await aiDesignDress(state.design)
       : await aiTryOn({
         designHash: aiDraws.get(key).hash,
-        sampleModel: model.key,
+        ...(wearer ? { photoPath: wearer.path } : { sampleModel: state.model.key }),
         body: state.body,
         options: { model: 'standard', samples: 1, photoType: 'flat-lay' },
       });
@@ -276,7 +284,12 @@ async function runAi(kind) {
     }
     if (typeof result.remaining === 'number') state.ai.remaining = result.remaining;
     if (kind === 'draw') aiDraws.set(key, { url: result.designUrl, hash: result.designHash, tryons: {} });
-    else aiDraws.get(key).tryons[model.key] = result.images?.[0] ?? result.imageUrl;
+    else {
+      const url = result.images?.[0] ?? result.imageUrl;
+      aiDraws.get(key).tryons[who] = url;
+      // Ảnh ướm thiết kế này lên người → tự thêm vào ảnh tham khảo cho Atelier (nếu còn chỗ)
+      if (result.paths?.[0]) addRef({ bucket: 'tryon-results', path: result.paths[0], url, name: 'AI ướm thiết kế' }, { quiet: true });
+    }
   } catch (error) {
     if (typeof error.remaining === 'number') state.ai.remaining = error.remaining;
     toastError(error);
@@ -306,11 +319,205 @@ function renderAiBar() {
       <button class="btn btn-primary btn-sm" type="button" data-ai="draw" ${busy || noCredit || draw ? 'disabled' : ''}>
         ${busy === 'draw' ? 'Đang vẽ…' : draw ? '✓ Đã vẽ thiết kế này' : stale ? '↻ Vẽ lại theo thiết kế mới' : '✨ Vẽ váy của tôi bằng AI'}</button>
       ${draw ? html`<button class="btn btn-light btn-sm" type="button" data-ai="tryon"
-          ${busy || noCredit || draw.tryons[state.model.key] ? 'disabled' : ''}>
-          ${busy === 'tryon' ? 'Đang ướm…' : `👰 Ướm lên ${state.model.name}`}</button>` : ''}
+          ${busy || noCredit || draw.tryons[wearerKey()] ? 'disabled' : ''}>
+          ${busy === 'tryon' ? 'Đang ướm…' : `👰 Ướm lên ${wearerName()}`}</button>` : ''}
     </div>
     ${status ? html`<p class="small mirror-ai-status" aria-live="polite">${status}</p>` : ''}
     ${draw ? html`<p class="small mirror-ai-status">Ảnh AI minh họa – váy thật do Atelier chốt sau buổi tư vấn.</p>` : ''}`);
+}
+
+// ---------- ẢNH CỦA KHÁCH (người mặc thử) ----------
+const wearerKey = () => state.wearer?.path ?? state.model.key;
+const wearerName = () => (state.wearer ? 'ảnh của bạn' : state.model.name);
+const backToHere = () => `thiet-ke-vay.html?${new URLSearchParams({ [DESIGN_PARAM]: JSON.stringify(state.design) })}`;
+const TEN_MB = 10 * 1024 * 1024;
+
+async function loadMyPhotos() {
+  if (!state.profile) return;
+  try {
+    state.myPhotos = await listBridePhotos(state.profile.id, 'body');
+  } catch (error) {
+    toastError(error);
+  }
+}
+
+function pickWearer(photo) {
+  state.wearer = photo;
+  renderModels();
+  renderMirror();
+}
+
+async function uploadWearer(file) {
+  if (file.size > TEN_MB) return toastError(new Error('Ảnh tối đa 10MB'));
+  if (state.myPhotos.length >= MAX_BRIDE_PHOTOS) {
+    return toastError(new Error(`Bạn đã lưu đủ ${MAX_BRIDE_PHOTOS} ảnh – bấm × trên ảnh cũ để xóa bớt rồi tải lại`));
+  }
+  const url = URL.createObjectURL(file);
+  try {
+    const path = await uploadBridePhoto(state.profile.id, file, 'body');
+    const saved = { path, url };
+    state.myPhotos.unshift(saved);
+    pickWearer(saved);
+    toast('Đã lưu ảnh riêng tư vào tài khoản – bấm “Ướm lên ảnh của bạn” sau khi vẽ váy.', 'success');
+  } catch (error) {
+    toastError(error);
+  }
+}
+
+async function deleteMyPhoto(path) {
+  const done = await openDialog({
+    title: 'Xóa ảnh này?',
+    content: html`<p>Ảnh sẽ bị xóa hẳn khỏi tài khoản của bạn và không khôi phục được.</p>`,
+    confirmText: 'Xóa ảnh',
+    danger: true,
+    onConfirm: () => deleteBridePhoto(path),
+  });
+  if (!done) return false;
+  state.myPhotos = state.myPhotos.filter((p) => p.path !== path);
+  state.refs = state.refs.filter((r) => r.path !== path);
+  if (state.wearer?.path === path) state.wearer = null;
+  renderModels();
+  renderMirror();
+  renderRefs();
+  return true;
+}
+
+function openWearerPicker() {
+  openPersonSheet({
+    loggedIn: Boolean(state.profile),
+    loginHref: loginUrl(backToHere()),
+    getPhotos: () => state.myPhotos,
+    max: MAX_BRIDE_PHOTOS,
+    selectedKey: state.wearer?.path ?? `sample:${state.model.key}`,
+    onPick: (key) => {
+      if (key.startsWith('sample:')) {
+        state.model = MODELS.find((m) => m.key === key.slice(7)) ?? state.model;
+        pickWearer(null);
+      } else {
+        pickWearer(state.myPhotos.find((p) => p.path === key) ?? null);
+      }
+    },
+    onDelete: deleteMyPhoto,
+    onUpload: uploadWearer,
+  });
+}
+
+// ---------- ẢNH THAM KHẢO GỬI ATELIER (tối đa 3) ----------
+const sameRef = (a, b) => a.bucket === b.bucket && a.path === b.path;
+
+function addRef(ref, { quiet = false } = {}) {
+  if (state.refs.some((r) => sameRef(r, ref))) return quiet || toast('Ảnh này đã có trong ảnh tham khảo.');
+  if (state.refs.length >= MAX_REFS) {
+    if (!quiet) toastError(new Error(`Tối đa ${MAX_REFS} ảnh tham khảo – bấm × để bỏ bớt ảnh cũ.`));
+    return;
+  }
+  state.refs.push(ref);
+  renderRefs();
+  renderSummary();
+  if (!quiet) toast('Đã thêm vào ảnh tham khảo.', 'success');
+}
+
+function removeRef(index) {
+  state.refs.splice(index, 1);
+  renderRefs();
+  renderSummary();
+}
+
+// Các lần ướm ở Phòng thử → ảnh chọn được: ảnh kết quả + ảnh váy khách tự tải (nếu có)
+async function tryonShots() {
+  const { batches } = await listTryonHistory();
+  return batches.flatMap((b) => [
+    ...b.resultPaths.map((path, i) => ({ key: `tryon-results|${path}`, url: b.images[i], name: 'Ảnh ướm AI' })),
+    ...(b.garmentPath && b.garmentUrl ? [{ key: `bride-photos|${b.garmentPath}`, url: b.garmentUrl, name: 'Váy bạn tải lên' }] : []),
+  ]);
+}
+
+async function openTryonPicker() {
+  if (!state.profile) {
+    location.href = loginUrl(backToHere());
+    return;
+  }
+  let shots;
+  try {
+    shots = await tryonShots();
+  } catch (error) {
+    toastError(error);
+    return;
+  }
+  openShotSheet({
+    title: 'Ảnh đã ướm ở Phòng thử',
+    shots,
+    empty: 'Bạn chưa ướm váy nào ở Phòng thử AI.',
+    onPick: (key) => {
+      const shot = shots.find((s) => s.key === key);
+      const [bucket, path] = key.split('|');
+      addRef({ bucket, path, url: shot.url, name: shot.name });
+    },
+  });
+}
+
+async function uploadRef(file) {
+  if (file.size > TEN_MB) return toastError(new Error('Ảnh tối đa 10MB'));
+  if (state.refs.length >= MAX_REFS) return toastError(new Error(`Tối đa ${MAX_REFS} ảnh tham khảo – bấm × để bỏ bớt ảnh cũ.`));
+  try {
+    const path = await uploadBridePhoto(state.profile.id, file, 'garment');
+    addRef({ bucket: 'bride-photos', path, url: URL.createObjectURL(file), name: 'Váy bạn thích' });
+  } catch (error) {
+    toastError(error);
+  }
+}
+
+// Đến từ Phòng thử với ?batch= → tự đính ảnh váy khách tải + ảnh ướm của lần đó
+async function attachBatch(batchId) {
+  try {
+    const { batches } = await listTryonHistory();
+    const batch = batches.find((b) => b.id === batchId);
+    if (!batch) return false;
+    if (batch.garmentPath && batch.garmentUrl) addRef({ bucket: 'bride-photos', path: batch.garmentPath, url: batch.garmentUrl, name: 'Váy bạn tải lên' }, { quiet: true });
+    if (batch.resultPaths[0]) addRef({ bucket: 'tryon-results', path: batch.resultPaths[0], url: batch.images[0], name: 'Ảnh ướm AI' }, { quiet: true });
+    return state.refs.length > 0;
+  } catch {
+    return false;                                   // không lấy được → giữ ghi chú cũ, khách gửi ảnh khi tư vấn
+  }
+}
+
+function renderRefs() {
+  const loggedIn = Boolean(state.profile);
+  const full = state.refs.length >= MAX_REFS;
+  render($('#bespoke-refs'), html`
+    ${state.refs.length ? html`
+      <div class="ref-grid">
+        ${state.refs.map((r, i) => html`
+          <figure class="ref-item">
+            <img src="${r.url}" alt="${r.name}" loading="lazy" decoding="async">
+            <figcaption class="small ellipsis">${r.name}</figcaption>
+            <button type="button" class="pick-remove" data-ref-remove="${i}" aria-label="Bỏ ảnh tham khảo">×</button>
+          </figure>`)}
+      </div>` : ''}
+    <div class="ref-actions">
+      <button class="btn btn-outline btn-sm" type="button" data-ref-tryon ${full ? 'disabled' : ''}>🖼️ Lấy từ Phòng thử AI</button>
+      ${loggedIn
+        ? html`<label class="btn btn-outline btn-sm ${full ? 'is-disabled' : ''}">📤 Tải ảnh váy bạn thích
+            <input type="file" accept="image/jpeg,image/png,image/webp" hidden data-ref-upload ${full ? 'disabled' : ''}></label>`
+        : html`<a class="btn btn-outline btn-sm" href="${loginUrl(backToHere())}">🔑 Đăng nhập để tải ảnh</a>`}
+    </div>
+    <p class="small muted ref-note">${state.refs.length}/${MAX_REFS} ảnh · Ảnh tham khảo sẽ gửi cho Atelier khi bạn đặt lịch
+      (chỉ tiệm nhận đơn xem được, tự thu hồi nếu đơn bị hủy).</p>`);
+}
+
+function initRefs() {
+  const box = $('#bespoke-refs');
+  box.addEventListener('click', (e) => {
+    const remove = e.target.closest('[data-ref-remove]');
+    if (remove) removeRef(Number(remove.dataset.refRemove));
+    else if (e.target.closest('[data-ref-tryon]:not(:disabled)')) openTryonPicker();
+  });
+  box.addEventListener('change', (e) => {
+    if (!e.target.matches('[data-ref-upload]')) return;
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (file) uploadRef(file);
+  });
 }
 
 // Hiệu ứng dựng phom ngắn rồi hiện ảnh minh họa mới
@@ -356,6 +563,8 @@ function selection() {
         budget_max: budget?.max,
         // Ảnh AI vẽ đúng thiết kế đang chọn (ảnh công khai dress-images/bespoke/<hash>) – Atelier xem trong đơn
         ai_design_hash: currentDraw()?.hash,
+        // Ảnh riêng tư khách đính kèm – chủ tiệm xem được theo policy SQL 43 (đơn chưa hủy)
+        references: state.refs.map(({ bucket, path }) => ({ bucket, path })),
       },
     },
   };
@@ -380,6 +589,7 @@ function renderAll() {
   renderBody();
   renderDesign();
   renderMirror();
+  renderRefs();
   renderBudget();
   renderSummary();
 }
@@ -387,10 +597,12 @@ function renderAll() {
 function renderMirror() {
   const theme = bespokeTheme(state.design);
   const draw = currentDraw();
-  const tryon = draw?.tryons[state.model.key];
-  $('#mirror-img').src = tryon || draw?.url || renderImageFor(state.model.key, theme);
-  $('#mirror-label').textContent = tryon ? `AI ướm lên ${state.model.name}`
-    : draw ? 'Ảnh AI theo thiết kế của bạn' : `Minh họa: ${DRESS_THEME[theme]}`;
+  const tryon = draw?.tryons[wearerKey()];
+  $('#mirror-img').src = tryon || draw?.url || state.wearer?.url || renderImageFor(state.model.key, theme);
+  $('#mirror-label').textContent = tryon ? `AI ướm lên ${wearerName()}`
+    : draw ? 'Ảnh AI theo thiết kế của bạn'
+      : state.wearer ? 'Ảnh của bạn – vẽ váy rồi bấm ướm'
+        : `Minh họa: ${bespokeLabel('silhouette', state.design.silhouette)}`;
   renderFit();
   renderAiBar();
 }
@@ -402,13 +614,21 @@ function renderFit() {
 }
 
 function renderModels() {
-  render($('#models'), MODELS.map((m) => html`
-    <button class="model ${m.key === state.model.key ? 'active' : ''}" type="button" data-model="${m.key}">
+  const own = state.wearer;
+  render($('#models'), html`
+    <button class="model ${own ? 'active' : ''}" type="button" data-wearer aria-pressed="${Boolean(own)}">
+      ${own ? html`<img src="${own.url}" alt="">` : html`<span class="model-add" aria-hidden="true">📷</span>`}Ảnh của bạn
+    </button>
+    ${MODELS.map((m) => html`
+    <button class="model ${!own && m.key === state.model.key ? 'active' : ''}" type="button" data-model="${m.key}"
+            aria-pressed="${!own && m.key === state.model.key}">
       <img src="${m.photo}" alt="">${m.name}
-    </button>`));
+    </button>`)}`);
+  $('[data-wearer]').addEventListener('click', openWearerPicker);
   for (const btn of $$('[data-model]')) {
     btn.addEventListener('click', () => {
       state.model = MODELS.find((m) => m.key === btn.dataset.model);
+      state.wearer = null;
       redraw();
     });
   }
@@ -475,8 +695,16 @@ function renderDesign() {
   }
 }
 
+// Chia tiền 3 đợt giống create_booking (SQL 30): đợt 1–2 làm tròn theo %, đợt cuối = phần còn lại
+function stepAmounts(total) {
+  const first = STEPS.slice(0, -1).map((s) => Math.round(total * s.percent / 100));
+  return [...first, total - first.reduce((a, b) => a + b, 0)];
+}
+console.assert(stepAmounts(15000000).join() === '4500000,6000000,4500000' && stepAmounts(10000001).reduce((a, b) => a + b) === 10000001);
+
 function renderSummary() {
   const booking = selection();
+  const amounts = booking.budget ? stepAmounts(booking.budget.estimate) : null;
   const { design } = state;
   const specs = [
     `Cổ: ${bespokeLabel('neckline', design.neckline)}`,
@@ -504,8 +732,12 @@ function renderSummary() {
       <ol class="bespoke-steps" aria-label="Thanh toán 3 đợt qua Trạm Hỷ">
         ${STEPS.map((s, i) => html`
           <li><span class="bespoke-step-pct">${s.percent}%</span>
-            <span class="small"><strong>Đợt ${i + 1}</strong><br>${s.title}</span></li>`)}
+            <span class="small"><strong>Đợt ${i + 1}</strong><br>${s.title}</span>
+            ${amounts ? html`<strong class="bespoke-step-amount">${money(amounts[i])}</strong>` : ''}</li>`)}
       </ol>
+      ${amounts ? html`<p class="small muted" style="margin:0">${booking.budget.isRange
+        ? `Số tiền từng đợt tạm tính theo ${money(booking.budget.estimate)} (giữa khoảng bạn chọn).`
+        : 'Số tiền từng đợt tạm tính theo ngân sách bạn nhập.'} Giá chốt sau buổi tư vấn có thể thay đổi.</p>` : ''}
       <p class="small muted" style="margin:0">Tiền được Trạm Hỷ giữ, chỉ chuyển cho tiệm khi bạn nghiệm thu từng đợt. Tiệm sai cam kết → hoàn 100%.</p>
     </div>`);
   $('[data-goto-budget]')?.addEventListener('click', goToBudget);
@@ -519,5 +751,6 @@ restoreDesign();
 if (param('tu') === 'anh-vay') $('#bespoke-notes').value = FROM_TRYON_NOTE;
 renderAll();                       // hiện ngay ảnh minh họa trong lúc chờ tải dữ liệu
 state.profile = await initLayout('bespoke');
-await Promise.all([loadVendor(), loadBodyProfile(), loadAi()]);
+await Promise.all([loadVendor(), loadBodyProfile(), loadAi(), loadMyPhotos()]);
+if (state.profile && param('batch') && await attachBatch(param('batch'))) $('#bespoke-notes').value = FROM_TRYON_NOTE_ATTACHED;
 renderAll();
