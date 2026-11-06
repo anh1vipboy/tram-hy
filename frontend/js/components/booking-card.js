@@ -4,6 +4,10 @@ import { html, money, dateTime } from '../core/utils.js';
 import { MILESTONE_STATUS, VENDOR_CATEGORY, statusBadge } from '../core/labels.js';
 import { openDialog, toast, toastError, withBusy } from '../core/ui.js';
 import { BODY_SHAPES } from '../data/tryon-data.js';
+import { SUPABASE_URL } from '../config.js';
+
+// Ảnh váy may đo AI vẽ (Edge Function thu-vay-ai, mode design) – bucket công khai, chỉ nhận mã hash hợp lệ
+const aiDesignUrl = (hash) => `${SUPABASE_URL}/storage/v1/object/public/dress-images/bespoke/${hash}`;
 import {
   respondDisputeAsBride,
   respondDisputeAsVendor,
@@ -109,7 +113,12 @@ export function detailsView(details) {
               <div>Phom: ${design.silhouette} · Cổ: ${design.neckline} · Tay: ${design.sleeve} · Vải: ${design.fabric} · Đuôi: ${design.train_m}m</div>
               ${design.extras?.length ? html`<div>Thêm: ${design.extras.join(', ')}</div>` : ''}
               ${design.budget ? html`<div>Ngân sách mong muốn: <strong>${design.budget}</strong></div>` : ''}
-              ${design.notes ? html`<div>Ý tưởng: ${design.notes}</div>` : ''}` : ''}
+              ${design.notes ? html`<div>Ý tưởng: ${design.notes}</div>` : ''}
+              ${/^[a-f0-9]{64}$/.test(design.ai_design_hash ?? '') ? html`
+                <a href="${aiDesignUrl(design.ai_design_hash)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px">
+                  <img src="${aiDesignUrl(design.ai_design_hash)}" alt="Ảnh AI theo thiết kế khách chọn" loading="lazy" decoding="async"
+                       style="width:120px;aspect-ratio:3/4;object-fit:cover;border-radius:8px;border:1px solid var(--line)"></a>
+                <div>Ảnh AI vẽ theo đúng thông số khách chọn (minh họa).</div>` : ''}` : ''}
           </div>
         </details>` : ''}
       ${hasHistory ? html`

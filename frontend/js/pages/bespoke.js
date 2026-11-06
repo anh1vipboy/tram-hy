@@ -3,7 +3,11 @@
 // Không hiện giá theo từng lựa chọn: váy may đo không định giá cố định theo chi tiết được – Atelier tư vấn thiết kế
 // vừa ngân sách và chốt giá sau buổi tư vấn. Ngân sách (giữa khoảng nếu chọn khoảng) là giá tạm tính của đơn.
 // Ướm váy bằng AI lên ảnh thật nằm ở Phòng thử (tryon.html) – "Đặt may theo mẫu này" ở đó dẫn về đây (?tu=anh-vay).
+// AI ngay tại trang (tùy chọn, không chặn đặt lịch): "Vẽ váy của tôi" → ảnh váy đúng thông số → "Ướm lên người mẫu".
+// Ảnh vẽ chỉ gửi kèm đơn khi còn khớp thiết kế hiện tại (đổi chip → phải vẽ lại).
 import { initLayout } from '../core/layout.js';
+import { loginUrl } from '../core/auth.js';
+import { aiDesignDress, aiTryOn, getTryonSettings, creditsUsedToday } from '../services/tryon-ai.js';
 import { $, $$, html, render, money, param, debounce, sleep } from '../core/utils.js';
 import { DRESS_THEME } from '../core/labels.js';
 import { toast, toastError } from '../core/ui.js';
@@ -29,7 +33,26 @@ const state = {
   // Không chọn sẵn: Atelier cần biết đúng mức khách mong muốn, không phải mức mặc định của trang.
   budget: null,
   budgetError: '',
+  ai: { enabled: false, busy: '', remaining: null },   // busy: '' | 'draw' | 'tryon'
 };
+
+// Ảnh AI đã vẽ trong phiên, theo thông số: specKey → { url, hash, tryons: { [modelKey]: url } }
+const aiDraws = new Map();
+const specKey = (d) => JSON.stringify([d.silhouette, d.neckline, d.sleeve, d.fabric, d.train, [...d.extras].sort()]);
+const currentDraw = () => aiDraws.get(specKey(state.design));
+
+// Chưa đăng nhập mà bấm vẽ → đi đăng nhập, mang theo thiết kế để quay lại không mất lựa chọn
+const DESIGN_PARAM = 'thiet-ke';
+function restoreDesign() {
+  let saved;
+  try { saved = JSON.parse(param(DESIGN_PARAM) || 'null'); } catch { return; }
+  if (!saved) return;
+  for (const [group, { choices }] of Object.entries(BESPOKE_OPTIONS)) {
+    if (choices.some((c) => c.key === saved[group])) state.design[group] = saved[group];
+  }
+  if ([0.5, 1, 1.5, 2, 2.5].includes(saved.train)) state.design.train = saved.train;
+  if (Array.isArray(saved.extras)) state.design.extras = BESPOKE_EXTRAS.map((x) => x.key).filter((k) => saved.extras.includes(k));
+}
 
 // 3 đợt giữ cọc của đơn may đo – cùng tỉ lệ / thứ tự với create_booking (SQL 30)
 const STEPS = [
@@ -198,12 +221,96 @@ function initControls() {
   $('#train').addEventListener('input', (e) => {
     state.design.train = Number(e.target.value);
     renderDesign();
+    renderMirror();
     renderSummary();
+  });
+  $('#mirror-ai').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-ai]');
+    if (btn && !btn.disabled) runAi(btn.dataset.ai);
   });
   $('#bespoke-notes').addEventListener('input', debounce(renderSummary, 300));
   $('#book-btn').addEventListener('click', book);
   $('#cta-book').addEventListener('click', book);
   initBudget();
+}
+
+// ---------- AI: VẼ VÁY & ƯỚM ----------
+async function loadAi() {
+  try {
+    const settings = await getTryonSettings();
+    state.ai.enabled = settings.enabled;
+    if (settings.enabled && state.profile) state.ai.remaining = Math.max(0, settings.dailyCredits - await creditsUsedToday());
+  } catch {
+    state.ai.enabled = false;                    // không đọc được cài đặt → giữ trang như cũ, không hiện nút AI
+  }
+}
+
+const AI_FALLBACK = 'AI chưa vẽ được lúc này – bạn vẫn đặt lịch tư vấn bình thường nhé.';
+
+async function runAi(kind) {
+  if (state.ai.busy) return;
+  if (!state.profile) {
+    const back = `thiet-ke-vay.html?${new URLSearchParams({ [DESIGN_PARAM]: JSON.stringify(state.design) })}`;
+    location.href = loginUrl(back);
+    return;
+  }
+  const key = specKey(state.design);
+  const model = state.model;
+  state.ai.busy = kind;
+  const scan = $('#mirror-scan');
+  scan.textContent = kind === 'draw' ? 'AI đang vẽ váy theo thiết kế của bạn… (khoảng 20 giây)' : `AI đang ướm váy lên ${model.name}…`;
+  scan.hidden = false;
+  renderAiBar();
+  try {
+    const result = kind === 'draw'
+      ? await aiDesignDress(state.design)
+      : await aiTryOn({
+        designHash: aiDraws.get(key).hash,
+        sampleModel: model.key,
+        body: state.body,
+        options: { model: 'standard', samples: 1, photoType: 'flat-lay' },
+      });
+    if (result.fallback) {
+      toast(AI_FALLBACK, 'error');
+      return;
+    }
+    if (typeof result.remaining === 'number') state.ai.remaining = result.remaining;
+    if (kind === 'draw') aiDraws.set(key, { url: result.designUrl, hash: result.designHash, tryons: {} });
+    else aiDraws.get(key).tryons[model.key] = result.images?.[0] ?? result.imageUrl;
+  } catch (error) {
+    if (typeof error.remaining === 'number') state.ai.remaining = error.remaining;
+    toastError(error);
+  } finally {
+    state.ai.busy = '';
+    scan.hidden = true;
+    scan.textContent = 'Đang dựng phom váy theo thiết kế của bạn…';
+    renderMirror();
+    renderSummary();
+  }
+}
+
+function renderAiBar() {
+  const bar = $('#mirror-ai');
+  bar.hidden = !state.ai.enabled;
+  if (!state.ai.enabled) return;
+  const draw = currentDraw();
+  const { busy, remaining } = state.ai;
+  const stale = !draw && aiDraws.size > 0;
+  const noCredit = remaining === 0;
+  const status = !state.profile ? 'Đăng nhập để vẽ váy bằng AI.'
+    : noCredit ? 'Hôm nay bạn đã hết lượt AI – vẫn đặt lịch tư vấn được nhé.'
+      : stale ? 'Thiết kế đã đổi so với ảnh AI – vẽ lại để xem đúng mẫu.'
+        : typeof remaining === 'number' ? `Còn ${remaining} lượt AI hôm nay · mỗi lần vẽ hoặc ướm dùng 1 lượt.` : '';
+  render(bar, html`
+    <div class="mirror-ai-actions">
+      <button class="btn btn-primary btn-sm" type="button" data-ai="draw" ${busy || noCredit || draw ? 'disabled' : ''}>
+        ${busy === 'draw' ? 'Đang vẽ…' : draw ? '✓ Đã vẽ thiết kế này' : stale ? '↻ Vẽ lại theo thiết kế mới' : '✨ Vẽ váy của tôi bằng AI'}</button>
+      ${draw ? html`<button class="btn btn-light btn-sm" type="button" data-ai="tryon"
+          ${busy || noCredit || draw.tryons[state.model.key] ? 'disabled' : ''}>
+          ${busy === 'tryon' ? 'Đang ướm…' : `👰 Ướm lên ${state.model.name}`}</button>` : ''}
+    </div>
+    ${status ? html`<p class="small mirror-ai-status" aria-live="polite">${status}</p>` : ''}
+    ${draw ? html`<p class="small mirror-ai-status">Ảnh AI minh họa – váy thật do Atelier chốt sau buổi tư vấn.</p>` : ''}`);
 }
 
 // Hiệu ứng dựng phom ngắn rồi hiện ảnh minh họa mới
@@ -247,6 +354,8 @@ function selection() {
         budget: budget?.label,
         budget_min: budget?.min,
         budget_max: budget?.max,
+        // Ảnh AI vẽ đúng thiết kế đang chọn (ảnh công khai dress-images/bespoke/<hash>) – Atelier xem trong đơn
+        ai_design_hash: currentDraw()?.hash,
       },
     },
   };
@@ -277,9 +386,13 @@ function renderAll() {
 
 function renderMirror() {
   const theme = bespokeTheme(state.design);
-  $('#mirror-img').src = renderImageFor(state.model.key, theme);
-  $('#mirror-label').textContent = `Minh họa: ${DRESS_THEME[theme]}`;
+  const draw = currentDraw();
+  const tryon = draw?.tryons[state.model.key];
+  $('#mirror-img').src = tryon || draw?.url || renderImageFor(state.model.key, theme);
+  $('#mirror-label').textContent = tryon ? `AI ướm lên ${state.model.name}`
+    : draw ? 'Ảnh AI theo thiết kế của bạn' : `Minh họa: ${DRESS_THEME[theme]}`;
   renderFit();
+  renderAiBar();
 }
 
 function renderFit() {
@@ -336,7 +449,7 @@ function renderDesign() {
     chip.addEventListener('click', () => {
       state.design[chip.dataset.group] = chip.dataset.choice;
       if (chip.dataset.group === 'silhouette') redraw();
-      else { renderDesign(); renderSummary(); }
+      else { renderDesign(); renderMirror(); renderSummary(); }
     });
   }
 
@@ -356,6 +469,7 @@ function renderDesign() {
         ? state.design.extras.filter((k) => k !== key)
         : [...state.design.extras, key];
       renderDesign();
+      renderMirror();
       renderSummary();
     });
   }
@@ -401,8 +515,9 @@ function renderSummary() {
 
 // ---------- KHỞI CHẠY TRANG ----------
 initControls();
+restoreDesign();
 if (param('tu') === 'anh-vay') $('#bespoke-notes').value = FROM_TRYON_NOTE;
 renderAll();                       // hiện ngay ảnh minh họa trong lúc chờ tải dữ liệu
 state.profile = await initLayout('bespoke');
-await Promise.all([loadVendor(), loadBodyProfile()]);
+await Promise.all([loadVendor(), loadBodyProfile(), loadAi()]);
 renderAll();

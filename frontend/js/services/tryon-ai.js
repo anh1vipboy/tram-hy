@@ -39,6 +39,14 @@ export const aiTryOn = (params, signal) =>
   invoke('thu-vay-ai', params, 'Không kết nối được dịch vụ thử váy AI, vui lòng thử lại sau', signal);
 
 /**
+ * Vẽ váy may đo từ thông số trang Thiết kế váy: { silhouette, neckline, sleeve, fabric, train, extras }
+ * → { designUrl, designHash, cached, remaining } (ảnh công khai) hoặc { fallback: true, reason }.
+ * Ướm váy vừa vẽ: aiTryOn({ designHash, sampleModel, ... }).
+ */
+export const aiDesignDress = (design, signal) =>
+  invoke('thu-vay-ai', { mode: 'design', design }, 'Không kết nối được dịch vụ vẽ váy AI, vui lòng thử lại sau', signal);
+
+/**
  * Hỏi trợ lý thử váy: { message, hasPerson, garment, model, body, history }
  * → { reply, action: 'tryon'|'chat', prompt, samples, theme, remaining }
  */

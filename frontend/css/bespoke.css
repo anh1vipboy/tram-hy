@@ -68,3 +68,11 @@
   .bespoke-perks li { font-size: 12px; padding: 4px 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .budget-card.nudge { animation: none; } }
+
+/* AI ngay dưới ảnh: vẽ váy theo thiết kế → ướm lên người mẫu (nền tối của .mirror) */
+.mirror-ai { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.mirror-ai-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.mirror-ai-actions .btn { min-height: 40px; }
+.mirror-ai-actions .btn:not(:disabled):active { transform: scale(0.97); }
+.mirror-ai-actions .btn:focus-visible { outline: 2px solid #f3ead9; outline-offset: 2px; }
+.mirror-ai-status { margin: 0; color: #d9cbb8; text-wrap: pretty; }

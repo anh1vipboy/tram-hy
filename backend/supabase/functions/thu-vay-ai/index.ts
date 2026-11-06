@@ -2,9 +2,15 @@
 // Gọi từ trình duyệt (người dùng đã đăng nhập): sb.functions.invoke('thu-vay-ai', { body }).
 // Chỉ ƯỚM váy lên người (1 ảnh người + 1 ảnh váy → ảnh thử) – không đổi nền, không đổi khung, không video.
 //
-// Body: { dressId | garmentPath, photoPath | sampleModel, body?, options?, prompt?, message? }
+// Body: { dressId | garmentPath | designHash, photoPath | sampleModel, body?, options?, prompt?, message? }
 //   dressId     – mẫu váy của tiệm trên Trạm Hỷ (lấy ảnh thật của mẫu)
 //   garmentPath – hoặc ảnh váy mẫu người dùng tự tải lên (bride-photos/<user_id>/garment-...)
+//   designHash  – hoặc váy may đo vừa vẽ bằng AI (dress-images/bespoke/<hash>, xem mode design bên dưới)
+//
+// Body { mode: 'design', design: { silhouette, neckline, sleeve, fabric, train, extras } } – VẼ váy may đo từ
+//   thông số trang Thiết kế váy (Gemini, 1 credit). Chỉ nhận các mã có trong DESIGN_TEXT (không nhận chữ tự do).
+//   Ảnh lưu công khai ở dress-images/bespoke/<sha256 của prompt> – cùng thông số thì dùng lại, không tốn credit.
+//   Trả về { designUrl, designHash, cached, remaining, limit } hoặc { fallback, reason } như trên.
 //   photoPath   – ảnh cô dâu đã tải lên bucket riêng tư bride-photos (<user_id>/body-...)
 //   sampleModel – hoặc dùng ảnh người mẫu có sẵn của web: user | bride1..bride4
 //   body        – { height, weight, heel } số đo để AI đặt độ dài váy cho đúng (model có nhận prompt)
@@ -121,6 +127,47 @@ async function creditsUsedToday(admin: SupabaseClient, userId: string) {
   return count ?? 0;
 }
 
+// Mã lựa chọn ở trang Thiết kế váy (BESPOKE_OPTIONS / BESPOKE_EXTRAS trong tryon-data.js) → mô tả tiếng Anh cho AI
+const DESIGN_TEXT = {
+  silhouette: {
+    aline: 'A-line silhouette', ballgown: 'princess ball gown silhouette with a full voluminous skirt',
+    mermaid: 'mermaid silhouette fitted to the knee then flaring out', sheath: 'sleek minimalist sheath column silhouette',
+    aodai: 'Vietnamese ao dai wedding dress: a long fitted tunic with mandarin collar and side slits over wide silk trousers',
+  },
+  neckline: { sweetheart: 'sweetheart neckline', vneck: 'V-neckline', offshoulder: 'off-the-shoulder neckline', highneck: 'high lace neckline' },
+  sleeve: { none: 'sleeveless', cap: 'short cap sleeves', long: 'long sheer lace sleeves' },
+  fabric: {
+    tulle: 'soft layered tulle', mikado: 'structured Italian silk mikado with a subtle sheen',
+    chantilly: 'delicate French Chantilly lace', brocade: 'Vietnamese silk brocade with woven floral patterns',
+  },
+  extras: { swarovski: 'scattered Swarovski crystal embellishment', flower3d: 'handmade 3D lace flower appliques' },
+} as const;
+type DesignGroup = 'silhouette' | 'neckline' | 'sleeve' | 'fabric';
+
+// Thông số từ trình duyệt → prompt vẽ váy; mã lạ → null (không vẽ)
+function designPrompt(raw: Record<string, unknown> | undefined): string | null {
+  const parts: string[] = [];
+  for (const group of ['silhouette', 'neckline', 'sleeve', 'fabric'] as DesignGroup[]) {
+    const text = (DESIGN_TEXT[group] as Record<string, string>)[String(raw?.[group])];
+    if (!text) return null;
+    parts.push(text);
+  }
+  const train = Number(raw?.train);
+  if (![0.5, 1, 1.5, 2, 2.5].includes(train)) return null;
+  const extras = [...new Set(Array.isArray(raw?.extras) ? raw.extras : [])].sort()
+    .map((k) => (DESIGN_TEXT.extras as Record<string, string>)[String(k)]);
+  if (extras.some((x) => !x)) return null;
+  return `Fashion product photo of ONE ivory wedding dress on an invisible ghost mannequin, full-length front view, centered,
+the whole dress and its ${train} m train visible, plain warm cream studio background, soft even lighting.
+No person, no face, no head, no hands, no text, no watermark. Photorealistic couture detail.
+Dress design: ${parts.join(', ')}${extras.length ? `, ${extras.join(', ')}` : ''}.`;
+}
+
+const sha256 = async (text: string) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)))]
+  .map((b) => b.toString(16).padStart(2, '0')).join('');
+const DESIGN_BUCKET = 'dress-images';                        // công khai: Atelier mở được ảnh trong đơn đặt may
+const isDesignHash = (v: unknown): v is string => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v);
+
 const geminiPrompt = (b: Body) => `Image 1 is a bride. Image 2 is a wedding dress.
 Create a photorealistic full-body photo of the SAME person from image 1 wearing the wedding dress from image 2.
 Keep her face, hairstyle, skin tone, body shape, pose and background exactly as in image 1.
@@ -151,17 +198,21 @@ async function fetchImg(url: string): Promise<Img> {
 
 // ---------- NHÀ CUNG CẤP AI ----------
 
-async function runGemini(person: Img, garment: Img, body: Body): Promise<Result> {
+const GEMINI_MODEL = Deno.env.get('GEMINI_IMAGE_MODEL') ?? 'gemini-3.1-flash-image-preview';
+const geminiTryOnParts = (person: Img, garment: Img, body: Body) =>
+  [{ text: geminiPrompt(body) }, { inlineData: person }, { inlineData: garment }];
+
+// parts: ướm váy (chữ + 2 ảnh) hoặc vẽ váy may đo (chỉ chữ, khung dọc 3:4 giống khung ảnh trang Thiết kế)
+async function runGemini(parts: unknown[], portrait = false): Promise<Result> {
   const key = Deno.env.get('GEMINI_API_KEY');
   if (!key) return { unavailable: 'not-configured' };
-  const model = Deno.env.get('GEMINI_IMAGE_MODEL') ?? 'gemini-3.1-flash-image-preview';
 
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: geminiPrompt(body) }, { inlineData: person }, { inlineData: garment }] }],
-      generationConfig: { responseModalities: ['IMAGE'] },
+      contents: [{ parts }],
+      generationConfig: { responseModalities: ['IMAGE'], ...(portrait ? { imageConfig: { aspectRatio: '3:4' } } : {}) },
     }),
   });
   // Key Free tier / chưa bật thanh toán: Google trả 429 (quota = 0) hoặc 403
@@ -252,8 +303,23 @@ Deno.serve(withCors(async (req) => {
   const { data: { user } } = await admin.auth.getUser(token);
   if (!user) return json({ error: 'Bạn cần đăng nhập để thử váy bằng AI' }, 401);
 
-  const { dressId, garmentPath, photoPath, sampleModel, body: rawBody, options: rawOptions, prompt: rawPrompt, message: rawMessage } =
-    await req.json().catch(() => ({}));
+  const { dressId, garmentPath, designHash, photoPath, sampleModel, body: rawBody, options: rawOptions, prompt: rawPrompt, message: rawMessage,
+    mode, design } = await req.json().catch(() => ({}));
+
+  // VẼ VÁY MAY ĐO: thông số giống nhau → dùng lại ảnh đã vẽ (của bất kỳ ai), không tốn credit
+  const drawing = mode === 'design';
+  let drawPrompt = '', drawHash = '';
+  if (drawing) {
+    const text = designPrompt(design);
+    if (!text) return json({ error: 'Thông số thiết kế không hợp lệ' }, 400);
+    drawPrompt = text;
+    drawHash = await sha256(`${GEMINI_MODEL}\n${text}`);
+    const { data: found } = await admin.storage.from(DESIGN_BUCKET).list('bespoke', { search: drawHash, limit: 1 });
+    if (found?.some((f) => f.name === drawHash)) {
+      const designUrl = admin.storage.from(DESIGN_BUCKET).getPublicUrl(`bespoke/${drawHash}`).data.publicUrl;
+      return json({ designUrl, designHash: drawHash, cached: true });
+    }
+  }
   const styling = cleanText(rawPrompt, 300);
   const message = cleanText(rawMessage, 500);
   const ownsPath = (path: unknown) => typeof path === 'string' && path.startsWith(`${user.id}/`) && !path.includes('..');
@@ -267,12 +333,16 @@ Deno.serve(withCors(async (req) => {
     return json({ error: 'Mô hình Siêu nét đang tắt – hãy chọn Tiêu chuẩn' }, 403);
   }
   // Gemini chỉ trả 1 ảnh, không có tùy chỉnh → tính 1 credit
-  const provider = PROVIDER;
+  const provider = drawing ? 'gemini' : PROVIDER;                   // chỉ Gemini vẽ được váy từ mô tả
   const cost = provider === 'fashn' ? creditCost(options) : 1;
 
-  // Váy: mẫu của tiệm (dressId) hoặc ảnh váy người dùng tự tải (garmentPath)
+  // Váy: mẫu của tiệm (dressId), ảnh váy người dùng tự tải (garmentPath) hoặc váy may đo đã vẽ (designHash)
   let dress: { id: string; image_url: string | null } | null = null;
-  if (garmentPath) {
+  if (drawing) {
+    // không cần váy / người
+  } else if (designHash !== undefined) {
+    if (!isDesignHash(designHash)) return json({ error: 'Ảnh thiết kế không hợp lệ' }, 400);
+  } else if (garmentPath) {
     if (!ownsPath(garmentPath)) return json({ error: 'Ảnh váy không hợp lệ' }, 403);
   } else {
     const { data } = await admin.from('dresses').select('id, image_url, is_active').eq('id', dressId).maybeSingle();
@@ -293,8 +363,10 @@ Deno.serve(withCors(async (req) => {
     }, 429);
   }
 
-  let person: Img;
-  if (photoPath) {
+  let person: Img | null = null;
+  if (drawing) {
+    // vẽ váy không cần ảnh người
+  } else if (photoPath) {
     if (!ownsPath(photoPath)) return json({ error: 'Ảnh không hợp lệ' }, 403);
     const { data, error } = await admin.storage.from('bride-photos').download(photoPath);
     if (error || !data) return json({ error: 'Không đọc được ảnh của bạn, hãy tải ảnh lại' }, 400);
@@ -305,9 +377,15 @@ Deno.serve(withCors(async (req) => {
     return json({ error: 'Vui lòng chọn ảnh người mẫu hoặc tải ảnh của bạn' }, 400);
   }
 
-  let garment: Img;
-  if (dress) {
+  let garment: Img | null = null;
+  if (drawing) {
+    // chưa có váy – sắp vẽ
+  } else if (dress) {
     garment = await fetchImg(dress.image_url!);
+  } else if (designHash) {
+    const { data, error } = await admin.storage.from(DESIGN_BUCKET).download(`bespoke/${designHash}`);
+    if (error || !data) return json({ error: 'Không tìm thấy ảnh thiết kế, hãy vẽ lại' }, 400);
+    garment = await toImg(data);
   } else {
     const { data, error } = await admin.storage.from('bride-photos').download(garmentPath);
     if (error || !data) return json({ error: 'Không đọc được ảnh váy, hãy tải ảnh lại' }, 400);
@@ -334,18 +412,51 @@ Deno.serve(withCors(async (req) => {
   const release = async () => { if (reservationId) await admin.from('tryon_jobs').delete().eq('id', reservationId); };
 
   try {
+    if (drawing) {
+      let drawn: Result;
+      try {
+        drawn = await runGemini([{ text: drawPrompt }], true);
+      } catch (error) {
+        console.error('Vẽ váy AI lỗi:', error);
+        await admin.from('tryon_jobs').insert({ user_id: user.id, provider, status: 'failed', error: String(error).slice(0, 500) });
+        return fallback('provider-error');
+      }
+      if ('unavailable' in drawn) return fallback(drawn.unavailable);
+      const img = drawn.images[0];
+      // Không ghi result_path → không hiện trong lịch sử Phòng thử, nhưng vẫn tính 1 credit trong ngày
+      const upload = await admin.storage.from(DESIGN_BUCKET)
+        .upload(`bespoke/${drawHash}`, img.bytes, { contentType: img.mimeType, upsert: true });
+      if (upload.error) {
+        console.error('Lưu ảnh thiết kế lỗi:', upload.error);
+        return fallback('provider-error');
+      }
+      const job = { user_id: user.id, provider, status: 'done' };
+      const saved = await admin.from('tryon_jobs').insert({ ...job, credits: 1, options: { mode: 'design', design_hash: drawHash } });
+      if (saved.error) await admin.from('tryon_jobs').insert(job);                   // chưa chạy SQL 28
+      return json({
+        designUrl: admin.storage.from(DESIGN_BUCKET).getPublicUrl(`bespoke/${drawHash}`).data.publicUrl,
+        designHash: drawHash,
+        cached: false,
+        remaining: unlimited ? null : Math.max(0, left - 1),
+        limit: settings.limit,
+      });
+    }
+
     const body = readBody(rawBody);
     // garment_path chỉ ghi khi dùng ảnh váy tự tải (cột có từ SQL 12 – thử mẫu của tiệm không phụ thuộc file này)
-    const baseJob = { user_id: user.id, dress_id: dress?.id ?? null, ...(dress ? {} : { garment_path: garmentPath }) };
+    const baseJob = { user_id: user.id, dress_id: dress?.id ?? null, ...(dress || designHash ? {} : { garment_path: garmentPath }) };
+    const tryPerson = person!, tryGarment = garment!;
     let usedProvider = provider;
     let result: Result;
     try {
-      result = provider === 'fashn' ? await runFashn(person, garment, body, options, styling) : await runGemini(person, garment, body);
+      result = provider === 'fashn'
+        ? await runFashn(tryPerson, tryGarment, body, options, styling)
+        : await runGemini(geminiTryOnParts(tryPerson, tryGarment, body));
       // FASHN hết credit → vẫn cho người dùng ướm bằng Gemini (1 ảnh) nếu có key
       if ('unavailable' in result && result.unavailable === 'no-credits' && Deno.env.get('GEMINI_API_KEY')) {
         console.warn('FASHN hết credit → chuyển sang Gemini');
         usedProvider = 'gemini';
-        const backup = await runGemini(person, garment, body);
+        const backup = await runGemini(geminiTryOnParts(tryPerson, tryGarment, body));
         if (!('unavailable' in backup)) result = backup;
       }
     } catch (error) {
