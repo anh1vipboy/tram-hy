@@ -39,6 +39,14 @@ export const aiTryOn = (params, signal) =>
   invoke('thu-vay-ai', params, 'Không kết nối được dịch vụ thử váy AI, vui lòng thử lại sau', signal);
 
 /**
+ * Vẽ váy may đo từ thông số trang Thiết kế váy: { silhouette, neckline, sleeve, fabric, train, extras }
+ * → { designUrl, designHash, cached, remaining } (ảnh công khai) hoặc { fallback: true, reason }.
+ * Ướm váy vừa vẽ: aiTryOn({ designHash, sampleModel, ... }).
+ */
+export const aiDesignDress = (design, signal) =>
+  invoke('thu-vay-ai', { mode: 'design', design }, 'Không kết nối được dịch vụ vẽ váy AI, vui lòng thử lại sau', signal);
+
+/**
  * Hỏi trợ lý thử váy: { message, hasPerson, garment, model, body, history }
  * → { reply, action: 'tryon'|'chat', prompt, samples, theme, remaining }
  */
@@ -154,12 +162,15 @@ export async function listTryonHistory({ before = null, limit = 24 } = {}) {
   const batches = groups.map(({ key, jobs: list }) => {
     const first = list.at(-1);                       // ảnh đầu tiên của lần gửi (danh sách đang mới → cũ)
     const person = personOf(first);
+    const shots = list.slice().reverse().filter((j) => resultUrls.has(j.result_path));
     return {
       id: key,
       createdAt: first.created_at,
       message: first.message ?? '',
       model: first.options?.model ?? null,
-      images: list.slice().reverse().map((j) => resultUrls.get(j.result_path)).filter(Boolean),
+      images: shots.map((j) => resultUrls.get(j.result_path)),
+      resultPaths: shots.map((j) => j.result_path),    // trang Thiết kế váy đính ảnh vào đơn theo đường dẫn
+      garmentPath: first.garment_path && photoUrls.has(first.garment_path) ? first.garment_path : null,
       personUrl: person && !person.startsWith('sample:') ? photoUrls.get(person) ?? null : null,
       personSample: person?.startsWith('sample:') ? person.slice(7) : null,
       personDeleted: Boolean(person) && !person.startsWith('sample:') && !photoUrls.has(person),

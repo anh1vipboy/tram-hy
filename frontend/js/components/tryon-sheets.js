@@ -85,6 +85,23 @@ export function openPersonSheet({ loggedIn, loginHref, getPhotos, max, selectedK
   });
 }
 
+/**
+ * Tấm chọn 1 ảnh từ danh sách (trang Thiết kế váy: lấy ảnh đã ướm ở Phòng thử làm ảnh tham khảo).
+ * shots: [{ key, url, name }] – onPick(key). Danh sách rỗng → hiện lời nhắn empty.
+ */
+export function openShotSheet({ title, shots, empty, onPick }) {
+  openSheet({
+    title,
+    className: 'pick-sheet',
+    onOpen: (body, close) => {
+      render(body, shots.length
+        ? html`<div class="pick-grid">${shots.map((s) => tile({ key: s.key, photo: s.url, name: s.name, active: false }))}</div>`
+        : html`<p class="muted">${empty}</p>`);
+      bindTiles(body, { onPick, onDelete: async () => false, onUpload: () => {}, close, redraw: () => {} });
+    },
+  });
+}
+
 // Nhận diện mẫu váy Hot Trend (nhiều góc ảnh thực tế, ưu đãi sâu hoặc mẫu biểu tượng được thử nhiều nhất)
 const HOT_DRESS_REGEX = /alina|song hỷ|hàn quốc|pha lê royal|camile|bellis|triều nguyễn|mikado/i;
 const photoAnglesCount = (d) => (Array.isArray(d.photos) ? (d.photos[0]?.count ?? d.photos.length) : 0);

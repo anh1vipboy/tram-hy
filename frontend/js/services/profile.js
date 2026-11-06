@@ -40,6 +40,21 @@ export async function listBridePhotos(userId, kind = 'body') {
   return signed.filter((s) => s.signedUrl).map((s) => ({ path: s.path, url: s.signedUrl }));
 }
 
+/**
+ * Link tạm 1 giờ cho ảnh tham khảo của đơn may đo: [{ bucket, path }] → Map("bucket/path" → url).
+ * Chủ tiệm xem được nhờ policy SQL 43; ảnh đã xóa / không có quyền → không có trong Map.
+ */
+export async function signReferenceUrls(refs) {
+  const urls = new Map();
+  for (const bucket of ['bride-photos', 'tryon-results']) {
+    const paths = refs.filter((r) => r.bucket === bucket).map((r) => r.path);
+    if (!paths.length) continue;
+    const { data } = await sb.storage.from(bucket).createSignedUrls(paths, 3600);
+    for (const s of data ?? []) if (s.signedUrl) urls.set(`${bucket}/${s.path}`, s.signedUrl);
+  }
+  return urls;
+}
+
 export async function deleteBridePhoto(path) {
   unwrap(await sb.storage.from(PHOTO_BUCKET).remove([path]));
 }

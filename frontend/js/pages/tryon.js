@@ -19,7 +19,7 @@ import {
 import { openBookingDialog } from '../components/booking-dialog.js';
 import { openDressGallery, realPhotoCount } from '../components/dress-gallery.js';
 import { resultViewer } from '../components/tryon-result.js';
-import { openPersonSheet, openDressSheet, openSettingsSheet, QUALITY_SECONDS } from '../components/tryon-sheets.js?v=5';
+import { openPersonSheet, openDressSheet, openSettingsSheet, QUALITY_SECONDS } from '../components/tryon-sheets.js?v=6';
 import { openPricingModal, openPromoDialog } from '../components/pricing-modal.js';
 import { getMySubscription } from '../services/subscription.js';
 import { MODELS, dressThumb, fitScore } from '../data/tryon-data.js';
@@ -609,7 +609,7 @@ async function runTryOn(run, signal) {
         { act: 'dress', label: '👗 Đổi váy khác' },
         garment.kind === 'dress'
           ? { act: 'book', arg: garment.dress.id, label: '📅 Đặt lịch thử váy này', primary: true }
-          : { act: 'bespoke', label: '✂️ Đặt may theo mẫu này', primary: true },
+          : { act: 'bespoke', arg: result.batchId, label: '✂️ Đặt may theo mẫu này', primary: true },
       ])}`.value);
     scrollToEnd();
   } catch (error) {
@@ -679,7 +679,8 @@ function onThreadClick(e) {
   else if (act === 'book') bookDress(arg);
   else if (act === 'photos') openDressGallery(findDress(arg)).catch(toastError);
   else if (act === 'pick-dress') pickDress(arg, { announce: true });
-  else if (act === 'bespoke') location.href = 'thiet-ke-vay.html?tu=anh-vay';
+  // Mang theo lần ướm (batch) → trang Thiết kế váy tự đính ảnh váy + ảnh ướm vào đơn may đo
+  else if (act === 'bespoke') location.href = `thiet-ke-vay.html?tu=anh-vay${arg ? `&batch=${encodeURIComponent(arg)}` : ''}`;
   else if (act === 'more-history') loadMoreHistory(button);
 }
 

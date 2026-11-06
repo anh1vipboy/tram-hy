@@ -11,8 +11,8 @@
   <link rel="modulepreload" href="js/vendor/supabase-2.117.3.js">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/bespoke.css">
-  <script type="module" src="js/pages/bespoke.js"></script>
+  <link rel="stylesheet" href="css/bespoke.css?v=20261107">
+  <script type="module" src="js/pages/bespoke.js?v=20261107"></script>
 </head>
 <body class="has-sticky-cta">
   <header id="app-header"></header>
@@ -41,6 +41,7 @@
           <span class="mirror-label" id="mirror-label"></span>
           <div class="mirror-scan" id="mirror-scan" hidden>Đang dựng phom váy theo thiết kế của bạn…</div>
         </div>
+        <div class="mirror-ai" id="mirror-ai" hidden></div>
         <div class="fit-score">
           <div class="score" id="fit-score">–</div>
           <div>
@@ -62,8 +63,14 @@
             <textarea class="input" id="bespoke-notes" maxlength="500" placeholder="VD: thêu tên hai vợ chồng ở gấu váy, ren hoa nhỏ ở lưng…"></textarea></label>
         </section>
 
+        <section class="card stack" aria-labelledby="refs-title">
+          <h3 id="refs-title">Ảnh tham khảo <span class="muted small">(không bắt buộc)</span></h3>
+          <p class="small muted" style="margin:0">Mẫu váy bạn thích hoặc ảnh đã ướm ở Phòng thử – Atelier dựa vào đây để tư vấn sát ý bạn.</p>
+          <div id="bespoke-refs" class="stack" style="gap:10px"></div>
+        </section>
+
         <section class="card stack">
-          <h3>2. Người mẫu & số đo</h3>
+          <h3>2. Người mặc thử & số đo</h3>
           <div class="models" id="models"></div>
           <label class="field"><span>Chiều cao: <strong id="height-value"></strong> cm</span>
             <input type="range" id="height" min="140" max="185" value="160"></label>
