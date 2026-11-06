@@ -111,7 +111,7 @@ test.describe('Phòng thử váy AI', () => {
     await page.getByRole('button', { name: '📷 Chọn ảnh của bạn' }).click();
     const sheet = page.locator('dialog.sheet');
     await expect(sheet.getByRole('link', { name: /Đăng nhập để tải ảnh lên/ })).toHaveAttribute('href', /login\.html\?next=tryon\.html/);
-    await expect(sheet.locator('[data-pick^="sample:"]')).toHaveCount(5);
+    await expect(sheet.locator('[data-pick^="sample:"]')).toHaveCount(4);
     await expect(sheet.locator('[data-upload]')).toHaveCount(0);
     await sheet.getByRole('button', { name: 'Đóng' }).click();
     await expect(sheet).toHaveCount(0);

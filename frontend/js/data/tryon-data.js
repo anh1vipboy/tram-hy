@@ -5,7 +5,6 @@
 const IMG = 'assets/images/';
 
 export const MODELS = [
-  { key: 'user',   name: 'Dâu Thảo', photo: `${IMG}user_bride.png` },
   { key: 'bride1', name: 'Dâu Mai',  photo: `${IMG}bride_model_1.png` },
   { key: 'bride2', name: 'Dâu Kim',  photo: `${IMG}bride_model_2.jpg` },
   { key: 'bride3', name: 'Dâu Linh', photo: `${IMG}bride_model_3.png` },
